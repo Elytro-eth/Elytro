@@ -63,7 +63,10 @@ class Networks {
     if (prevState) {
       const state = prevState as CustomChainMapStore;
       this._customChainMapStore.setState(state);
-      this._customChainMap = new Map(state.data.customChainMap);
+      const nets = Object.entries(
+        state.data.customChainMap as Map<string, Chain>
+      );
+      this._customChainMap = new Map(nets);
       this._currentChain = state.data.currentChain;
     }
   }
