@@ -1,8 +1,4 @@
-import {
-  DEFAULT_CHAIN_TYPE,
-  SUPPORTED_CHAIN_MAP,
-  SupportedChainTypeEn,
-} from '@/constants/chains';
+import { chainIdToChainNameMap, SUPPORTED_CHAIN_MAP } from '@/constants/chains';
 import {
   getDomainSeparator,
   getEncoded1271MessageHash,
@@ -33,25 +29,35 @@ import {
 } from 'viem';
 import { createAccount } from '@/utils/ethRpc/create-account';
 import { ethErrors } from 'eth-rpc-errors';
+import { sepolia } from 'viem/chains';
+import eventBus from '@/utils/eventBus';
+import { EVENT_TYPES } from '@/constants/events';
 
 class ElytroSDK {
   private _sdk!: SoulWallet;
   private _bundler!: Bundler;
-  private _chainType!: SupportedChainTypeEn;
+  private _chainId!: number;
   private _config!: SDKInitConfig;
   private _pimlicoRpc: Nullable<PublicClient> = null;
 
   constructor() {
-    this._initByChainType(DEFAULT_CHAIN_TYPE);
+    this._initByChainId(sepolia.id);
+    this._chainChangeWatcher();
   }
 
   get bundler() {
     return this._bundler;
   }
 
-  public resetSDK(chainType: SupportedChainTypeEn) {
-    if (chainType !== this._chainType) {
-      this._initByChainType(chainType);
+  private _chainChangeWatcher() {
+    eventBus.on(EVENT_TYPES.NETWORK.ITEMS_UPDATED, (currentChain) => {
+      this.resetSDK(currentChain.id);
+    });
+  }
+
+  public resetSDK(chainId: number) {
+    if (chainId !== this._chainId) {
+      this._initByChainId(chainId);
     }
   }
 
@@ -63,15 +69,15 @@ class ElytroSDK {
   }
 
   get chain() {
-    return SUPPORTED_CHAIN_MAP[this._chainType];
+    return SUPPORTED_CHAIN_MAP[chainIdToChainNameMap[this._chainId]];
   }
 
-  private _initByChainType(chainType: SupportedChainTypeEn) {
-    this._config = SDK_INIT_CONFIG_BY_CHAIN_MAP[chainType];
+  private _initByChainId(chainId: number) {
+    this._config = SDK_INIT_CONFIG_BY_CHAIN_MAP[chainId];
     const { endpoint, bundler, factory, fallback, recovery } = this._config;
     this._sdk = new SoulWallet(endpoint, bundler, factory, fallback, recovery);
     this._bundler = new Bundler(bundler);
-    this._chainType = chainType;
+    this._chainId = chainId;
   }
 
   /**
@@ -84,9 +90,9 @@ class ElytroSDK {
    */
   public async createWalletAddress(
     eoaAddress: string,
+    chainId: number | string = this.chain.id,
     initialGuardianHash: string = DEFAULT_GUARDIAN_HASH,
-    initialGuardianSafePeriod: number = DEFAULT_GUARDIAN_SAFE_PERIOD,
-    chainId: number | string = this.chain.id
+    initialGuardianSafePeriod: number = DEFAULT_GUARDIAN_SAFE_PERIOD
   ) {
     const initialKeysStrArr = [paddingZero(eoaAddress, 32)];
 

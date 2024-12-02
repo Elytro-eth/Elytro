@@ -11,7 +11,7 @@ export default function TokenList({ data }: TokenListProps) {
     <div className="flex flex-col gap-y-2">
       {data.map((item) => {
         const balance = formatEther(hexToBigInt(item.tokenBalance));
-        const price = Number(balance) / Number(item.price);
+        const price = item.price > 0 ? Number(balance) / Number(item.price) : 0;
         return (
           <TokenItem
             key={item.name}

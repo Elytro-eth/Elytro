@@ -1,5 +1,6 @@
-import { SupportedChainTypeEn } from './chains';
 import { keccak256, encodeAbiParameters, encodePacked, Hex } from 'viem';
+
+import { mainnet, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
 export type SDKInitConfig = {
   endpoint: string; // rpc url
@@ -10,11 +11,8 @@ export type SDKInitConfig = {
   validator: string; // validator address
 };
 
-export const SDK_INIT_CONFIG_BY_CHAIN_MAP: Record<
-  SupportedChainTypeEn,
-  SDKInitConfig
-> = {
-  [SupportedChainTypeEn.OP_SEPOLIA]: {
+export const SDK_INIT_CONFIG_BY_CHAIN_MAP: Record<number, SDKInitConfig> = {
+  [optimismSepolia.id]: {
     endpoint:
       'https://opt-sepolia.g.alchemy.com/v2/q9tQ1GMZy-4gtTuQQO6JF_5m_Bf1NYdq', //this.chain.rpcUrls.default.http[0], //
     bundler:
@@ -25,7 +23,7 @@ export const SDK_INIT_CONFIG_BY_CHAIN_MAP: Record<
     validator: '0x2425b23C5C2B322E664334debBa04eE73871ebf7',
   },
   // TODO: change to respective chain config
-  [SupportedChainTypeEn.ETH]: {
+  [mainnet.id]: {
     endpoint:
       'https://opt-sepolia.g.alchemy.com/v2/q9tQ1GMZy-4gtTuQQO6JF_5m_Bf1NYdq', //this.chain.rpcUrls.default.http[0], //
     bundler:
@@ -35,7 +33,7 @@ export const SDK_INIT_CONFIG_BY_CHAIN_MAP: Record<
     recovery: '0x3Cc36538cf53A13AF5C28BB693091e23CF5BB567',
     validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
   },
-  [SupportedChainTypeEn.ETH_SEPOLIA]: {
+  [sepolia.id]: {
     endpoint:
       // 'https://eth-sepolia.g.alchemy.com/v2/Gp8ptWCctltOyYxWVlQMI_eg8Uj44o64',
       'https://ethereum-sepolia-rpc.publicnode.com',
@@ -46,7 +44,7 @@ export const SDK_INIT_CONFIG_BY_CHAIN_MAP: Record<
     recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
     validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
   },
-  [SupportedChainTypeEn.OP]: {
+  [optimism.id]: {
     endpoint:
       'https://opt-mainnet.g.alchemy.com/v2/GCSFuO3fOSch0AQ4JQThV5CO_McJvA0V', //this.chain.rpcUrls.default.http[0], //
     bundler:

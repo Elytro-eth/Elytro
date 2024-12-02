@@ -213,6 +213,17 @@ const initBackgroundMessage = () => {
       }
     );
   });
+
+  eventBus.on(EVENT_TYPES.NETWORK.ITEMS_UPDATED, (currentChain, chains) => {
+    RuntimeMessage.sendMessage(EVENT_TYPES.NETWORK.ITEMS_UPDATED, {
+      chains,
+      currentChain,
+    });
+  });
+
+  eventBus.on(EVENT_TYPES.ACCOUNT.ITEMS_UPDATED, () => {
+    RuntimeMessage.sendMessage(EVENT_TYPES.ACCOUNT.ITEMS_UPDATED);
+  });
 };
 
 initBackgroundMessage();

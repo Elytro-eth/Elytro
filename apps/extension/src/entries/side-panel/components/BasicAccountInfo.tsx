@@ -12,13 +12,13 @@ import Account from './Account';
 import { useAccount } from '../contexts/account-context';
 
 export default function BasicAccountInfo() {
-  const {
-    accountInfo: { isActivated, address, balance, chainType },
-  } = useAccount();
+  const { currentChain, accounts } = useAccount();
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openSetting, setOpenSetting] = useState(false);
   const [openAccounts, setOpenAccounts] = useState(false);
-
+  const currentAccount = accounts
+    ? accounts.find((account) => account.networkId === currentChain?.id)
+    : null;
   const onClickMore = () => {
     setOpenSetting(true);
   };
@@ -40,7 +40,9 @@ export default function BasicAccountInfo() {
             className="rounded-md p-2 cursor-pointer hover:bg-white"
             onClick={() => setOpenAccounts(true)}
           >
-            <Account chainType={chainType} address={address} />
+            {currentChain && (
+              <Account chain={currentChain} address={currentAccount?.address} />
+            )}
           </div>
           <Button variant="ghost" onClick={onClickMore}>
             <Ellipsis className="w-6 h-6 text-gray-900" />
@@ -48,15 +50,15 @@ export default function BasicAccountInfo() {
         </div>
       </div>
       {/* Balance: $XX.xx */}
-      <div className="mt-6 text-5xl font-medium py-1">
+      {/* <div className="mt-6 text-5xl font-medium py-1">
         <span className=" text-gray-900">{balance?.split?.('.')?.[0]}</span>
         <span className=" text-gray-200">
           .{balance?.split?.('.')?.[1]?.slice(0, 3) || '000'}
         </span>
-      </div>
+      </div> */}
 
       {/* Actions */}
-      {isActivated ? (
+      {currentAccount?.isActivated ? (
         <div className="grid grid-cols-2 gap-2 mt-2 ">
           <ActionButton
             icon={<ArrowDownLeft />}

@@ -11,7 +11,6 @@ type TAccountInfo = {
   ownerAddress: Nullable<string>;
   balance: Nullable<string>;
   isActivated: boolean;
-  chainType: SupportedChainTypeEn;
 };
 
 type TTransactionInfo = {
