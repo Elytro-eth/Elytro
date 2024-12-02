@@ -14,7 +14,13 @@ export default function TokenItem({
   return (
     <div className="flex flex-row items-center justify-between">
       <div className="flex flex-row items-center gap-x-2">
-        <img src={icon} alt={name} className="w-8 h-8" />
+        <img
+          src={
+            icon || 'https://bucket-ue0tq1.s3.us-east-1.amazonaws.com/logo.png'
+          }
+          alt={name}
+          className="w-8 h-8"
+        />
         <p className="text-2xl font-medium">{name}</p>
       </div>
       <div className="flex flex-col items-end gap-x-2">
