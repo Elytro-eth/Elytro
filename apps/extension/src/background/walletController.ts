@@ -10,6 +10,8 @@ import sessionManager from './services/session';
 import { deformatUserOperation } from '@/utils/format';
 import historyManager from './services/history';
 import { UserOperationHistory } from '@/constants/operations';
+import networkService from './services/networks';
+import accountManager, { Account } from './services/accountManager';
 
 // ! DO NOT use getter. They can not be proxied.
 class WalletController {
@@ -115,6 +117,41 @@ class WalletController {
     }));
 
     return res;
+  }
+
+  public getCurrentChain() {
+    return networkService.currentChain;
+  }
+
+  public getChains() {
+    return networkService.chains;
+  }
+
+  public activateAccount(ac: Account) {
+    const account = accountManager.getAccount(ac.networkId);
+    if (account) {
+      accountManager.updateAccount({ ...account, isActivated: true });
+    }
+  }
+
+  public getAccounts() {
+    const accounts = accountManager.accounts;
+    if (accounts.size) {
+      return Array.from(accounts.values());
+    }
+    return [];
+  }
+
+  public async createNewSmartAccount(networkId: number) {
+    const isExist = accountManager.getAccount(networkId);
+    if (isExist) {
+      return;
+    }
+    await accountManager.createNewSmartAccount(networkId);
+  }
+
+  public switchNetwork(networkId: string) {
+    networkService.switchNetwork(networkId);
   }
 }
 

@@ -1,12 +1,12 @@
 import {
+  chainIdToChainNameMap,
   DEFAULT_CHAIN_TYPE,
   SUPPORTED_CHAIN_MAP,
-  SUPPORTED_CHAIN_RPC_URL_MAP,
-  SupportedChainTypeEn,
 } from '@/constants/chains';
 import {
   Address,
   BlockTag,
+  Chain,
   createPublicClient,
   formatEther,
   GetBlockParameters,
@@ -20,26 +20,27 @@ import keyring from './keyring';
 import { elytroSDK } from './sdk';
 import { ethErrors } from 'eth-rpc-errors';
 import { formatBlockInfo, formatBlockParam } from '@/utils/format';
+import networkService from './networks';
+import accountManager from './accountManager';
+import eventBus from '@/utils/eventBus';
+import { EVENT_TYPES } from '@/constants/events';
 
 class ElytroWalletClient {
   private _address: Nullable<Address> = null;
   private _isDeployed: boolean = false;
-  private _chainType: SupportedChainTypeEn = DEFAULT_CHAIN_TYPE;
+  private _chain: Chain = SUPPORTED_CHAIN_MAP[DEFAULT_CHAIN_TYPE];
   private _balance: Nullable<string> = null;
 
   private _client!: PublicClient;
 
   constructor() {
     // default to ETH Sepolia
-    this.init(DEFAULT_CHAIN_TYPE);
-  }
-
-  get chainType() {
-    return this._chainType;
+    this.init(this._chain.id);
+    this._chainChangeWatcher();
   }
 
   get chain() {
-    return SUPPORTED_CHAIN_MAP[this._chainType];
+    return this._chain;
   }
 
   get address() {
@@ -54,22 +55,34 @@ class ElytroWalletClient {
     return this._isDeployed;
   }
 
-  public async init(chainType: SupportedChainTypeEn) {
-    if (!this._client || chainType !== this._chainType) {
-      this._chainType = chainType;
+  private _chainChangeWatcher() {
+    eventBus.on(EVENT_TYPES.NETWORK.ITEMS_UPDATED, (currentChain) => {
+      this.resetClient(currentChain.id);
+    });
+  }
+
+  public resetClient(chainId: number) {
+    this.init(chainId);
+  }
+
+  public async init(chainId: number) {
+    if (!this._client || chainId !== this.chain.id) {
+      this._chain = SUPPORTED_CHAIN_MAP[chainIdToChainNameMap[chainId]];
 
       this._client = createPublicClient({
-        chain: SUPPORTED_CHAIN_MAP[this._chainType],
-        transport: http(SUPPORTED_CHAIN_RPC_URL_MAP[this._chainType]),
+        chain: this._chain,
+        transport: http(this._chain.rpcUrls.default.http[0]),
       });
     }
   }
 
   public async initSmartAccount(): Promise<TAccountInfo | undefined> {
     await keyring.tryUnlock();
-
-    if (keyring.smartAccountAddress) {
-      this._address = keyring.smartAccountAddress;
+    const currentAccount = accountManager.getAccount(
+      networkService.currentChain.id
+    );
+    if (currentAccount) {
+      this._address = currentAccount.address as Address;
       this._isDeployed = await elytroSDK.isSmartAccountDeployed(this._address);
 
       this._balance = formatEther(
@@ -82,7 +95,6 @@ class ElytroWalletClient {
         address: this._address,
         ownerAddress: keyring.owner?.address,
         isActivated: this._isDeployed,
-        chainType: this._chainType,
         balance: this._balance,
       };
     }

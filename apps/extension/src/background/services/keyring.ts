@@ -1,15 +1,15 @@
 import { decrypt, encrypt } from '@/utils/passworder';
 import { localStorage } from '@/utils/storage/local';
 import { SubscribableStore } from '@/utils/store/subscribableStore';
-import { Address, Hex } from 'viem';
+import { Hex } from 'viem';
 import {
   PrivateKeyAccount,
   generatePrivateKey,
   privateKeyToAccount,
 } from 'viem/accounts';
-import { elytroSDK } from './sdk';
 import sessionManager from './session';
 import { sessionStorage } from '@/utils/storage/session';
+import accountManager from './accountManager';
 
 type EncryptedData = {
   key: Hex;
@@ -27,7 +27,6 @@ class KeyringService {
   private _locked = true;
   private _key: Nullable<Hex> = null;
   private _owner: Nullable<PrivateKeyAccount> = null;
-  private _sa: Nullable<Address> = null;
   private _store!: SubscribableStore<KeyringServiceState>;
 
   constructor() {
@@ -65,7 +64,7 @@ class KeyringService {
   }
 
   public get smartAccountAddress() {
-    return this._sa;
+    return 'this._sa';
   }
 
   public async restore() {
@@ -104,7 +103,6 @@ class KeyringService {
     this._locked = true;
     this._key = null;
     this._store?.setState({});
-    this._sa = null;
     sessionStorage.clear(); // clear local password encrypted data
 
     sessionManager.broadcastMessage('accountsChanged', []);
@@ -118,12 +116,10 @@ class KeyringService {
     try {
       this._key = generatePrivateKey();
       this._owner = privateKeyToAccount(this._key);
-      this._sa = await elytroSDK.createWalletAddress(this._owner.address);
 
       const encryptedData = await encrypt(
         {
           key: this._key,
-          sa: this._sa,
         },
         password
       );
@@ -131,6 +127,7 @@ class KeyringService {
         data: encryptedData,
       });
       this._locked = false;
+      await accountManager.createNewSmartAccount();
     } catch {
       this._locked = true;
       throw new Error('Elytro: Failed to create new owner');
@@ -161,10 +158,9 @@ class KeyringService {
     }
 
     try {
-      const { key, sa } = (await decrypt(data, password)) as EncryptedData;
+      const { key } = (await decrypt(data, password)) as EncryptedData;
 
       this._updateOwnerByKey(key as Hex);
-      this._sa = sa as Address;
       this._locked = false;
     } catch {
       this._locked = true;
@@ -176,7 +172,6 @@ class KeyringService {
     this._owner = null;
     this._locked = true;
     this._key = null;
-    this._sa = null;
   }
 
   public async tryUnlock(callback?: () => void) {
