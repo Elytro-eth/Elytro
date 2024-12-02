@@ -13,7 +13,7 @@ export interface Account {
 }
 
 interface AccountState {
-  accounts: Map<string, Account> | null;
+  accounts: { [key: string]: Account } | null;
 }
 
 const ACCOUNTS_STORAGE_KEY = 'elytroAccountsState';
@@ -25,7 +25,7 @@ class AccountManager {
 
   constructor() {
     this._accountStore = new SubscribableStore<AccountState>({
-      accounts: new Map(),
+      accounts: {},
     });
     // localStorage.remove([ACCOUNTS_STORAGE_KEY])
     this._accountStore.subscribe((state) => {
@@ -41,7 +41,7 @@ class AccountManager {
     ]);
     if (prevState) {
       const state = prevState as AccountState;
-      const acs = Object.entries(state.accounts as Map<string, Account>);
+      const acs = Object.entries(state.accounts as { [key: string]: Account });
       this._accountStore.setState(state);
       this._accounts = new Map(acs);
     }
@@ -72,7 +72,7 @@ class AccountManager {
       };
       this._accounts.set(account.networkId.toString(), account);
       this._accountStore.setState({
-        accounts: this._accounts,
+        accounts: Object.fromEntries(this._accounts),
       });
     } catch (error) {
       console.error(error);
@@ -87,7 +87,7 @@ class AccountManager {
   public updateAccount(account: Account) {
     this._accounts.set(account.networkId.toString(), account);
     this._accountStore.setState({
-      accounts: this._accounts,
+      accounts: Object.fromEntries(this._accounts),
     });
   }
 }

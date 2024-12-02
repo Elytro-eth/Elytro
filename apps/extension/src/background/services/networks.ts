@@ -16,7 +16,7 @@ const supportedChains = [mainnet, optimism, optimismSepolia, sepolia];
 
 interface CustomChainMapStore {
   data: {
-    customChainMap: Map<string, Chain>;
+    customChainMap: { [key: string]: Chain };
     currentChain: Chain;
   };
 }
@@ -45,7 +45,7 @@ class Networks {
   private async _init() {
     this._customChainMapStore = new SubscribableStore({
       data: {
-        customChainMap: new Map(),
+        customChainMap: {},
         currentChain: this._currentChain,
       },
     });
@@ -64,7 +64,7 @@ class Networks {
       const state = prevState as CustomChainMapStore;
       this._customChainMapStore.setState(state);
       const nets = Object.entries(
-        state.data.customChainMap as Map<string, Chain>
+        state.data.customChainMap as { [key: string]: Chain }
       );
       this._customChainMap = new Map(nets);
       this._currentChain = state.data.currentChain;
@@ -85,7 +85,7 @@ class Networks {
     }
     this._customChainMapStore.setState({
       data: {
-        customChainMap: this._customChainMap,
+        customChainMap: Object.fromEntries(this._customChainMap),
         currentChain: this._currentChain,
       },
     });
