@@ -30,8 +30,6 @@ import {
 import { createAccount } from '@/utils/ethRpc/create-account';
 import { ethErrors } from 'eth-rpc-errors';
 import { sepolia } from 'viem/chains';
-import eventBus from '@/utils/eventBus';
-import { EVENT_TYPES } from '@/constants/events';
 
 class ElytroSDK {
   private _sdk!: SoulWallet;
@@ -42,17 +40,10 @@ class ElytroSDK {
 
   constructor() {
     this._initByChainId(sepolia.id);
-    this._chainChangeWatcher();
   }
 
   get bundler() {
     return this._bundler;
-  }
-
-  private _chainChangeWatcher() {
-    eventBus.on(EVENT_TYPES.NETWORK.ITEMS_UPDATED, (currentChain) => {
-      this.resetSDK(currentChain.id);
-    });
   }
 
   public resetSDK(chainId: number) {

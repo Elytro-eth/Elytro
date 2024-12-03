@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { useWallet } from '@/contexts/wallet';
+import { Loader2 } from 'lucide-react';
 
 interface IProps {
   open: boolean;
@@ -17,22 +18,35 @@ interface IProps {
 }
 
 export default function AccountsModal({ open, onOpenChange }: IProps) {
-  const { chains, accounts, currentChain } = useAccount();
+  const { chains, accounts, currentChain, getAccounts, updateChains } =
+    useAccount();
   const wallet = useWallet();
+  const [isAdding, setIsAdding] = useState<boolean>(false);
   const [networkId, setNetworkId] = useState<string>('');
   const handleAdd = async () => {
     try {
+      setIsAdding(true);
       if (networkId) {
         await wallet.createNewSmartAccount(Number(networkId));
+        getAccounts();
       }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const handleSwitch = async (networkId: string) => {
+    try {
+      await wallet.switchAccount(networkId);
+      getAccounts();
+      updateChains();
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleSwitch = async (networkId: string | number) => {
-    await wallet.switchNetwork(networkId.toString());
-  };
   if (chains.length === 0) return;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -48,7 +62,9 @@ export default function AccountsModal({ open, onOpenChange }: IProps) {
               {account.address && <div>{account.address}</div>}
               <div>{account.isActivated ? 'Activated' : 'Not Activated'}</div>
               {account.networkId !== currentChain?.id && (
-                <Button onClick={() => handleSwitch(account.networkId)}>
+                <Button
+                  onClick={() => handleSwitch(account.networkId.toString())}
+                >
                   Switch
                 </Button>
               )}
@@ -73,7 +89,10 @@ export default function AccountsModal({ open, onOpenChange }: IProps) {
                   ))}
                 </SelectContent>
               </Select>
-              <Button onClick={handleAdd}>Add</Button>
+              <Button disabled={isAdding} onClick={handleAdd}>
+                {isAdding && <Loader2 className="animate-spin" />}
+                Add
+              </Button>
             </div>
           </div>
           {currentChain ? (

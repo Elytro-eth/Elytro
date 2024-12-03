@@ -12,7 +12,11 @@ import Account from './Account';
 import { useAccount } from '../contexts/account-context';
 
 export default function BasicAccountInfo() {
-  const { currentChain, accounts } = useAccount();
+  const {
+    currentChain,
+    accounts,
+    accountInfo: { balance },
+  } = useAccount();
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openSetting, setOpenSetting] = useState(false);
   const [openAccounts, setOpenAccounts] = useState(false);
@@ -50,12 +54,12 @@ export default function BasicAccountInfo() {
         </div>
       </div>
       {/* Balance: $XX.xx */}
-      {/* <div className="mt-6 text-5xl font-medium py-1">
+      <div className="mt-6 text-5xl font-medium py-1">
         <span className=" text-gray-900">{balance?.split?.('.')?.[0]}</span>
         <span className=" text-gray-200">
           .{balance?.split?.('.')?.[1]?.slice(0, 3) || '000'}
         </span>
-      </div> */}
+      </div>
 
       {/* Actions */}
       {currentAccount?.isActivated ? (

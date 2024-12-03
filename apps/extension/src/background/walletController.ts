@@ -12,6 +12,7 @@ import historyManager from './services/history';
 import { UserOperationHistory } from '@/constants/operations';
 import networkService from './services/networks';
 import accountManager, { Account } from './services/accountManager';
+import { Address, formatEther } from 'viem';
 
 // ! DO NOT use getter. They can not be proxied.
 class WalletController {
@@ -42,7 +43,17 @@ class WalletController {
    * Get Smart Account Info
    */
   public async getSmartAccountInfo() {
-    return await walletClient.initSmartAccount();
+    const account = accountManager.currentAccount;
+    if (account) {
+      const balance = await walletClient.getBalance(account.address as Address);
+      return {
+        address: account.address,
+        ownerAddress: account.ownerAddress,
+        isActivated: account.isActivated,
+        balance: formatEther(balance),
+      };
+    }
+    return null;
     // const res = await walletClient.initSmartAccount();
 
     // if (res) {
@@ -75,7 +86,7 @@ class WalletController {
   public async connectWallet(dApp: TDAppInfo, chainType: SupportedChainTypeEn) {
     connectionManager.connect(dApp, chainType);
     sessionManager.broadcastMessageToDApp(dApp.origin!, 'accountsChanged', [
-      keyring.smartAccountAddress,
+      accountManager?.currentAccount?.address as string,
     ]);
   }
 
@@ -135,23 +146,38 @@ class WalletController {
   }
 
   public getAccounts() {
-    const accounts = accountManager.accounts;
-    if (accounts.size) {
-      return Array.from(accounts.values());
-    }
-    return [];
+    return Array.from(accountManager.accounts.values());
   }
 
-  public async createNewSmartAccount(networkId: number) {
+  public async createNewSmartAccount(
+    networkId: number,
+    setAsCurrent?: boolean
+  ) {
     const isExist = accountManager.getAccount(networkId);
     if (isExist) {
-      return;
+      throw new Error('Elytro: Account already exist');
     }
-    await accountManager.createNewSmartAccount(networkId);
+    try {
+      await accountManager.createNewSmartAccount(networkId, setAsCurrent);
+    } catch (error) {
+      console.error(error);
+      throw new Error('Elytro: Failed to create new account');
+    }
   }
 
-  public switchNetwork(networkId: string) {
-    networkService.switchNetwork(networkId);
+  public getCurrentAccount() {
+    return accountManager.currentAccount;
+  }
+
+  public switchAccount(networkId: string) {
+    const newAccount = accountManager.switchAccout(networkId);
+    if (newAccount) {
+      networkService.switchNetwork(networkId);
+      walletClient.resetClient(Number(networkId));
+      elytroSDK.resetSDK(Number(networkId));
+    } else {
+      throw new Error('Elytro: Account not found');
+    }
   }
 }
 

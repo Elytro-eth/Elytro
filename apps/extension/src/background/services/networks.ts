@@ -8,17 +8,13 @@ import {
 } from 'viem/chains';
 
 import { localStorage } from '@/utils/storage/local';
-import eventBus from '@/utils/eventBus';
-import { EVENT_TYPES } from '@/constants/events';
 
 const customChainMapStoreKey = 'customChainMap';
 const supportedChains = [mainnet, optimism, optimismSepolia, sepolia];
 
 interface CustomChainMapStore {
-  data: {
-    customChainMap: { [key: string]: Chain };
-    currentChain: Chain;
-  };
+  customChainMap: { [key: string]: Chain };
+  currentChain: Chain;
 }
 
 class Networks {
@@ -44,18 +40,11 @@ class Networks {
 
   private async _init() {
     this._customChainMapStore = new SubscribableStore({
-      data: {
-        customChainMap: {},
-        currentChain: this._currentChain,
-      },
+      customChainMap: {},
+      currentChain: this._currentChain,
     });
     this._customChainMapStore.subscribe((state) => {
       localStorage.save({ [customChainMapStoreKey]: state });
-      eventBus.emit(
-        EVENT_TYPES.NETWORK.ITEMS_UPDATED,
-        this._currentChain,
-        this.chains
-      );
     });
     const { [customChainMapStoreKey]: prevState } = await localStorage.get([
       customChainMapStoreKey,
@@ -64,10 +53,10 @@ class Networks {
       const state = prevState as CustomChainMapStore;
       this._customChainMapStore.setState(state);
       const nets = Object.entries(
-        state.data.customChainMap as { [key: string]: Chain }
+        state.customChainMap as { [key: string]: Chain }
       );
       this._customChainMap = new Map(nets);
-      this._currentChain = state.data.currentChain;
+      this._currentChain = state.currentChain;
     }
   }
 
@@ -84,10 +73,8 @@ class Networks {
       }
     }
     this._customChainMapStore.setState({
-      data: {
-        customChainMap: Object.fromEntries(this._customChainMap),
-        currentChain: this._currentChain,
-      },
+      customChainMap: Object.fromEntries(this._customChainMap),
+      currentChain: this._currentChain,
     });
   }
 }

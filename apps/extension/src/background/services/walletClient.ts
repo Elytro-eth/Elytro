@@ -20,10 +20,7 @@ import keyring from './keyring';
 import { elytroSDK } from './sdk';
 import { ethErrors } from 'eth-rpc-errors';
 import { formatBlockInfo, formatBlockParam } from '@/utils/format';
-import networkService from './networks';
 import accountManager from './accountManager';
-import eventBus from '@/utils/eventBus';
-import { EVENT_TYPES } from '@/constants/events';
 
 class ElytroWalletClient {
   private _address: Nullable<Address> = null;
@@ -36,7 +33,6 @@ class ElytroWalletClient {
   constructor() {
     // default to ETH Sepolia
     this.init(this._chain.id);
-    this._chainChangeWatcher();
   }
 
   get chain() {
@@ -53,12 +49,6 @@ class ElytroWalletClient {
 
   get isActivated() {
     return this._isDeployed;
-  }
-
-  private _chainChangeWatcher() {
-    eventBus.on(EVENT_TYPES.NETWORK.ITEMS_UPDATED, (currentChain) => {
-      this.resetClient(currentChain.id);
-    });
   }
 
   public resetClient(chainId: number) {
@@ -78,9 +68,7 @@ class ElytroWalletClient {
 
   public async initSmartAccount(): Promise<TAccountInfo | undefined> {
     await keyring.tryUnlock();
-    const currentAccount = accountManager.getAccount(
-      networkService.currentChain.id
-    );
+    const currentAccount = accountManager.currentAccount;
     if (currentAccount) {
       this._address = currentAccount.address as Address;
       this._isDeployed = await elytroSDK.isSmartAccountDeployed(this._address);
@@ -93,7 +81,7 @@ class ElytroWalletClient {
 
       return {
         address: this._address,
-        ownerAddress: keyring.owner?.address,
+        ownerAddress: keyring.owner?.address as Address,
         isActivated: this._isDeployed,
         balance: this._balance,
       };
@@ -215,11 +203,11 @@ class ElytroWalletClient {
   //   return await this._client.sendRawTransaction({ serializedTransaction });
   // }
 
-  // public async getBalance() {
-  //   return await this._client.getBalance({
-  //     address: keyring.owner?.address as Address,
-  //   });
-  // }
+  public async getBalance(address: Address) {
+    return await this._client.getBalance({
+      address,
+    });
+  }
 }
 
 const walletClient = new ElytroWalletClient();

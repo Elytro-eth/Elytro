@@ -29,6 +29,8 @@ type IAccountContext = {
   accounts: Account[];
   currentChain: Chain | null;
   updateHistory: () => Promise<void>;
+  getAccounts: () => Promise<void>;
+  updateChains: () => void;
 };
 
 const AccountContext = createContext<IAccountContext>({
@@ -44,6 +46,8 @@ const AccountContext = createContext<IAccountContext>({
   chains: [],
   accounts: [],
   currentChain: null,
+  getAccounts: async () => {},
+  updateChains: async () => {},
 });
 
 export const AccountProvider = ({
@@ -141,8 +145,6 @@ export const AccountProvider = ({
 
   useEffect(() => {
     updateChains();
-
-    RuntimeMessage.onMessage(EVENT_TYPES.NETWORK.ITEMS_UPDATED, updateChains);
   }, []);
 
   const getAccounts = async () => {
@@ -154,8 +156,6 @@ export const AccountProvider = ({
 
   useEffect(() => {
     getAccounts();
-
-    RuntimeMessage.onMessage(EVENT_TYPES.ACCOUNT.ITEMS_UPDATED, getAccounts);
   }, []);
 
   return (
@@ -173,6 +173,8 @@ export const AccountProvider = ({
         chains,
         accounts,
         currentChain,
+        getAccounts,
+        updateChains,
       }}
     >
       {children}

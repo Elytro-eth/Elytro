@@ -9,7 +9,6 @@ import {
 } from 'viem/accounts';
 import sessionManager from './session';
 import { sessionStorage } from '@/utils/storage/session';
-import accountManager from './accountManager';
 
 type EncryptedData = {
   key: Hex;
@@ -61,10 +60,6 @@ class KeyringService {
 
   public get owner() {
     return this._owner;
-  }
-
-  public get smartAccountAddress() {
-    return 'this._sa';
   }
 
   public async restore() {
@@ -127,7 +122,6 @@ class KeyringService {
         data: encryptedData,
       });
       this._locked = false;
-      await accountManager.createNewSmartAccount();
     } catch {
       this._locked = true;
       throw new Error('Elytro: Failed to create new owner');
