@@ -6,7 +6,6 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import DAppDetail from '../DAppDetail';
-import { SupportedChainTypeEn } from '@/constants/chains';
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
 import { SignTypeEn, getProcessingFromSignType } from './utils';
@@ -18,14 +17,14 @@ interface ISendTxProps {
   dapp: TDAppInfo;
   onConfirm: (signature: string) => void;
   onCancel: () => void;
-  chainType: SupportedChainTypeEn;
+  chainName: string;
 }
 
 export default function SignDetail({
   onConfirm,
   onCancel,
   dapp,
-  chainType,
+  chainName,
   signData: { method, params },
 }: ISendTxProps) {
   const wallet = useWallet();
@@ -66,7 +65,7 @@ export default function SignDetail({
   return (
     <Card className="w-full max-w-md mx-auto flex-grow flex flex-col min-w-[430px]">
       <CardHeader>
-        <DAppDetail dapp={dapp} chainType={chainType} />
+        <DAppDetail dapp={dapp} chainName={chainName} />
       </CardHeader>
 
       <CardContent className="space-y-4 flex-grow">

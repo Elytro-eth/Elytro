@@ -6,13 +6,16 @@ type TUserOperationPreFundResult = {
   suspiciousOp: boolean;
 };
 
-type TAccountInfo = {
-  address: Nullable<string>;
-  ownerAddress: Nullable<string>;
-  balance: Nullable<string>;
+type Account = {
+  ownerAddress: string;
+  address: string;
+  networkId: string | number;
   isActivated: boolean;
-  chainType: SupportedChainTypeEn;
 };
+
+type TAccountInfo = {
+  balance: Nullable<string>;
+} & Account;
 
 type TTransactionInfo = {
   from: string; // Address

@@ -22,9 +22,7 @@ export default function SendTxModal() {
     url: 'https://elytro.io',
   };
 
-  const {
-    accountInfo: { chainType },
-  } = useAccount();
+  const { currentChain } = useAccount();
 
   return (
     <Dialog open={isSendTxDialogOpen} modal={false}>
@@ -32,7 +30,7 @@ export default function SendTxModal() {
         <SendTxComponent
           txParams={txDetail}
           dapp={dapp}
-          chainType={chainType}
+          chainName={currentChain?.name as string}
           onConfirm={handleConfirm}
           onCancel={closeSendTxDialog}
         />

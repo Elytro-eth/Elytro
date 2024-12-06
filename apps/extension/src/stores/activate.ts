@@ -3,11 +3,13 @@ import { create } from 'zustand';
 import useDialogStore from './dialog';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/entries/side-panel/routes';
+import accountManager from '@/background/services/accountManager';
+import _omit from 'lodash/omit';
 
 interface ActivateState {
   calcResult: Nullable<TUserOperationPreFundResult>;
   deployUserOp: ElytroUserOperation | null;
-  createDeployUserOp: (ownerAddress: string) => Promise<void>;
+  createDeployUserOp: (account: TAccountInfo) => Promise<void>;
   calculateDeployUserOp: (
     userOp: ElytroUserOperation
   ) => Promise<TUserOperationPreFundResult | undefined>;
@@ -34,10 +36,10 @@ const useActivateStore = create<ActivateState>((set, get) => ({
       set({ isCalculating: false });
     }
   },
-  async createDeployUserOp(ownerAddress: string) {
-    const deployUserOp =
-      await elytroSDK.createUnsignedDeployWalletUserOp(ownerAddress);
-
+  async createDeployUserOp(account: TAccountInfo) {
+    const deployUserOp = await elytroSDK.createUnsignedDeployWalletUserOp(
+      account.ownerAddress as string
+    );
     await elytroSDK.estimateGas(deployUserOp);
     const calcResult = await get().calculateDeployUserOp(deployUserOp);
 
@@ -46,6 +48,10 @@ const useActivateStore = create<ActivateState>((set, get) => ({
       useDialogStore.getState().openSignTxDialog(
         deployUserOp,
         () => {
+          accountManager.updateAccount({
+            ..._omit(account, 'balance'),
+            isActivated: true,
+          });
           navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard, {
             activating: '1',
           });

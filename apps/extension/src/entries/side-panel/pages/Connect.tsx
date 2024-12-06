@@ -8,9 +8,7 @@ import Spin from '@/components/Spin';
 export default function Connect() {
   const wallet = useWallet();
   const { approval, resolve, reject } = useApproval();
-  const {
-    accountInfo: { chainType },
-  } = useAccount();
+  const { currentChain } = useAccount();
 
   if (!approval || !approval.data) {
     return <Spin isLoading />;
@@ -22,7 +20,7 @@ export default function Connect() {
 
   const handleConnect = async () => {
     try {
-      await wallet.connectWallet(dApp, chainType);
+      await wallet.connectWallet(dApp, currentChain?.id || 1);
       resolve();
     } catch (error) {
       reject(error as Error);

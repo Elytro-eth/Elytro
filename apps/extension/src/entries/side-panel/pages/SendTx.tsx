@@ -8,9 +8,7 @@ import { SIDE_PANEL_ROUTE_PATHS } from '../routes';
 import { navigateTo } from '@/utils/navigation';
 
 export default function SendTx() {
-  const {
-    accountInfo: { chainType },
-  } = useAccount();
+  const { currentChain } = useAccount();
   const { approval, reject, resolve } = useApproval();
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -47,7 +45,7 @@ export default function SendTx() {
         <SendTxComponent
           txParams={approval.data.tx[0]}
           dapp={approval.data.dApp}
-          chainType={chainType}
+          chainName={currentChain?.name as string}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
         />

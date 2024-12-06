@@ -8,9 +8,7 @@ import { navigateTo } from '@/utils/navigation';
 import SignDetail from '../components/SignDetail';
 
 export default function Sign() {
-  const {
-    accountInfo: { chainType },
-  } = useAccount();
+  const { currentChain } = useAccount();
   const { approval, reject, resolve } = useApproval();
   const [loading, setLoading] = useState(true);
 
@@ -46,7 +44,7 @@ export default function Sign() {
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           dapp={approval.data.dApp}
-          chainType={chainType}
+          chainName={currentChain?.name as string}
           signData={approval.data.sign}
         />
 

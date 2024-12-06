@@ -1,4 +1,3 @@
-import { SupportedChainTypeEn } from '@/constants/chains';
 import { approvalService } from './services/approval';
 import connectionManager from './services/connection';
 import keyring from './services/keyring';
@@ -10,6 +9,9 @@ import sessionManager from './services/session';
 import { deformatUserOperation } from '@/utils/format';
 import historyManager from './services/history';
 import { UserOperationHistory } from '@/constants/operations';
+import networkService from './services/networks';
+import accountManager from './services/accountManager';
+import { Address, formatEther } from 'viem';
 
 // ! DO NOT use getter. They can not be proxied.
 class WalletController {
@@ -40,8 +42,24 @@ class WalletController {
    * Get Smart Account Info
    */
   public async getSmartAccountInfo() {
-    return await walletClient.initSmartAccount();
-    // const res = await walletClient.initSmartAccount();
+    try {
+      if (accountManager.currentAccount) {
+        const balance = await this.getBalance(
+          accountManager.currentAccount.address as Address
+        );
+        const res = {
+          ...accountManager.currentAccount,
+          balance,
+        };
+        return res;
+      }
+
+      throw new Error('Elytro: No current account');
+    } catch (error) {
+      console.error(error);
+      throw new Error('Elytro: Failed to get smart account info');
+    }
+    // return await walletClient.initSmartAccount();
 
     // if (res) {
     //   sessionManager.broadcastMessage('accountsChanged', [res.address]);
@@ -70,10 +88,10 @@ class WalletController {
     return approvalService.rejectApproval(id);
   }
 
-  public async connectWallet(dApp: TDAppInfo, chainType: SupportedChainTypeEn) {
-    connectionManager.connect(dApp, chainType);
+  public async connectWallet(dApp: TDAppInfo, chainId: number) {
+    connectionManager.connect(dApp, chainId);
     sessionManager.broadcastMessageToDApp(dApp.origin!, 'accountsChanged', [
-      keyring.smartAccountAddress,
+      accountManager?.currentAccount?.address as string,
     ]);
   }
 
@@ -115,6 +133,62 @@ class WalletController {
     }));
 
     return res;
+  }
+
+  public getCurrentChain() {
+    return networkService.currentChain;
+  }
+
+  public getChains() {
+    return networkService.chains;
+  }
+
+  public activateAccount(ac: Account) {
+    const account = accountManager.getAccount(ac.networkId);
+    if (account) {
+      accountManager.updateAccount({ ...account, isActivated: true });
+    }
+  }
+
+  public getAccounts() {
+    return Array.from(accountManager.accounts.values());
+  }
+
+  public async createNewSmartAccount(
+    networkId: number,
+    setAsCurrent?: boolean
+  ) {
+    const isExist = accountManager.getAccount(networkId);
+    if (isExist) {
+      throw new Error('Elytro: Account already exist');
+    }
+    try {
+      await accountManager.createNewSmartAccount(networkId, setAsCurrent);
+    } catch (error) {
+      console.error(error);
+      throw new Error('Elytro: Failed to create new account');
+    }
+  }
+
+  public getCurrentAccount() {
+    return accountManager.currentAccount;
+  }
+
+  public switchAccount(networkId: string) {
+    const newAccount = accountManager.switchAccount(networkId);
+    if (newAccount) {
+      networkService.switchNetwork(networkId);
+      walletClient.resetClient(Number(networkId));
+      elytroSDK.resetSDK(Number(networkId));
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public async getBalance(address: Address) {
+    const res = await walletClient.getBalance(address);
+    return formatEther(res);
   }
 }
 

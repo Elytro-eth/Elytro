@@ -1,10 +1,9 @@
-import { SupportedChainTypeEn } from '@/constants/chains';
 import { localStorage } from '@/utils/storage/local';
 import { SubscribableStore } from '@/utils/store/subscribableStore';
 import sessionManager from './session';
 
 type TConnectedDAppInfo = TDAppInfo & {
-  chainType: SupportedChainTypeEn;
+  chainId: number;
   isConnected: boolean;
   permissions: WalletPermission[];
 };
@@ -58,7 +57,7 @@ class ConnectionManager {
     this._initialized = true;
   }
 
-  public connect(dApp: TDAppInfo, chainType: SupportedChainTypeEn) {
+  public connect(dApp: TDAppInfo, chainId: number) {
     if (!dApp.origin) {
       return;
     }
@@ -66,7 +65,7 @@ class ConnectionManager {
     this.addConnectedSite({
       ...dApp,
       isConnected: true,
-      chainType: chainType,
+      chainId,
       permissions: [
         {
           parentCapability: 'eth_accounts',

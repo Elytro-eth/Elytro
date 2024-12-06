@@ -1,12 +1,13 @@
 import { BackArrow } from '@/assets/icons/BackArrow';
 import { ChevronRight } from 'lucide-react';
 import { useState } from 'react';
-import { arbitrum, base, Chain, optimism } from 'viem/chains';
+import { Chain } from 'viem/chains';
 import NetworkEditor from './NetworkEditor';
+import { useAccount } from '../../contexts/account-context';
 
 export default function NetworkSetting({ onBack }: { onBack: () => void }) {
   // TODO: change it to supported networks
-  const networks = [optimism, arbitrum, base];
+  const { chains: networks } = useAccount();
   const [editingNetwork, setEditingNetwork] = useState<Chain | null>(null);
   return (
     <>

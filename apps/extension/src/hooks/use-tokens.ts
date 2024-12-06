@@ -1,5 +1,6 @@
 import { gql, useQuery } from '@apollo/client';
-import { Address, Hex } from 'viem';
+import { useEffect } from 'react';
+import { Address, Hex, toHex } from 'viem';
 
 export interface TokenDTO {
   decimals: number;
@@ -14,7 +15,13 @@ interface TokenQueryDTO {
   tokens: TokenDTO[];
 }
 
-export default function useTokens(address?: Address, chainId?: Hex) {
+export default function useTokens({
+  chainId,
+  address,
+}: {
+  chainId: number;
+  address?: Address;
+}) {
   const tokens_query = gql`
     query TokensQuery($address: String!, $chainId: String!) {
       tokens(address: $address, chainID: $chainId) {
@@ -27,9 +34,13 @@ export default function useTokens(address?: Address, chainId?: Hex) {
       }
     }
   `;
-
+  useEffect(() => {
+    if (address && chainId) {
+      refetch();
+    }
+  }, [address, chainId]);
   const { loading, data, refetch } = useQuery<TokenQueryDTO>(tokens_query, {
-    variables: { address, chainId },
+    variables: { address, chainId: toHex(chainId as number) },
   });
 
   return {

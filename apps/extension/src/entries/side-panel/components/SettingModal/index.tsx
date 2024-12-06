@@ -8,6 +8,7 @@ import ReceiveAddress from '../ReceiveAddress';
 import { useAccount } from '../../contexts/account-context';
 import NetworkSetting from './NetworkSetting';
 import { useKeyring } from '@/contexts/keyring';
+import { Chain } from 'viem';
 
 interface IProps {
   open: boolean;
@@ -16,7 +17,8 @@ interface IProps {
 
 export default function SettingModal({ open, onOpenChange }: IProps) {
   const {
-    accountInfo: { chainType, address },
+    accountInfo: { address },
+    currentChain,
   } = useAccount();
   const [currentSetting, setCurrentSetting] = useState('');
   const { lock } = useKeyring();
@@ -61,7 +63,7 @@ export default function SettingModal({ open, onOpenChange }: IProps) {
             <div className="flex justify-center">
               <ReceiveAddress
                 address={address as string}
-                chainType={chainType}
+                currentChain={currentChain as Chain}
               />
             </div>
           </>

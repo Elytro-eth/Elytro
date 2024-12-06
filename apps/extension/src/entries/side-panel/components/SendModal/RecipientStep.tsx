@@ -1,6 +1,5 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { SUPPORTED_CHAIN_ICON_MAP } from '@/constants/chains';
 import questionIcon from '@/assets/icons/question.svg';
 import {
   Tooltip,
@@ -24,9 +23,7 @@ import { useElytroStep } from '@/components/steps/StepProvider';
 import { TxData } from '.';
 
 export default function RecipientStep() {
-  const {
-    accountInfo: { chainType },
-  } = useAccount();
+  const { currentChain } = useAccount();
   const { handleContinue } = useElytroStep();
   const formResolverConfig = z.object({
     address: z.string().refine((address) => isAddress(address), {
@@ -68,16 +65,7 @@ export default function RecipientStep() {
       <div className="space-y-2">
         <Label className="text-gray-400 font-normal">Network</Label>
         <div className="flex flex-row items-center font-medium text-lg space-x-2">
-          <img
-            className="w-10 h-10"
-            src={
-              SUPPORTED_CHAIN_ICON_MAP[
-                chainType as keyof typeof SUPPORTED_CHAIN_ICON_MAP
-              ]
-            }
-            alt={chainType}
-          />
-          <div>{chainType}</div>
+          <div>{currentChain?.name}</div>
           <Tooltip>
             <TooltipTrigger>
               <img src={questionIcon} alt="question icon" />

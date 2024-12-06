@@ -37,12 +37,12 @@ class RPCCacheManager extends CacheManager {
     }
   }
 
-  private _getLatestBlockNumber(chain: SupportedChainTypeEn) {
+  private _getLatestBlockNumber(chain: number) {
     return this._latestBlockNumberByChain[chain] ?? 0;
   }
 
   protected _getCacheKey(
-    chainId: SupportedChainTypeEn,
+    chainId: number,
     address: string,
     method: string,
     params: SafeAny
@@ -51,7 +51,7 @@ class RPCCacheManager extends CacheManager {
   }
 
   public set(
-    chainId: SupportedChainTypeEn,
+    chainId: number,
     address: string,
     request: RequestArguments,
     result: SafeAny,
@@ -82,7 +82,7 @@ class RPCCacheManager extends CacheManager {
   }
 
   public get(
-    chainId: SupportedChainTypeEn,
+    chainId: number,
     address: string,
     request: RequestArguments
   ): SafeAny | null {

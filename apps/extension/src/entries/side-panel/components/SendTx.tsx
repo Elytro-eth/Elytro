@@ -8,7 +8,6 @@ import {
 import DAppDetail from './DAppDetail';
 import TxDetail, { SendTxTypeEn } from './TxDetail';
 import GasEstimation, { TGasEstimate } from './GasEstimation';
-import { SupportedChainTypeEn } from '@/constants/chains';
 import { useEffect, useRef, useState } from 'react';
 import { useWallet } from '@/contexts/wallet';
 import { elytroSDK } from '@/background/services/sdk';
@@ -25,7 +24,7 @@ interface ISendTxProps {
   dapp: TDAppInfo;
   onConfirm: () => void;
   onCancel: () => void;
-  chainType: SupportedChainTypeEn;
+  chainName: string;
 }
 
 export default function SendTx({
@@ -33,7 +32,7 @@ export default function SendTx({
   onConfirm,
   onCancel,
   dapp,
-  chainType,
+  chainName,
 }: ISendTxProps) {
   const gasEstimationRef = useRef<TGasEstimate>();
   const wallet = useWallet();
@@ -130,7 +129,7 @@ export default function SendTx({
     <Card className="w-full max-w-md mx-auto flex-grow flex flex-col min-w-[430px]">
       <Spin isLoading={isLoading} />
       <CardHeader>
-        <DAppDetail dapp={dapp} chainType={chainType} />
+        <DAppDetail dapp={dapp} chainName={chainName} />
       </CardHeader>
 
       <CardContent className="space-y-4 flex-grow">

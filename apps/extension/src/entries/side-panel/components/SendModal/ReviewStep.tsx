@@ -1,6 +1,5 @@
 import { Label } from '@/components/ui/label';
 import { useAccount } from '../../contexts/account-context';
-import { SUPPORTED_CHAIN_ICON_MAP } from '@/constants/chains';
 import {
   Tooltip,
   TooltipContent,
@@ -17,7 +16,8 @@ import useDialogStore from '@/stores/dialog';
 
 export default function ReviewStep({ onConfirm }: { onConfirm: () => void }) {
   const {
-    accountInfo: { chainType, address },
+    accountInfo: { address },
+    currentChain,
   } = useAccount();
   const { stepData } = useElytroStep() as { stepData: TxData };
   const { openSendTxDialog, closeSendTxDialog } = useDialogStore();
@@ -68,16 +68,7 @@ export default function ReviewStep({ onConfirm }: { onConfirm: () => void }) {
       <div className="space-y-2">
         <Label className="text-gray-400 font-normal">Network</Label>
         <div className="flex flex-row items-center font-medium text-lg space-x-2">
-          <img
-            className="w-10 h-10"
-            src={
-              SUPPORTED_CHAIN_ICON_MAP[
-                chainType as keyof typeof SUPPORTED_CHAIN_ICON_MAP
-              ]
-            }
-            alt={chainType}
-          />
-          <div>{chainType}</div>
+          <div>{currentChain?.name}</div>
           <Tooltip>
             <TooltipTrigger>
               <img src={questionIcon} alt="question icon" />

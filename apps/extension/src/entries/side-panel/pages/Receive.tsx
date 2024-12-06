@@ -4,7 +4,8 @@ import { useAccount } from '../contexts/account-context';
 
 export default function Receive() {
   const {
-    accountInfo: { address, chainType },
+    accountInfo: { address },
+    currentChain,
   } = useAccount();
 
   return (
@@ -16,7 +17,7 @@ export default function Receive() {
         }}
       />
       <h1 className="text-2xl text-gray-900 font-medium my-8">Receive</h1>
-      <ReceiveAddress address={address!} chainType={chainType!} />
+      <ReceiveAddress address={address!} currentChain={currentChain!} />
     </div>
   );
 }

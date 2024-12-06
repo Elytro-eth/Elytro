@@ -12,7 +12,9 @@ class ReqCacheManager extends CacheManager {
   ];
 
   protected _getCacheKey(method: string, params: unknown[]): string {
-    return `${method}_${params.join('_')}`;
+    // if params is empty, use timestamp as key
+    const paramsKey = params.length ? params.join('_') : new Date().getTime();
+    return `${method}_${paramsKey}`;
   }
 
   public set(method: string, params: unknown[], res: unknown): void {

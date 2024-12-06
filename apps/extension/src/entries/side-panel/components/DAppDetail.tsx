@@ -1,12 +1,11 @@
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { SupportedChainTypeEn } from '@/constants/chains';
 
 interface IDAppDetail {
   dapp: TDAppInfo;
-  chainType: SupportedChainTypeEn;
+  chainName: string;
 }
 
-export default function DAppDetail({ dapp, chainType }: IDAppDetail) {
+export default function DAppDetail({ dapp, chainName }: IDAppDetail) {
   return (
     <div className="flex items-center mb-2 w-full flex-grow">
       {/* DApp Icon & Chain Icon */}
@@ -21,10 +20,10 @@ export default function DAppDetail({ dapp, chainType }: IDAppDetail) {
             src={
               'https://assets.coingecko.com/coins/images/25244/standard/Optimism.png'
             }
-            alt={`${chainType} logo`}
+            alt={`${chainName} logo`}
           />
           <AvatarFallback>
-            {chainType?.slice(0, 2)?.toUpperCase()}
+            {chainName?.slice(0, 2)?.toUpperCase()}
           </AvatarFallback>
         </Avatar>
       </div>

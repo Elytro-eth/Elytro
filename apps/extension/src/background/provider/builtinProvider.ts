@@ -4,7 +4,7 @@ import { Address, BlockTag, toHex } from 'viem';
 import walletClient from '../services/walletClient';
 import { ethErrors } from 'eth-rpc-errors';
 import { rpcCacheManager } from '@/utils/cache/rpcCacheManager';
-import keyring from '../services/keyring';
+import accountManager from '../services/accountManager';
 
 /**
  * Elytro Builtin Provider: based on EIP-1193
@@ -48,7 +48,9 @@ class BuiltinProvider extends SafeEventEmitter {
       case 'eth_accounts':
       case 'eth_requestAccounts':
         // TODO: 替换为 account manager
-        return keyring.smartAccountAddress ? [keyring.smartAccountAddress] : [];
+        return accountManager.currentAccount?.address
+          ? [accountManager.currentAccount?.address]
+          : [];
       case 'eth_getBlockByNumber':
         return await walletClient.getBlockByNumber({
           blockTag: (params as [BlockTag])?.[0] ?? 'latest',
@@ -74,7 +76,7 @@ class BuiltinProvider extends SafeEventEmitter {
 
   public async request({ method, params }: RequestArguments) {
     const cacheResult = rpcCacheManager.get(
-      walletClient.chainType,
+      walletClient.chain.id,
       walletClient.address ?? '0x',
       { method, params }
     );
@@ -86,7 +88,7 @@ class BuiltinProvider extends SafeEventEmitter {
     const result = await this._request({ method, params });
 
     rpcCacheManager.set(
-      walletClient.chainType,
+      walletClient.chain.id,
       walletClient.address ?? '0x',
       { method, params },
       result
