@@ -31,7 +31,7 @@ export default function TxConfirm() {
   } = useTx();
   const { currentChain } = useChain();
   const [isSending, setIsSending] = useState(false);
-  const { reject, resolve, approval } = useApproval();
+  const { reject, resolve } = useApproval();
 
   const renderContent = useMemo(() => {
     if (isPacking) return <ProcessingTip />;
@@ -43,7 +43,6 @@ export default function TxConfirm() {
           calcResult={calcResult}
           chainId={currentChain!.id}
           decodedUserOp={decodedDetail}
-          session={approval?.data?.dApp}
           from={userOp?.sender}
         />
       );

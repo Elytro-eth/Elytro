@@ -4,6 +4,8 @@ import InfoCard from '../InfoCard';
 import TokenAmountItem from '../TokenAmountItem';
 import FragmentedAddress from '../FragmentedAddress';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
+import { useApproval } from '@/contexts/approval-context';
+import { UserOpType } from '@/contexts/tx-context';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -13,9 +15,10 @@ interface IApprovalDetailProps {
 }
 
 export default function ApprovalDetail({
-  session,
   decodedUserOp,
 }: IApprovalDetailProps) {
+  const { approval } = useApproval();
+
   if (!decodedUserOp) {
     return null;
   }
@@ -24,7 +27,13 @@ export default function ApprovalDetail({
 
   return (
     <>
-      <SessionCard session={session} />
+      <SessionCard
+        session={
+          approval?.type === UserOpType.ApproveTransaction
+            ? approval?.data?.dApp
+            : undefined
+        }
+      />
       <InfoCardList>
         <InfoCardItem
           label="Sending"
