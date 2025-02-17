@@ -135,20 +135,7 @@ export default function SendTx() {
   };
 
   return (
-    <SecondaryPageWrapper
-      title="Send"
-      footer={
-        <Button
-          variant="secondary"
-          size="large"
-          className="w-full"
-          disabled={!form.formState.isValid}
-          onClick={handleContinue}
-        >
-          Continue
-        </Button>
-      }
-    >
+    <SecondaryPageWrapper title="Send">
       <div>
         <Form {...form}>
           <div className="bg-light-green rounded-sm">
@@ -217,7 +204,7 @@ export default function SendTx() {
             </div>
           </div>
         </Form>
-        <div className="p-4 bg-gray-150 rounded-sm space-y-2">
+        <div className="p-4 bg-gray-150 rounded-sm space-y-2 mb-4">
           <div className="flex justify-between items-center">
             <div className="font-bold text-base text-gray-750">
               From account
@@ -236,6 +223,16 @@ export default function SendTx() {
             </div>
           </div>
         </div>
+
+        <Button
+          variant="secondary"
+          size="large"
+          className="w-full gap-xl"
+          disabled={!form.formState.isValid}
+          onClick={handleContinue}
+        >
+          Continue
+        </Button>
       </div>
     </SecondaryPageWrapper>
   );
