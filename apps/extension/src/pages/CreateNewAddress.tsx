@@ -48,19 +48,7 @@ export default function CreateNewAddress() {
     }
   };
   return (
-    <SecondaryPageWrapper
-      title="Create New Address"
-      footer={
-        <Button
-          size="large"
-          className="w-full"
-          onClick={handleCreate}
-          disabled={!selectedChain}
-        >
-          Create
-        </Button>
-      }
-    >
+    <SecondaryPageWrapper title="Create New Address">
       <div className=" text-lg font-bold mb-2">Create a new address</div>
       <div className="text-gray-600 mb-2">
         You are about to create a new address within the below network. You can
@@ -79,6 +67,15 @@ export default function CreateNewAddress() {
           );
         })}
       </div>
+
+      <Button
+        size="large"
+        className="w-full mt-4"
+        onClick={handleCreate}
+        disabled={!selectedChain}
+      >
+        Create
+      </Button>
     </SecondaryPageWrapper>
   );
 }
