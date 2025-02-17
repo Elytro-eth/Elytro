@@ -139,10 +139,10 @@ export default function TxConfirm() {
       title={UserOpTitleMap[opType!]}
     >
       {/* Content */}
-      <div className="flex flex-col gap-y-md pb-14">{renderContent}</div>
+      <div className="flex flex-col gap-y-md">{renderContent}</div>
 
       {/* Footer */}
-      <div className="flex w-full mt-auto">
+      <div className="flex w-full mt-10">
         <div className="flex w-full gap-x-2">
           <Button
             variant="ghost"
