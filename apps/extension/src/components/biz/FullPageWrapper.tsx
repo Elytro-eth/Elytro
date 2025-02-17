@@ -23,7 +23,7 @@ export default function FullPageWrapper({
   return (
     <div
       className={cn(
-        'elytro-gradient-bg flex flex-col flex-grow justify-center items-center p-sm relative',
+        'elytro-gradient-bg w-full flex flex-col flex-grow justify-center items-center p-sm relative',
         className
       )}
     >
@@ -34,7 +34,7 @@ export default function FullPageWrapper({
         />
       )}
 
-      <div className="flex flex-col items-center justify-center gap-y-2xl">
+      <div className="flex flex-col w-full items-center justify-center gap-y-2xl">
         {children}
       </div>
     </div>
