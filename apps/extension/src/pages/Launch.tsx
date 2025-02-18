@@ -71,6 +71,7 @@ export default function Launch() {
             {/* TODO: navigate to new create account page */}
             <Button
               size="large"
+              className="mb-3"
               onClick={() => {
                 navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreatePasscode);
               }}
@@ -101,7 +102,7 @@ export default function Launch() {
   const { title, content, iconImg } = renderContent;
 
   return (
-    <div className="elytro-gradient-bg flex flex-1 flex-col items-center justify-center px-3xl h-full gap-y-3xl">
+    <div className="elytro-gradient-bg flex flex-1 flex-col items-center justify-center px-xl h-full gap-y-3xl">
       <img src={iconImg} alt="Launch" className="size-[164px]" />
       <h1 className="elytro-text-headline text-center">{title}</h1>
       <div className="flex flex-col w-full">{content}</div>

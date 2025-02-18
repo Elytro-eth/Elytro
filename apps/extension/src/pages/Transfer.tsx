@@ -9,8 +9,12 @@ export default function Transfer() {
   return (
     <FullPageWrapper>
       <img src={WalletImg} alt="Wallet" className="size-[144px]" />
-      <div className="text-center flex flex-col gap-y-2xs">
-        <h1 className="elytro-text-subtitle">Manage your Elytro accounts</h1>
+      <div className="text-center flex flex-col ap-y-2xs">
+        <h1 className="elytro-text-subtitle mb-2">
+          Manage your
+          <br />
+          Elytro accounts
+        </h1>
         <p className="elytro-text-smaller-body text-gray-600">
           Smart contract accounts created on Elytro only
         </p>

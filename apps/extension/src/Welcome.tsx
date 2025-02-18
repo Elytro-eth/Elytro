@@ -27,8 +27,8 @@ const Welcome = () => (
     <main className="rounded-sm p-4xl bg-white w-[480px]">
       <h1 className="elytro-text-headline mb-lg ">Welcome to Elytro</h1>
       <p className="elytro-text-body opacity-60">
-        You can now add or import your smart contract accounts to start
-        exploring Ethereum.
+        Set up or import your smart contract wallets to start exploring
+        Ethereum.
       </p>
 
       <Button
@@ -39,7 +39,7 @@ const Welcome = () => (
           })
         }
       >
-        Open Elytro to get started
+        Launch Elytro
       </Button>
     </main>
     <footer className="flex gap-4 items-center mt-6">

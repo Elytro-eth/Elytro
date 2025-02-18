@@ -20,10 +20,11 @@ const passwordForm = z
       .string()
       .min(6, {
         message:
-          'The passcode should be more than 6 characters and include more than 1 capitalized letter.',
+          'Must be more than 6 characters with more than 1 capitalized letter.',
       })
       .refine((value) => /[A-Z]/.test(value), {
-        message: 'The passcode should include more than 1 capitalized letter.',
+        message:
+          'Must be more than 6 characters with more than 1 capitalized letter.',
       }),
     confirm: z.string(),
   })
@@ -73,8 +74,7 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
                   <FormMessage />
                 ) : (
                   <FormDescription>
-                    The passcode should be more than 6 characters and include
-                    more than 1 capitalized letter.
+                    More than 6 characters and at least 1 capitalized letter.
                   </FormDescription>
                 )}
               </FormItem>

@@ -79,7 +79,8 @@ export function UserOpDetail({
               )}
               <span
                 className={cn({
-                  'line-through text-gray-600': calcResult?.hasSponsored,
+                  'line-through font-bold text-sm text-gray-600':
+                    calcResult?.hasSponsored,
                 })}
               >
                 {formatGasUsed(calcResult?.gasUsed)} ETH
@@ -93,7 +94,7 @@ export function UserOpDetail({
       {opType === UserOpType.ApproveTransaction && (
         <div>
           <button
-            className="flex items-center justify-center gap-x-2xs elytro-text-tiny-body text-gray-750 "
+            className="flex items-center justify-center gap-x-2xs elytro-text-tiny-body text-gray-750 mb-sm"
             onClick={() => setShowRawData((prev) => !prev)}
           >
             Raw Data
@@ -101,10 +102,11 @@ export function UserOpDetail({
           </button>
           <pre
             className={`
-            elytro-text-smaller-body text-gray-500 overflow-auto w-full flex-grow px-lg py-md bg-gray-150 rounded-2xs
-            transition-opacity duration-300
-            ${showRawData ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
-          `}
+              elytro-text-code-body text-gray-500 overflow-auto w-full flex-grow px-lg py-md bg-gray-150 rounded-2xs
+              transition-opacity whitespace-pre-wrap
+              ${showRawData ? 'block' : 'hidden'}
+              `}
+            style={{ userSelect: 'text' }}
           >
             {formatRawData(decodedUserOp)}
           </pre>

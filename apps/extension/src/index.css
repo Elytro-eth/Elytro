@@ -134,12 +134,12 @@
     @apply elytro-text-smaller-body font-bold;
   }
 
-  .elytro-text-tiny-body {
-    @apply text-[12px] font-normal leading-[140%] text-black-blue;
+  .elytro-text-code-body {
+    @apply text-[10px] font-normal leading-[140%] text-black-blue;
   }
 
-  .elytro-text-tiny-bold-body {
-    @apply elytro-text-tiny-body font-bold;
+  .elytro-text-tiny-body {
+    @apply text-[12px] font-normal leading-[140%] text-black-blue;
   }
 
   .elytro-clickable-icon {
