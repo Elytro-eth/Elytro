@@ -8,7 +8,7 @@ import {
   toBytes,
 } from 'viem';
 
-export const DEFAULT_GUARDIAN_SAFE_PERIOD = 5;
+export const DEFAULT_GUARDIAN_SAFE_PERIOD = 48 * 60 * 60; // 48 hours in seconds
 
 export const DEFAULT_GUARDIAN_HASH = zeroHash;
 

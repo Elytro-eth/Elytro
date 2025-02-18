@@ -15,7 +15,7 @@ enum ShowType {
 export default function RecoverySettings() {
   const { wallet } = useWallet();
   const {
-    accountInfo: { address },
+    currentAccount: { address },
   } = useAccount();
   const [loading, setLoading] = useState(false);
   const [contacts, setContacts] = useState<TRecoveryContact[]>([]);

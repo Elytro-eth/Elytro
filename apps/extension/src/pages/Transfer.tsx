@@ -3,23 +3,14 @@ import { Button } from '@/components/ui/button';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
 import { toast } from '@/hooks/use-toast';
-import { useWallet } from '@/contexts/wallet';
+import FullPageWrapper from '@/components/biz/FullPageWrapper';
 
 export default function Transfer() {
-  // TODO: dev mock only. delete this when new creation process is done.
-  const { wallet } = useWallet();
-  const handleJumpPage = (
-    path: (typeof SIDE_PANEL_ROUTE_PATHS)[keyof typeof SIDE_PANEL_ROUTE_PATHS]
-  ) => {
-    navigateTo('side-panel', path);
-  };
   return (
-    <div className="elytro-gradient-bg flex flex-col items-center justify-center gap-y-2xl p-3xl">
+    <FullPageWrapper>
       <img src={WalletImg} alt="Wallet" className="size-[144px]" />
       <div className="text-center flex flex-col gap-y-2xs">
-        <h1 className="elytro-text-subtitle">
-          Manage your smart contract accounts
-        </h1>
+        <h1 className="elytro-text-subtitle">Manage your Elytro accounts</h1>
         <p className="elytro-text-smaller-body text-gray-600">
           Smart contract accounts created on Elytro only
         </p>
@@ -39,22 +30,15 @@ export default function Transfer() {
         <Button
           size="large"
           variant="secondary"
-          onClick={async () => {
-            try {
-              // TODO: dev mock only. delete this when new creation process is done.
-
-              await wallet.createNewOwner('123123A');
-              await wallet.switchChain(11155420);
-
-              handleJumpPage(SIDE_PANEL_ROUTE_PATHS.AccountRecovery);
-            } catch (error) {
-              console.error(error);
-            }
+          onClick={() => {
+            navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreatePasscode, {
+              from: 'recover',
+            });
           }}
         >
           Recover an account
         </Button>
       </div>
-    </div>
+    </FullPageWrapper>
   );
 }

@@ -13,6 +13,7 @@ interface IProps {
   className?: string;
   size?: keyof typeof SIZE_MAP;
   dotColor?: string;
+  showChainIcon?: boolean;
 }
 
 const SIZE_MAP = {
@@ -21,6 +22,10 @@ const SIZE_MAP = {
     text: 'elytro-text-smaller-body',
   },
   md: {
+    icon: 'size-6',
+    text: 'elytro-text-bold-body',
+  },
+  lg: {
     icon: 'size-8',
     text: 'elytro-text-bold-body',
   },
@@ -32,6 +37,7 @@ export default function FragmentedAddress({
   size = 'sm',
   className,
   dotColor,
+  showChainIcon = true,
 }: IProps) {
   if (!address || !isAddress(address)) {
     return '--';
@@ -44,7 +50,9 @@ export default function FragmentedAddress({
 
   return (
     <div className={cn('flex items-center gap-sm', className)}>
-      {chain && <img src={chain.icon} alt={chain.name} className={icon} />}
+      {showChainIcon && chain && (
+        <img src={chain.icon} alt={chain.name} className={icon} />
+      )}
       <div className={cn('flex items-center gap-sm', text)}>
         <span>{prefix}</span>
         <Tooltip>

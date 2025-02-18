@@ -23,11 +23,16 @@ import { safeClipboard } from '@/utils/clipboard';
 import { Copy } from 'lucide-react';
 import { IRecoveryRecord } from '@/utils/ethRpc/recovery';
 import { toast } from '@/hooks/use-toast';
+import WalletImg from '@/assets/wallet.png';
+import { TRecoveryStatus } from '@/constants/recovery';
+import { safeOpen } from '@/utils/safeOpen';
 
 type TShareInfo = {
   type: 'link' | 'email';
   content: string;
 };
+
+const RECOVERY_APP_URL = 'https://elytro.vercel.app/';
 
 function PageContent() {
   const { wallet } = useWallet();
@@ -57,7 +62,8 @@ function PageContent() {
           ),
         }))
       );
-    } catch {
+    } catch (err) {
+      console.error('Elytro: getRecoveryRecord error', err);
       setRecoveryContacts([]);
       setRecoveryRecord(null);
       toast({
@@ -79,10 +85,20 @@ function PageContent() {
   }, [address, currentChain]);
 
   const handleShareContact = (contact: TRecoveryContact) => {
+    if (!recoveryRecord || !recoveryRecord.recoveryRecordID) {
+      toast({
+        title: 'No recovery record found',
+        description: 'Please try again later',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const isAddressContact = isAddress(contact.address);
+
     // TODO: change this to real link
     const shareContent = isAddressContact
-      ? `https://elytro.com/recovery?id=${recoveryRecord?.recoveryRecordID}`
+      ? `${RECOVERY_APP_URL}?id=${recoveryRecord?.recoveryRecordID}`
       : `from: ${contact.address}\nto:guardian-dev@institution.soulwallet.io\nsubject: Approve address ${address} for hash ${recoveryRecord?.recoveryRecordID}\nbody: 可为空或者任意内容`;
 
     safeClipboard(shareContent, false);
@@ -107,7 +123,36 @@ function PageContent() {
     );
   }
 
-  // TODO: what if the recovery is completed.
+  if (recoveryRecord?.status === TRecoveryStatus.RECOVERY_COMPLETED) {
+    return (
+      <div className="h-full flex flex-col justify-center items-center gap-y-xl text-center">
+        <img src={WalletImg} alt="Wallet" className="size-36" />
+      </div>
+    );
+  }
+
+  if (recoveryRecord?.status === TRecoveryStatus.SIGNATURE_COMPLETED) {
+    return (
+      <div className="h-full flex flex-col justify-center items-center gap-y-xl text-center">
+        <img src={WalletImg} alt="Wallet" className="size-36" />
+        <div className="flex flex-col gap-y-sm">
+          <h1 className="elytro-text-title ">Enough signatures collected</h1>
+          <p className="text-gray-600 elytro-text-smaller-body">
+            Begin & Complete your recovery in recovery app
+          </p>
+        </div>
+        <Button
+          onClick={() => {
+            safeOpen(
+              `${RECOVERY_APP_URL}start?id=${recoveryRecord?.recoveryRecordID}`
+            );
+          }}
+        >
+          Launch recovery app
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-y-md">

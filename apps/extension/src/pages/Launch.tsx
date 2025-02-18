@@ -35,8 +35,13 @@ export default function Launch() {
   };
 
   const renderContent = useMemo(() => {
-    if (status === WalletStatusEn.NoAccount) {
+    if (status === WalletStatusEn.Recovering) {
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.AccountRecovery);
+      return null;
+    }
+
+    if (status === WalletStatusEn.NoAccount) {
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreateAccount);
       return null;
     }
 
@@ -99,7 +104,7 @@ export default function Launch() {
     <div className="elytro-gradient-bg flex flex-1 flex-col items-center justify-center px-3xl h-full gap-y-3xl">
       <img src={iconImg} alt="Launch" className="size-[164px]" />
       <h1 className="elytro-text-headline text-center">{title}</h1>
-      <div className="flex flex-col gap-y-md w-full">{content}</div>
+      <div className="flex flex-col w-full">{content}</div>
     </div>
   );
 }

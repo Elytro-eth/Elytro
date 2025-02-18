@@ -17,7 +17,7 @@ import { useEffect } from 'react';
 
 export default function BasicAccountInfo() {
   const {
-    accountInfo,
+    currentAccount,
     updateTokens,
     updateAccount,
     getAccounts,
@@ -57,7 +57,7 @@ export default function BasicAccountInfo() {
           <AccountsDropdown />
           <Copy
             className="elytro-clickable-icon size-4 stroke-gray-600 hover:stroke-gray-900"
-            onClick={() => safeClipboard(accountInfo.address)}
+            onClick={() => safeClipboard(currentAccount.address)}
           />
         </div>
         <div className="flex flex-row gap-x-md">
@@ -82,7 +82,7 @@ export default function BasicAccountInfo() {
       {/* Actions */}
       <div>
         <div className="flex flex-row gap-md">
-          {accountInfo.isDeployed ? (
+          {currentAccount.isDeployed ? (
             <>
               <ActionButton
                 className="bg-light-green hover:bg-green hover:stroke-white"

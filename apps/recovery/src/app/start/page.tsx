@@ -20,7 +20,7 @@ enum RecoveryStatusEn {
   Completed = 3, // Recovery completed
 }
 
-const DELAY_TIME = 48 * 60 * 60 * 1_000; // 48 hours
+// const DELAY_TIME = 48 * 60 * 60 * 1_000; // 48 hours
 
 const TimeBlock = ({ time, unit }: { time: number; unit: string }) => {
   return (
@@ -84,7 +84,7 @@ export default function Start() {
       status = RecoveryStatusEn.NonStarted;
     } else if (validTime === 1) {
       status = RecoveryStatusEn.Completed;
-    } else if (validTime * 1000 + DELAY_TIME > Date.now()) {
+    } else if (validTime * 1000 > Date.now()) {
       status = RecoveryStatusEn.Waiting;
     } else {
       status = RecoveryStatusEn.Ready;
@@ -117,7 +117,7 @@ export default function Start() {
 
   useEffect(() => {
     if (status === RecoveryStatusEn.Waiting) {
-      const targetTime = recoveryRecord!.validTime * 1000 + DELAY_TIME;
+      const targetTime = recoveryRecord!.validTime * 1000;
 
       const interval = setInterval(() => {
         const lastTime = targetTime - Date.now();

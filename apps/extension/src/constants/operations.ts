@@ -1,5 +1,4 @@
 import { Method } from '@soulwallet/decoder';
-import { TSessionData } from './session';
 
 export enum UserOperationStatusEn {
   pending = 'pending',
@@ -12,13 +11,6 @@ export type TDAppActionDetail = {
   dAppLogo?: string;
   name: string;
   description?: string;
-};
-
-export type TSignTxDetail = {
-  fromSession: TSessionData;
-  toSession: TSessionData;
-  actionName: string;
-  txDetail: TTxDetail;
 };
 
 export type TTxDetail = {

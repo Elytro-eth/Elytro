@@ -5,6 +5,8 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UnsupportedMethod } from '@/background/provider/rpcFlow/checkCallable';
+import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
+import { navigateTo } from '@/utils/navigation';
 
 export default function BlockedAlert() {
   const { approval, reject } = useApproval();
@@ -20,8 +22,8 @@ export default function BlockedAlert() {
   const { name, reason } = options as UnsupportedMethod;
 
   const handleReject = () => {
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
     reject(ethErrors.provider.userRejectedRequest());
-    window.close();
   };
 
   return (

@@ -33,37 +33,30 @@ async function query<T>(
   queryDocument: DocumentNode,
   variables?: Record<string, unknown>
 ): Promise<T> {
-  try {
-    const { data, errors } = await client.query({
-      query: queryDocument,
-      variables,
-    });
-    if (errors) {
-      throw errors;
-    }
-    return data as T;
-  } catch (error) {
-    throw error;
+  const { data, errors } = await client.query({
+    query: queryDocument,
+    variables,
+    fetchPolicy: 'no-cache',
+  });
+  if (errors) {
+    throw errors;
   }
+  return data as T;
 }
 
 async function mutate<T>(
   mutationDocument: DocumentNode,
   variables?: Record<string, unknown>
 ): Promise<T> {
-  try {
-    const { data, errors } = await client.mutate({
-      mutation: mutationDocument,
-      variables,
-    });
+  const { data, errors } = await client.mutate({
+    mutation: mutationDocument,
+    variables,
+  });
 
-    if (errors) {
-      throw errors;
-    }
-    return data as T;
-  } catch (error) {
-    throw error;
+  if (errors) {
+    throw errors;
   }
+  return data as T;
 }
 
 export { client, query, mutate };

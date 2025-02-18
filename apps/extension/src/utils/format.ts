@@ -296,7 +296,7 @@ export function formatQuantity(value: SafeAny): string {
 
 export function getHostname(url?: string) {
   try {
-    const { hostname } = new URL(url || '');
+    const { hostname } = new URL(url || '--');
     return hostname;
   } catch {
     return url;

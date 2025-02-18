@@ -17,6 +17,15 @@ export const SUPPORTED_CHAINS: readonly [Chain, ...Chain[]] = [
   scrollSepolia,
 ];
 
+export const CHAIN_ID_TO_NAME_MAP: Record<number, string> = {
+  [mainnet.id]: 'Ethereum',
+  [sepolia.id]: 'Sepolia',
+  [optimism.id]: 'Optimism',
+  [optimismSepolia.id]: 'Optimism Sepolia',
+  [scroll.id]: 'Scroll',
+  [scrollSepolia.id]: 'Scroll Sepolia',
+};
+
 export const CHAIN_LOGOS: Record<number, string> = {
   [mainnet.id]: 'https://icons.llamao.fi/icons/chains/rsz_ethereum',
   [sepolia.id]: 'https://icons.llamao.fi/icons/chains/rsz_ethereum',

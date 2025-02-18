@@ -31,11 +31,12 @@ import AmountInput from '@/components/biz/AmountInput';
 import { useTx } from '@/contexts/tx-context';
 import { UserOpType } from '@/contexts/tx-context';
 import { ABI_ERC20 } from '@/constants/abi';
+import { toast } from '@/hooks/use-toast';
 
 export default function SendTx() {
   const {
     tokenInfo: { tokens = [] },
-    accountInfo: { address },
+    currentAccount: { address },
   } = useAccount();
   const { currentChain } = useChain();
   const { openUserOpConfirmTx } = useTx();
@@ -107,6 +108,15 @@ export default function SendTx() {
 
     const token = form.getValues('token');
     const to = form.getValues('to');
+
+    if (to.toLowerCase() === address.toLowerCase()) {
+      toast({
+        title: 'Cannot send to yourself',
+        description: 'Please input a valid address.',
+      });
+      return;
+    }
+
     const txParams: Transaction = { to };
 
     const amount = parseEther(form.getValues('amount')).toString();
@@ -125,20 +135,7 @@ export default function SendTx() {
   };
 
   return (
-    <SecondaryPageWrapper
-      title="Send"
-      footer={
-        <Button
-          variant="secondary"
-          size="large"
-          className="w-full"
-          disabled={!form.formState.isValid}
-          onClick={handleContinue}
-        >
-          Continue
-        </Button>
-      }
-    >
+    <SecondaryPageWrapper title="Send">
       <div>
         <Form {...form}>
           <div className="bg-light-green rounded-sm">
@@ -207,7 +204,7 @@ export default function SendTx() {
             </div>
           </div>
         </Form>
-        <div className="p-4 bg-gray-150 rounded-sm space-y-2">
+        <div className="p-4 bg-gray-150 rounded-sm space-y-2 mb-4">
           <div className="flex justify-between items-center">
             <div className="font-bold text-base text-gray-750">
               From account
@@ -226,6 +223,16 @@ export default function SendTx() {
             </div>
           </div>
         </div>
+
+        <Button
+          variant="secondary"
+          size="large"
+          className="w-full gap-xl"
+          disabled={!form.formState.isValid}
+          onClick={handleContinue}
+        >
+          Continue
+        </Button>
       </div>
     </SecondaryPageWrapper>
   );

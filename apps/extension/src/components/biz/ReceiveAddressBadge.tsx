@@ -17,7 +17,7 @@ export default function ReceiveAddressBadge({
       <FragmentedAddress
         address={address}
         chainId={chainId}
-        size="md"
+        size="lg"
         dotColor="#B5D6BA"
       />
     </div>

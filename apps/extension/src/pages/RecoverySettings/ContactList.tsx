@@ -33,7 +33,7 @@ export default function ContactList({
   onEditContact,
   onDeleteContact,
 }: IContactListProps) {
-  const { accountInfo: currentAccount } = useAccount();
+  const { currentAccount: currentAccount } = useAccount();
   const { wallet } = useWallet();
   const { openUserOpConfirmTx } = useTx();
   const [loading, setLoading] = useState(false);
@@ -63,7 +63,7 @@ export default function ContactList({
   };
 
   return (
-    <div className="flex flex-col justify-between h-full">
+    <div className="flex flex-col justify-between">
       <div className="flex flex-col gap-y-md">
         <h1 className="elytro-text-bold-body">Your recovery contacts</h1>
 
@@ -161,7 +161,7 @@ export default function ContactList({
       {/* Contact List */}
 
       <Button
-        className="w-full"
+        className="w-full mt-10"
         disabled={!contacts.length || loading || Number(myThreshold) < 1}
         onClick={handleConfirmContacts}
       >

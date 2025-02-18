@@ -23,12 +23,14 @@ import {
 } from '@/utils/ethRpc/recovery';
 import { DecodeResult } from '@soulwallet/decoder';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
+import { TRecoveryStatus } from '@/constants/recovery';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
   NoAccount = 'NoAccount',
   HasAccountButLocked = 'HasAccountButLocked',
   HasAccountAndUnlocked = 'HasAccountAndUnlocked',
+  Recovering = 'Recovering',
 }
 
 // ! DO NOT use getter. They can not be proxied.
@@ -49,6 +51,10 @@ class WalletController {
     return keyring.locked;
   }
   public async getWalletStatus() {
+    if (accountManager.recoveryRecord) {
+      return WalletStatusEn.Recovering;
+    }
+
     if (!keyring.hasOwner) {
       return WalletStatusEn.NoOwner;
     }
@@ -387,10 +393,30 @@ class WalletController {
     return accountManager.recoveryRecord?.address;
   }
 
-  public async getRecoveryRecord(address: Address) {
-    console.log('accountManager.recoveryRecord', accountManager.recoveryRecord);
+  public async getRecoveryRecord(address?: Address) {
     if (accountManager.recoveryRecord) {
-      return await getRecoveryRecord(accountManager.recoveryRecord.id);
+      const record = await getRecoveryRecord(accountManager.recoveryRecord.id);
+
+      if (record?.status === TRecoveryStatus.RECOVERY_COMPLETED) {
+        accountManager.recoveryRecord = null;
+
+        accountManager.updateCurrentAccountInfo({
+          address: record?.address,
+          chainId: Number(record?.chainID),
+          isDeployed: true,
+        });
+
+        this._onAccountChanged();
+      } else if (record?.status === TRecoveryStatus.RECOVERY_CANCELED) {
+        accountManager.recoveryRecord = null;
+        await keyring.reset();
+      }
+
+      return record;
+    }
+
+    if (!address) {
+      throw new Error('Elytro: No address provided');
     }
 
     const newOwner = keyring.owner?.address;

@@ -5,8 +5,8 @@ import { LoaderCircle } from 'lucide-react';
 import AddressWithChain from '@/components/AddressWithChain';
 import ContentWrapper from '@/components/ContentWrapper';
 import { Button } from '@/components/ui/button';
-import React from 'react';
-import { notFound, redirect } from 'next/navigation';
+import React, { useEffect } from 'react';
+import { redirect } from 'next/navigation';
 import { TRecoveryStatus } from '@/constants/enums';
 import LinkWithQuery from '@/components/LinkWithQuery';
 
@@ -40,7 +40,11 @@ const StepBlock = ({
 };
 
 export default function Home() {
-  const { recoveryRecord, loading } = useRecoveryRecord();
+  const { recoveryRecord, loading, getRecoveryRecord } = useRecoveryRecord();
+
+  useEffect(() => {
+    getRecoveryRecord();
+  }, []);
 
   if (loading) {
     return (
@@ -55,10 +59,6 @@ export default function Home() {
         <div className="text-bold-body">Fetching recovery details...</div>
       </div>
     );
-  }
-
-  if (!recoveryRecord) {
-    return notFound();
   }
 
   if (

@@ -29,9 +29,9 @@ const ErrorTip = ({
       <path
         d="M50.5 33.833V55.5M50.5 67.1663H50.5417"
         stroke="#FF7066"
-        stroke-width="7"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
     <div className="elytro-text-bold-body text-center w-full">{title}</div>

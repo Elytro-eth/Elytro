@@ -2,15 +2,16 @@ import { UserOpType } from '@/contexts/tx-context';
 import InfoCard from '@/components/biz/InfoCard';
 import { formatEther } from 'viem';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';
-import { formatBalance } from '@/utils/format';
+import { formatBalance, formatRawData } from '@/utils/format';
 import { DecodeResult } from '@soulwallet/decoder';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { cn } from '@/utils/shadcn/utils';
 import ActivateDetail from './ActivationDetail';
 import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 
-const { InfoCardItem, InfoCardWrapper } = InfoCard;
+const { InfoCardItem, InfoCardList } = InfoCard;
 
 interface IUserOpDetailProps {
   session?: TDAppInfo;
@@ -20,12 +21,6 @@ interface IUserOpDetailProps {
   decodedUserOp: Nullable<DecodeResult>;
   from?: string;
 }
-
-const UserOpTitleMap = {
-  [UserOpType.DeployWallet]: 'Activate account',
-  [UserOpType.SendTransaction]: 'You are sending',
-  [UserOpType.ApproveTransaction]: 'Confirm Transaction',
-};
 
 const formatGasUsed = (gasUsed?: string) => {
   return gasUsed
@@ -42,6 +37,8 @@ export function UserOpDetail({
   decodedUserOp,
   from,
 }: IUserOpDetailProps) {
+  const [showRawData, setShowRawData] = useState(false);
+
   const DetailContent = useMemo(() => {
     switch (opType) {
       case UserOpType.DeployWallet:
@@ -60,21 +57,11 @@ export function UserOpDetail({
 
   return (
     <div className="flex flex-col w-full gap-y-md">
-      {/* UserOp Title */}
-      <div className="flex items-center justify-between">
-        <span className="elytro-text-bold-body">{UserOpTitleMap[opType]}</span>
-
-        {/* Raw data: for deploy wallet no need to show */}
-        {opType === UserOpType.DeployWallet ? null : (
-          <span className="elytro-text-tiny-body text-gray-750">Raw data</span>
-        )}
-      </div>
-
       {/* DApp Info: no need for sending transaction */}
       <div className="flex flex-col gap-y-sm">{DetailContent}</div>
 
       {/* UserOp Pay Info */}
-      <InfoCardWrapper>
+      <InfoCardList>
         <InfoCardItem
           label="From account"
           content={<FragmentedAddress address={from} chainId={chainId} />}
@@ -100,7 +87,29 @@ export function UserOpDetail({
             </span>
           }
         />
-      </InfoCardWrapper>
+      </InfoCardList>
+
+      {/* Transaction Raw Data: Only show for approve transaction */}
+      {opType === UserOpType.ApproveTransaction && (
+        <div>
+          <button
+            className="flex items-center justify-center gap-x-2xs elytro-text-tiny-body text-gray-750 "
+            onClick={() => setShowRawData((prev) => !prev)}
+          >
+            Raw Data
+            {showRawData ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          <pre
+            className={`
+            elytro-text-smaller-body text-gray-500 overflow-auto w-full flex-grow px-lg py-md bg-gray-150 rounded-2xs
+            transition-opacity duration-300
+            ${showRawData ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
+          `}
+          >
+            {formatRawData(decodedUserOp)}
+          </pre>
+        </div>
+      )}
     </div>
   );
 }

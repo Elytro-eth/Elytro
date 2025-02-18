@@ -17,7 +17,7 @@ const DEFAULT_ACCOUNT_INFO: TAccountInfo = {
 };
 
 type IAccountContext = {
-  accountInfo: TAccountInfo;
+  currentAccount: TAccountInfo;
   updateAccount: () => Promise<void>;
   loading: boolean;
   tokenInfo: {
@@ -33,7 +33,7 @@ type IAccountContext = {
 
 // TODO: extract HistoryContext
 const AccountContext = createContext<IAccountContext>({
-  accountInfo: DEFAULT_ACCOUNT_INFO,
+  currentAccount: DEFAULT_ACCOUNT_INFO,
   updateAccount: async () => {},
   loading: false,
   tokenInfo: {
@@ -53,7 +53,7 @@ export const AccountProvider = ({
   children: React.ReactNode;
 }) => {
   const { wallet } = useWallet();
-  const [accountInfo, setAccountInfo] =
+  const [currentAccount, setCurrentAccount] =
     useState<TAccountInfo>(DEFAULT_ACCOUNT_INFO);
   const [loading, setLoading] = useState(false);
   const [pathname] = useHashLocation();
@@ -71,7 +71,7 @@ export const AccountProvider = ({
       setLoading(true);
 
       const res = (await wallet.getCurrentAccount()) ?? DEFAULT_ACCOUNT_INFO;
-      setAccountInfo(res);
+      setCurrentAccount(res);
       updateHistory();
 
       if (intervalRef.current && res.isDeployed) {
@@ -86,11 +86,15 @@ export const AccountProvider = ({
   };
 
   const { tokens, loadingTokens, refetchTokens } = useTokens({
-    address: accountInfo.address as Address,
-    chainId: accountInfo.chainId,
+    address: currentAccount.address as Address,
+    chainId: currentAccount.chainId,
   });
 
   const updateTokens = async () => {
+    if (loading || !currentAccount.address) {
+      return;
+    }
+
     await refetchTokens();
   };
 
@@ -114,7 +118,7 @@ export const AccountProvider = ({
   }, []);
 
   useEffect(() => {
-    if (!loading && !accountInfo.address) {
+    if (!loading && !currentAccount.address) {
       updateAccount();
     }
   }, [pathname]);
@@ -150,7 +154,7 @@ export const AccountProvider = ({
   return (
     <AccountContext.Provider
       value={{
-        accountInfo,
+        currentAccount,
         updateAccount,
         tokenInfo: {
           tokens,
