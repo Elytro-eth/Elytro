@@ -36,7 +36,7 @@ import { toast } from '@/hooks/use-toast';
 export default function SendTx() {
   const {
     tokenInfo: { tokens = [] },
-    accountInfo: { address },
+    currentAccount: { address },
   } = useAccount();
   const { currentChain } = useChain();
   const { openUserOpConfirmTx } = useTx();

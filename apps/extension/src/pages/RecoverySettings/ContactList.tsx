@@ -33,7 +33,7 @@ export default function ContactList({
   onEditContact,
   onDeleteContact,
 }: IContactListProps) {
-  const { accountInfo: currentAccount } = useAccount();
+  const { currentAccount: currentAccount } = useAccount();
   const { wallet } = useWallet();
   const { openUserOpConfirmTx } = useTx();
   const [loading, setLoading] = useState(false);

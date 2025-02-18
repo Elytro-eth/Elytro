@@ -10,7 +10,7 @@ import Spin from '@/components/ui/Spin';
 
 export default function Receive() {
   const {
-    accountInfo: { address },
+    currentAccount: { address },
   } = useAccount();
   const { currentChain } = useChain();
 

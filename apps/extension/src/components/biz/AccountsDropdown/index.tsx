@@ -25,7 +25,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function AccountsDropdown() {
   const [open, setOpen] = useState(false);
   const {
-    accountInfo: currentAccount,
+    currentAccount,
     accounts,
     updateTokens,
     updateAccount,

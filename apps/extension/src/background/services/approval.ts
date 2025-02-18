@@ -33,8 +33,7 @@ class ApprovalService {
 
   public async request(type: ApprovalTypeEn, data?: TApprovalData) {
     if (this._currentApproval) {
-      console.log('Elytro: Approval already exists', this._currentApproval);
-      return;
+      throw ethErrors.provider.userRejectedRequest();
     }
 
     return new Promise((resolve, reject) => {
@@ -79,20 +78,29 @@ class ApprovalService {
     return (await openPopupWindow(path)) || null;
   };
 
+  private _clearApproval = () => {
+    if (this._currentApproval) {
+      // set a timeout to avoid propose a new approval too soon
+      setTimeout(() => {
+        this._currentApproval = null;
+      }, 200);
+    }
+  };
+
   private _rejectApprovalByWinId = (winId?: number) => {
     if (!winId || !this._approvals.has(winId)) {
       return;
     }
 
     if (this._currentApproval?.winId === winId) {
-      this._currentApproval = null;
+      this._clearApproval();
+
+      const approval = this._approvals.get(winId);
+      approval?.reject(ethErrors.provider.userRejectedRequest());
+      this._approvals.delete(winId);
+
+      tryRemoveWindow(winId);
     }
-
-    const approval = this._approvals.get(winId);
-    approval?.reject(ethErrors.provider.userRejectedRequest());
-    this._approvals.delete(winId);
-
-    tryRemoveWindow(winId);
   };
 
   public resolveApproval = (id: string, data: unknown) => {
@@ -104,7 +112,7 @@ class ApprovalService {
     // go to success page. no need to remove window for now.
     // tryRemoveWindow(this._currentApproval?.winId);
 
-    this._currentApproval = null;
+    this._clearApproval();
   };
 
   public rejectApproval = (id: string) => {
