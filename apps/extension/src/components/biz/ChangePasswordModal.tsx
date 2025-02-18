@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -154,26 +153,25 @@ export default function ChangePasswordModal({
                 </div>
               </form>
             </Form>
+
+            <div className="w-full flex justify-between gap-lg mt-4">
+              <Button
+                className="flex-1"
+                variant="outline"
+                onClick={handleOnOpenChange}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={handleConfirm}
+                disabled={!form.formState.isValid}
+              >
+                Confirm
+              </Button>
+            </div>
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter>
-          <div className="w-full flex justify-between gap-lg">
-            <Button
-              className="flex-1"
-              variant="outline"
-              onClick={handleOnOpenChange}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="flex-1"
-              onClick={handleConfirm}
-              disabled={!form.formState.isValid}
-            >
-              Confirm
-            </Button>
-          </div>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -44,24 +44,20 @@ const CreateAccount: React.FC = () => {
   };
 
   return (
-    <SecondaryPageWrapper
-      title="Create account"
-      showBack={false}
-      footer={
-        <Button
-          type="submit"
-          className="w-full rounded-full h-14"
-          size="large"
-          onClick={handleCreateAccount}
-        >
-          Create
-        </Button>
-      }
-    >
+    <SecondaryPageWrapper title="Create account" showBack={false}>
       <NetworkSelection
         selectedChain={selectedChain}
         handleSelectChain={handleSelectChain}
       />
+
+      <Button
+        type="submit"
+        className="w-full rounded-full mt-10"
+        size="large"
+        onClick={handleCreateAccount}
+      >
+        Create
+      </Button>
     </SecondaryPageWrapper>
   );
 };
