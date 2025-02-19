@@ -24,11 +24,6 @@ export default function TxSuccess() {
       showBack={false}
       closeable
       onClose={handleClose}
-      footer={
-        <Button size="large" className="w-full" onClick={handleClose}>
-          Close
-        </Button>
-      }
     >
       <div className="flex flex-col items-center justify-center h-full gap-y-sm">
         <svg
@@ -60,6 +55,9 @@ export default function TxSuccess() {
         >
           <ExternalLink className="size-3 mr-2xs" />
           Transaction details
+        </Button>
+        <Button size="large" className="w-full" onClick={handleClose}>
+          Close
         </Button>
       </div>
     </SecondaryPageWrapper>
