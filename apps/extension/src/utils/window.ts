@@ -130,10 +130,6 @@ const openSidePanel = async (onOpen?: () => void) => {
   }
 };
 
-const isDarkMode = () => {
-  return false; // matchMedia && matchMedia?.('(prefers-color-scheme: dark)')?.matches;
-};
-
 export {
   openPopupWindow,
   createWindow,
@@ -141,5 +137,4 @@ export {
   approvalWindowEvent,
   ApprovalWindowEventNameEn,
   openSidePanel,
-  isDarkMode,
 };

@@ -4,9 +4,9 @@
   "version": "0.0.1",
   "description": "Elytro Wallet Extension",
   "icons": {
-    "16": "public/icon16-dark.png",
-    "48": "public/icon48-dark.png",
-    "128": "public/icon128-dark.png"
+    "16": "public/icon16.png",
+    "48": "public/icon48.png",
+    "128": "public/icon128.png"
   },
   "side_panel": {
     "default_path": "src/side-panel.html"

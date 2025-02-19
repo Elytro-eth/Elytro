@@ -1,6 +1,5 @@
-import { iconElytro, iconElytroDark } from '@/assets/icons';
+import { iconElytro } from '@/assets/icons';
 import PageProvider from '@/background/provider/pageProvider';
-import { isDarkMode } from '@/utils/window';
 
 declare global {
   interface Window {
@@ -20,7 +19,7 @@ const mainWorld = () => {
   const info: EIP6963ProviderInfo = {
     uuid: generateUUID4(),
     name: 'Elytro',
-    icon: isDarkMode() ? iconElytroDark : iconElytro,
+    icon: iconElytro,
     rdns: 'com.elytro',
   };
 

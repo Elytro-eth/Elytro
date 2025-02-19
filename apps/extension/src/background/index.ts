@@ -229,19 +229,6 @@ const initBackgroundMessage = () => {
     );
   });
 
-  // matchMedia?.('(prefers-color-scheme: dark)').addEventListener('change', e => {
-  //   const iconVariant = e.matches ? "-dark" : "";
-
-  //   // @ts-ignore
-  //   browser.browserAction.setIcon({
-  //       path: {
-  //           16: `public/icon16${iconVariant}.png`,
-  //           48: `public/icon48${iconVariant}.png`,
-  //           128: `public/icon128${iconVariant}.png`
-  //       },
-  //   });
-  // });
-
   // /** Approval */
   // eventBus.on(EVENT_TYPES.APPROVAL.REQUESTED, (approvalId) => {
   //   RuntimeMessage.sendMessage(EVENT_TYPES.APPROVAL.REQUESTED, { approvalId });

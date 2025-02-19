@@ -14,8 +14,4 @@ export const EVENT_TYPES = {
     ACCOUNT_INITIALIZED: 'accountInitialized',
     ACCOUNT_CHANGED: 'accountChanged',
   },
-  THEME: {
-    DARK: 'dark',
-    LIGHT: 'light',
-  },
 };
