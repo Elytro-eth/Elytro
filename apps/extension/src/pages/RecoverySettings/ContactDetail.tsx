@@ -15,7 +15,7 @@ export default function ContactDetail({
   contact,
   onSaveContact,
 }: IContactDetailProps) {
-  const { accountInfo: currentAccount } = useAccount();
+  const { currentAccount: currentAccount } = useAccount();
   const [address, setAddress] = useState<string>(contact?.address || '');
   const [name, setName] = useState<string>(contact?.name || '');
 

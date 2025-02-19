@@ -4,7 +4,7 @@ import { toast } from '@/hooks/use-toast';
 import { useTx, UserOpType } from '@/contexts/tx-context';
 
 export default function ActivateButton() {
-  const { accountInfo } = useAccount();
+  const { currentAccount } = useAccount();
   const { openUserOpConfirmTx } = useTx();
 
   const onClickActivate = async () => {
@@ -21,7 +21,7 @@ export default function ActivateButton() {
   };
 
   return (
-    <Button onClick={onClickActivate} disabled={!accountInfo}>
+    <Button onClick={onClickActivate} disabled={!currentAccount}>
       Activate account
     </Button>
   );

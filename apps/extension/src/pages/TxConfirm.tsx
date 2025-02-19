@@ -31,7 +31,7 @@ export default function TxConfirm() {
   } = useTx();
   const { currentChain } = useChain();
   const [isSending, setIsSending] = useState(false);
-  const { reject, resolve, approval } = useApproval();
+  const { reject, resolve } = useApproval();
 
   const renderContent = useMemo(() => {
     if (isPacking) return <ProcessingTip />;
@@ -43,7 +43,6 @@ export default function TxConfirm() {
           calcResult={calcResult}
           chainId={currentChain!.id}
           decodedUserOp={decodedDetail}
-          session={approval?.data?.dApp}
           from={userOp?.sender}
         />
       );
@@ -139,10 +138,10 @@ export default function TxConfirm() {
       title={UserOpTitleMap[opType!]}
     >
       {/* Content */}
-      <div className="flex flex-col gap-y-md pb-14">{renderContent}</div>
+      <div className="flex flex-col gap-y-md">{renderContent}</div>
 
       {/* Footer */}
-      <div className="flex w-full mt-auto">
+      <div className="flex w-full mt-10">
         <div className="flex w-full gap-x-2">
           <Button
             variant="ghost"

@@ -10,7 +10,7 @@ import Spin from '@/components/ui/Spin';
 
 export default function Receive() {
   const {
-    accountInfo: { address },
+    currentAccount: { address },
   } = useAccount();
   const { currentChain } = useChain();
 
@@ -23,23 +23,7 @@ export default function Receive() {
   }
 
   return (
-    <SecondaryPageWrapper
-      title="Receive"
-      footer={
-        <>
-          {/* Copy Address */}
-          <Button
-            variant="secondary"
-            size="large"
-            className="fixed bottom-lg  left-lg right-lg group hover:stroke-white"
-            onClick={() => safeClipboard(address!)}
-          >
-            <Copy className="elytro-clickable-icon mr-2xs group-hover:stroke-white" />
-            Copy Address
-          </Button>
-        </>
-      }
-    >
+    <SecondaryPageWrapper title="Receive">
       <div className="flex flex-col gap-y-5 items-center w-full relative">
         {/* Chain info */}
         <div className="flex flex-row items-center justify-between w-full">
@@ -71,6 +55,17 @@ export default function Receive() {
             Copy address & paste it to your sender to receive tokens.
           </div>
         </div>
+
+        {/* Copy Address */}
+        <Button
+          variant="secondary"
+          size="large"
+          className="w-full group hover:stroke-white"
+          onClick={() => safeClipboard(address!)}
+        >
+          <Copy className="elytro-clickable-icon mr-2xs group-hover:stroke-white" />
+          Copy Address
+        </Button>
       </div>
     </SecondaryPageWrapper>
   );

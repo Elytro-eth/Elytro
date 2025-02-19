@@ -19,10 +19,10 @@ export default function SessionCard({
           <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
         </Avatar>
 
-        <span className="elytro-text-bold-body">{name}</span>
+        <span className="elytro-text-bold-body truncate">{name}</span>
       </span>
 
-      <span className="elytro-text-smaller-bold-body text-gray-600">
+      <span className="elytro-text-smaller-bold-body text-gray-600 flex-shrink-0">
         {getHostname(origin)}
       </span>
     </div>

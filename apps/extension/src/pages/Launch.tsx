@@ -79,6 +79,7 @@ export default function Launch() {
             </Button>
             {/* TODO: navigate to import/recover account page */}
             <Button
+              className="rounded-full w-full px-4 py-5 h-14 mb-4 font-medium text-lg leading-6"
               variant="secondary"
               onClick={() =>
                 // TODO: this is a temporary dev mock: go to recover account page without user's confirmation
@@ -103,7 +104,7 @@ export default function Launch() {
     <div className="elytro-gradient-bg flex flex-1 flex-col items-center justify-center px-3xl h-full gap-y-3xl">
       <img src={iconImg} alt="Launch" className="size-[164px]" />
       <h1 className="elytro-text-headline text-center">{title}</h1>
-      <div className="flex flex-col gap-y-md w-full">{content}</div>
+      <div className="flex flex-col w-full">{content}</div>
     </div>
   );
 }

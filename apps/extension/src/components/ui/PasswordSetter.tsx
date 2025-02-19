@@ -50,7 +50,10 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-3xl">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="w-full space-y-3xl"
+      >
         <div className="space-y-sm">
           <FormField
             control={form.control}
