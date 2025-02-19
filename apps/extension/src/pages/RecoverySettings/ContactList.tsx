@@ -152,7 +152,7 @@ export default function ContactList({
 
             <Button variant="secondary" size="tiny" onClick={onAddContact}>
               <Plus className="h-4 w-4 mr-1 stroke-[1.5px] group-hover:stroke-white" />
-              Add a new contact
+              Add contact
             </Button>
           </div>
         )}
