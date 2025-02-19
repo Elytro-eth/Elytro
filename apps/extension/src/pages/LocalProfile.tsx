@@ -5,13 +5,13 @@ import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 export default function LocalProfile() {
   const [openChangePasswordModal, setOpenChangePasswordModal] = useState(false);
   return (
-    <SecondaryPageWrapper title="Local Profile">
+    <SecondaryPageWrapper title="Device Profile">
       <div className="space-y-2">
         <div
           className="elytro-rounded-border-item-wrapper hover:bg-gray-150"
           onClick={() => setOpenChangePasswordModal(true)}
         >
-          Change password
+          Change passcode
         </div>
       </div>
       {openChangePasswordModal && (

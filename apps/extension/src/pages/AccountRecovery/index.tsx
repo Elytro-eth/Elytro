@@ -129,7 +129,7 @@ export default function AccountRecovery() {
           disabled={!isAddress(address)}
           onClick={handleRetrieveContacts}
         >
-          <Box className="size-2xl mr-sm" color="#cce1ea" />
+          <Box className="size-4 mr-sm" color="#cce1ea" />
           Retrieve my contacts
         </Button>
       }

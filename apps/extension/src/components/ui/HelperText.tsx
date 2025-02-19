@@ -18,8 +18,10 @@ export default function HelperText({
         className
       )}
     >
-      <h2 className="elytro-text-small-bold ">{title}</h2>
-      <p className="elytro-text-tiny-body mt-2xs">{description}</p>
+      <h2 className="elytro-text-small-bold text-gray-750">{title}</h2>
+      <p className="elytro-text-tiny-body mt-2xs text-gray-750">
+        {description}
+      </p>
     </div>
   );
 }
