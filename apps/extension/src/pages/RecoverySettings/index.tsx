@@ -95,7 +95,7 @@ export default function RecoverySettings() {
 
   return (
     <SecondaryPageWrapper
-      title="Social recovery"
+      title="Social Recovery"
       onBack={() => {
         if (showType === ShowType.Detail) {
           setShowType(ShowType.List);

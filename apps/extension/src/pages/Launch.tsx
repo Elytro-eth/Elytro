@@ -70,7 +70,8 @@ export default function Launch() {
           <>
             {/* TODO: navigate to new create account page */}
             <Button
-              className="rounded-full w-full px-4 py-5 h-14 mb-4 font-medium text-lg leading-6"
+              size="large"
+              className="mb-3"
               onClick={() => {
                 navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreatePasscode);
               }}
@@ -79,7 +80,7 @@ export default function Launch() {
             </Button>
             {/* TODO: navigate to import/recover account page */}
             <Button
-              className="rounded-full w-full px-4 py-5 h-14 mb-4 font-medium text-lg leading-6"
+              size="large"
               variant="secondary"
               onClick={() =>
                 // TODO: this is a temporary dev mock: go to recover account page without user's confirmation
@@ -101,7 +102,7 @@ export default function Launch() {
   const { title, content, iconImg } = renderContent;
 
   return (
-    <div className="elytro-gradient-bg flex flex-1 flex-col items-center justify-center px-3xl h-full gap-y-3xl">
+    <div className="elytro-gradient-bg flex flex-1 flex-col items-center justify-center px-xl h-full gap-y-3xl">
       <img src={iconImg} alt="Launch" className="size-[164px]" />
       <h1 className="elytro-text-headline text-center">{title}</h1>
       <div className="flex flex-col w-full">{content}</div>

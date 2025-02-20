@@ -52,7 +52,7 @@ export default function Settings() {
           <AccountsDropdown />
           <SettingItem
             icon={ShieldIcon}
-            label="Social recovery"
+            label="Social Recovery"
             path={SIDE_PANEL_ROUTE_PATHS.RecoverySetting}
           />
           <SettingItem
