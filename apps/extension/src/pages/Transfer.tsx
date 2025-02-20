@@ -7,7 +7,7 @@ import FullPageWrapper from '@/components/biz/FullPageWrapper';
 
 export default function Transfer() {
   return (
-    <FullPageWrapper>
+    <FullPageWrapper className="elytro-gradient-bg-2">
       <img src={WalletImg} alt="Wallet" className="size-[144px]" />
       <div className="text-center flex flex-col ap-y-2xs">
         <h1 className="elytro-text-subtitle mb-2">
@@ -22,6 +22,17 @@ export default function Transfer() {
       <div className="flex flex-col gap-y-md w-full">
         <Button
           size="large"
+          onClick={() => {
+            navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreatePasscode, {
+              from: 'recover',
+            });
+          }}
+        >
+          Recover an account
+        </Button>
+        <Button
+          size="large"
+          variant="secondary"
           onClick={() =>
             toast({
               title: 'Import feature is not available yet',
@@ -30,17 +41,6 @@ export default function Transfer() {
           }
         >
           Import an account
-        </Button>
-        <Button
-          size="large"
-          variant="secondary"
-          onClick={() => {
-            navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreatePasscode, {
-              from: 'recover',
-            });
-          }}
-        >
-          Recover an account
         </Button>
       </div>
     </FullPageWrapper>
