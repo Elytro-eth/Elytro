@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useWallet } from '@/contexts/wallet';
@@ -14,17 +14,21 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import PasswordInput from '@/components/ui/PasswordInputer';
+import { navigateTo } from '@/utils/navigation';
+import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 
 const ChangePassword: React.FC = () => {
   const { wallet } = useWallet();
+  const [oldPasscodeTryTimesLeft, setOldPasscodeTryTimesLeft] = useState(5);
   const handleCheckPassword = async (password: string) => {
     const locked = await wallet.unlock(password);
     return !locked;
   };
   const passwordForm = z
     .object({
-      oldPassword: z.string().refine(handleCheckPassword, {
-        message: 'The passcode is incorrect',
+      oldPassword: z.string().min(6, {
+        message:
+          'The passcode should be more than 6 characters and include more than 1 capitalized letter.',
       }),
       password: z
         .string()
@@ -66,15 +70,37 @@ const ChangePassword: React.FC = () => {
     resolver: zodResolver(passwordForm),
     mode: 'onBlur',
   });
+
   const handleConfirm = async () => {
     try {
+      if (oldPasscodeTryTimesLeft <= 0) {
+        return;
+      }
       const data = form.getValues();
+
+      const isOldPasswordValid = await handleCheckPassword(data.oldPassword);
+      if (!isOldPasswordValid) {
+        const leftTimes = oldPasscodeTryTimesLeft - 1;
+        setOldPasscodeTryTimesLeft(leftTimes);
+        toast({
+          title: 'Passcode Error',
+          variant: 'destructive',
+          description: `The old passcode is incorrect. You have ${leftTimes} times are left to change passcode.`,
+        });
+        if (leftTimes <= 0) {
+          await wallet.lock();
+          navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
+        }
+        return;
+      }
+
       await wallet.changePassword(data.oldPassword, data.password);
       toast({
         title: 'Passcode changed',
         description: 'Your passcode has been changed successfully',
       });
       await wallet.lock();
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
     } catch (error) {
       toast({
         title: 'Error',
@@ -83,7 +109,7 @@ const ChangePassword: React.FC = () => {
       console.error(error);
     }
   };
-  //  onOpenChange={handleOnOpenChange}
+
   return (
     <SecondaryPageWrapper title="Change passcode">
       <Form {...form}>
