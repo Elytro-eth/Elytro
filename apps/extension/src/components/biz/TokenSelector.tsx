@@ -46,8 +46,12 @@ export default function TokenSelector({
   onTokenChange?: (token: TokenDTO) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const defaultToken =
+    tokens.find((token) => Number(token.tokenBalance) > 0) ??
+    tokens?.[0] ??
+    null;
   const [selectedToken, setSelectedToken] = useState<TokenDTO | null>(
-    tokens?.[0] ?? null
+    defaultToken
   );
   const handleSelect = (item: TokenDTO) => {
     setSelectedToken(item);
