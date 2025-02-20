@@ -148,7 +148,12 @@
   }
 
   .elytro-gradient-bg {
-    background: linear-gradient(to top, #f9fbfb 0%, #f7f3f0 24%, #dfecf3 50%);
+    background: linear-gradient(330deg, #f9fbfb 0%, #f7f3f0 44%, #dfecf3 80%);
+    background-blend-mode: overlay;
+  }
+
+  .elytro-gradient-bg-2 {
+    background: linear-gradient(319deg, #f9fbfb 0%, #f7f3f0 70%, #dfecf3 100%);
     background-blend-mode: overlay;
   }
 
