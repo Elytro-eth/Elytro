@@ -24,19 +24,24 @@ import { FIREBASE_CONFIG, FIREBASE_VAPID_KEY } from '@/constants/fcm';
 const app = initializeApp(FIREBASE_CONFIG);
 const messaging = getMessaging(app);
 
-onBackgroundMessage(messaging, async (payload) => {
-  console.log(`Huzzah! A Message.`, payload);
-
-  // Note: you will need to open a notification here or the browser will do it for you.. something, something, security
+onBackgroundMessage(messaging, async () => {
+  RuntimeMessage.sendMessage(EVENT_TYPES.HISTORY.ITEMS_UPDATED);
 });
 
 const getFcmToken = async (scope: SafeAny) => {
+  const prevToken = await localStorage.get('fcmToken');
+
+  if (prevToken) {
+    return prevToken;
+  }
+
   getToken(messaging, {
     serviceWorkerRegistration: scope.registration,
     vapidKey: FIREBASE_VAPID_KEY,
   })
-    .then((token) => {
-      localStorage.save({ fcmToken: token });
+    .then(async (token) => {
+      await localStorage.save({ fcmToken: token });
+      console.log('yes, my fcm token is ', token);
     })
     .catch((err) => {
       console.error('getFcmToken error', err);

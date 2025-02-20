@@ -10,6 +10,7 @@ export async function query<T>(
     const { data } = await client.query({
       query: queryDocument,
       variables,
+      fetchPolicy: 'no-cache',
     });
     return data as T;
   } catch (error) {
@@ -71,6 +72,25 @@ export const query_recovery_record = gql`
       }
       validTime
       emailGuardianStatus
+    }
+  }
+`;
+
+export const query_receive_activities = gql`
+  query Transactions($address: String!, $chainId: String!) {
+    transactions(address: $address, chainID: $chainId) {
+      type
+      opHash
+      timestamp
+      txhash
+      list {
+        asset_from
+        asset_to
+        asset_value
+        token_address
+        decimals
+        symbol
+      }
     }
   }
 `;
