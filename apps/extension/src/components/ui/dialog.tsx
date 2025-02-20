@@ -38,9 +38,9 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed z-50 grid w-full rounded-sm gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0  data-[state=closed]:slide-out-to-bottom-0  data-[state=open]:slide-in-from-bottom-0',
+        'fixed z-50 grid w-full rounded-sm gap-4 border bg-background p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0  data-[state=closed]:slide-out-to-bottom-0  data-[state=open]:slide-in-from-bottom-0',
         // Elytro Customized Style. PLEASE DO NOT CHANGE IT
-        'bg-white w-[calc(100%-2rem)] bottom-4 left-4 right-4 min-h-[calc(70%)]  max-h-[calc(100%-2rem)] overflow-y-scroll',
+        'bg-white w-[calc(100%-2rem)] bottom-4 left-4 right-4 max-h-[calc(100%-2rem)]',
         className
       )}
       {...props}
@@ -61,10 +61,7 @@ const DialogHeader = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn(
-      'flex flex-col space-y-1.5 text-center sm:text-left',
-      className
-    )}
+    className={cn('flex flex-col space-y-1.5 sm:text-left', className)}
     {...props}
   />
 );

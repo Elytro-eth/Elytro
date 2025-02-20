@@ -90,7 +90,7 @@ export default function Launch() {
                 navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Transfer)
               }
             >
-              I already have an account
+              Already have an account
             </Button>
           </>
         ),

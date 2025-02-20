@@ -181,9 +181,10 @@ function PageContent() {
                 <Button
                   variant="secondary"
                   size="tiny"
+                  className="group"
                   onClick={() => handleShareContact(contact)}
                 >
-                  <Copy className="size-md mr-xs" />
+                  <Copy className="size-md mr-xs group-hover:stroke-white" />
                   Copy {isAddress(contact.address) ? 'link' : 'email'}
                 </Button>
               )
@@ -202,12 +203,16 @@ function PageContent() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="max-h-fit p-lg rounded-lg bg-gray-150 overflow-auto overflow-y-auto overflow-wrap-break-word  whitespace-pre-wrap">
+          <pre
+            className="elytro-text-code-body text-gray-500 w-full flex-grow px-lg py-md bg-gray-150 rounded-2xs
+              transition-opacity whitespace-pre-wrap break-all"
+            style={{ userSelect: 'text' }}
+          >
             {shareInfo?.content || '--'}
-          </div>
+          </pre>
 
           <DialogFooter>
-            <Button onClick={() => setShareInfo(null)}>
+            <Button size="small" onClick={() => setShareInfo(null)}>
               I&apos;ve done this
             </Button>
           </DialogFooter>
