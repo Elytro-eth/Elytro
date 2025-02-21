@@ -80,7 +80,8 @@ export default function Sign() {
       />
 
       <Button
-        className="w-full mt-lg"
+        size="lg"
+        className="w-full mt-lg shadow-none"
         disabled={!isConnected || isSigned}
         onClick={sendSignatureRequest}
       >

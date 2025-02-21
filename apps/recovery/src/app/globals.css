@@ -17,10 +17,15 @@
   font-weight: 400;
   line-height: 1.5;
   text-rendering: optimizeLegibility;
+  font-variant-ligatures: no-contextual;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
 
 @layer base {
