@@ -9,7 +9,7 @@ export function LogoHeader() {
   return (
     <div
       onClick={backToHome}
-      className="flex flex-row items-center gap-2 cursor-pointer"
+      className="flex flex-row items-center gap-1 cursor-pointer"
     >
       <Image
         className="dark:invert"

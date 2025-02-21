@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+
   background: radial-gradient(
     93.78% 93.78% at 83.78% 16.41%,
     #fffaf5 0%,
@@ -12,7 +13,6 @@
 
   color:#161F36;
   color-scheme: light dark;
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-synthesis: none;
   font-weight: 400;
   line-height: 1.5;
@@ -24,14 +24,29 @@
 }
 
 @layer base {
+
   * {
     @apply border-border;
     @apply text-black-blue hover:text-dark-blue;
   }
 
+  @font-face {
+    font-family: 'ElytroSoehne';
+    src:  url('../assets/fonts/soehne-buch.woff2') format('woff2'),
+          url('../assets/fonts/soehne-buch.woff') format('woff');
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: 'ElytroSoehne';
+    src:  url('../assets/fonts/soehne-kraftig.woff2') format('woff2'),
+          url('../assets/fonts/soehne-kraftig.woff') format('woff');
+    font-weight: 700;
+  }
+
   body {
     @apply bg-background text-foreground;
     user-select: none;
+    font-family: ElytroSoehne, system-ui, Helvetica, Arial, sans-serif;
   }
 
   :root {
@@ -103,15 +118,15 @@
 
 @layer utilities {
   .text-title {
-    @apply text-xl font-medium leading-[100%];
+    @apply text-xl font-bold leading-[100%];
   }
 
   .text-bold-body {
-    @apply text-lg font-medium leading-[125%];
+    @apply text-lg font-bold leading-[125%];
   }
 
   .text-small-bold {
-    @apply text-base font-medium leading-[130%];
+    @apply text-base font-bold leading-[130%];
   }
 
   .text-smaller {
@@ -123,7 +138,7 @@
   }
 
   .text-tiny-bold {
-    @apply text-tiny font-medium ;
+    @apply text-tiny font-bold ;
   }
 }
 
