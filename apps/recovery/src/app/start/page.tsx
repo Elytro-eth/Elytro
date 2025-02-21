@@ -148,7 +148,14 @@ export default function Start() {
       currentStep={2}
       allSteps={3}
       title="Start Recovery"
-      subtitle="It will take effect in 48 hours. You can access your account after the countdown."
+      subtitle={
+        <span
+          dangerouslySetInnerHTML={{
+            __html:
+              'It will take effect in 48 hours. You can access your <br />account after the countdown.',
+          }}
+        />
+      }
     >
       {/* Count down */}
       <div className="flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg">
@@ -159,6 +166,7 @@ export default function Start() {
 
       <div className="grid grid-cols-2 gap-x-sm items-center">
         <Button
+          size="lg"
           variant={
             status === RecoveryStatusEn.NonStarted ? 'default' : 'outline'
           }
@@ -170,6 +178,7 @@ export default function Start() {
         </Button>
 
         <Button
+          size="lg"
           variant={status === RecoveryStatusEn.Ready ? 'default' : 'outline'}
           disabled={isLoading || status !== RecoveryStatusEn.Ready}
           onClick={completeRecovery}

@@ -37,7 +37,7 @@ export default function ContentWrapper({
         </h1>
       )}
       {subtitle && (
-        <h2 className="text-bold-body text-gray-750 mb-lg">{subtitle}</h2>
+        <h2 className="text-gray-600 mb-lg text-center">{subtitle}</h2>
       )}
       {children}
     </section>
