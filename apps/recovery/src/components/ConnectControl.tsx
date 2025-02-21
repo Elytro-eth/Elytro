@@ -129,7 +129,7 @@ export default function ConnectControl() {
           </div>
         ) : (
           <Button
-            className="rounded-full bg-transparent hover:bg-transparent shadow-none hover:shadow-md text-dark-blue border border-gray-450"
+            className="rounded-full font-normal shadow-none duration-0 bg-transparent hover:bg-light-blue text-dark-blue border border-gray-450 hover:border-light-blue"
             onClick={() => setShowDialog(true)}
           >
             Connect Wallet

@@ -74,13 +74,13 @@
     @apply text-black-blue hover:text-dark-blue;
   }
   @font-face {
-    font-family: 'ElytroSohne';
+    font-family: 'ElytroSoehne';
     src:  url('/src/assets/fonts/soehne-buch.woff2') format('woff2'),
           url('/src/assets/fonts/soehne-buch.woff') format('woff');
     font-weight: 400;
   }
   @font-face {
-    font-family: 'ElytroSohne';
+    font-family: 'ElytroSoehne';
     src:  url('/src/assets/fonts/soehne-kraftig.woff2') format('woff2'),
           url('/src/assets/fonts/soehne-kraftig.woff') format('woff');
     font-weight: 700;
@@ -88,7 +88,7 @@
   body {
     @apply bg-background text-foreground;
     user-select: none;
-    font-family: ElytroSohne;
+    font-family: ElytroSoehne;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-variant-ligatures: no-contextual;
