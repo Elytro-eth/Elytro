@@ -160,13 +160,15 @@ export default function ContactList({
 
       {/* Contact List */}
 
-      <Button
-        className="w-full mt-10"
-        disabled={!contacts.length || loading || Number(myThreshold) < 1}
-        onClick={handleConfirmContacts}
-      >
-        {loading ? 'Confirming...' : 'Confirm contacts'}
-      </Button>
+      {contacts.length ? (
+        <Button
+          className="w-full mt-10"
+          disabled={!contacts.length || loading || Number(myThreshold) < 1}
+          onClick={handleConfirmContacts}
+        >
+          {loading ? 'Confirming...' : 'Confirm contacts'}
+        </Button>
+      ) : null}
     </div>
   );
 }
