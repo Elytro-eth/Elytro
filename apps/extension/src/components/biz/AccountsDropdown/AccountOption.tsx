@@ -65,10 +65,14 @@ export default function AccountOption({
 
       <div className="elytro-text-small text-gray-600 flex flex-row items-center gap-sm">
         <span className="text-gray-600">{account?.balance}</span>
-        <Trash2
-          className="size-4 stroke-gray-600 hover:stroke-gray-900"
-          onClick={handleDelete}
-        />
+        {!isSelected ? (
+          <Trash2
+            className="size-4 stroke-gray-600 hover:stroke-gray-900"
+            onClick={handleDelete}
+          />
+        ) : (
+          <span className="w-4 h-4"></span>
+        )}
       </div>
     </div>
   );
