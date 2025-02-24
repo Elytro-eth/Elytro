@@ -6,13 +6,14 @@ import {
   ExternalLinkIcon,
   LayoutGridIcon,
   LockKeyholeIcon,
-  Settings2Icon,
+  // Settings2Icon,
   ShieldIcon,
   UserRoundIcon,
 } from 'lucide-react';
 import { useWallet } from '@/contexts/wallet';
 import SettingItem from '@/components/ui/SettingItem';
 import AccountsDropdown from '@/components/biz/AccountsDropdown';
+import pkg from '../../package.json';
 
 export default function Settings() {
   const { wallet } = useWallet();
@@ -20,30 +21,10 @@ export default function Settings() {
     await wallet.lock();
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
   };
+  const appVersion = pkg.version;
 
   return (
-    <SecondaryPageWrapper
-      title="Settings"
-      footer={
-        <div className="flex flex-col space-y-2 w-full">
-          <Button variant="secondary" onClick={handleLock}>
-            <LockKeyholeIcon className="w-4 h-4 mr-2 duration-100 group-hover:stroke-white" />
-            Lock Elytro
-          </Button>
-
-          <Button variant="outline">
-            <ExternalLinkIcon className="w-4 h-4 mr-2" />
-            FAQ
-          </Button>
-
-          <div className="text-center text-gray-750">
-            {/* TODO: add link to join telegram group */}
-            <p>Join Telegram group</p>
-            <p>Version 1.00. Third party software licenses</p>
-          </div>
-        </div>
-      }
-    >
+    <SecondaryPageWrapper title="Settings">
       <div className="bg-gray-150 p-lg rounded-sm space-y-2">
         <h2 className="elytro-text-small-bold text-gray-600 pd-md">
           Account settings
@@ -72,12 +53,38 @@ export default function Settings() {
             label="Device Profile"
             path={SIDE_PANEL_ROUTE_PATHS.LocalProfile}
           />
+          {/*
+          // TODO: add network configuration page
           <SettingItem
             icon={Settings2Icon}
             label="Network configuration"
-            // TODO: add network configuration page
             path={''} //SIDE_PANEL_ROUTE_PATHS.Network}
           />
+          */}
+        </div>
+        <div className="flex flex-col space-y-2 w-full my-8">
+          <Button variant="secondary" onClick={handleLock}>
+            <LockKeyholeIcon className="w-4 h-4 mr-2 duration-100 group-hover:stroke-white" />
+            Lock Elytro
+          </Button>
+
+          <Button variant="outline">
+            <ExternalLinkIcon className="w-4 h-4 mr-2" />
+            FAQ
+          </Button>
+
+          <div className="text-center text-gray-750">
+            <p>
+              <a
+                href="https://t.me/+l9coqJq9QHgyYjI1"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Join Telegram group
+              </a>
+            </p>
+            <p>version {appVersion}</p>
+          </div>
         </div>
       </div>
     </SecondaryPageWrapper>

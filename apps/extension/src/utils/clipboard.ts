@@ -51,7 +51,8 @@ const isClipboardAPISupported = (): boolean =>
  */
 export const safeClipboard = async (
   text: string,
-  showToast = true
+  showToast = true,
+  onCopied?: (error?: Error) => void
 ): Promise<void> => {
   try {
     if (isClipboardAPISupported()) {
@@ -65,10 +66,12 @@ export const safeClipboard = async (
         title: 'Copied',
       });
     }
+    onCopied?.();
   } catch (error) {
     toast({
       title: 'Copy failed',
     });
+    onCopied?.(error as Error);
     throw error;
   }
 };

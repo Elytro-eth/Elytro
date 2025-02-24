@@ -1,22 +1,35 @@
 import { useAccount } from '@/contexts/account-context';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
-import { ChevronDown, Copy } from 'lucide-react';
+import { ChevronDown, Copy, Check } from 'lucide-react';
 import ReceiveAddressBadge from '@/components/biz/ReceiveAddressBadge';
 import { CircleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { safeClipboard } from '@/utils/clipboard';
 import { useChain } from '@/contexts/chain-context';
 import Spin from '@/components/ui/Spin';
+import { useCallback, useState } from 'react';
 
 export default function Receive() {
   const {
     currentAccount: { address },
   } = useAccount();
   const { currentChain } = useChain();
+  const [isCopied, setIsCopied] = useState(false);
 
   const handleClickChainSelector = () => {
     alert('TODO: Chain selector?');
   };
+
+  const onCopied = useCallback((error?: Error) => {
+    if (!error) {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 1000);
+    }
+  }, []);
+
+  const onCopy = useCallback(() => {
+    safeClipboard(address!, false, onCopied);
+  }, [address]);
 
   if (!currentChain) {
     return <Spin isLoading />;
@@ -61,10 +74,19 @@ export default function Receive() {
           variant="secondary"
           size="large"
           className="w-full group hover:stroke-white"
-          onClick={() => safeClipboard(address!)}
+          onClick={onCopy}
         >
-          <Copy className="elytro-clickable-icon mr-2xs group-hover:stroke-white" />
-          Copy Address
+          {isCopied ? (
+            <>
+              <Check className="elytro-clickable-icon mr-2xs group-hover:stroke-white" />
+              Address copied
+            </>
+          ) : (
+            <>
+              <Copy className="elytro-clickable-icon mr-2xs group-hover:stroke-white" />
+              Copy address
+            </>
+          )}
         </Button>
       </div>
     </SecondaryPageWrapper>

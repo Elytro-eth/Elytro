@@ -1,7 +1,6 @@
 import {
   ArrowDownLeft,
   ArrowUpRight,
-  Copy,
   Settings2Icon,
   RefreshCcw,
 } from 'lucide-react';
@@ -12,7 +11,7 @@ import ActivateButton from './ActivateButton';
 import { useAccount } from '@/contexts/account-context';
 import { useChain } from '@/contexts/chain-context';
 import AccountsDropdown from './AccountsDropdown';
-import { safeClipboard } from '@/utils/clipboard';
+import Copy from '@/components/ui/Copy';
 import { useEffect } from 'react';
 
 export default function BasicAccountInfo() {
@@ -55,10 +54,7 @@ export default function BasicAccountInfo() {
       <div className="flex flex-row gap-3 w-full items-center justify-between mb-lg">
         <div className="flex flex-row gap-x-md items-center">
           <AccountsDropdown />
-          <Copy
-            className="elytro-clickable-icon size-4 stroke-gray-600 hover:stroke-gray-900"
-            onClick={() => safeClipboard(currentAccount.address)}
-          />
+          <Copy text={currentAccount.address} />
         </div>
         <div className="flex flex-row gap-x-md">
           <RefreshCcw
