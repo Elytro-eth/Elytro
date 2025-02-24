@@ -80,17 +80,16 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     // }
   };
 
-  const getTxType = (type: UserOpType, params?: Transaction) => {
-    if (type === UserOpType.DeployWallet) {
-      return HistoricalActivityTypeEn.ActivateAccount;
+  const getTxType = (type: UserOpType) => {
+    switch (type) {
+      case UserOpType.DeployWallet:
+        return HistoricalActivityTypeEn.ActivateAccount;
+      case UserOpType.SendTransaction:
+        return HistoricalActivityTypeEn.Send;
+      // TODO: no 'receive' tx type yet.
+      default:
+        return HistoricalActivityTypeEn.ContractInteraction;
     }
-
-    if (params?.data?.length && params.data.length > 0) {
-      return HistoricalActivityTypeEn.ContractInteraction;
-    }
-
-    // TODO: no 'receive' tx type yet.
-    return HistoricalActivityTypeEn.Send;
   };
 
   const packUserOp = async (type: UserOpType, params?: Transaction[]) => {
@@ -111,6 +110,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
 
         currentUserOp = await wallet.createTxUserOp(params);
         // TODO: use the first decoded result only. what if there are multiple decoded results?
+
         const decodeRes = (await wallet.decodeUserOp(currentUserOp))?.[0];
 
         if (!decodeRes) {
@@ -126,7 +126,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       userOpRef.current = res.userOp;
       setCalcResult(res.calcResult);
       setHasSufficientBalance(!res.calcResult.needDeposit);
-      txTypeRef.current = getTxType(type, params?.[0]);
+      txTypeRef.current = getTxType(type);
     } catch (err: unknown) {
       const errMsg = (err as Error)?.message || String(err) || 'Unknown Error';
       toast({
@@ -141,11 +141,14 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    if (approval?.data?.tx?.[0]) {
-      packUserOp(
-        UserOpType.ApproveTransaction,
-        approval?.data?.tx as Transaction[]
-      );
+    const txInfo = approval?.data?.tx as Transaction[];
+    if (txInfo?.[0]) {
+      const type =
+        !txInfo[0].data || txInfo[0].data === '0x'
+          ? UserOpType.SendTransaction
+          : UserOpType.ApproveTransaction;
+
+      packUserOp(type, txInfo);
     }
   }, [approval]);
 

@@ -1,13 +1,26 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useWallet } from '@/contexts/wallet';
 import { useHashLocation } from 'wouter/use-hash-location';
 import useSearchParams from '@/hooks/use-search-params';
-import { Address } from 'viem';
+import { Address, toHex } from 'viem';
 import useTokens, { TokenDTO } from '@/hooks/use-tokens';
-import { UserOperationHistory } from '@/constants/operations';
+import {
+  UserOperationStatusEn,
+  HistoricalActivityTypeEn,
+  UserOperationHistory,
+} from '@/constants/operations';
 import RuntimeMessage from '@/utils/message/runtimeMessage';
 import { EVENT_TYPES } from '@/constants/events';
 import { removeSearchParamsOfCurrentWindow } from '@/utils/url';
+import { query, query_receive_activities } from '@/requests/query';
+import { debounce, DebouncedFunc } from 'lodash';
 
 const DEFAULT_ACCOUNT_INFO: TAccountInfo = {
   address: '',
@@ -17,8 +30,8 @@ const DEFAULT_ACCOUNT_INFO: TAccountInfo = {
 };
 
 type IAccountContext = {
-  accountInfo: TAccountInfo;
-  updateAccount: () => Promise<void>;
+  currentAccount: TAccountInfo;
+  updateAccount: DebouncedFunc<() => Promise<void>>;
   loading: boolean;
   tokenInfo: {
     tokens: TokenDTO[];
@@ -26,22 +39,22 @@ type IAccountContext = {
   };
   history: UserOperationHistory[];
   accounts: TAccountInfo[];
-  updateHistory: () => Promise<void>;
+  updateHistory: DebouncedFunc<() => Promise<void>>;
   getAccounts: () => Promise<void>;
   updateTokens: () => Promise<void>;
 };
 
 // TODO: extract HistoryContext
 const AccountContext = createContext<IAccountContext>({
-  accountInfo: DEFAULT_ACCOUNT_INFO,
-  updateAccount: async () => {},
+  currentAccount: DEFAULT_ACCOUNT_INFO,
+  updateAccount: debounce(async () => {}, 1000),
   loading: false,
   tokenInfo: {
     tokens: [],
     loadingTokens: false,
   },
   history: [],
-  updateHistory: async () => {},
+  updateHistory: debounce(async () => {}, 1000),
   accounts: [],
   getAccounts: async () => {},
   updateTokens: async () => {},
@@ -53,7 +66,7 @@ export const AccountProvider = ({
   children: React.ReactNode;
 }) => {
   const { wallet } = useWallet();
-  const [accountInfo, setAccountInfo] =
+  const [currentAccount, setCurrentAccount] =
     useState<TAccountInfo>(DEFAULT_ACCOUNT_INFO);
   const [loading, setLoading] = useState(false);
   const [pathname] = useHashLocation();
@@ -62,7 +75,7 @@ export const AccountProvider = ({
   const [history, setHistory] = useState<UserOperationHistory[]>([]);
   const [accounts, setAccounts] = useState<TAccountInfo[]>([]);
 
-  const updateAccount = async () => {
+  const updateAccount = debounce(async () => {
     if (loading) {
       return;
     }
@@ -71,7 +84,7 @@ export const AccountProvider = ({
       setLoading(true);
 
       const res = (await wallet.getCurrentAccount()) ?? DEFAULT_ACCOUNT_INFO;
-      setAccountInfo(res);
+      setCurrentAccount(res);
       updateHistory();
 
       if (intervalRef.current && res.isDeployed) {
@@ -83,23 +96,32 @@ export const AccountProvider = ({
     } finally {
       setLoading(intervalRef.current ? true : false);
     }
-  };
+  }, 1000);
 
   const { tokens, loadingTokens, refetchTokens } = useTokens({
-    address: accountInfo.address as Address,
-    chainId: accountInfo.chainId,
+    address: currentAccount.address as Address,
+    chainId: currentAccount.chainId,
   });
 
   const updateTokens = async () => {
+    if (loading || !currentAccount.address) {
+      return;
+    }
+
     await refetchTokens();
   };
 
-  // TODO: check this logic
-  const updateHistory = async () => {
-    const res = await wallet.getLatestHistories();
+  const updateHistory = debounce(async () => {
+    const localHistory = await wallet.getLatestHistories();
+
+    const receives = await getReceiveActivities();
+
+    const res = [...localHistory, ...receives].sort(
+      (a, b) => b.timestamp - a.timestamp
+    );
 
     setHistory(res);
-  };
+  }, 1000);
 
   useEffect(() => {
     if (!history) {
@@ -113,8 +135,36 @@ export const AccountProvider = ({
     };
   }, []);
 
+  const getReceiveActivities = async () => {
+    const account = await wallet.getCurrentAccount();
+    if (!account?.address) {
+      return;
+    }
+
+    const res = (await query(query_receive_activities, {
+      address: account?.address as Address,
+      chainId: toHex(account?.chainId ?? 0),
+    })) as SafeAny;
+
+    const transactions = res.transactions.map((item: SafeAny) => {
+      return {
+        type: HistoricalActivityTypeEn.Receive,
+        from: item.list[0].asset_from,
+        to: item.list[0].asset_to,
+        value: item.list[0].asset_value,
+        timestamp: item.timestamp * 1000,
+        opHash: item.opHash || item.txhash,
+        status: UserOperationStatusEn.confirmedSuccess,
+        decimals: item.list[0].decimals,
+        symbol: item.list[0].symbol,
+      };
+    });
+
+    return transactions;
+  };
+
   useEffect(() => {
-    if (!loading && !accountInfo.address) {
+    if (!loading && !currentAccount.address) {
       updateAccount();
     }
   }, [pathname]);
@@ -147,23 +197,26 @@ export const AccountProvider = ({
     getAccounts();
   }, []);
 
+  const contextValue = useMemo(
+    () => ({
+      currentAccount,
+      updateAccount,
+      tokenInfo: {
+        tokens,
+        loadingTokens,
+      },
+      updateTokens,
+      history,
+      updateHistory,
+      loading,
+      accounts,
+      getAccounts,
+    }),
+    [currentAccount, tokens, loadingTokens, history, loading, accounts]
+  );
+
   return (
-    <AccountContext.Provider
-      value={{
-        accountInfo,
-        updateAccount,
-        tokenInfo: {
-          tokens,
-          loadingTokens,
-        },
-        updateTokens,
-        history,
-        updateHistory,
-        loading,
-        accounts,
-        getAccounts,
-      }}
-    >
+    <AccountContext.Provider value={contextValue}>
       {children}
     </AccountContext.Provider>
   );

@@ -5,8 +5,8 @@ import { LoaderCircle } from 'lucide-react';
 import AddressWithChain from '@/components/AddressWithChain';
 import ContentWrapper from '@/components/ContentWrapper';
 import { Button } from '@/components/ui/button';
-import React from 'react';
-import { notFound, redirect } from 'next/navigation';
+import React, { useEffect } from 'react';
+import { redirect } from 'next/navigation';
 import { TRecoveryStatus } from '@/constants/enums';
 import LinkWithQuery from '@/components/LinkWithQuery';
 
@@ -15,6 +15,7 @@ interface IStepBlockProps {
   description: string;
   index: number;
   actionButton: React.ReactNode;
+  variant: 'available' | 'unavailable';
 }
 
 const StepBlock = ({
@@ -22,15 +23,33 @@ const StepBlock = ({
   description,
   index,
   actionButton,
+  variant,
 }: IStepBlockProps) => {
+  const bgColor = variant === 'available' ? 'bg-gray-150' : 'bg-gray-0';
+  const borderColor =
+    variant === 'available' ? 'border-gray-150' : 'border-gray-300';
+  const subborderColor =
+    variant === 'available' ? 'border-gray-900' : 'border-gray-300';
+  const textColor = variant === 'available' ? 'text-gray-900' : 'text-gray-300';
+  const subtextColor =
+    variant === 'available' ? 'text-gray-450' : 'text-gray-300';
+
   return (
-    <div className="flex flex-col gap-y-md p-lg rounded-lg bg-gray-150 max-w-[248px]">
-      <div className="text-tiny-bold  text-center size-5 border-[1.5px] border-dark-blue rounded-full">
+    <div
+      className={`flex flex-col gap-y-md p-lg rounded-lg border-1 ${bgColor} ${borderColor} max-w-[248px]`}
+    >
+      <div
+        className={`text-tiny-bold text-center size-5 border-[1.5px] ${subborderColor} ${textColor} rounded-full`}
+      >
         {index}
       </div>
       <div className="flex flex-col gap-y-2xs">
-        <div className="text-small-bold text-gray-900 text-nowrap">{title}</div>
-        <div className="text-tiny text-gray-450 whitespace-pre-wrap">
+        <div className={`text-small-bold ${textColor} text-nowrap`}>
+          {title}
+        </div>
+        <div
+          className={`text-tiny text-gray-450 ${subtextColor} whitespace-pre-wrap`}
+        >
           {description}
         </div>
       </div>
@@ -40,7 +59,11 @@ const StepBlock = ({
 };
 
 export default function Home() {
-  const { recoveryRecord, loading } = useRecoveryRecord();
+  const { recoveryRecord, loading, getRecoveryRecord } = useRecoveryRecord();
+
+  useEffect(() => {
+    getRecoveryRecord();
+  }, []);
 
   if (loading) {
     return (
@@ -55,10 +78,6 @@ export default function Home() {
         <div className="text-bold-body">Fetching recovery details...</div>
       </div>
     );
-  }
-
-  if (!recoveryRecord) {
-    return notFound();
   }
 
   if (
@@ -82,6 +101,7 @@ export default function Home() {
             index={1}
             title="Sign the recovery"
             description="A minimum number of signatures are needed for recovery"
+            variant="available"
             actionButton={
               <Button
                 disabled={
@@ -97,8 +117,10 @@ export default function Home() {
             index={2}
             title="Begin & Complete recovery"
             description="48 hours security time is required after you begin the recovery"
+            variant="unavailable"
             actionButton={
               <Button
+                className="border-gray-450 border-1 text-gray-450 bg-gray-0 shadow-none"
                 disabled={
                   recoveryRecord?.status !== TRecoveryStatus.SIGNATURE_COMPLETED
                 }

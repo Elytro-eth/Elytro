@@ -15,7 +15,7 @@ export default function ContactDetail({
   contact,
   onSaveContact,
 }: IContactDetailProps) {
-  const { accountInfo: currentAccount } = useAccount();
+  const { currentAccount: currentAccount } = useAccount();
   const [address, setAddress] = useState<string>(contact?.address || '');
   const [name, setName] = useState<string>(contact?.name || '');
 
@@ -24,7 +24,7 @@ export default function ContactDetail({
   };
 
   return (
-    <div className="flex flex-col h-full justify-between ">
+    <div className="flex flex-col justify-between ">
       <div className=" flex flex-col gap-y-md">
         <h1 className="elytro-text-bold-body my-1">
           {contact ? 'Edit' : 'Add'} a recovery contact
@@ -53,6 +53,7 @@ export default function ContactDetail({
       </div>
 
       <Button
+        className="mt-4"
         disabled={!isAddress(address)}
         onClick={() => onSaveContact({ address, name })}
       >

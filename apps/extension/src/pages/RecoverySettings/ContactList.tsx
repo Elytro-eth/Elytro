@@ -33,7 +33,7 @@ export default function ContactList({
   onEditContact,
   onDeleteContact,
 }: IContactListProps) {
-  const { accountInfo: currentAccount } = useAccount();
+  const { currentAccount: currentAccount } = useAccount();
   const { wallet } = useWallet();
   const { openUserOpConfirmTx } = useTx();
   const [loading, setLoading] = useState(false);
@@ -50,11 +50,12 @@ export default function ContactList({
         Number(myThreshold)
       );
 
-      openUserOpConfirmTx(UserOpType.SendTransaction, txs);
+      openUserOpConfirmTx(UserOpType.ApproveTransaction, txs);
     } catch (error) {
       toast({
         title: 'Confirm contacts failed',
         description: String(error),
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -62,7 +63,7 @@ export default function ContactList({
   };
 
   return (
-    <div className="flex flex-col justify-between h-full">
+    <div className="flex flex-col justify-between">
       <div className="flex flex-col gap-y-md">
         <h1 className="elytro-text-bold-body">Your recovery contacts</h1>
 
@@ -151,7 +152,7 @@ export default function ContactList({
 
             <Button variant="secondary" size="tiny" onClick={onAddContact}>
               <Plus className="h-4 w-4 mr-1 stroke-[1.5px] group-hover:stroke-white" />
-              Add a new contact
+              Add contact
             </Button>
           </div>
         )}
@@ -159,13 +160,15 @@ export default function ContactList({
 
       {/* Contact List */}
 
-      <Button
-        className="w-full"
-        disabled={!contacts.length || loading || Number(myThreshold) < 1}
-        onClick={handleConfirmContacts}
-      >
-        {loading ? 'Confirming...' : 'Confirm contacts'}
-      </Button>
+      {contacts.length ? (
+        <Button
+          className="w-full mt-10"
+          disabled={!contacts.length || loading || Number(myThreshold) < 1}
+          onClick={handleConfirmContacts}
+        >
+          {loading ? 'Confirming...' : 'Confirm contacts'}
+        </Button>
+      ) : null}
     </div>
   );
 }

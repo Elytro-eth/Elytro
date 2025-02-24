@@ -1,4 +1,11 @@
-import { formatEther, Hex, hexToBigInt, isAddress, parseEther } from 'viem';
+import {
+  encodeFunctionData,
+  formatEther,
+  Hex,
+  hexToBigInt,
+  isAddress,
+  parseEther,
+} from 'viem';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,11 +30,13 @@ import TokenSelector from '@/components/biz/TokenSelector';
 import AmountInput from '@/components/biz/AmountInput';
 import { useTx } from '@/contexts/tx-context';
 import { UserOpType } from '@/contexts/tx-context';
+import { ABI_ERC20 } from '@/constants/abi';
+import { toast } from '@/hooks/use-toast';
 
 export default function SendTx() {
   const {
     tokenInfo: { tokens = [] },
-    accountInfo: { address },
+    currentAccount: { address },
   } = useAccount();
   const { currentChain } = useChain();
   const { openUserOpConfirmTx } = useTx();
@@ -39,6 +48,7 @@ export default function SendTx() {
       decimals: z.number(),
       symbol: z.string(),
       price: z.number(),
+      contractAddress: z.string(),
     }),
     amount: z.string().superRefine((data, ctx) => {
       if (data === '' || isNaN(Number(data)) || Number(data) <= 0) {
@@ -96,29 +106,36 @@ export default function SendTx() {
       return;
     }
 
-    const txParams: Transaction = {
-      to: form.getValues('to'),
-      value: parseEther(form.getValues('amount')).toString(),
-    };
+    const token = form.getValues('token');
+    const to = form.getValues('to');
+
+    if (to.toLowerCase() === address.toLowerCase()) {
+      toast({
+        title: 'Cannot send to yourself',
+        description: 'Please input a valid address.',
+      });
+      return;
+    }
+
+    const txParams: Transaction = { to };
+
+    const amount = parseEther(form.getValues('amount')).toString();
+    if (token.symbol === 'ETH') {
+      txParams.value = amount;
+    } else {
+      txParams.to = token.contractAddress;
+      txParams.data = encodeFunctionData({
+        abi: ABI_ERC20,
+        functionName: 'transfer',
+        args: [to, amount],
+      });
+    }
 
     openUserOpConfirmTx(UserOpType.SendTransaction, [txParams]);
   };
 
   return (
-    <SecondaryPageWrapper
-      title="Send"
-      footer={
-        <Button
-          variant="secondary"
-          size="large"
-          className="w-full"
-          disabled={!form.formState.isValid}
-          onClick={handleContinue}
-        >
-          Continue
-        </Button>
-      }
-    >
+    <SecondaryPageWrapper title="Send">
       <div>
         <Form {...form}>
           <div className="bg-light-green rounded-sm">
@@ -187,7 +204,7 @@ export default function SendTx() {
             </div>
           </div>
         </Form>
-        <div className="p-4 bg-gray-150 rounded-sm space-y-2">
+        <div className="p-4 bg-gray-150 rounded-sm space-y-2 mb-4">
           <div className="flex justify-between items-center">
             <div className="font-bold text-base text-gray-750">
               From account
@@ -206,6 +223,16 @@ export default function SendTx() {
             </div>
           </div>
         </div>
+
+        <Button
+          variant="secondary"
+          size="large"
+          className="w-full gap-xl"
+          disabled={!form.formState.isValid}
+          onClick={handleContinue}
+        >
+          Continue
+        </Button>
       </div>
     </SecondaryPageWrapper>
   );

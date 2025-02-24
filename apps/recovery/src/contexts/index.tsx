@@ -28,7 +28,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [recoveryRecord, setRecoveryRecord] = useState<TRecoveryInfo | null>(
     null
   );
@@ -42,6 +42,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({
 
   const getRecoveryRecord = async () => {
     try {
+      if (loading) return;
       setLoading(true);
       if (!recoveryRecordId) {
         throw new Error('Recovery record id is required');

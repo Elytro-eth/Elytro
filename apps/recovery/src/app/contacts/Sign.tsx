@@ -1,6 +1,6 @@
 'use client';
 import AddressWithChain from '@/components/AddressWithChain';
-import { useAccount } from 'wagmi';
+import { useAccount, useSwitchChain } from 'wagmi';
 import { useRecoveryRecord } from '@/contexts';
 import React from 'react';
 import { Button } from '@/components/ui/button';
@@ -16,8 +16,9 @@ import { MUTATION_ADD_CONTACT_SIGNATURE } from '@/requests/gqls';
 import { toast } from '@/hooks/use-toast';
 
 export default function Sign() {
-  const { address, isConnected, connector } = useAccount();
-  const { recoveryRecord, getRecoveryRecord } = useRecoveryRecord();
+  const { address, isConnected, connector, chainId } = useAccount();
+  const { switchChain } = useSwitchChain();
+  const { recoveryRecord, backToHome } = useRecoveryRecord();
 
   const isSigned = (
     recoveryRecord?.guardianSignatures as TGuardianSignature[]
@@ -25,6 +26,10 @@ export default function Sign() {
 
   const sendSignatureRequest = async () => {
     try {
+      if (chainId !== Number(recoveryRecord?.chainID)) {
+        switchChain({ chainId: Number(recoveryRecord?.chainID) });
+      }
+
       const nonce = await getWalletNonce(
         recoveryRecord?.address,
         Number(recoveryRecord?.chainID)
@@ -56,11 +61,12 @@ export default function Sign() {
         title: 'Success',
         description: 'Signature sent successfully',
       });
-      getRecoveryRecord();
-    } catch {
+
+      backToHome();
+    } catch (error) {
       toast({
         title: 'Failed to sign',
-        description: 'Please try again',
+        description: (error as SafeAny)?.details || 'Please try again',
       });
     }
   };
@@ -74,7 +80,8 @@ export default function Sign() {
       />
 
       <Button
-        className="w-full mt-lg"
+        size="lg"
+        className="w-full mt-lg shadow-none"
         disabled={!isConnected || isSigned}
         onClick={sendSignatureRequest}
       >

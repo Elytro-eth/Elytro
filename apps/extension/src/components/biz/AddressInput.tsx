@@ -117,7 +117,7 @@ export default function AddressInput({
           <FragmentedAddress
             address={displayLabel}
             chainId={currentChain?.id}
-            size="md"
+            size="lg"
           />
         </div>
       );

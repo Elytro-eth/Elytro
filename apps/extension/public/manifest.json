@@ -12,9 +12,16 @@
     "default_path": "src/side-panel.html"
   },
   "action": {
-    "default_title": "Click to open panel"
+    "default_title": "Click to open Elytro wallet"
   },
-  "permissions": ["activeTab", "storage", "tabs", "sidePanel"],
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "sidePanel",
+    "gcm",
+    "notifications"
+  ],
   "web_accessible_resources": [
     {
       "matches": ["<all_urls>"],

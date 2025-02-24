@@ -9,6 +9,7 @@ export interface TokenDTO {
   symbol: string;
   tokenBalance: Hex;
   price: number;
+  contractAddress: string;
 }
 
 interface TokenQueryDTO {
@@ -32,6 +33,7 @@ export default function useTokens({
           symbol
           tokenBalance
           price
+          contractAddress
         }
       }
     `,

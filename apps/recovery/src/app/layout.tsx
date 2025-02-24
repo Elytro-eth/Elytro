@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { cookieToInitialState } from 'wagmi';
 
@@ -10,7 +9,6 @@ import ConnectControl from '@/components/ConnectControl';
 import { LogoHeader } from '@/components/LogoHeader';
 import { Toaster } from '@/components/ui/toaster';
 
-const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Elytro Recovery',
   description: "Help you recover your or your friend's Elytro accounts",
@@ -29,9 +27,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body
-        className={`${inter.className} antialiased w-screen h-screen screen-bg min-w-[800px]`}
-      >
+      <body className="antialiased w-screen h-screen screen-bg min-w-[800px]">
         <Providers initialState={initialState}>
           <Toaster />
           <header className="fixed top-0 left-0 right-0 flex items-center justify-between gap-2 px-xl py-lg">

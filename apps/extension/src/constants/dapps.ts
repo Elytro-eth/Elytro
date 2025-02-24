@@ -4,6 +4,7 @@ import lido from '@/assets/icons/lido.svg';
 import originEther from '@/assets/icons/ether.svg';
 import tenderizeV2 from '@/assets/icons/tenderize.svg';
 import makerDAO from '@/assets/icons/makerdao.svg';
+import logo from '@/assets/logo.svg';
 
 export const ENCOURAGE_DAPPS = [
   {
@@ -37,3 +38,9 @@ export const ENCOURAGE_DAPPS = [
     icon: makerDAO,
   },
 ];
+
+export const ELYTRO_APP_DATA: TDAppInfo = {
+  name: 'Elytro',
+  origin: 'https://elytro.com',
+  icon: logo,
+};

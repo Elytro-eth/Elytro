@@ -20,15 +20,16 @@ const passwordForm = z
       .string()
       .min(6, {
         message:
-          'The password should be more than 6 characters and include more than 1 capitalized letter.',
+          'Must be more than 6 characters with more than 1 capitalized letter.',
       })
       .refine((value) => /[A-Z]/.test(value), {
-        message: 'The password should include more than 1 capitalized letter.',
+        message:
+          'Must be more than 6 characters with more than 1 capitalized letter.',
       }),
     confirm: z.string(),
   })
   .refine((data) => data.password === data.confirm, {
-    message: "Passwords don't match",
+    message: "Passcodes don't match",
     path: ['confirm'], // path of error
   });
 
@@ -50,7 +51,10 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-3xl">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="w-full space-y-3xl"
+      >
         <div className="space-y-sm">
           <FormField
             control={form.control}
@@ -61,7 +65,7 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
                   <PasswordInput
                     field={field}
                     disabled={loading}
-                    placeholder="Enter password"
+                    placeholder="Enter passcode"
                     onPwdVisibleChange={setIsPwdVisible}
                   />
                 </FormControl>
@@ -70,8 +74,7 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
                   <FormMessage />
                 ) : (
                   <FormDescription>
-                    The password should be more than 6 characters and include
-                    more than 1 capitalized letter.
+                    More than 6 characters and at least 1 capitalized letter.
                   </FormDescription>
                 )}
               </FormItem>
@@ -87,7 +90,7 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
                   <PasswordInput
                     field={field}
                     disabled={loading}
-                    placeholder="Repeat password"
+                    placeholder="Repeat passcode"
                     showEye={false}
                     outerPwdVisible={isPwdVisible}
                   />
@@ -105,7 +108,7 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
           disabled={loading}
           size="large"
         >
-          {loading ? 'Creating...' : 'Next'}
+          {loading ? 'Creating...' : 'Continue'}
         </Button>
       </form>
     </Form>

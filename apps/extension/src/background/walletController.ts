@@ -11,7 +11,7 @@ import {
   formatObjectWithBigInt,
 } from '@/utils/format';
 import historyManager from './services/history';
-import { UserOperationHistory } from '@/constants/operations';
+import { HistoricalActivityTypeEn } from '@/constants/operations';
 import { Address, formatEther, Hex, isHex, toHex } from 'viem';
 import chainService from './services/chain';
 import accountManager from './services/account';
@@ -21,12 +21,16 @@ import {
   createRecoveryRecord,
   getRecoveryRecord,
 } from '@/utils/ethRpc/recovery';
+import { DecodeResult } from '@soulwallet/decoder';
+import { getTransferredTokenInfo } from '@/utils/dataProcess';
+import { TRecoveryStatus } from '@/constants/recovery';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
   NoAccount = 'NoAccount',
   HasAccountButLocked = 'HasAccountButLocked',
   HasAccountAndUnlocked = 'HasAccountAndUnlocked',
+  Recovering = 'Recovering',
 }
 
 // ! DO NOT use getter. They can not be proxied.
@@ -47,6 +51,10 @@ class WalletController {
     return keyring.locked;
   }
   public async getWalletStatus() {
+    if (accountManager.recoveryRecord) {
+      return WalletStatusEn.Recovering;
+    }
+
     if (!keyring.hasOwner) {
       return WalletStatusEn.NoOwner;
     }
@@ -140,11 +148,27 @@ class WalletController {
     }
   }
 
-  public async addNewHistory(data: UserOperationHistory) {
-    historyManager.add(data);
+  public async addNewHistory({
+    type,
+    opHash,
+    userOp,
+    decodedDetail,
+  }: {
+    type: HistoricalActivityTypeEn;
+    opHash: string;
+    userOp: ElytroUserOperation;
+    decodedDetail: DecodeResult;
+  }) {
+    historyManager.add({
+      timestamp: Date.now(),
+      type,
+      opHash,
+      from: userOp.sender,
+      ...getTransferredTokenInfo(decodedDetail),
+    });
   }
 
-  public getLatestHistories() {
+  public async getLatestHistories() {
     return historyManager.histories.map((item) => ({
       ...item.data,
       status: item.status,
@@ -369,10 +393,30 @@ class WalletController {
     return accountManager.recoveryRecord?.address;
   }
 
-  public async getRecoveryRecord(address: Address) {
-    console.log('accountManager.recoveryRecord', accountManager.recoveryRecord);
+  public async getRecoveryRecord(address?: Address) {
     if (accountManager.recoveryRecord) {
-      return await getRecoveryRecord(accountManager.recoveryRecord.id);
+      const record = await getRecoveryRecord(accountManager.recoveryRecord.id);
+
+      if (record?.status === TRecoveryStatus.RECOVERY_COMPLETED) {
+        accountManager.recoveryRecord = null;
+
+        accountManager.updateCurrentAccountInfo({
+          address: record?.address,
+          chainId: Number(record?.chainID),
+          isDeployed: true,
+        });
+
+        this._onAccountChanged();
+      } else if (record?.status === TRecoveryStatus.RECOVERY_CANCELED) {
+        accountManager.recoveryRecord = null;
+        await keyring.reset();
+      }
+
+      return record;
+    }
+
+    if (!address) {
+      throw new Error('Elytro: No address provided');
     }
 
     const newOwner = keyring.owner?.address;

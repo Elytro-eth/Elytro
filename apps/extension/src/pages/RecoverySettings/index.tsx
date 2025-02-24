@@ -15,7 +15,7 @@ enum ShowType {
 export default function RecoverySettings() {
   const { wallet } = useWallet();
   const {
-    accountInfo: { address },
+    currentAccount: { address },
   } = useAccount();
   const [loading, setLoading] = useState(false);
   const [contacts, setContacts] = useState<TRecoveryContact[]>([]);
@@ -46,12 +46,12 @@ export default function RecoverySettings() {
 
   if (loading) {
     return (
-      <div className="relative h-full w-full flex flex-col items-center justify-center gap-y-sm">
-        <ProcessingTip body="Retrieving recovery contacts" subBody="" />
+      <div className="relative h-full w-full flex flex-col items-center gap-y-sm p-4">
+        <ProcessingTip body="Retrieving recovery contacts" />
         <Button
           size="large"
           variant="outline"
-          className="w-full bottom-lg absolute"
+          className="w-full mx-8"
           onClick={() => {
             history.back();
           }}
@@ -95,7 +95,7 @@ export default function RecoverySettings() {
 
   return (
     <SecondaryPageWrapper
-      title="Social recovery"
+      title="Social Recovery"
       onBack={() => {
         if (showType === ShowType.Detail) {
           setShowType(ShowType.List);

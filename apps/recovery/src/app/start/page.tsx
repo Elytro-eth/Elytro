@@ -20,7 +20,7 @@ enum RecoveryStatusEn {
   Completed = 3, // Recovery completed
 }
 
-const DELAY_TIME = 48 * 60 * 60 * 1_000; // 48 hours
+// const DELAY_TIME = 48 * 60 * 60 * 1_000; // 48 hours
 
 const TimeBlock = ({ time, unit }: { time: number; unit: string }) => {
   return (
@@ -84,7 +84,7 @@ export default function Start() {
       status = RecoveryStatusEn.NonStarted;
     } else if (validTime === 1) {
       status = RecoveryStatusEn.Completed;
-    } else if (validTime * 1000 + DELAY_TIME > Date.now()) {
+    } else if (validTime * 1000 > Date.now()) {
       status = RecoveryStatusEn.Waiting;
     } else {
       status = RecoveryStatusEn.Ready;
@@ -117,7 +117,7 @@ export default function Start() {
 
   useEffect(() => {
     if (status === RecoveryStatusEn.Waiting) {
-      const targetTime = recoveryRecord!.validTime * 1000 + DELAY_TIME;
+      const targetTime = recoveryRecord!.validTime * 1000;
 
       const interval = setInterval(() => {
         const lastTime = targetTime - Date.now();
@@ -148,7 +148,14 @@ export default function Start() {
       currentStep={2}
       allSteps={3}
       title="Start Recovery"
-      subtitle="It will take effect in 48 hours. You can access your account after the countdown."
+      subtitle={
+        <span
+          dangerouslySetInnerHTML={{
+            __html:
+              'It will take effect in 48 hours. You can access your <br />account after the countdown.',
+          }}
+        />
+      }
     >
       {/* Count down */}
       <div className="flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg">
@@ -159,6 +166,7 @@ export default function Start() {
 
       <div className="grid grid-cols-2 gap-x-sm items-center">
         <Button
+          size="lg"
           variant={
             status === RecoveryStatusEn.NonStarted ? 'default' : 'outline'
           }
@@ -170,6 +178,7 @@ export default function Start() {
         </Button>
 
         <Button
+          size="lg"
           variant={status === RecoveryStatusEn.Ready ? 'default' : 'outline'}
           disabled={isLoading || status !== RecoveryStatusEn.Ready}
           onClick={completeRecovery}

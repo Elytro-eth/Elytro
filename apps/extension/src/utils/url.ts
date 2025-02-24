@@ -8,7 +8,7 @@ export const getDAppInfoFromSender = async (
     origin,
     name: tabInfo?.title || 'unknown',
     icon: tabInfo?.favIconUrl || '',
-  };
+  } as TDAppInfo;
 };
 
 export const removeSearchParamsOfCurrentWindow = (paramName: string) => {

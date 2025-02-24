@@ -10,6 +10,10 @@ let isUnlocking = false;
 // TODO: check if other methods are private
 const PRIVATE_METHODS: ProviderMethodType[] = [
   'eth_requestAccounts',
+  'wallet_requestPermissions',
+  'wallet_addEthereumChain',
+  'wallet_switchEthereumChain',
+  'wallet_revokePermissions',
   'eth_sendTransaction',
   'personal_sign',
   'eth_signTypedData_v1',

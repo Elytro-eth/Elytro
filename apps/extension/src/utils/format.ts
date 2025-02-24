@@ -82,7 +82,7 @@ export function formatAddressToShort(address: Nullable<string>) {
 export function formatTokenAmount(
   amount: string | null | undefined,
   decimals: number = 18,
-  symbol: string = 'ETH'
+  symbol: string = ''
 ): string {
   // todo: format amount. 8 decimal places is enough?
   try {
@@ -181,18 +181,18 @@ export const formatObjectWithBigInt = (obj: SafeAny): SafeAny => {
       return Object.fromEntries(
         Object.entries(obj).map(([key, value]) => [
           key,
-          formatBigIntToHex(value),
+          formatObjectWithBigInt(value),
         ])
       );
     case 'array':
       return (obj as SafeAny[]).map((value) => formatObjectWithBigInt(value));
+    case 'bigint':
+      return formatBigIntToHex(obj);
     case 'function':
     case 'undefined':
     case 'null':
-    case 'bigint':
-      return obj;
     default:
-      return formatBigIntToHex(obj);
+      return obj;
   }
 };
 
@@ -296,7 +296,7 @@ export function formatQuantity(value: SafeAny): string {
 
 export function getHostname(url?: string) {
   try {
-    const { hostname } = new URL(url || '');
+    const { hostname } = new URL(url || '--');
     return hostname;
   } catch {
     return url;

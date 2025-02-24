@@ -3,7 +3,7 @@ import { Select, SelectTrigger, SelectContent } from '@/components/ui/select';
 import { ChevronDown } from 'lucide-react';
 import { formatEther } from 'viem';
 import DefaultTokenIcon from '@/assets/icons/ether.svg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TokenItem from '@/components/ui/TokenItem';
 import { cn } from '@/utils/shadcn/utils';
 
@@ -46,7 +46,13 @@ export default function TokenSelector({
   onTokenChange?: (token: TokenDTO) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [selectedToken, setSelectedToken] = useState<TokenDTO | null>(null);
+  const defaultToken =
+    tokens.find((token) => Number(token.tokenBalance) > 0) ??
+    tokens?.[0] ??
+    null;
+  const [selectedToken, setSelectedToken] = useState<TokenDTO | null>(
+    defaultToken
+  );
   const handleSelect = (item: TokenDTO) => {
     setSelectedToken(item);
     if (onTokenChange) {
@@ -54,6 +60,13 @@ export default function TokenSelector({
     }
     setOpen(false);
   };
+
+  useEffect(() => {
+    if (selectedToken && onTokenChange) {
+      onTokenChange?.(selectedToken);
+    }
+  }, []);
+
   return (
     <Select open={open}>
       <SelectTrigger

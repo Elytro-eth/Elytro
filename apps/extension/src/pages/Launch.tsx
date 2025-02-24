@@ -35,8 +35,13 @@ export default function Launch() {
   };
 
   const renderContent = useMemo(() => {
-    if (status === WalletStatusEn.NoAccount) {
+    if (status === WalletStatusEn.Recovering) {
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.AccountRecovery);
+      return null;
+    }
+
+    if (status === WalletStatusEn.NoAccount) {
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreateAccount);
       return null;
     }
 
@@ -51,7 +56,10 @@ export default function Launch() {
         iconImg: LaunchImg,
         content: (
           <div className="flex flex-col gap-y-3xl">
-            <PasswordInput onValueChange={(pwd) => setPwd(pwd)} />
+            <PasswordInput
+              onValueChange={(pwd) => setPwd(pwd)}
+              placeholder="Enter your passcode"
+            />
             <Button onClick={handleUnlock} disabled={!pwd || pwd.length < 7}>
               Unlock
             </Button>
@@ -65,7 +73,8 @@ export default function Launch() {
           <>
             {/* TODO: navigate to new create account page */}
             <Button
-              className="rounded-full w-full px-4 py-5 h-14 mb-4 font-medium text-lg leading-6"
+              size="large"
+              className="mb-3"
               onClick={() => {
                 navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreatePasscode);
               }}
@@ -74,13 +83,14 @@ export default function Launch() {
             </Button>
             {/* TODO: navigate to import/recover account page */}
             <Button
+              size="large"
               variant="secondary"
               onClick={() =>
                 // TODO: this is a temporary dev mock: go to recover account page without user's confirmation
                 navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Transfer)
               }
             >
-              I already have an account
+              Already have an account
             </Button>
           </>
         ),
@@ -95,10 +105,10 @@ export default function Launch() {
   const { title, content, iconImg } = renderContent;
 
   return (
-    <div className="elytro-gradient-bg flex flex-1 flex-col items-center justify-center px-3xl h-full gap-y-3xl">
+    <div className="elytro-gradient-bg flex flex-1 flex-col items-center justify-center px-xl h-full gap-y-3xl">
       <img src={iconImg} alt="Launch" className="size-[164px]" />
       <h1 className="elytro-text-headline text-center">{title}</h1>
-      <div className="flex flex-col gap-y-md w-full">{content}</div>
+      <div className="flex flex-col w-full">{content}</div>
     </div>
   );
 }

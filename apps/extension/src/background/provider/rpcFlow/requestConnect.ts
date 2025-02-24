@@ -65,8 +65,8 @@ export const requestConnect: TFlowMiddleWareFn = async (ctx, next) => {
       if (method === 'wallet_requestPermissions') {
         return connectionManager.getPermissions(dApp.origin);
       }
-    } catch {
-      return ethErrors.provider.userRejectedRequest();
+    } catch (error) {
+      return error || ethErrors.provider.userRejectedRequest();
     } finally {
       connectingSites.delete(dApp.origin);
     }

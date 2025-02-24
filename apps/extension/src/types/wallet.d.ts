@@ -41,8 +41,8 @@ type TElytroTxInfo = {
 
 type TDAppInfo = {
   name: string;
-  origin?: string;
   icon: string;
+  origin?: string;
 };
 
 type TConnectedDAppInfo = TDAppInfo & {

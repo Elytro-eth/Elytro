@@ -27,7 +27,7 @@ export default function Contacts() {
     }
 
     return {
-      subtitle: 'Connect to the following wallet address to sign the recovery',
+      subtitle: 'Select the account you will use to sign',
       content: <Status />,
     };
   }, [recoveryRecord, address]);
@@ -37,8 +37,8 @@ export default function Contacts() {
       title={
         <div className="text-left mr-5xl">Sign your friend’s recovery</div>
       }
-      allSteps={3}
-      currentStep={1}
+      // allSteps={3}
+      // currentStep={1}
       subtitle={subtitle}
     >
       {content}

@@ -15,7 +15,7 @@ import { UserOpDetail } from '@/components/biz/UserOpDetail';
 const UserOpTitleMap = {
   [UserOpType.DeployWallet]: 'Activate account',
   [UserOpType.SendTransaction]: 'Send',
-  [UserOpType.ApproveTransaction]: 'Confirm Transaction',
+  [UserOpType.ApproveTransaction]: 'Confirm transaction',
 };
 
 export default function TxConfirm() {
@@ -31,7 +31,7 @@ export default function TxConfirm() {
   } = useTx();
   const { currentChain } = useChain();
   const [isSending, setIsSending] = useState(false);
-  const { reject, resolve, approval } = useApproval();
+  const { reject, resolve } = useApproval();
 
   const renderContent = useMemo(() => {
     if (isPacking) return <ProcessingTip />;
@@ -43,7 +43,6 @@ export default function TxConfirm() {
           calcResult={calcResult}
           chainId={currentChain!.id}
           decodedUserOp={decodedDetail}
-          session={approval?.data?.dApp}
           from={userOp?.sender}
         />
       );
@@ -63,14 +62,16 @@ export default function TxConfirm() {
     }
   };
 
-  const onSendSuccess = async (opHash: string) => {
-    // if (opType === UserOpType.ApproveTransaction) {
-    //   resolve(opHash);
-    // } else {
-    //   navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard, {
-    //     activating: opType as unknown as string,
-    //   });
-    // }
+  const onSendSuccess = async (
+    opHash: string,
+    currentUserOp: ElytroUserOperation
+  ) => {
+    wallet.addNewHistory({
+      type: txType!,
+      opHash,
+      userOp: currentUserOp!,
+      decodedDetail: decodedDetail!,
+    });
 
     const goSuccessPage = () => {
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxSuccess, {
@@ -117,23 +118,7 @@ export default function TxConfirm() {
 
       await wallet.sendUserOperation(currentUserOp!);
 
-      // TODO: what to do if op is a batch of txs?
-      wallet.addNewHistory({
-        opHash,
-        timestamp: Date.now(),
-        from: userOp!.sender,
-        to: decodedDetail?.to || userOp?.factory,
-        method: decodedDetail?.method,
-        value: decodedDetail?.value.toString() || '0',
-        type: txType,
-      });
-
-      await toast({
-        title: 'Transaction sent successfully',
-        description: 'User operation hash: ' + opHash,
-      });
-
-      onSendSuccess(opHash);
+      onSendSuccess(opHash, currentUserOp!);
     } catch (error) {
       toast({
         title: 'Failed to send transaction',
@@ -153,10 +138,10 @@ export default function TxConfirm() {
       title={UserOpTitleMap[opType!]}
     >
       {/* Content */}
-      <div className="flex flex-col gap-y-md pb-14">{renderContent}</div>
+      <div className="flex flex-col gap-y-md">{renderContent}</div>
 
       {/* Footer */}
-      <div className="flex w-full mt-auto">
+      <div className="flex w-full mt-10">
         <div className="flex w-full gap-x-2">
           <Button
             variant="ghost"

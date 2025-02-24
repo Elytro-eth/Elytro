@@ -7,8 +7,7 @@ import { UserOperationStatusEn } from '@/constants/operations';
 import { useState } from 'react';
 import { EVENT_TYPES } from '@/constants/events';
 import RuntimeMessage from '@/utils/message/runtimeMessage';
-import { formatEther } from 'viem';
-import { formatAddressToShort } from '@/utils/format';
+import { formatAddressToShort, formatTokenAmount } from '@/utils/format';
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -17,6 +16,7 @@ import {
   ShieldQuestion,
 } from 'lucide-react';
 import { useChain } from '@/contexts/chain-context';
+
 const ActivityTypeMap = {
   [HistoricalActivityTypeEn.Send]: {
     name: 'Send',
@@ -65,8 +65,11 @@ export default function ActivityItem({
   opHash,
   status = UserOperationStatusEn.pending,
   to,
-  value,
   type,
+  decimals,
+  value,
+  symbol,
+  logoURI,
 }: UserOperationHistory) {
   const { openExplorer } = useChain();
   const [latestStatus, setLatestStatus] = useState(status);
@@ -94,7 +97,9 @@ export default function ActivityItem({
   return (
     <div
       className="flex items-center justify-between px-lg cursor-pointer py-md hover:bg-gray-150 "
-      onClick={() => openExplorer(opHash)}
+      onClick={() =>
+        openExplorer(opHash, type !== HistoricalActivityTypeEn.Receive)
+      }
     >
       <div className="flex items-center gap-3">
         <IconComponent className={`size-8 p-2 ${bg} rounded-full`} />
@@ -110,17 +115,22 @@ export default function ActivityItem({
           </span>
 
           <span className="elytro-text-tiny-body text-gray-600">
-            To {formatAddressToShort(to)}
+            {type === HistoricalActivityTypeEn.Receive ? 'from' : 'to'}{' '}
+            {formatAddressToShort(to)}
           </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-base font-bold">
-          {/* TODO: history need currency info */}
-          {formatEther(BigInt(value))} ETH
-        </span>
-      </div>
+      {value ? (
+        <div className="flex flex-row items-center gap-2">
+          <span className="text-base font-bold">
+            {formatTokenAmount(value, decimals, symbol)}
+          </span>
+          {logoURI && (
+            <img src={logoURI} alt={symbol} className="size-4 rounded-full" />
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }

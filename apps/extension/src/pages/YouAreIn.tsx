@@ -1,39 +1,51 @@
 import React from 'react';
 import IconSuccess from '@/assets/icons/success.png';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
-import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { Button } from '@/components/ui/button';
+import useSearchParams from '@/hooks/use-search-params';
+import { navigateTo } from '@/utils/navigation';
 
 const YouAreIn: React.FC = () => {
-  const handleGotoCreateAccount = async () => {
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreateAccount);
-  };
+  const params = useSearchParams();
+  const isFromRecover = params.from === 'recover';
+
+  const { title, description, action, actionPath } = isFromRecover
+    ? {
+        title: 'You are ready to recover',
+        description: 'You will need the passcode to see recovery status',
+        action: 'Start recover',
+        actionPath: SIDE_PANEL_ROUTE_PATHS.AccountRecovery,
+      }
+    : {
+        title: 'You are in!',
+        description: 'Now you can create your first smart account',
+        action: 'Create',
+        actionPath: SIDE_PANEL_ROUTE_PATHS.CreateAccount,
+      };
 
   return (
-    <FullPageWrapper
-      className="elytro-gradient-bg"
-      // TODO: full page layout without title.
-      title="&nbsp;"
-      showBack={false}
-    >
-      <div className="space-y-4">
-        <div className="flex justify-center">
-          <img src={IconSuccess} alt="Passcode" width={100} />
-        </div>
-        <h1 className="elytro-text-title text-center">You are in!</h1>
-        <h2 className="text-sm text-muted-foreground text-center">
-          Now you can create your first smart account
-        </h2>
-        <Button
-          type="submit"
-          className="w-full rounded-full h-14"
-          size="large"
-          onClick={handleGotoCreateAccount}
-        >
-          Create account
-        </Button>
+    <FullPageWrapper showBack={false}>
+      <div className="flex justify-center">
+        <img src={IconSuccess} alt="Passcode" width={100} />
       </div>
+
+      <div className="flex flex-col gap-y-2xs">
+        <h1 className="elytro-text-title text-center">{title}</h1>
+        <h2 className="elytro-text-smaller-body text-muted-foreground text-center">
+          {description}
+        </h2>
+      </div>
+
+      <Button
+        className="w-full rounded-full h-14"
+        size="large"
+        onClick={() => {
+          navigateTo('side-panel', actionPath);
+        }}
+      >
+        {action}
+      </Button>
     </FullPageWrapper>
   );
 };
