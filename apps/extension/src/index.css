@@ -153,7 +153,7 @@
   }
 
   .elytro-gradient-bg-2 {
-    background: linear-gradient(319deg, #f9fbfb 0%, #f7f3f0 70%, #dfecf3 100%);
+    background: linear-gradient(319deg, #f9fbfb 0%, #f7f3f0 10%, #f7f3f0 60%, #dfecf3 100%);
     background-blend-mode: overlay;
   }
 

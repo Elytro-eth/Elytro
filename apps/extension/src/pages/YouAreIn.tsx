@@ -18,9 +18,9 @@ const YouAreIn: React.FC = () => {
         actionPath: SIDE_PANEL_ROUTE_PATHS.AccountRecovery,
       }
     : {
-        title: 'You are in!',
-        description: 'Now you can create your first smart account',
-        action: 'Create',
+        title: 'Welcome!',
+        description: 'Ready to create your first smart contract account?',
+        action: 'Create account',
         actionPath: SIDE_PANEL_ROUTE_PATHS.CreateAccount,
       };
 
