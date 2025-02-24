@@ -1,3 +1,4 @@
+import { formatAddressToShort } from '@/utils/format';
 import { UserRound } from 'lucide-react';
 
 interface IContactItemProps {
@@ -21,7 +22,7 @@ export default function ContactItem({
             className="elytro-text-tiny-body text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap"
             title={contact.address}
           >
-            {contact.address}
+            {formatAddressToShort(contact.address)}
           </p>
         </div>
       </div>
