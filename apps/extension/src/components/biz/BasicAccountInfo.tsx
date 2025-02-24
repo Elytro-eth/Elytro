@@ -11,7 +11,7 @@ import ActivateButton from './ActivateButton';
 import { useAccount } from '@/contexts/account-context';
 import { useChain } from '@/contexts/chain-context';
 import AccountsDropdown from './AccountsDropdown';
-import Copy from '@/components/biz/Copy';
+import Copy from '@/components/ui/Copy';
 import { useEffect } from 'react';
 
 export default function BasicAccountInfo() {
