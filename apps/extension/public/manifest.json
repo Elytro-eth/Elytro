@@ -14,7 +14,14 @@
   "action": {
     "default_title": "Click to open Elytro wallet"
   },
-  "permissions": ["activeTab", "storage", "tabs", "sidePanel"],
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "sidePanel",
+    "gcm",
+    "notifications"
+  ],
   "web_accessible_resources": [
     {
       "matches": ["<all_urls>"],

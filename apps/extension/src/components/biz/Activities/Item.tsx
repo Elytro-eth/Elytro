@@ -97,7 +97,9 @@ export default function ActivityItem({
   return (
     <div
       className="flex items-center justify-between px-lg cursor-pointer py-md hover:bg-gray-150 "
-      onClick={() => openExplorer(opHash)}
+      onClick={() =>
+        openExplorer(opHash, type !== HistoricalActivityTypeEn.Receive)
+      }
     >
       <div className="flex items-center gap-3">
         <IconComponent className={`size-8 p-2 ${bg} rounded-full`} />
@@ -113,7 +115,8 @@ export default function ActivityItem({
           </span>
 
           <span className="elytro-text-tiny-body text-gray-600">
-            To {formatAddressToShort(to)}
+            {type === HistoricalActivityTypeEn.Receive ? 'from' : 'to'}{' '}
+            {formatAddressToShort(to)}
           </span>
         </div>
       </div>
