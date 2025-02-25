@@ -19,7 +19,7 @@ export default function BlockedAlert() {
     data: { dApp, options },
   } = approval;
 
-  const { name, reason } = options as UnsupportedMethod;
+  const { reason } = options as UnsupportedMethod;
 
   const handleReject = () => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
@@ -31,23 +31,25 @@ export default function BlockedAlert() {
       <Card className="w-full h-full flex flex-col justify-between border-none rounded-none shadow-none">
         <CardContent className="flex flex-col p-6 text-center">
           <div className="flex justify-center mb-2">
-            <Avatar className="w-16 h-16 z-10 rounded-none">
+            <Avatar className="w-16 h-16 z-10 mt-3xl rounded-none">
               <AvatarImage src={dApp.icon} alt={`${dApp.name} icon`} />
               <AvatarFallback>{dApp.name}</AvatarFallback>
             </Avatar>
           </div>
           <div className="mb-6">
-            <div className="elytro-text-subtitle">{dApp.name}</div>
-            <div className="elytro-text-body">{dApp.origin}</div>
+            <div className="elytro-text-body font-bold mb-2">{dApp.name}</div>
+            <div className="elytro-text-tiny-body text-gray-600">
+              {dApp.origin}
+            </div>
           </div>
-          <div className="elytro-text-body">
-            The Dapp called <span className="font-bold">{name}</span> failed,
-            the reason is <span className="font-bold">{reason}</span>
+          <div className="elytro-text-small">
+            Can’t connect to this app. <br />
+            {reason}
           </div>
         </CardContent>
         <CardFooter className="flex justify-between space-x-4">
           <Button className="flex-1" onClick={handleReject}>
-            Got it!
+            OK
           </Button>
         </CardFooter>
       </Card>

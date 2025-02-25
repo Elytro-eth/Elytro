@@ -103,7 +103,7 @@ export default function Launch() {
 
   return (
     <div className="elytro-gradient-bg flex flex-1 flex-col items-center justify-center px-xl h-full gap-y-3xl">
-      <img src={iconImg} alt="Launch" className="size-[164px]" />
+      <img src={iconImg} alt="Launch" className="size-[128px]" />
       <h1 className="elytro-text-headline text-center">{title}</h1>
       <div className="flex flex-col w-full">{content}</div>
     </div>

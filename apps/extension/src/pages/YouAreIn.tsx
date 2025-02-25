@@ -1,5 +1,5 @@
 import React from 'react';
-import IconSuccess from '@/assets/icons/success.png';
+import IconSuccess from '@/assets/door.png';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,7 @@ const YouAreIn: React.FC = () => {
   return (
     <FullPageWrapper showBack={false}>
       <div className="flex justify-center">
-        <img src={IconSuccess} alt="Passcode" width={100} />
+        <img src={IconSuccess} alt="Passcode" width={164} />
       </div>
 
       <div className="flex flex-col gap-y-2xs">
