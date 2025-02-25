@@ -27,7 +27,7 @@ export default function Settings() {
       footer={
         <div className="flex flex-col space-y-2 w-full">
           <Button variant="secondary" onClick={handleLock}>
-            <LockKeyholeIcon className="w-4 h-4 mr-2 duration-100 group-hover:stroke-white" />
+            <LockKeyholeIcon className="w-4 h-4 mr-2 duration-100 stroke-dark-blue group-hover:stroke-white" />
             Lock Elytro
           </Button>
 
