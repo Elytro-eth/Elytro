@@ -53,8 +53,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const res = await walletControllerProxy.getWalletStatus();
 
-      console.log('res', res);
-      if (res === WalletStatusEn.HasAccountAndUnlocked) {
+      if (res === WalletStatusEn.HasAccountButLocked) {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
       }
       setStatus(res);
