@@ -17,13 +17,17 @@ class RuntimeMessage {
           ...params,
         },
         (response) => {
-          if (chrome.runtime.lastError) {
-            // reject(chrome.runtime.lastError);
-            console.error(
-              'Elytro: Runtime message error',
-              chrome.runtime.lastError
-            );
-          } else {
+          // if (chrome.runtime.lastError) {
+          //   // reject(chrome.runtime.lastError);
+          //   // console.error(
+          //   //   'Elytro: Runtime message error',
+          //   //   chrome.runtime.lastError
+          //   // );
+          // } else {
+          //   onResponse?.(response);
+          //   resolve(response);
+          // }
+          if (!chrome.runtime.lastError) {
             onResponse?.(response);
             resolve(response);
           }
