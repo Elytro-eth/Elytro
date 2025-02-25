@@ -136,31 +136,36 @@ export const AccountProvider = ({
   }, []);
 
   const getReceiveActivities = async () => {
-    const account = await wallet.getCurrentAccount();
-    if (!account?.address) {
-      return;
+    try {
+      const account = await wallet.getCurrentAccount();
+      if (!account?.address) {
+        throw new Error('Elytro: No account');
+      }
+
+      const res = (await query(query_receive_activities, {
+        address: account?.address as Address,
+        chainId: toHex(account?.chainId ?? 0),
+      })) as SafeAny;
+
+      const transactions = res.transactions.map((item: SafeAny) => {
+        return {
+          type: HistoricalActivityTypeEn.Receive,
+          from: item.list[0].asset_from,
+          to: item.list[0].asset_to,
+          value: item.list[0].asset_value,
+          timestamp: item.timestamp * 1000,
+          opHash: item.opHash || item.txhash,
+          status: UserOperationStatusEn.confirmedSuccess,
+          decimals: item.list[0].decimals,
+          symbol: item.list[0].symbol,
+        };
+      });
+
+      return transactions || [];
+    } catch (error) {
+      console.error(error);
+      return [];
     }
-
-    const res = (await query(query_receive_activities, {
-      address: account?.address as Address,
-      chainId: toHex(account?.chainId ?? 0),
-    })) as SafeAny;
-
-    const transactions = res.transactions.map((item: SafeAny) => {
-      return {
-        type: HistoricalActivityTypeEn.Receive,
-        from: item.list[0].asset_from,
-        to: item.list[0].asset_to,
-        value: item.list[0].asset_value,
-        timestamp: item.timestamp * 1000,
-        opHash: item.opHash || item.txhash,
-        status: UserOperationStatusEn.confirmedSuccess,
-        decimals: item.list[0].decimals,
-        symbol: item.list[0].symbol,
-      };
-    });
-
-    return transactions;
   };
 
   useEffect(() => {
