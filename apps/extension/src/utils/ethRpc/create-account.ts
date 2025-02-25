@@ -1,5 +1,10 @@
-import { mutate, mutate_create_account } from '@/requests/mutate';
+import {
+  mutate,
+  mutate_create_account,
+  mutate_register_device,
+} from '@/requests/mutate';
 import { toHex } from 'viem';
+import { localStorage } from '../storage/local';
 
 export const createAccount = async (
   address: string,
@@ -22,6 +27,21 @@ export const createAccount = async (
         },
       },
     });
+
+    const token = await localStorage.get('fcmToken');
+
+    if (token) {
+      await mutate(mutate_register_device, {
+        input: {
+          deviceID: `firebase:${token}`,
+          accounts: [{ address, chainID: toHex(chainID), pushOn: true }],
+        },
+      });
+    } else {
+      console.error(
+        'Elytro::createAccount:: No token found thus cannot register device'
+      );
+    }
   } catch (error) {
     console.error(
       'Elytro: Something went wrong when send create account info to backend',

@@ -168,7 +168,7 @@ class WalletController {
     });
   }
 
-  public getLatestHistories() {
+  public async getLatestHistories() {
     return historyManager.histories.map((item) => ({
       ...item.data,
       status: item.status,

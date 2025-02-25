@@ -14,7 +14,7 @@ const ProcessingTip = ({
 }: IProcessingTipProps) => (
   <div
     className={cn(
-      'flex flex-col items-center justify-center gap-y-sm h-screen -mt-16',
+      'flex flex-col items-center justify-center gap-y-sm h-48 my-16',
       className
     )}
   >
@@ -26,7 +26,9 @@ const ProcessingTip = ({
       />
     </div>
     <div className="elytro-text-bold-body">{body}</div>
-    <div className="elytro-text-tiny-body text-gray-600">{subBody}</div>
+    {subBody ? (
+      <div className="elytro-text-tiny-body text-gray-600">{subBody}</div>
+    ) : null}
   </div>
 );
 

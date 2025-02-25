@@ -75,11 +75,13 @@
   }
   @font-face {
     font-family: 'ElytroSoehne';
+    font-family: 'ElytroSoehne';
     src:  url('/src/assets/fonts/soehne-buch.woff2') format('woff2'),
           url('/src/assets/fonts/soehne-buch.woff') format('woff');
     font-weight: 400;
   }
   @font-face {
+    font-family: 'ElytroSoehne';
     font-family: 'ElytroSoehne';
     src:  url('/src/assets/fonts/soehne-kraftig.woff2') format('woff2'),
           url('/src/assets/fonts/soehne-kraftig.woff') format('woff');
@@ -89,8 +91,10 @@
     @apply bg-background text-foreground;
     user-select: none;
     font-family: ElytroSoehne;
+    font-family: ElytroSoehne;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-variant-ligatures: no-contextual;
     font-variant-ligatures: no-contextual;
   }
 }

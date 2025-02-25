@@ -13,21 +13,27 @@ export default function Activities() {
       </div>
     );
 
-  // split histories into days
-  const historiesByDay = history.reduce(
+  // split histories into YYYY/MM
+  const historiesByMonth = history.reduce(
     (acc, item) => {
-      const date = new Date(item.timestamp).toLocaleDateString();
-      acc[date] = acc[date] || [];
-      acc[date].push(item);
+      const [month, year] = new Date(item.timestamp)
+        .toLocaleDateString('default', {
+          month: 'numeric',
+          year: 'numeric',
+        })
+        .split('/');
+
+      const key = `${year}/${month}`;
+      acc[key] = acc[key] || [];
+      acc[key].push(item);
       return acc;
     },
     {} as Record<string, UserOperationHistory[]>
   );
-
   return (
     <div className="flex flex-col overflow-auto gap-y-lg">
-      {Object.entries(historiesByDay).map(([date, items]) => (
-        <ActivityGroup key={date} date={date} items={items} />
+      {Object.entries(historiesByMonth).map(([month, items]) => (
+        <ActivityGroup key={month} date={month} items={items} />
       ))}
     </div>
   );

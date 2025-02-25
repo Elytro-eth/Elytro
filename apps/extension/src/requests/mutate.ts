@@ -70,3 +70,11 @@ export const mutate_create_recovery_record = gql`
     }
   }
 `;
+
+export const mutate_register_device = gql`
+  mutation RegisterDevice($input: RegisterDeviceInput!) {
+    registerDevice(input: $input) {
+      deviceID
+    }
+  }
+`;

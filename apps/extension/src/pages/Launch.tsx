@@ -56,7 +56,10 @@ export default function Launch() {
         iconImg: LaunchImg,
         content: (
           <div className="flex flex-col gap-y-3xl">
-            <PasswordInput onValueChange={(pwd) => setPwd(pwd)} />
+            <PasswordInput
+              onValueChange={(pwd) => setPwd(pwd)}
+              placeholder="Enter your passcode"
+            />
             <Button onClick={handleUnlock} disabled={!pwd || pwd.length < 7}>
               Unlock
             </Button>

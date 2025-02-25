@@ -49,148 +49,123 @@ importers:
         version: 8.11.0(eslint@9.13.0(jiti@1.21.6))(typescript@5.6.3)
 
   apps/extension:
+    specifiers:
+      '@apollo/client': ^3.11.8
+      '@crxjs/vite-plugin': 2.0.0-beta.26
+      '@eslint/js': ^9.9.0
+      '@ethersproject/signing-key': ^5.7.0
+      '@hookform/resolvers': ^3.9.0
+      '@metamask/post-message-stream': 8.1.0
+      '@radix-ui/react-alert-dialog': ^1.1.4
+      '@radix-ui/react-avatar': ^1.1.1
+      '@radix-ui/react-dialog': ^1.1.4
+      '@radix-ui/react-dropdown-menu': ^2.1.2
+      '@radix-ui/react-label': ^2.1.0
+      '@radix-ui/react-popover': ^1.1.3
+      '@radix-ui/react-select': ^2.1.2
+      '@radix-ui/react-slot': ^1.1.1
+      '@radix-ui/react-tabs': ^1.1.1
+      '@radix-ui/react-toast': ^1.2.1
+      '@radix-ui/react-toggle': ^1.1.1
+      '@radix-ui/react-toggle-group': ^1.1.1
+      '@radix-ui/react-tooltip': ^1.1.3
+      '@soulwallet/abi': ^0.3.4
+      '@soulwallet/decoder': ^0.3.4
+      '@soulwallet/keyvault': ^0.3.3
+      '@soulwallet/sdk': ^0.3.13
+      '@types/archiver': ^6.0.3
+      '@types/chrome': ^0.0.270
+      '@types/koa-compose': ^3.2.8
+      '@types/node': ^22.5.4
+      '@types/react': ^18.3.3
+      '@types/react-dom': ^18.3.0
+      '@types/readable-stream': ^4.0.15
+      '@types/uuid': ^10.0.0
+      '@vitejs/plugin-react': ^4.3.1
+      archiver: ^7.0.1
+      autoprefixer: ^10.4.20
+      axios: ^1.7.7
+      buffer: ^6.0.3
+      class-variance-authority: ^0.7.0
+      clsx: ^2.1.1
+      date-fns: ^4.1.0
+      dayjs: ^1.11.13
+      eslint: ^9.9.0
+      eslint-plugin-react-hooks: ^5.1.0-rc.0
+      eslint-plugin-react-refresh: ^0.4.9
+      eth-rpc-errors: ^4.0.3
+      events: ^3.3.0
+      globals: ^15.9.0
+      graphql: ^16.9.0
+      koa-compose: ^4.1.0
+      lodash: ^4.17.21
+      lucide-react: ^0.441.0
+      postcss: ^8.4.45
+      qrcode.react: ^4.0.1
+      react: ^18.3.1
+      react-dom: ^18.3.1
+      react-hook-form: ^7.53.0
+      tailwind-merge: ^2.5.2
+      tailwindcss: ^3.4.11
+      tailwindcss-animate: ^1.0.7
+      typescript: ^5.5.3
+      typescript-eslint: ^8.0.1
+      usehooks-ts: ^3.1.0
+      uuid: ^10.0.0
+      viem: ^2.21.10
+      vite: ^5.4.1
+      vite-plugin-node-polyfills: ^0.22.0
+      wouter: ^3.3.5
+      zod: ^3.23.8
+      zustand: ^4.5.5
     dependencies:
-      '@apollo/client':
-        specifier: ^3.11.8
-        version: 3.12.3(@types/react@18.3.17)(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@ethersproject/signing-key':
-        specifier: ^5.7.0
-        version: 5.7.0
-      '@hookform/resolvers':
-        specifier: ^3.9.0
-        version: 3.9.1(react-hook-form@7.54.1(react@18.3.1))
-      '@metamask/post-message-stream':
-        specifier: 8.1.0
-        version: 8.1.0
-      '@radix-ui/react-alert-dialog':
-        specifier: ^1.1.4
-        version: 1.1.4(@types/react-dom@18.3.5(@types/react@18.3.17))(@types/react@18.3.17)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-avatar':
-        specifier: ^1.1.1
-        version: 1.1.2(@types/react-dom@18.3.5(@types/react@18.3.17))(@types/react@18.3.17)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-dialog':
-        specifier: ^1.1.4
-        version: 1.1.4(@types/react-dom@18.3.5(@types/react@18.3.17))(@types/react@18.3.17)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-dropdown-menu':
-        specifier: ^2.1.2
-        version: 2.1.4(@types/react-dom@18.3.5(@types/react@18.3.17))(@types/react@18.3.17)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-label':
-        specifier: ^2.1.0
-        version: 2.1.1(@types/react-dom@18.3.5(@types/react@18.3.17))(@types/react@18.3.17)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-popover':
-        specifier: ^1.1.3
-        version: 1.1.4(@types/react-dom@18.3.5(@types/react@18.3.17))(@types/react@18.3.17)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-select':
-        specifier: ^2.1.2
-        version: 2.1.4(@types/react-dom@18.3.5(@types/react@18.3.17))(@types/react@18.3.17)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-slot':
-        specifier: ^1.1.1
-        version: 1.1.1(@types/react@18.3.17)(react@18.3.1)
-      '@radix-ui/react-tabs':
-        specifier: ^1.1.1
-        version: 1.1.2(@types/react-dom@18.3.5(@types/react@18.3.17))(@types/react@18.3.17)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-toast':
-        specifier: ^1.2.1
-        version: 1.2.4(@types/react-dom@18.3.5(@types/react@18.3.17))(@types/react@18.3.17)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-toggle':
-        specifier: ^1.1.1
-        version: 1.1.1(@types/react-dom@18.3.5(@types/react@18.3.17))(@types/react@18.3.17)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-toggle-group':
-        specifier: ^1.1.1
-        version: 1.1.1(@types/react-dom@18.3.5(@types/react@18.3.17))(@types/react@18.3.17)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-tooltip':
-        specifier: ^1.1.3
-        version: 1.1.6(@types/react-dom@18.3.5(@types/react@18.3.17))(@types/react@18.3.17)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@soulwallet/abi':
-        specifier: ^0.3.4
-        version: 0.3.4
-      '@soulwallet/decoder':
-        specifier: ^0.3.4
-        version: 0.3.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      '@soulwallet/keyvault':
-        specifier: ^0.3.3
-        version: 0.3.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      '@soulwallet/sdk':
-        specifier: ^0.3.13
-        version: 0.3.13(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      autoprefixer:
-        specifier: ^10.4.20
-        version: 10.4.20(postcss@8.4.49)
-      axios:
-        specifier: ^1.7.7
-        version: 1.7.7
-      buffer:
-        specifier: ^6.0.3
-        version: 6.0.3
-      class-variance-authority:
-        specifier: ^0.7.0
-        version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      dayjs:
-        specifier: ^1.11.13
-        version: 1.11.13
-      eth-rpc-errors:
-        specifier: ^4.0.3
-        version: 4.0.3
-      events:
-        specifier: ^3.3.0
-        version: 3.3.0
-      graphql:
-        specifier: ^16.9.0
-        version: 16.10.0
-      koa-compose:
-        specifier: ^4.1.0
-        version: 4.1.0
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
-      lucide-react:
-        specifier: ^0.441.0
-        version: 0.441.0(react@18.3.1)
-      postcss:
-        specifier: ^8.4.45
-        version: 8.4.49
-      qrcode.react:
-        specifier: ^4.0.1
-        version: 4.2.0(react@18.3.1)
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.3.1
-        version: 18.3.1(react@18.3.1)
-      react-hook-form:
-        specifier: ^7.53.0
-        version: 7.54.1(react@18.3.1)
-      tailwind-merge:
-        specifier: ^2.5.2
-        version: 2.5.5
-      tailwindcss:
-        specifier: ^3.4.11
-        version: 3.4.17
-      tailwindcss-animate:
-        specifier: ^1.0.7
-        version: 1.0.7(tailwindcss@3.4.17)
-      usehooks-ts:
-        specifier: ^3.1.0
-        version: 3.1.0(react@18.3.1)
-      uuid:
-        specifier: ^10.0.0
-        version: 10.0.0
-      viem:
-        specifier: ^2.21.10
-        version: 2.21.55(bufferutil@4.0.9)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.24.1)
-      wouter:
-        specifier: ^3.3.5
-        version: 3.3.5(react@18.3.1)
-      zod:
-        specifier: ^3.23.8
-        version: 3.24.1
-      zustand:
-        specifier: ^4.5.5
-        version: 4.5.5(@types/react@18.3.17)(react@18.3.1)
+      '@apollo/client': 3.12.3_4oncyas7665o52juvopn457osi
+      '@ethersproject/signing-key': 5.7.0
+      '@hookform/resolvers': 3.9.1_react-hook-form@7.54.1
+      '@metamask/post-message-stream': 8.1.0
+      '@radix-ui/react-alert-dialog': 1.1.4_wqpz4i3lfwfru5ookkkzees7uu
+      '@radix-ui/react-avatar': 1.1.2_wqpz4i3lfwfru5ookkkzees7uu
+      '@radix-ui/react-dialog': 1.1.4_wqpz4i3lfwfru5ookkkzees7uu
+      '@radix-ui/react-dropdown-menu': 2.1.4_wqpz4i3lfwfru5ookkkzees7uu
+      '@radix-ui/react-label': 2.1.1_wqpz4i3lfwfru5ookkkzees7uu
+      '@radix-ui/react-popover': 1.1.4_wqpz4i3lfwfru5ookkkzees7uu
+      '@radix-ui/react-select': 2.1.4_wqpz4i3lfwfru5ookkkzees7uu
+      '@radix-ui/react-slot': 1.1.1_tnkfhq5d5u6qtopeeyurvvz5au
+      '@radix-ui/react-tabs': 1.1.2_wqpz4i3lfwfru5ookkkzees7uu
+      '@radix-ui/react-toast': 1.2.4_wqpz4i3lfwfru5ookkkzees7uu
+      '@radix-ui/react-toggle': 1.1.1_wqpz4i3lfwfru5ookkkzees7uu
+      '@radix-ui/react-toggle-group': 1.1.1_wqpz4i3lfwfru5ookkkzees7uu
+      '@radix-ui/react-tooltip': 1.1.6_wqpz4i3lfwfru5ookkkzees7uu
+      '@soulwallet/abi': 0.3.4
+      '@soulwallet/decoder': 0.3.5
+      '@soulwallet/keyvault': 0.3.3
+      '@soulwallet/sdk': 0.3.13
+      autoprefixer: 10.4.20_postcss@8.4.49
+      axios: 1.7.7
+      buffer: 6.0.3
+      class-variance-authority: 0.7.1
+      clsx: 2.1.1
+      dayjs: 1.11.13
+      eth-rpc-errors: 4.0.3
+      events: 3.3.0
+      graphql: 16.10.0
+      koa-compose: 4.1.0
+      lodash: 4.17.21
+      lucide-react: 0.441.0_react@18.3.1
+      postcss: 8.4.49
+      qrcode.react: 4.2.0_react@18.3.1
+      react: 18.3.1
+      react-dom: 18.3.1_react@18.3.1
+      react-hook-form: 7.54.1_react@18.3.1
+      tailwind-merge: 2.5.5
+      tailwindcss: 3.4.16
+      tailwindcss-animate: 1.0.7_tailwindcss@3.4.16
+      usehooks-ts: 3.1.0_react@18.3.1
+      uuid: 10.0.0
+      viem: 2.21.55_3o752lgaipns7f3yigxsywaqya
+      wouter: 3.3.5_react@18.3.1
+      zod: 3.24.1
+      zustand: 4.5.5_tnkfhq5d5u6qtopeeyurvvz5au
     devDependencies:
       '@crxjs/vite-plugin':
         specifier: 2.0.0-beta.26
@@ -777,8 +752,16 @@ packages:
 
   '@ethersproject/signing-key@5.7.0':
     resolution: {integrity: sha512-MZdy2nL3wO0u7gkB4nA/pEf8lu1TlFswPNmy8AiYkfKTdO6eXBJyUdmHO/ehm/htHw9K/qF8ujnTyUAD+Ry54Q==}
+    dependencies:
+      '@ethersproject/bytes': 5.7.0
+      '@ethersproject/logger': 5.7.0
+      '@ethersproject/properties': 5.7.0
+      bn.js: 5.2.1
+      elliptic: 6.5.4
+      hash.js: 1.1.7
+    dev: false
 
-  '@floating-ui/core@1.6.8':
+  /@floating-ui/core/1.6.8:
     resolution: {integrity: sha512-7XJ9cPU+yI2QeLS+FCSlqNFZJq8arvswefkZrYI1yQBbftw6FyrZOxYSh+9S7z7TpeWlRt9zJ5IhM1WIL334jA==}
 
   '@floating-ui/dom@1.6.12':
@@ -798,7 +781,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  '@hookform/resolvers@3.9.1':
+  /@hookform/resolvers/3.9.1_react-hook-form@7.54.1:
     resolution: {integrity: sha512-ud2HqmGBM0P0IABqoskKWI6PEf6ZDDBZkFqe2Vnl+mTHCEHzr3ISjjZyCwTjC/qpL25JC9aIDkloQejvMeq0ug==}
     peerDependencies:
       react-hook-form: ^7.0.0
@@ -1275,7 +1258,7 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
-  '@radix-ui/number@1.1.0':
+  /@radix-ui/number/1.1.0:
     resolution: {integrity: sha512-V3gRzhVNU1ldS5XhAPTom1fOIo4ccrjjJgmE+LI2h/WaFpHmx0MQApT+KZHnx8abG6Avtfcz4WoEciMnpFT3HQ==}
 
   '@radix-ui/primitive@1.1.1':
@@ -8692,7 +8675,8 @@ snapshots:
 
   '@types/conventional-commits-parser@5.0.0':
     dependencies:
-      '@types/node': 22.8.1
+      '@types/node': 20.17.14
+    dev: true
 
   '@types/cookies@0.9.0':
     dependencies:
@@ -10982,11 +10966,9 @@ snapshots:
     dependencies:
       reusify: 1.0.4
 
-  fdir@6.4.3(picomatch@4.0.2):
-    optionalDependencies:
-      picomatch: 4.0.2
-
-  figures@3.2.0:
+  /figures/3.2.0:
+    resolution: {integrity: sha512-yaduQFRKLXYOGgEn6AZau90j3ggSOyiqXU0F9JZfeXYhNa+Jk4X+s45A2zg5jns87GAFa34BBm2kXw4XpNcbdg==}
+    engines: {node: '>=8'}
     dependencies:
       escape-string-regexp: 1.0.5
 
@@ -11028,7 +11010,9 @@ snapshots:
       path-exists: 5.0.0
       unicorn-magic: 0.1.0
 
-  flat-cache@3.2.0:
+  /flat-cache/3.2.0:
+    resolution: {integrity: sha512-CYcENa+FtcUKLmhhqyctpclsq7QF38pKjZHsGNiSQF5r4FtoKDWabFDl3hzaEQMvT1LHEysw5twgLvpYYb4vbw==}
+    engines: {node: ^10.12.0 || >=12.0.0}
     dependencies:
       flatted: 3.3.1
       keyv: 4.5.4
@@ -11368,7 +11352,9 @@ snapshots:
 
   http-cache-semantics@4.1.1: {}
 
-  http-proxy-agent@7.0.2:
+  /http-proxy-agent/7.0.2:
+    resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
+    engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.1
       debug: 4.3.7
@@ -11400,7 +11386,8 @@ snapshots:
 
   idb-keyval@6.2.1: {}
 
-  ieee754@1.2.1: {}
+  /ieee754/1.2.1:
+    resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
 
   ignore-walk@6.0.5:
     dependencies:
@@ -11989,7 +11976,9 @@ snapshots:
     dependencies:
       p-locate: 6.0.0
 
-  lodash.camelcase@4.3.0: {}
+  /lodash.camelcase/4.3.0:
+    resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
+    dev: true
 
   lodash.debounce@4.0.8: {}
 
@@ -12028,7 +12017,9 @@ snapshots:
       strip-ansi: 7.1.0
       wrap-ansi: 9.0.0
 
-  loose-envify@1.4.0:
+  /loose-envify/1.4.0:
+    resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
+    hasBin: true
     dependencies:
       js-tokens: 4.0.0
 
@@ -12971,7 +12962,9 @@ snapshots:
       object-assign: 4.1.1
       react-is: 16.13.1
 
-  protocols@2.0.1: {}
+  /protocols/2.0.1:
+    resolution: {integrity: sha512-/XJ368cyBJ7fzLMwLKv1e4vLxOju2MNAIokcr7meSaNcVbWz/CPcW22cP04mwxOErdA5mwjA8Q6w/cdAQxVn7Q==}
+    dev: true
 
   proxy-compare@2.5.1: {}
 
@@ -14076,7 +14069,8 @@ snapshots:
     dependencies:
       defaults: 1.0.4
 
-  webauthn-p256@0.0.10:
+  /webauthn-p256/0.0.10:
+    resolution: {integrity: sha512-EeYD+gmIT80YkSIDb2iWq0lq2zbHo1CxHlQTeJ+KkCILWpVy3zASH3ByD4bopzfk0uCwXxLqKGLqp2W4O28VFA==}
     dependencies:
       '@noble/curves': 1.7.0
       '@noble/hashes': 1.6.1
@@ -14085,7 +14079,9 @@ snapshots:
 
   webidl-conversions@3.0.1: {}
 
-  whatwg-encoding@3.1.1:
+  /whatwg-encoding/3.1.1:
+    resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
+    engines: {node: '>=18'}
     dependencies:
       iconv-lite: 0.6.3
 
@@ -14221,33 +14217,63 @@ snapshots:
       bufferutil: 4.0.9
       utf-8-validate: 5.0.10
 
-  ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10):
-    optionalDependencies:
-      bufferutil: 4.0.9
-      utf-8-validate: 5.0.10
+  /ws/8.18.0:
+    resolution: {integrity: sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+    dev: false
 
-  xmlhttprequest-ssl@2.1.2: {}
+  /xmlhttprequest-ssl/2.1.2:
+    resolution: {integrity: sha512-TEU+nJVUUnA4CYJFLvK5X9AOeH4KvDvhIfm0vV1GaQRtchnG0hgK5p8hw/xjv8cunWYCsiPCSDzObPyhEwq3KQ==}
+    engines: {node: '>=0.4.0'}
+    dev: false
 
-  xtend@4.0.2: {}
+  /xtend/4.0.2:
+    resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
+    engines: {node: '>=0.4'}
 
-  y18n@4.0.3: {}
+  /y18n/4.0.3:
+    resolution: {integrity: sha512-JKhqTOwSrqNA1NY5lSztJ1GrBiUodLMmIZuLiDaMRJ+itFd+ABVE8XBjOvIWL+rSqNDC74LCSFmlb/U4UZ4hJQ==}
+    dev: false
 
-  y18n@5.0.8: {}
+  /y18n/5.0.8:
+    resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
+    engines: {node: '>=10'}
+    dev: true
 
-  yallist@3.1.1: {}
+  /yallist/3.1.1:
+    resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
+    dev: true
 
-  yallist@4.0.0: {}
+  /yallist/4.0.0:
+    resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
+    dev: true
 
-  yaml@2.5.1: {}
+  /yaml/2.5.1:
+    resolution: {integrity: sha512-bLQOjaX/ADgQ20isPJRvF0iRUHIxVhYvr53Of7wGcWlO2jvtUlH5m87DsmulFVxRpNLOnI4tB6p/oh8D7kpn9Q==}
+    engines: {node: '>= 14'}
+    hasBin: true
 
-  yargs-parser@18.1.3:
+  /yargs-parser/18.1.3:
+    resolution: {integrity: sha512-o50j0JeToy/4K6OZcaQmW6lyXXKhq7csREXcDwk2omFPJEwUNOVtJKvmDr9EI1fAJZUyZcRF7kxGBWmRXudrCQ==}
+    engines: {node: '>=6'}
     dependencies:
       camelcase: 5.3.1
       decamelize: 1.2.0
 
   yargs-parser@20.2.9: {}
 
-  yargs-parser@21.1.1: {}
+  /yargs-parser/21.1.1:
+    resolution: {integrity: sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==}
+    engines: {node: '>=12'}
+    dev: true
 
   yargs@15.4.1:
     dependencies:

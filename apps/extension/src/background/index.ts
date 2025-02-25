@@ -15,7 +15,47 @@ import { rpcCacheManager } from '@/utils/cache/rpcCacheManager';
 import accountManager from './services/account';
 import { ElytroMessageTypeEn } from '@/utils/message/duplexStream';
 
-chrome.runtime.onInstalled.addListener((details) => {
+import { getMessaging, onBackgroundMessage } from 'firebase/messaging/sw';
+import { getToken } from 'firebase/messaging';
+import { initializeApp } from 'firebase/app';
+import { localStorage } from '@/utils/storage/local';
+import { FIREBASE_CONFIG, FIREBASE_VAPID_KEY } from '@/constants/fcm';
+
+const app = initializeApp(FIREBASE_CONFIG);
+const messaging = getMessaging(app);
+
+onBackgroundMessage(messaging, async () => {
+  RuntimeMessage.sendMessage(EVENT_TYPES.HISTORY.ITEMS_UPDATED);
+});
+
+const getFcmToken = async (scope: SafeAny) => {
+  const prevToken = await localStorage.get('fcmToken');
+
+  if (prevToken) {
+    return prevToken;
+  }
+
+  getToken(messaging, {
+    serviceWorkerRegistration: scope.registration,
+    vapidKey: FIREBASE_VAPID_KEY,
+  })
+    .then(async (token) => {
+      await localStorage.save({ fcmToken: token });
+      console.log('yes, my fcm token is ', token);
+    })
+    .catch((err) => {
+      console.error('getFcmToken error', err);
+      getFcmToken(scope);
+    });
+};
+
+chrome.runtime.onInstalled.addListener(async (details) => {
+  const scope = globalThis as SafeAny;
+
+  setTimeout(() => {
+    getFcmToken(scope);
+  }, 300);
+
   switch (details.reason) {
     case chrome.runtime.OnInstalledReason.INSTALL:
       // wait for 200ms to ensure the page is ready
