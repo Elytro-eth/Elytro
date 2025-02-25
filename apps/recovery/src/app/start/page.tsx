@@ -145,8 +145,8 @@ export default function Start() {
 
   return (
     <ContentWrapper
-      currentStep={2}
-      allSteps={3}
+      // currentStep={2}
+      // allSteps={3}
       title="Start Recovery"
       subtitle={
         <span
