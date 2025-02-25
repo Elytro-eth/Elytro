@@ -48,7 +48,7 @@ export default function AccountRecovery() {
           navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
         }}
       >
-        <div className="flex flex-col items-center space-y-2xl">
+        <div className="flex flex-col items-center space-y-2xl mt-3xl">
           <img src={WalletImg} alt="Wallet" className="size-36" />
           <h1 className="elytro-text-title">How recovery works</h1>
           <div>
