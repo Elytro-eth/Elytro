@@ -12,7 +12,7 @@ import {
 } from '@/utils/format';
 import historyManager from './services/history';
 import { HistoricalActivityTypeEn } from '@/constants/operations';
-import { Address, formatEther, Hex, isHex, toHex } from 'viem';
+import { Abi, Address, Hex, isHex, toHex } from 'viem';
 import chainService from './services/chain';
 import accountManager from './services/account';
 import type { Transaction } from '@soulwallet/sdk';
@@ -24,6 +24,8 @@ import {
 import { DecodeResult } from '@soulwallet/decoder';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { TRecoveryStatus } from '@/constants/recovery';
+import { getTop100TokenAddresses } from '@/utils/tokens';
+import { ABI_ERC20_BALANCE_OF } from '@/constants/abi';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -234,22 +236,26 @@ class WalletController {
       return null;
     }
 
-    if (!basicInfo.isDeployed) {
-      const isDeployed = await elytroSDK.isSmartAccountDeployed(
-        basicInfo.address
-      );
+    let isDeployed = basicInfo.isDeployed;
 
-      if (isDeployed) {
-        accountManager.activateCurrentAccount();
-      }
+    // isDeployed maybe undefined when the account is just created, in this case, we need to check if the account is deployed
+    if (!isDeployed) {
+      isDeployed = await elytroSDK.isSmartAccountDeployed(basicInfo.address);
+
+      accountManager.updateCurrentAccountInfo({
+        isDeployed,
+      });
     }
 
-    const balanceBn = await walletClient.getBalance(basicInfo.address);
+    const balance = await walletClient.getBalance(basicInfo.address);
     accountManager.updateCurrentAccountInfo({
-      balance: formatEther(balanceBn),
+      balance: balance.toString(),
     });
 
-    return basicInfo;
+    return {
+      ...basicInfo,
+      isDeployed,
+    };
   }
 
   public async createAccount(chainId: number) {
@@ -448,6 +454,52 @@ class WalletController {
     };
 
     return recoveryRecord;
+  }
+
+  public async getCurrentAccountTokens() {
+    if (!accountManager.currentAccount || !chainService.currentChain) {
+      return [];
+    }
+
+    const erc20Tokens = await getTop100TokenAddresses(
+      chainService.currentChain.id
+    );
+
+    const res = await walletClient.client?.multicall({
+      contracts: erc20Tokens.map((token) => ({
+        address: token.address,
+        abi: ABI_ERC20_BALANCE_OF as Abi,
+        functionName: 'balanceOf',
+        args: [accountManager.currentAccount?.address],
+      })),
+    });
+
+    const processedRes = res.reduce((acc, item, index) => {
+      const currentToken = erc20Tokens[index];
+      if (
+        currentToken.importedByUser ||
+        (item.status === 'success' && (item.result as bigint) > BigInt(0))
+      ) {
+        acc.push({
+          ...currentToken,
+          balance: Number(item.result),
+        });
+      }
+
+      return acc;
+    }, [] as TTokenInfo[]);
+
+    return [
+      {
+        name: 'Ether',
+        balance: accountManager.currentAccount?.balance,
+        decimals: 18,
+        symbol: 'ETH',
+        logoURI:
+          'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
+      },
+      ...processedRes,
+    ];
   }
 }
 

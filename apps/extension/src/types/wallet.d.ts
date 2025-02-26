@@ -100,3 +100,14 @@ type TGuardianInfo = {
   threshold: number;
   guardians: string[];
 };
+
+type TTokenInfo = {
+  chainId?: number;
+  address: `0x${string}`;
+  name: string;
+  symbol: string;
+  decimals: number;
+  logoURI: string;
+  balance?: number; // in minimum unit
+  importedByUser?: boolean;
+};

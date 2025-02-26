@@ -64,6 +64,7 @@ const ActivityStatusMap = {
 export default function ActivityItem({
   opHash,
   status = UserOperationStatusEn.pending,
+  from,
   to,
   type,
   decimals,
@@ -115,8 +116,9 @@ export default function ActivityItem({
           </span>
 
           <span className="elytro-text-tiny-body text-gray-600">
-            {type === HistoricalActivityTypeEn.Receive ? 'from' : 'to'}{' '}
-            {formatAddressToShort(to)}
+            {type === HistoricalActivityTypeEn.Receive
+              ? `from ${formatAddressToShort(from)}`
+              : `to ${formatAddressToShort(to)}`}
           </span>
         </div>
       </div>

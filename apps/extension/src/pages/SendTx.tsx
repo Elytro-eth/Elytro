@@ -30,7 +30,7 @@ import TokenSelector from '@/components/biz/TokenSelector';
 import AmountInput from '@/components/biz/AmountInput';
 import { useTx } from '@/contexts/tx-context';
 import { UserOpType } from '@/contexts/tx-context';
-import { ABI_ERC20 } from '@/constants/abi';
+import { ABI_ERC20_TRANSFER } from '@/constants/abi';
 import { toast } from '@/hooks/use-toast';
 
 export default function SendTx() {
@@ -125,7 +125,7 @@ export default function SendTx() {
     } else {
       txParams.to = token.contractAddress;
       txParams.data = encodeFunctionData({
-        abi: ABI_ERC20,
+        abi: ABI_ERC20_TRANSFER,
         functionName: 'transfer',
         args: [to, amount],
       });
