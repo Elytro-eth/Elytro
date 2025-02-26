@@ -8,7 +8,7 @@ interface ICopyProps {
 
 export default function Copy({ text }: ICopyProps) {
   const [isCopied, setIsCopied] = useState(false);
-  const onCopied = useCallback((copyError: Error) => {
+  const onCopied = useCallback((copyError?: Error) => {
     if (!copyError) {
       setIsCopied(true);
 

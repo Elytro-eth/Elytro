@@ -25,13 +25,13 @@ import { toast } from '@/hooks/use-toast';
 const DEFAULT_ACCOUNT_INFO: TAccountInfo = {
   address: '',
   isDeployed: false,
-  balance: '0',
+  balance: 0,
   chainId: 0,
 };
 
 type IAccountContext = {
   currentAccount: TAccountInfo;
-  updateAccount: DebouncedFunc<() => Promise<void>>;
+  updateAccount: () => Promise<void>;
   loading: boolean;
   tokenInfo: {
     tokens: TTokenInfo[];
@@ -47,7 +47,7 @@ type IAccountContext = {
 // TODO: extract HistoryContext
 const AccountContext = createContext<IAccountContext>({
   currentAccount: DEFAULT_ACCOUNT_INFO,
-  updateAccount: debounce(async () => {}, 1000),
+  updateAccount: async () => {},
   loading: false,
   tokenInfo: {
     tokens: [],
