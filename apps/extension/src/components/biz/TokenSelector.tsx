@@ -1,13 +1,12 @@
-import { TokenDTO } from '@/hooks/use-tokens';
 import { Select, SelectTrigger, SelectContent } from '@/components/ui/select';
 import { ChevronDown } from 'lucide-react';
-import { formatEther } from 'viem';
 import DefaultTokenIcon from '@/assets/icons/ether.svg';
 import { useEffect, useState } from 'react';
 import TokenItem from '@/components/ui/TokenItem';
 import { cn } from '@/utils/shadcn/utils';
+import { formatTokenAmount } from '@/utils/format';
 
-function SelectedToken({ token }: { token?: TokenDTO }) {
+function SelectedToken({ token }: { token?: TTokenInfo }) {
   if (!token)
     return (
       <div className="flex items-center">
@@ -15,6 +14,7 @@ function SelectedToken({ token }: { token?: TokenDTO }) {
         <ChevronDown className="stroke-gray-600" />
       </div>
     );
+
   return (
     <div className="flex items-center w-full">
       <img
@@ -29,7 +29,8 @@ function SelectedToken({ token }: { token?: TokenDTO }) {
         </div>
 
         <div className="text-gray-600 -mt-0.5">
-          Balance: {formatEther(BigInt(token.tokenBalance))}
+          Balance:{' '}
+          {formatTokenAmount(token.balance, token.decimals, token.symbol)}
         </div>
       </div>
     </div>
@@ -41,31 +42,33 @@ export default function TokenSelector({
   className,
   onTokenChange,
 }: {
-  tokens: TokenDTO[];
+  tokens: TTokenInfo[];
   className?: string;
-  onTokenChange?: (token: TokenDTO) => void;
+  onTokenChange?: (token: TTokenInfo) => void;
 }) {
   const [open, setOpen] = useState(false);
   const defaultToken =
-    tokens.find((token) => Number(token.tokenBalance) > 0) ??
+    tokens.find((token) => token.balance !== undefined && token.balance > 0) ??
     tokens?.[0] ??
     null;
-  const [selectedToken, setSelectedToken] = useState<TokenDTO | null>(
+
+  const [selectedToken, setSelectedToken] = useState<TTokenInfo | null>(
     defaultToken
   );
-  const handleSelect = (item: TokenDTO) => {
-    setSelectedToken(item);
-    if (onTokenChange) {
-      onTokenChange(item);
+
+  const handleSelect = (item: TTokenInfo) => {
+    if (item.symbol !== selectedToken?.symbol) {
+      setSelectedToken(item);
+      onTokenChange?.(item);
+      setOpen(false);
     }
-    setOpen(false);
   };
 
   useEffect(() => {
-    if (selectedToken && onTokenChange) {
+    if (selectedToken) {
       onTokenChange?.(selectedToken);
     }
-  }, []);
+  }, [selectedToken]);
 
   return (
     <Select open={open}>
@@ -74,7 +77,7 @@ export default function TokenSelector({
         onClick={() => setOpen(!open)}
         className={cn('border-0', className)}
       >
-        <SelectedToken token={selectedToken as TokenDTO} />
+        <SelectedToken token={selectedToken as TTokenInfo} />
       </SelectTrigger>
       <SelectContent
         className="rounded-3xl bg-white overflow-hidden w-full"

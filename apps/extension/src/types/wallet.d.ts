@@ -11,7 +11,7 @@ type TAccountInfo = {
   address: Address;
   chainId: number;
   isDeployed: boolean;
-  balance?: Nullable<string>;
+  balance?: Nullable<number>;
 };
 
 type TTransactionInfo = {
@@ -99,4 +99,15 @@ type TGuardianInfo = {
   salt: string;
   threshold: number;
   guardians: string[];
+};
+
+type TTokenInfo = {
+  chainId?: number;
+  address: `0x${string}`;
+  name: string;
+  symbol: string;
+  decimals: number;
+  logoURI: string;
+  balance?: number; // in minimum unit
+  importedByUser?: boolean;
 };

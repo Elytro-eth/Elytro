@@ -44,7 +44,7 @@ const CreateAccount: React.FC = () => {
   };
 
   return (
-    <SecondaryPageWrapper title="Create account" showBack={false}>
+    <SecondaryPageWrapper title="Create account">
       <NetworkSelection
         selectedChain={selectedChain}
         handleSelectChain={handleSelectChain}

@@ -1,19 +1,10 @@
-import {
-  encodeFunctionData,
-  formatEther,
-  Hex,
-  hexToBigInt,
-  isAddress,
-  parseEther,
-} from 'viem';
+import { encodeFunctionData, isAddress, parseEther } from 'viem';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMemo } from 'react';
 import { CircleHelp } from 'lucide-react';
 import { Transaction } from '@soulwallet/sdk';
 import { Button } from '@/components/ui/button';
-import { TokenDTO } from '@/hooks/use-tokens';
 import {
   Form,
   FormControl,
@@ -30,25 +21,34 @@ import TokenSelector from '@/components/biz/TokenSelector';
 import AmountInput from '@/components/biz/AmountInput';
 import { useTx } from '@/contexts/tx-context';
 import { UserOpType } from '@/contexts/tx-context';
-import { ABI_ERC20 } from '@/constants/abi';
+import { ABI_ERC20_TRANSFER } from '@/constants/abi';
 import { toast } from '@/hooks/use-toast';
+import { formatTokenAmount } from '@/utils/format';
+import { useEffect } from 'react';
 
 export default function SendTx() {
   const {
-    tokenInfo: { tokens = [] },
+    tokenInfo: { tokens },
     currentAccount: { address },
+    updateTokens,
   } = useAccount();
   const { currentChain } = useChain();
   const { openUserOpConfirmTx } = useTx();
+
+  useEffect(() => {
+    if (!tokens.length) {
+      updateTokens();
+    }
+  }, [tokens]);
+
   const formResolverConfig = z.object({
     token: z.object({
       name: z.string(),
       logoURI: z.string(),
-      tokenBalance: z.string(),
+      balance: z.number(),
       decimals: z.number(),
       symbol: z.string(),
-      price: z.number(),
-      contractAddress: z.string(),
+      address: z.string().nullable(),
     }),
     amount: z.string().superRefine((data, ctx) => {
       if (data === '' || isNaN(Number(data)) || Number(data) <= 0) {
@@ -57,12 +57,13 @@ export default function SendTx() {
           message: 'Please input a valid amount',
         });
       }
-      if (
-        Number(data) >
-        Number(
-          formatEther(hexToBigInt(form.getValues('token').tokenBalance as Hex))
+      const maxAmount = Number(
+        formatTokenAmount(
+          form.getValues('token').balance,
+          form.getValues('token').decimals
         )
-      ) {
+      );
+      if (Number(data) > maxAmount) {
         ctx.addIssue({
           code: 'custom',
           message: 'Insufficient balance',
@@ -73,32 +74,32 @@ export default function SendTx() {
       message: 'Please give a valid address.',
     }),
   });
+
   const form = useForm<z.infer<typeof formResolverConfig>>({
     resolver: zodResolver(formResolverConfig),
     mode: 'onChange',
   });
+
+  const changeAmountField = (amount: string) => {
+    form.setValue('amount', amount);
+    form.trigger('amount');
+  };
+
   const handleFillMax = () => {
     const token = form.getValues('token');
     if (token) {
-      form.setValue(
-        'amount',
-        formatEther(hexToBigInt(token.tokenBalance as Hex)).toString()
-      );
-      form.trigger('amount');
+      changeAmountField(formatTokenAmount(token.balance, token.decimals));
     }
   };
-  const handleTokenSelect = (item: TokenDTO) => {
-    form.setValue('token', item);
+
+  const handleTokenSelect = (item: TTokenInfo) => {
+    form.setValue('token', {
+      ...item,
+      balance: item.balance ?? 0,
+      address: item.address || '0x0000000000000000000000000000000000000000',
+    });
     form.trigger('token');
   };
-
-  const price = useMemo(() => {
-    const token = form.getValues('token');
-    const amount = form.getValues('amount');
-    if (!token) return 0;
-    const result = Number(amount) * token.price;
-    return result ? result.toFixed(2) : 0;
-  }, [form.getValues('token'), form.getValues('amount')]);
 
   const handleContinue = () => {
     if (!address) {
@@ -123,9 +124,9 @@ export default function SendTx() {
     if (token.symbol === 'ETH') {
       txParams.value = amount;
     } else {
-      txParams.to = token.contractAddress;
+      txParams.to = token.address!;
       txParams.data = encodeFunctionData({
-        abi: ABI_ERC20,
+        abi: ABI_ERC20_TRANSFER,
         functionName: 'transfer',
         args: [to, amount],
       });
@@ -149,7 +150,6 @@ export default function SendTx() {
                     <AmountInput
                       field={field}
                       isDisabled={!form.getValues('token')}
-                      price={price}
                     />
                   </FormControl>
                   <FormMessage />
