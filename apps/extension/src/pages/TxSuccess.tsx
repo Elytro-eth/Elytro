@@ -5,18 +5,31 @@ import useSearchParams from '@/hooks/use-search-params';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
 import { ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { useInterval } from 'usehooks-ts';
 
 export default function TxSuccess() {
   const { openExplorer } = useChain();
+  const [lastSeconds, setLastSeconds] = useState(5);
+
+  const { fromAppCall, opHash } = useSearchParams();
+
+  useInterval(() => {
+    setLastSeconds((prev) => {
+      if (prev === 1) {
+        handleClose();
+      }
+      return prev - 1;
+    });
+  }, 1000);
+
   const handleClose = () => {
-    if (history.length > 1) {
-      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
-    } else {
+    if (fromAppCall === '1') {
       window.close();
+    } else {
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
     }
   };
-
-  const opHash = useSearchParams()['opHash'];
 
   return (
     <SecondaryPageWrapper
@@ -56,8 +69,21 @@ export default function TxSuccess() {
           <ExternalLink className="size-3 mr-2xs" />
           Transaction details
         </Button>
+
+        {fromAppCall === '1' && (
+          <div className="w-full rounded-sm bg-gray-150 px-lg py-md">
+            <p className="elytro-text-small-bold text-gray-750 mb-2xs">
+              See an error?
+            </p>
+            <p className="elytro-text-tiny-body text-gray-600">
+              Some apps are not yet adapted to new account standards. But don’t
+              worry, the transaction was successful.
+            </p>
+          </div>
+        )}
+
         <Button size="large" className="w-full mt-10" onClick={handleClose}>
-          Close
+          Close ({lastSeconds}s)
         </Button>
       </div>
     </SecondaryPageWrapper>

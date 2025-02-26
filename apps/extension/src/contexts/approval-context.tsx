@@ -61,6 +61,7 @@ export const ApprovalProvider = ({
       return;
     }
     await wallet.resolveApproval(approval.id, data);
+    setApproval(null);
   };
 
   const reject = async (e?: Error) => {
@@ -73,6 +74,8 @@ export const ApprovalProvider = ({
       title: 'Rejected',
       description: e ? e.message : 'The approval request has been rejected',
     });
+
+    setApproval(null);
   };
 
   // todo: delete it once all approval requests are handled by the target page

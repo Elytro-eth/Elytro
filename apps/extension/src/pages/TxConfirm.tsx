@@ -11,7 +11,6 @@ import { toast } from '@/hooks/use-toast';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { UserOpDetail } from '@/components/biz/UserOpDetail';
 import { useAccount } from '@/contexts/account-context';
-
 const UserOpTitleMap = {
   [UserOpType.DeployWallet]: 'Activate account',
   [UserOpType.SendTransaction]: 'Send',

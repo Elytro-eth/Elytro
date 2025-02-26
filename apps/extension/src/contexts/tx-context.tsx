@@ -60,7 +60,9 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     type: UserOpType,
     params?: Transaction[]
   ) => {
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm);
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm, {
+      fromAppCall: type === UserOpType.ApproveTransaction ? '1' : '0',
+    });
     packUserOp(type, params);
   };
 

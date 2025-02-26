@@ -39,9 +39,8 @@ type IAccountContext = {
   };
   history: UserOperationHistory[];
   accounts: TAccountInfo[];
-  updateHistory: DebouncedFunc<() => Promise<void>>;
   getAccounts: () => Promise<void>;
-  updateTokens: DebouncedFunc<() => Promise<void>>;
+  updateTokens: () => Promise<void>;
   reloadAccount: DebouncedFunc<() => Promise<void>>;
 };
 
@@ -55,10 +54,9 @@ const AccountContext = createContext<IAccountContext>({
     loading: false,
   },
   history: [],
-  updateHistory: debounce(async () => {}, 1000),
   accounts: [],
   getAccounts: async () => {},
-  updateTokens: debounce(async () => {}, 1_000),
+  updateTokens: async () => {},
   reloadAccount: debounce(async () => {}, 1_000),
 });
 
@@ -118,7 +116,7 @@ export const AccountProvider = ({
     }
   };
 
-  const updateTokens = debounce(async () => {
+  const updateTokens = async () => {
     if (isTokensLoading) {
       return;
     }
@@ -136,7 +134,7 @@ export const AccountProvider = ({
     } finally {
       setIsTokensLoading(false);
     }
-  }, 1_000);
+  };
 
   const getReceiveActivities = async () => {
     try {
@@ -169,7 +167,7 @@ export const AccountProvider = ({
     }
   };
 
-  const updateHistory = debounce(async () => {
+  const updateHistory = async () => {
     const localHistory = await wallet.getLatestHistories();
 
     const receives = await getReceiveActivities();
@@ -179,7 +177,7 @@ export const AccountProvider = ({
     );
 
     setHistory(res);
-  }, 1_000);
+  };
 
   useEffect(() => {
     if (!currentAccount.address) {
@@ -226,7 +224,6 @@ export const AccountProvider = ({
       },
       updateTokens,
       history,
-      updateHistory,
       loading,
       accounts,
       getAccounts,
