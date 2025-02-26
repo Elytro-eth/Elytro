@@ -8,7 +8,7 @@ import AccountOption from './AccountOption';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
 import { formatAddressToShort } from '@/utils/format';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -25,15 +25,6 @@ export default function AccountsDropdown() {
   const [open, setOpen] = useState(false);
   const { currentAccount, accounts, getAccounts, reloadAccount } = useAccount();
   const { wallet } = useWallet();
-
-  const reload = async () => {
-    await getAccounts();
-    reloadAccount();
-  };
-
-  useEffect(() => {
-    reload();
-  }, []);
 
   if (!currentAccount) {
     return <Spin isLoading />;
@@ -89,9 +80,16 @@ export default function AccountsDropdown() {
     setOpen(false);
   };
 
+  const handleOpenChange = async (open: boolean) => {
+    if (open) {
+      await getAccounts();
+    }
+    setOpen(open);
+  };
+
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <div onClick={() => setOpen(!open)}>
+    <DropdownMenu open={open} onOpenChange={handleOpenChange}>
+      <div onClick={() => handleOpenChange(!open)}>
         <div className="max-w-fit cursor-pointer flex items-center gap-x-sm border border-gray-200 rounded-[8px] bg-white px-sm py-xs text-gray-750 hover:bg-gray-100">
           <DropdownMenuTrigger asChild>
             <Avatar className="size-4">
