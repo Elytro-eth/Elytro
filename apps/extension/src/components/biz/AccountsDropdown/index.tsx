@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { groupBy } from 'lodash';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { useWallet } from '@/contexts/wallet';
-import { useChain } from '@/contexts/chain-context';
 import { useAccount } from '@/contexts/account-context';
 import { navigateTo } from '@/utils/navigation';
 import Spin from '@/components/ui/Spin';
@@ -24,30 +23,19 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AccountsDropdown() {
   const [open, setOpen] = useState(false);
-  const {
-    currentAccount,
-    accounts,
-    updateTokens,
-    updateAccount,
-    getAccounts,
-    updateHistory,
-  } = useAccount();
+  const { currentAccount, accounts, getAccounts, reloadAccount } = useAccount();
   const { wallet } = useWallet();
-  const { currentChain, getCurrentChain } = useChain();
 
-  const reloadAccount = async () => {
-    await getCurrentChain();
+  const reload = async () => {
     await getAccounts();
-    await updateAccount();
-    await updateTokens();
-    await updateHistory();
+    reloadAccount();
   };
 
   useEffect(() => {
-    reloadAccount();
+    reload();
   }, []);
 
-  if (!currentChain || !currentAccount) {
+  if (!currentAccount) {
     return <Spin isLoading />;
   }
 

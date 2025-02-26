@@ -5,10 +5,13 @@ import { toast } from '@/hooks/use-toast';
 import { SIDE_PANEL_ROUTE_PATHS } from '../routes';
 import { navigateTo } from '@/utils/navigation';
 import SignDetail from '@/components/biz/SignDetail';
-import { useChain } from '@/contexts/chain-context';
+import { useAccount } from '@/contexts/account-context';
+import { getChainNameByChainId } from '@/constants/chains';
 
 export default function Sign() {
-  const { currentChain } = useChain();
+  const {
+    currentAccount: { chainId },
+  } = useAccount();
   const { approval, reject, resolve } = useApproval();
   const [loading, setLoading] = useState(true);
 
@@ -18,7 +21,7 @@ export default function Sign() {
     }
   }, [approval]);
 
-  if (!approval || !approval.data?.sign) {
+  if (!approval || !approval.data?.sign || !chainId) {
     return <Spin isLoading={loading} />;
   }
 
@@ -44,7 +47,7 @@ export default function Sign() {
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           dapp={approval.data.dApp}
-          chainName={currentChain?.name as string}
+          chainName={getChainNameByChainId(chainId) as string}
           signData={approval.data.sign}
         />
 

@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/form';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useAccount } from '@/contexts/account-context';
-import { useChain } from '@/contexts/chain-context';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';
 import AddressInput from '@/components/biz/AddressInput';
 import TokenSelector from '@/components/biz/TokenSelector';
@@ -29,10 +28,9 @@ import { useEffect } from 'react';
 export default function SendTx() {
   const {
     tokenInfo: { tokens },
-    currentAccount: { address },
+    currentAccount: { address, chainId },
     updateTokens,
   } = useAccount();
-  const { currentChain } = useChain();
   const { openUserOpConfirmTx } = useTx();
 
   useEffect(() => {
@@ -191,7 +189,7 @@ export default function SendTx() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <AddressInput field={field} currentChain={currentChain} />
+                    <AddressInput field={field} chainId={chainId} />
                   </FormControl>
                   <FormMessage className="pb-2" />
                 </FormItem>
@@ -209,10 +207,7 @@ export default function SendTx() {
             <div className="font-bold text-base text-gray-750">
               From account
             </div>
-            <FragmentedAddress
-              address={address}
-              chainId={currentChain?.id || 1}
-            />
+            <FragmentedAddress address={address} chainId={chainId} />
           </div>
           <div className="flex justify-between items-center">
             <div className="font-bold text-base text-gray-750">

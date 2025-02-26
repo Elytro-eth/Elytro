@@ -42,6 +42,7 @@ type IAccountContext = {
   updateHistory: DebouncedFunc<() => Promise<void>>;
   getAccounts: () => Promise<void>;
   updateTokens: DebouncedFunc<() => Promise<void>>;
+  reloadAccount: DebouncedFunc<() => Promise<void>>;
 };
 
 // TODO: extract HistoryContext
@@ -58,6 +59,7 @@ const AccountContext = createContext<IAccountContext>({
   accounts: [],
   getAccounts: async () => {},
   updateTokens: debounce(async () => {}, 1_000),
+  reloadAccount: debounce(async () => {}, 1_000),
 });
 
 export const AccountProvider = ({
@@ -136,30 +138,6 @@ export const AccountProvider = ({
     }
   }, 1_000);
 
-  const updateHistory = debounce(async () => {
-    const localHistory = await wallet.getLatestHistories();
-
-    const receives = await getReceiveActivities();
-
-    const res = [...localHistory, ...receives].sort(
-      (a, b) => b.timestamp - a.timestamp
-    );
-
-    setHistory(res);
-  }, 1_000);
-
-  useEffect(() => {
-    if (!history) {
-      updateHistory();
-    }
-
-    RuntimeMessage.onMessage(EVENT_TYPES.HISTORY.ITEMS_UPDATED, updateHistory);
-
-    return () => {
-      RuntimeMessage.offMessage(updateHistory);
-    };
-  }, []);
-
   const getReceiveActivities = async () => {
     try {
       const account = await wallet.getCurrentAccount();
@@ -191,11 +169,39 @@ export const AccountProvider = ({
     }
   };
 
+  const updateHistory = debounce(async () => {
+    const localHistory = await wallet.getLatestHistories();
+
+    const receives = await getReceiveActivities();
+
+    const res = [...localHistory, ...receives].sort(
+      (a, b) => b.timestamp - a.timestamp
+    );
+
+    setHistory(res);
+  }, 1_000);
+
   useEffect(() => {
-    if (!loading && !currentAccount.address) {
-      updateAccount();
+    if (!currentAccount.address) {
+      reloadAccount();
     }
   }, [pathname]);
+
+  const onHistoryUpdated = () => {
+    updateHistory();
+    updateTokens();
+  };
+
+  useEffect(() => {
+    RuntimeMessage.onMessage(
+      EVENT_TYPES.HISTORY.ITEMS_UPDATED,
+      onHistoryUpdated
+    );
+
+    return () => {
+      RuntimeMessage.offMessage(onHistoryUpdated);
+    };
+  }, []);
 
   const getAccounts = async () => {
     const res = await wallet.getAccounts();
@@ -204,9 +210,11 @@ export const AccountProvider = ({
     }
   };
 
-  useEffect(() => {
-    getAccounts();
-  }, []);
+  const reloadAccount = debounce(async () => {
+    await updateAccount();
+    await updateTokens();
+    await updateHistory();
+  }, 1_000);
 
   const contextValue = useMemo(
     () => ({
@@ -222,6 +230,7 @@ export const AccountProvider = ({
       loading,
       accounts,
       getAccounts,
+      reloadAccount,
     }),
     [currentAccount, tokens, isTokensLoading, history, loading, accounts]
   );

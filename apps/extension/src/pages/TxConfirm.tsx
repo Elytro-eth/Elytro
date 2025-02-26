@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { UserOpType, useTx } from '@/contexts/tx-context';
-import { useChain } from '@/contexts/chain-context';
 import ProcessingTip from '@/components/ui/ProcessingTip';
 import { Button } from '@/components/ui/button';
 import { navigateTo } from '@/utils/navigation';
@@ -11,6 +10,7 @@ import { formatObjectWithBigInt } from '@/utils/format';
 import { toast } from '@/hooks/use-toast';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { UserOpDetail } from '@/components/biz/UserOpDetail';
+import { useAccount } from '@/contexts/account-context';
 
 const UserOpTitleMap = {
   [UserOpType.DeployWallet]: 'Activate account',
@@ -29,7 +29,9 @@ export default function TxConfirm() {
     calcResult,
     decodedDetail,
   } = useTx();
-  const { currentChain } = useChain();
+  const {
+    currentAccount: { chainId },
+  } = useAccount();
   const [isSending, setIsSending] = useState(false);
   const { reject, resolve } = useApproval();
 
@@ -41,7 +43,7 @@ export default function TxConfirm() {
         <UserOpDetail
           opType={opType}
           calcResult={calcResult}
-          chainId={currentChain!.id}
+          chainId={chainId!}
           decodedUserOp={decodedDetail}
           from={userOp?.sender}
         />
@@ -50,7 +52,7 @@ export default function TxConfirm() {
 
     // TODO: error tip
     return null;
-  }, [isPacking, opType, calcResult, decodedDetail]);
+  }, [isPacking, opType, calcResult, decodedDetail, chainId]);
 
   const handleCancel = () => {
     if (opType === UserOpType.ApproveTransaction) {

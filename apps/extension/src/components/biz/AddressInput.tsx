@@ -1,4 +1,3 @@
-import { TChainItem } from '@/constants/chains';
 import { Input } from '@/components/ui/input';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { FieldValues } from 'react-hook-form';
@@ -14,10 +13,10 @@ const ELYTRO_RECENT_ADDRESS_STORE = 'ELYTRO_RECENT_ADDRESS_STORE';
 
 export default function AddressInput({
   field,
-  currentChain,
+  chainId,
 }: PropsWithChildren<{
   field: FieldValues;
-  currentChain: TChainItem | null;
+  chainId: number;
 }>) {
   const { wallet } = useWallet();
   const [displayLabel, setDisplayLabel] = useState<string>('');
@@ -116,7 +115,7 @@ export default function AddressInput({
         <div className="absolute bg-white">
           <FragmentedAddress
             address={displayLabel}
-            chainId={currentChain?.id}
+            chainId={chainId}
             size="lg"
           />
         </div>
@@ -198,7 +197,7 @@ export default function AddressInput({
                       <FragmentedAddress
                         size="md"
                         address={item.address}
-                        chainId={currentChain?.id}
+                        chainId={chainId}
                       />
                     );
                   }

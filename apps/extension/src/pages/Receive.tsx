@@ -5,15 +5,14 @@ import ReceiveAddressBadge from '@/components/biz/ReceiveAddressBadge';
 import { CircleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { safeClipboard } from '@/utils/clipboard';
-import { useChain } from '@/contexts/chain-context';
 import Spin from '@/components/ui/Spin';
 import { useCallback, useState } from 'react';
+import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
 
 export default function Receive() {
   const {
-    currentAccount: { address },
+    currentAccount: { address, chainId },
   } = useAccount();
-  const { currentChain } = useChain();
   const [isCopied, setIsCopied] = useState(false);
 
   // const handleClickChainSelector = () => {
@@ -31,9 +30,12 @@ export default function Receive() {
     safeClipboard(address!, false, onCopied);
   }, [address]);
 
-  if (!currentChain) {
+  if (!address) {
     return <Spin isLoading />;
   }
+
+  const chainName = getChainNameByChainId(chainId);
+  const chainIcon = getIconByChainId(chainId);
 
   return (
     <SecondaryPageWrapper title="Receive">
@@ -42,14 +44,14 @@ export default function Receive() {
         <div className="flex flex-row items-center justify-between w-full">
           <div className="flex flex-row items-center gap-2  ">
             <img
-              src={currentChain.icon}
-              alt={currentChain?.name}
+              src={chainIcon}
+              alt={chainName}
               className="size-8 rounded-full border border-gray-50"
             />
             <div className="flex flex-col">
-              <div className="elytro-text-bold-body">{currentChain?.name}</div>
+              <div className="elytro-text-bold-body">{chainName}</div>
               <div className="elytro-text-tiny-body text-gray-600">
-                This address only accepts {currentChain?.name} assets.
+                This address only accepts {chainName} assets.
               </div>
             </div>
           </div>
@@ -60,7 +62,7 @@ export default function Receive() {
           /> */}
         </div>
 
-        <ReceiveAddressBadge address={address!} chainId={currentChain.id} />
+        <ReceiveAddressBadge address={address!} chainId={chainId} />
 
         <div className="flex flex-row items-center gap-2 w-full text-left">
           <CircleAlert className="elytro-clickable-icon size-3" />
