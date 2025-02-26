@@ -10,8 +10,9 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ethErrors } from 'eth-rpc-errors';
 import { useWallet } from '@/contexts/wallet';
-import { useChain } from '@/contexts/chain-context';
+import { useAccount } from '@/contexts/account-context';
 import { SUPPORTED_CHAINS } from '@/constants/chains';
+import { getChainNameByChainId } from '@/constants/chains';
 
 function URLSection({ title, items }: { title: string; items: string[] }) {
   return (
@@ -36,7 +37,9 @@ function URLSection({ title, items }: { title: string; items: string[] }) {
 
 export default function ChainChange() {
   const { wallet } = useWallet();
-  const { currentChain } = useChain();
+  const {
+    currentAccount: { chainId },
+  } = useAccount();
   const { approval, reject, resolve } = useApproval();
 
   if (!approval || !approval.data) {
@@ -49,8 +52,8 @@ export default function ChainChange() {
 
   const {
     method,
-    chainId,
     chainName,
+    chainId: targetChainId,
     nativeCurrency,
     rpcUrls,
     blockExplorerUrls,
@@ -63,7 +66,7 @@ export default function ChainChange() {
 
   const handleConfirm = async () => {
     try {
-      await wallet.switchAccountByChain(Number(chainId));
+      await wallet.switchAccountByChain(Number(targetChainId));
       resolve();
       window.close();
     } catch (e) {
@@ -88,12 +91,15 @@ export default function ChainChange() {
           <div className="text-base text-gray-700">
             <p>
               Current chain is{' '}
-              <span className="font-bold">{currentChain?.name}</span>. Do you
-              want to switch to{' '}
+              <span className="font-bold">
+                {getChainNameByChainId(chainId)}
+              </span>
+              . Do you want to switch to{' '}
               <span className="font-bold">
                 {chainName ||
-                  SUPPORTED_CHAINS.find((chain) => chain.id === Number(chainId))
-                    ?.name}
+                  SUPPORTED_CHAINS.find(
+                    (chain) => chain.id === Number(targetChainId)
+                  )?.name}
               </span>
               ?
             </p>
@@ -103,8 +109,8 @@ export default function ChainChange() {
         {method === 'add' && (
           <div className="text-base text-gray-700 space-y-4">
             <p>
-              Chain <span className="font-bold">{chainName}</span> ({chainId})
-              will be added to your wallet.
+              Chain <span className="font-bold">{chainName}</span> (
+              {targetChainId}) will be added to your wallet.
             </p>
             <div className="border-t pt-4">
               <h3 className="font-bold text-lg">Native Currency</h3>
