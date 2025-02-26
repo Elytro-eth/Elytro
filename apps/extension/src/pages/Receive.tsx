@@ -1,6 +1,6 @@
 import { useAccount } from '@/contexts/account-context';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
-import { ChevronDown, Copy, Check } from 'lucide-react';
+import { Copy, Check } from 'lucide-react';
 import ReceiveAddressBadge from '@/components/biz/ReceiveAddressBadge';
 import { CircleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,9 +16,9 @@ export default function Receive() {
   const { currentChain } = useChain();
   const [isCopied, setIsCopied] = useState(false);
 
-  const handleClickChainSelector = () => {
-    alert('TODO: Chain selector?');
-  };
+  // const handleClickChainSelector = () => {
+  //   alert('TODO: Chain selector?');
+  // };
 
   const onCopied = useCallback((error?: Error) => {
     if (!error) {
@@ -54,10 +54,10 @@ export default function Receive() {
             </div>
           </div>
 
-          <ChevronDown
+          {/* <ChevronDown
             className="elytro-clickable-icon"
             onClick={handleClickChainSelector}
-          />
+          /> */}
         </div>
 
         <ReceiveAddressBadge address={address!} chainId={currentChain.id} />

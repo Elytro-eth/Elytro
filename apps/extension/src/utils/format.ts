@@ -80,13 +80,17 @@ export function formatAddressToShort(address: Nullable<string>) {
 }
 
 export function formatTokenAmount(
-  amount: string | null | undefined,
+  amount: string | null | undefined | number,
   decimals: number = 18,
-  symbol: string = ''
+  symbol: string = '',
+  maxDecimalLength: number = 6
 ): string {
-  // todo: format amount. 8 decimal places is enough?
   try {
-    return `${formatUnits(BigInt(amount!), decimals)} ${symbol}`;
+    const formattedAmount = formatUnits(BigInt(amount!), decimals);
+    const [integerPart, decimalPart = ''] = formattedAmount.split('.');
+    const displayDecimalPart = decimalPart.slice(0, maxDecimalLength);
+
+    return `${integerPart}${displayDecimalPart ? `.${displayDecimalPart}` : ''} ${symbol}`;
   } catch {
     return '--';
   }

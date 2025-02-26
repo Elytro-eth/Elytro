@@ -92,9 +92,8 @@ class AccountManager {
       const newAccount = {
         address: newAccountAddress,
         chainId,
-        isDeployed: false,
         hasRecoveryContacts: false,
-      };
+      } as unknown as TAccountInfo;
 
       // ! push method will not trigger state update, so we need to reset the array
       this._accounts = [...this._accounts, newAccount];
@@ -114,25 +113,6 @@ class AccountManager {
     }
 
     this._currentAccount = account;
-  }
-
-  public activateCurrentAccount() {
-    if (!this._currentAccount) {
-      throw new Error(
-        'Elytro::AccountManager::activateCurrentAccount: current account not found'
-      );
-    }
-
-    const updatedAccount = {
-      ...this._currentAccount,
-      isDeployed: true,
-    };
-
-    this._accounts = this._accounts.map((account) =>
-      account.address === updatedAccount.address ? updatedAccount : account
-    );
-
-    this._currentAccount = updatedAccount;
   }
 
   public async resetAccounts() {

@@ -249,7 +249,7 @@ class WalletController {
 
     const balance = await walletClient.getBalance(basicInfo.address);
     accountManager.updateCurrentAccountInfo({
-      balance: balance.toString(),
+      balance: Number(balance),
     });
 
     return {

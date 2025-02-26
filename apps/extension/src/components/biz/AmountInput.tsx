@@ -7,16 +7,15 @@ import { useMemo } from 'react';
 export default function AmountInput({
   field,
   isDisabled,
-  price,
 }: {
   field: FieldValues;
   isDisabled: boolean;
-  price: string | number;
 }) {
   const dynamicFontSize = useMemo(
     () => (field.value?.length > 10 ? 'text-lg' : 'text-xl'),
     [field.value]
   );
+
   return (
     <div className="bg-white px-2 py-3 rounded-md flex flex-row items-center">
       <Input
@@ -28,7 +27,6 @@ export default function AmountInput({
       <div className="bg-gray-300 p-2 rounded-sm">
         <ArrowRightLeftIcon className="w-4 h-4" />
       </div>
-      <div className="text-lg px-4 font-normal text-gray-600">${price}</div>
     </div>
   );
 }

@@ -37,7 +37,10 @@ export const getTop100TokenAddresses = async (
           name: token.name,
           symbol: token.symbol,
           decimals: token.decimals,
-          logoURI: token.logoURI,
+          // change ipfs to https: ipfs://{cid} -> https://ipfs.io/ipfs/{cid}
+          logoURI: token.logoURI.includes('ipfs')
+            ? `https://ipfs.io/ipfs/${token.logoURI.split('ipfs://')[1]}`
+            : token.logoURI,
         };
       });
 
