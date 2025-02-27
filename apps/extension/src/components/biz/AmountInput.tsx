@@ -1,5 +1,5 @@
 import { Input } from '@/components/ui/input';
-import { ArrowRightLeftIcon } from 'lucide-react';
+// import { ArrowRightLeftIcon } from 'lucide-react';
 import { FieldValues } from 'react-hook-form';
 import { cn } from '@/utils/shadcn/utils';
 import { useMemo } from 'react';
@@ -24,9 +24,9 @@ export default function AmountInput({
         placeholder="0"
         disabled={isDisabled}
       />
-      <div className="bg-gray-300 p-2 rounded-sm">
+      {/* <div className="bg-gray-300 p-2 rounded-sm">
         <ArrowRightLeftIcon className="w-4 h-4" />
-      </div>
+      </div> */}
     </div>
   );
 }

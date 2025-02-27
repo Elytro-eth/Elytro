@@ -178,7 +178,7 @@ export default function AddressInput({
         <div className="absolute top-full left-0 right-0 bg-white shadow-md rounded-md mt-1 z-10 overflow-hidden">
           {recentAddress && (
             <div className="w-full">
-              <div className="text-base text-gray-600 font-bold p-4">
+              <div className="text-base text-gray-600 font-bold p-2 px-4">
                 Recent
               </div>
               <div>
@@ -210,8 +210,8 @@ export default function AddressInput({
                       className="h-16 px-4 cursor-pointer flex items-center justify-between hover:bg-gray-300"
                     >
                       {Comp}
-                      <div className="text-gray-600 text-sm font-normal">
-                        {hour > 1 ? `${hour}hrs` : 'An hour'} ago
+                      <div className="text-gray-600 text-tiny font-normal">
+                        {hour > 1 ? `${hour}hrs` : '1 hr'} ago
                       </div>
                     </div>
                   );
