@@ -21,6 +21,7 @@ import AccountRecovery from './pages/AccountRecovery';
 import TxSuccess from './pages/TxSuccess';
 import RetrieveContacts from './pages/AccountRecovery/RetrieveContacts';
 import ChangePassword from './pages/ChangePassword';
+import ImportToken from './pages/ImportToken';
 
 export const SIDE_PANEL_ROUTE_PATHS = {
   Home: '/',
@@ -46,6 +47,7 @@ export const SIDE_PANEL_ROUTE_PATHS = {
   RetrieveContacts: '/retrieve-contacts',
   Transfer: '/transfer',
   TxSuccess: '/tx-success',
+  ImportToken: '/import-token',
 } as const;
 
 export const routes: TRoute[] = [
@@ -141,5 +143,9 @@ export const routes: TRoute[] = [
   {
     path: SIDE_PANEL_ROUTE_PATHS.TxSuccess,
     component: TxSuccess,
+  },
+  {
+    path: SIDE_PANEL_ROUTE_PATHS.ImportToken,
+    component: ImportToken,
   },
 ];

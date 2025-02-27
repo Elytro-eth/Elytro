@@ -6,6 +6,8 @@ import { useAccount } from '@/contexts/account-context';
 import Assets from '@/components/biz/Assets';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { navigateTo } from '@/utils/navigation';
+import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 // import { Button } from '@/components/ui/button';
 // import { Plus } from 'lucide-react';
 
@@ -39,6 +41,9 @@ export default function Dashboard() {
         variant="secondary"
         size="tiny"
         className="fixed bottom-6 left-1/2 transform -translate-x-1/2"
+        onClick={() => {
+          navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportToken);
+        }}
       >
         <Plus className="w-3 h-3 mr-1 duration-100 group-hover:stroke-white" />
         Import token

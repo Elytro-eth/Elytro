@@ -24,7 +24,7 @@ import {
 import { DecodeResult } from '@soulwallet/decoder';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { TRecoveryStatus } from '@/constants/recovery';
-import { getTop100TokenAddresses } from '@/utils/tokens';
+import { getTokenList, updateUserImportedTokens } from '@/utils/tokens';
 import { ABI_ERC20_BALANCE_OF } from '@/constants/abi';
 
 enum WalletStatusEn {
@@ -461,9 +461,7 @@ class WalletController {
       return [];
     }
 
-    const erc20Tokens = await getTop100TokenAddresses(
-      chainService.currentChain.id
-    );
+    const erc20Tokens = await getTokenList(chainService.currentChain.id);
 
     const res = await walletClient.client?.multicall({
       contracts: erc20Tokens.map((token) => ({
@@ -500,6 +498,14 @@ class WalletController {
       },
       ...processedRes,
     ];
+  }
+
+  public async importToken(token: TTokenInfo) {
+    if (!chainService.currentChain) {
+      throw new Error('Elytro: No current chain');
+    }
+
+    await updateUserImportedTokens(chainService.currentChain.id, token);
   }
 }
 

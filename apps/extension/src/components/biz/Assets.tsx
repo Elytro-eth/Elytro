@@ -21,7 +21,7 @@ export default function Assets() {
     return (
       <div className="flex flex-col">
         {tokens.map((item) => {
-          return <TokenItem key={item.name} token={item} />;
+          return <TokenItem key={item.address} token={item} />;
         })}
       </div>
     );
