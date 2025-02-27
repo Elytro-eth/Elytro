@@ -457,11 +457,13 @@ class WalletController {
   }
 
   public async getCurrentAccountTokens() {
-    if (!accountManager.currentAccount || !chainService.currentChain) {
+    if (!accountManager.currentAccount) {
       return [];
     }
 
-    const erc20Tokens = await getTokenList(chainService.currentChain.id);
+    const erc20Tokens = await getTokenList(
+      accountManager.currentAccount.chainId
+    );
 
     const res = await walletClient.client?.multicall({
       contracts: erc20Tokens.map((token) => ({
@@ -501,11 +503,14 @@ class WalletController {
   }
 
   public async importToken(token: TTokenInfo) {
-    if (!chainService.currentChain) {
-      throw new Error('Elytro: No current chain');
+    if (!accountManager.currentAccount) {
+      throw new Error('No current account');
     }
 
-    await updateUserImportedTokens(chainService.currentChain.id, token);
+    await updateUserImportedTokens(
+      accountManager.currentAccount.chainId,
+      token
+    );
   }
 }
 

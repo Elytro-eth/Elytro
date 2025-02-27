@@ -42,7 +42,6 @@ export default function AccountsDropdown() {
   const handleSelectAccount = async (account: TAccountInfo) => {
     try {
       await wallet.switchAccountByChain(account.chainId);
-
       await reloadAccount();
     } catch (error) {
       console.error(error);
@@ -58,6 +57,7 @@ export default function AccountsDropdown() {
     try {
       await wallet.removeAccount(account.address);
       await reloadAccount();
+      await getAccounts();
       toast({
         title: 'Account removed successfully',
       });
@@ -68,6 +68,8 @@ export default function AccountsDropdown() {
         description: 'Please try again',
         variant: 'destructive',
       });
+    } finally {
+      setOpen(false);
     }
   };
 

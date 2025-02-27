@@ -102,9 +102,9 @@ export const getTokenList = async (chainId: number) => {
 
   const userImportedTokensStorageKey = getUserImportedTokensStorageKey(chainId);
 
-  const userImportedTokens = (await localStorage.get(
-    userImportedTokensStorageKey
-  )) as TTokenInfo[] | [];
+  const userImportedTokens =
+    ((await localStorage.get(userImportedTokensStorageKey)) as TTokenInfo[]) ||
+    [];
 
   return [...top100Tokens, ...userImportedTokens];
 };

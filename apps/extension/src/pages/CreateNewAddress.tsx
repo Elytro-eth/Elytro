@@ -5,11 +5,12 @@ import { TChainItem } from '@/constants/chains';
 import { useWallet } from '@/contexts/wallet';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
-
+import { useAccount } from '@/contexts/account-context';
 import NetworkSelection from '@/components/biz/NetworkSelection';
 
 export default function CreateNewAddress() {
   const { wallet } = useWallet();
+  const { reloadAccount } = useAccount();
   const [selectedChain, setSelectedChain] = useState<TChainItem | null>(null);
   const handleChange = (chain: TChainItem) => {
     setSelectedChain(chain);
@@ -20,6 +21,7 @@ export default function CreateNewAddress() {
 
     try {
       await wallet.createAccount(selectedChain.id);
+      reloadAccount();
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
     } catch (error) {
       console.error(error);
