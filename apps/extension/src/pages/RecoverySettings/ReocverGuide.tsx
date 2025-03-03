@@ -5,7 +5,7 @@ import { Clock, Mail, Shield } from 'lucide-react';
 
 export default function RecoverGuide({ onClick }: { onClick: () => void }) {
   return (
-    <div className="flex flex-col gap-y-xl">
+    <div className="flex flex-col gap-y-xl items-center">
       <img src={ContactsImg} className="size-36" />
       <div className="elytro-text-subtitle">How recovery contact works</div>
       <div>
@@ -25,7 +25,9 @@ export default function RecoverGuide({ onClick }: { onClick: () => void }) {
           Icon={Clock}
         />
       </div>
-      <Button onClick={onClick}>Get Started</Button>
+      <Button onClick={onClick} className="w-full">
+        Get Started
+      </Button>
     </div>
   );
 }
