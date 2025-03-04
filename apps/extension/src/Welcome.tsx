@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import ElytroIcon from '@/assets/logo.svg';
 import '@/index.css';
 import { openSidePanel } from './utils/window';
+import { ArrowUp } from 'lucide-react';
 
 const SocialMediaIcon: React.FC<{
   name: string;
@@ -13,7 +14,7 @@ const SocialMediaIcon: React.FC<{
 }> = ({ name, url, icon }) => {
   return (
     <a key={name} href={url} target="_blank" rel="noreferrer">
-      <img src={icon} alt={name} className="w-6 h-6" />
+      <img src={icon} alt={name} className="w-6 h-6 hover:opacity-80" />
     </a>
   );
 };
@@ -21,12 +22,17 @@ const SocialMediaIcon: React.FC<{
 const Welcome = () => (
   <div className="w-screen h-screen elytro-horizontal-gradient-bg flex flex-col items-center justify-center">
     <header className="fixed top-4 left-4 elytro-text-subtitle flex items-center gap-3xs">
-      <img src={ElytroIcon} alt="Elytro" className="size-xl" />
+      <img src={ElytroIcon} alt="Elytro" className="size-2xl" />
       Elytro
     </header>
+    <div className="absolute top-4 right-8 elytro-text-small text-gray-600 flex items-top gap-2">
+      <ArrowUp className="w-5 h-5 stroke-gray-600" />
+      Open Extensions and pin <br />
+      Elytro for easy access
+    </div>
     <main className="rounded-sm p-4xl bg-white w-[480px]">
       <h1 className="elytro-text-headline mb-lg ">Welcome to Elytro</h1>
-      <p className="elytro-text-body opacity-60">
+      <p className="elytro-text-body text-gray-600">
         Set up or import your smart contract wallets to start exploring
         Ethereum.
       </p>
