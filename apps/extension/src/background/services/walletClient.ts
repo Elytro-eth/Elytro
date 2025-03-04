@@ -38,7 +38,7 @@ class ElytroWalletClient {
     if (chain.id && chain.id !== this._client?.chain?.id) {
       this._client = createPublicClient({
         chain,
-        transport: http(chain.rpcUrls.default.http[0]), // if default is down, use endpoint as fallback
+        transport: http(chain.endpoint || chain.rpcUrls.default.http[0]),
       });
     }
   }

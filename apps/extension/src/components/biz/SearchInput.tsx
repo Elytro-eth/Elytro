@@ -1,24 +1,24 @@
 import { cn } from '@/utils/shadcn/utils';
 import React, { useState, useRef, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
+import { LabelInput } from './LabelInput';
 
 interface SearchInputProps<T> {
+  label: string;
   input: string;
   onSearch: (value: string) => T[];
   onSelect: (item: T) => void;
   renderItem: (item: T) => React.ReactNode;
   placeholder?: string;
-  className?: string;
   maxSuggestions?: number;
 }
 
 export function SearchInput<T>({
   input,
+  label,
   onSearch,
   onSelect,
   renderItem,
   placeholder = 'Search...',
-  className = '',
 }: SearchInputProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -85,14 +85,14 @@ export function SearchInput<T>({
 
   return (
     <div className="relative w-full" ref={containerRef}>
-      <Input
+      <LabelInput
+        label={label}
         type="text"
         value={input}
         onChange={handleChange}
         onFocus={() => setIsOpen(true)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className={cn('w-full', className)}
       />
 
       {isOpen && suggestions.length > 0 && (
