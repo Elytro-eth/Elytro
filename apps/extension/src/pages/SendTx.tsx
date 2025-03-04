@@ -1,4 +1,4 @@
-import { encodeFunctionData, isAddress, parseEther } from 'viem';
+import { encodeFunctionData, isAddress, parseEther, parseUnits } from 'viem';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -42,7 +42,7 @@ export default function SendTx() {
   const formResolverConfig = z.object({
     token: z.object({
       name: z.string(),
-      logoURI: z.string(),
+      logoURI: z.string().nullable(),
       balance: z.number(),
       decimals: z.number(),
       symbol: z.string(),
@@ -79,7 +79,7 @@ export default function SendTx() {
   });
 
   const changeAmountField = (amount: string) => {
-    form.setValue('amount', amount);
+    form.setValue('amount', amount.trim());
     form.trigger('amount');
   };
 
@@ -95,6 +95,7 @@ export default function SendTx() {
       ...item,
       balance: item.balance ?? 0,
       address: item.address || '0x0000000000000000000000000000000000000000',
+      logoURI: item.logoURI || null,
     });
     form.trigger('token');
   };
@@ -118,7 +119,11 @@ export default function SendTx() {
 
     const txParams: Transaction = { to };
 
-    const amount = parseEther(form.getValues('amount')).toString();
+    const amount = parseUnits(
+      form.getValues('amount'),
+      token.decimals
+    ).toString();
+
     if (token.symbol === 'ETH') {
       txParams.value = amount;
     } else {
@@ -202,22 +207,6 @@ export default function SendTx() {
             </div>
           </div>
         </Form>
-        <div className="p-4 bg-gray-150 rounded-sm space-y-2 mb-4">
-          <div className="flex justify-between items-center">
-            <div className="font-bold text-base text-gray-750">
-              From account
-            </div>
-            <FragmentedAddress address={address} chainId={chainId} />
-          </div>
-          <div className="flex justify-between items-center">
-            <div className="font-bold text-base text-gray-750">
-              Network cost
-            </div>
-            <div className="text-gray-600 text-sm font-normal">
-              To be calculated
-            </div>
-          </div>
-        </div>
 
         <Button
           variant="secondary"

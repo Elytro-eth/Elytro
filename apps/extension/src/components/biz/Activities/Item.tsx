@@ -70,7 +70,7 @@ export default function ActivityItem({
   decimals,
   value,
   symbol,
-  logoURI,
+  // logoURI,
 }: UserOperationHistory) {
   const { openExplorer } = useChain();
   const [latestStatus, setLatestStatus] = useState(status);
@@ -128,9 +128,10 @@ export default function ActivityItem({
           <span className="text-base font-bold">
             {formatTokenAmount(value, decimals, symbol)}
           </span>
-          {logoURI && (
+          {/* Stop showing logoURI for now*/}
+          {/* {logoURI && (
             <img src={logoURI} alt={symbol} className="size-4 rounded-full" />
-          )}
+          )} */}
         </div>
       ) : null}
     </div>

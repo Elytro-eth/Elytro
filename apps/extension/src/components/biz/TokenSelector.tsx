@@ -88,7 +88,7 @@ export default function TokenSelector({
             <div
               onClick={() => handleSelect(item)}
               className="cursor-pointer hover:bg-gray-200"
-              key={item.name}
+              key={item.address}
             >
               <TokenItem token={item} />
             </div>

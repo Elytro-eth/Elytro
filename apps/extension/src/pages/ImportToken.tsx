@@ -4,15 +4,13 @@ import { useEffect, useState } from 'react';
 import { fetchTokens } from '@/utils/tokens';
 import { SearchInput } from '@/components/biz/SearchInput';
 import { HighlightText } from '@/components/biz/HighlightText';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { isAddress } from 'viem';
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
-
-const INPUT_CLASS_NAME = 'bg-gray-150 rounded-md py-sm px-lg';
+import { LabelInput } from '@/components/biz/LabelInput';
 
 const TokenConfigItem = ({
   token,
@@ -124,10 +122,10 @@ export default function ImportToken() {
   }, [token.address]);
 
   return (
-    <SecondaryPageWrapper title="Import Token">
-      <div className="flex flex-col gap-y-sm ">
+    <SecondaryPageWrapper title="Import Token" showBack={false} closeable>
+      <div className="flex flex-col gap-y-md ">
         <SearchInput<TTokenInfo>
-          className={INPUT_CLASS_NAME}
+          label="Currency symbol"
           input={token.symbol}
           onSearch={handleSymbolInputChange}
           onSelect={handleSelectToken}
@@ -138,12 +136,12 @@ export default function ImportToken() {
               searchValue={token.symbol}
             />
           )}
-          placeholder="Currency symbol"
+          placeholder="ETH"
         />
 
         <div className="flex flex-col gap-y-2xs">
           <SearchInput<TTokenInfo>
-            className={INPUT_CLASS_NAME}
+            label="Token contract address"
             input={token.address}
             onSearch={handleAddressInputChange}
             onSelect={handleSelectToken}
@@ -154,15 +152,15 @@ export default function ImportToken() {
                 searchValue={token.address}
               />
             )}
-            placeholder="Token contract address"
+            placeholder="0x"
           />
           {hasAddressError && (
             <p className="elytro-text-tiny-body text-red">Invalid address</p>
           )}
         </div>
 
-        <Input
-          className={INPUT_CLASS_NAME}
+        <LabelInput
+          label="Decimals"
           type="number"
           value={token.decimals}
           onChange={(e) =>
@@ -171,16 +169,16 @@ export default function ImportToken() {
               decimals: Number(e.target.value),
             }))
           }
-          placeholder="Decimals"
+          placeholder="18"
         />
 
-        <Input
-          className={INPUT_CLASS_NAME}
+        <LabelInput
+          label="Token Name"
           value={token.name}
           onChange={(e) =>
             setToken((prev) => ({ ...prev, name: e.target.value }))
           }
-          placeholder="Token name"
+          placeholder="Ether"
         />
 
         <Button
