@@ -1,4 +1,8 @@
-import { SUPPORTED_CHAIN_IDS, TChainItem } from '@/constants/chains';
+import {
+  SUPPORTED_CHAIN_IDS,
+  TChainItem,
+  FROM_BLOCK_NUMBER_OF_INFO_RECORDER_MAP,
+} from '@/constants/chains';
 import {
   getDomainSeparator,
   getEncoded1271MessageHash,
@@ -625,7 +629,7 @@ class ElytroSDK {
     const logs = await _client.getLogs({
       address: this._config.infoRecorder as Address,
       toBlock: 'latest',
-      fromBlock: this._config.infoRecorderFromBlock,
+      fromBlock: FROM_BLOCK_NUMBER_OF_INFO_RECORDER_MAP[this._config.id],
       event: parseAbiItem(
         'event DataRecorded(address indexed wallet, bytes32 indexed category, bytes data)'
       ),

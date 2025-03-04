@@ -60,17 +60,13 @@ export default function TokenSelector({
     );
   }, [tokens]);
 
-  const [selectedToken, setSelectedToken] = useState<TTokenInfo | null>(
-    defaultToken()
-  );
+  const [selectedToken, setSelectedToken] = useState<TTokenInfo | null>();
 
   useEffect(() => {
     if (!selectedToken && tokens.length > 0) {
       const newDefaultToken = defaultToken();
       setSelectedToken(newDefaultToken);
-      if (newDefaultToken) {
-        onTokenChange?.(newDefaultToken);
-      }
+      onTokenChange?.(newDefaultToken);
     }
   }, [tokens, selectedToken, defaultToken, onTokenChange]);
 
@@ -85,8 +81,8 @@ export default function TokenSelector({
         ...item,
         name: item.name || item.symbol,
         balance: item.balance || 0,
-        logoURI: item.logoURI || '', // 使用空字符串而不是null
-        address: item.address, // 保持原始address
+        logoURI: item.logoURI || '',
+        address: item.address,
       };
 
       setSelectedToken(safeToken);

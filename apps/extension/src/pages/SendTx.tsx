@@ -35,7 +35,6 @@ export default function SendTx() {
   const [isPreparing, setIsPreparing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedToken, setSelectedToken] = useState<TTokenInfo | null>(null);
-  const [maxAmount, setMaxAmount] = useState<string>('0');
 
   const filteredTokens = useMemo(() => {
     return tokens.filter((token) => {
@@ -62,10 +61,10 @@ export default function SendTx() {
     token: z.object({
       name: z.string(),
       logoURI: z.string().nullable(),
-      balance: z.number(),
+      balance: z.number().nullable().optional(),
       decimals: z.number(),
       symbol: z.string(),
-      address: z.string().nullable(),
+      address: z.string().nullable().optional(),
     }),
     amount: z
       .string()
@@ -79,6 +78,7 @@ export default function SendTx() {
             message: 'Please input a valid amount',
           });
         }
+
         const maxAmount = token
           ? Number(
               formatTokenAmount(
@@ -87,6 +87,15 @@ export default function SendTx() {
               )
             )
           : 0;
+
+        console.log(
+          'token',
+          form.getValues('token'),
+          maxAmount,
+          data,
+          Number(data) > maxAmount
+        );
+
         if (Number(data) > maxAmount) {
           ctx.addIssue({
             code: 'custom',
@@ -110,26 +119,6 @@ export default function SendTx() {
     }
   }, [tokens, tokensLoading, updateTokens]);
 
-  useEffect(() => {
-    if (selectedToken) {
-      const formattedAmount = formatTokenAmount(
-        selectedToken.balance || 0,
-        selectedToken.decimals
-      );
-      setMaxAmount(formattedAmount);
-
-      const currentAmount = form.getValues('amount');
-      if (currentAmount) {
-        const amountNum = Number(currentAmount);
-        const maxNum = Number(formattedAmount);
-
-        if (amountNum > maxNum) {
-          form.trigger('amount');
-        }
-      }
-    }
-  }, [selectedToken, form]);
-
   const changeAmountField = useCallback(
     (amount: string) => {
       form.setValue('amount', amount.trim());
@@ -138,16 +127,17 @@ export default function SendTx() {
     [form]
   );
 
-  const handleFillMax = useCallback(() => {
-    if (selectedToken) {
-      changeAmountField(maxAmount);
-    }
-  }, [selectedToken, maxAmount, changeAmountField]);
+  const handleFillMax = () => {
+    changeAmountField(
+      formatTokenAmount(selectedToken?.balance || 0, selectedToken?.decimals)
+    );
+  };
 
   const handleTokenSelect = useCallback(
     (token: TTokenInfo) => {
       setSelectedToken(token);
 
+      console.log('trigger token', token);
       form.setValue('token', token);
       form.trigger('token');
       form.trigger('amount');
@@ -271,7 +261,7 @@ export default function SendTx() {
                       disabled={!form.getValues('token')}
                       className="absolute right-4 top-6 bg-green !text-white !py-2"
                       size="tiny"
-                      onClick={() => handleFillMax()}
+                      onClick={handleFillMax}
                     >
                       Max
                     </Button>
