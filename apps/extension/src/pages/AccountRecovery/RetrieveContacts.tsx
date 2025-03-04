@@ -3,7 +3,6 @@ import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { Button } from '@/components/ui/button';
 import HelperText from '@/components/ui/HelperText';
 import ShortedAddress from '@/components/ui/ShortedAddress';
-import { useChain } from '@/contexts/chain-context';
 import { useWallet } from '@/contexts/wallet';
 import useSearchParams from '@/hooks/use-search-params';
 import { useState } from 'react';
@@ -26,6 +25,7 @@ import { toast } from '@/hooks/use-toast';
 import WalletImg from '@/assets/wallet.png';
 import { TRecoveryStatus } from '@/constants/recovery';
 import { safeOpen } from '@/utils/safeOpen';
+import { useAccount } from '@/contexts/account-context';
 
 type TShareInfo = {
   type: 'link' | 'email';
@@ -37,7 +37,9 @@ const RECOVERY_APP_URL = 'https://elytro.vercel.app/';
 function PageContent() {
   const { wallet } = useWallet();
   const { address } = useSearchParams();
-  const { currentChain, getCurrentChain } = useChain();
+  const {
+    currentAccount: { chainId },
+  } = useAccount();
   const [loading, setLoading] = useState(false);
   const [recoveryContacts, setRecoveryContacts] = useState<TRecoveryContact[]>(
     []
@@ -77,12 +79,10 @@ function PageContent() {
   };
 
   useEffect(() => {
-    if (Number(currentChain?.id)) {
+    if (Number(chainId)) {
       getRecoveryRecord();
-    } else {
-      getCurrentChain();
     }
-  }, [address, currentChain]);
+  }, [address, chainId]);
 
   const handleShareContact = (contact: TRecoveryContact) => {
     if (!recoveryRecord || !recoveryRecord.recoveryRecordID) {
@@ -164,7 +164,7 @@ function PageContent() {
         className="bg-light-green text-gray-750"
       />
 
-      <ShortedAddress address={address} chainId={currentChain?.id} />
+      <ShortedAddress address={address} chainId={chainId} />
 
       <div className="flex flex-col gap-y-sm">
         {recoveryContacts.map((contact) => (

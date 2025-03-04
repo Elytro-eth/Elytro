@@ -1,7 +1,7 @@
 import { useAlert } from '@/components/ui/alerter';
 import { getIconByChainId } from '@/constants/chains';
 import { toast } from '@/hooks/use-toast';
-import { formatAddressToShort } from '@/utils/format';
+import { formatAddressToShort, formatTokenAmount } from '@/utils/format';
 import { cn } from '@/utils/shadcn/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { Trash2 } from 'lucide-react';
@@ -64,7 +64,9 @@ export default function AccountOption({
       </div>
 
       <div className="elytro-text-small text-gray-600 flex flex-row items-center gap-sm">
-        <span className="text-gray-600">{account?.balance}</span>
+        <span className="text-gray-600">
+          {formatTokenAmount(account?.balance, 18, 'ETH')}
+        </span>
         {!isSelected ? (
           <Trash2
             className="size-4 stroke-gray-600 hover:stroke-gray-900"

@@ -2,17 +2,15 @@ import { TChainItem } from '@/constants/chains';
 import { cn } from '@/utils/shadcn/utils';
 
 interface IChainItemProps {
-  chain: TChainItem;
+  chain: TChainItem & { disabled?: boolean };
   onClick?: () => void;
   isSelected?: boolean; // TODO: remove this
-  disabled?: boolean;
 }
 
 export default function ChainItem({
   chain,
   onClick,
   isSelected = false,
-  disabled = false,
 }: IChainItemProps) {
   const handleClick = () => {
     onClick?.();
@@ -20,12 +18,12 @@ export default function ChainItem({
 
   return (
     <div
-      onClick={disabled ? undefined : handleClick}
+      onClick={chain.disabled ? undefined : handleClick}
       className={cn(
         'flex flex-row items-center gap-md p-lg rounded-sm bg-white hover:bg-gray-100 border border-gray-300 cursor-pointer',
         isSelected && 'bg-gray-100',
         onClick && 'cursor-pointer',
-        disabled && 'cursor-not-allowed opacity-50'
+        chain.disabled && 'cursor-not-allowed opacity-50'
       )}
     >
       <img

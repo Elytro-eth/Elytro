@@ -16,6 +16,7 @@ const Create: React.FC = () => {
     try {
       setLoading(true);
       await wallet.createNewOwner(pwd);
+      // TODO: check if this is accurate.
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.YouAreIn, params);
     } catch (error) {
       toast({

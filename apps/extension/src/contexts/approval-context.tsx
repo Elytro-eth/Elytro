@@ -2,7 +2,6 @@ import { createContext, useContext, useState } from 'react';
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
 import { useInterval } from 'usehooks-ts';
-import { useAccount } from './account-context';
 import { ApprovalTypeEn } from '@/constants/operations';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
@@ -25,15 +24,15 @@ export const ApprovalProvider = ({
   children: React.ReactNode;
 }) => {
   const { wallet } = useWallet();
-  const { currentAccount } = useAccount();
   const [approval, setApproval] = useState<Nullable<TApprovalInfo>>(null);
 
   const getCurrentApproval = async () => {
     const newApproval = await wallet.getCurrentApproval();
 
     if (newApproval) {
+      const currentAccount = await wallet.getCurrentAccount();
       if (
-        !currentAccount.isDeployed &&
+        !currentAccount?.isDeployed &&
         newApproval.type !== ApprovalTypeEn.Unlock
       ) {
         setApproval({
@@ -62,6 +61,7 @@ export const ApprovalProvider = ({
       return;
     }
     await wallet.resolveApproval(approval.id, data);
+    setApproval(null);
   };
 
   const reject = async (e?: Error) => {
@@ -74,6 +74,8 @@ export const ApprovalProvider = ({
       title: 'Rejected',
       description: e ? e.message : 'The approval request has been rejected',
     });
+
+    setApproval(null);
   };
 
   // todo: delete it once all approval requests are handled by the target page

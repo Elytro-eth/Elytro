@@ -64,12 +64,13 @@ const ActivityStatusMap = {
 export default function ActivityItem({
   opHash,
   status = UserOperationStatusEn.pending,
+  from,
   to,
   type,
   decimals,
   value,
   symbol,
-  logoURI,
+  // logoURI,
 }: UserOperationHistory) {
   const { openExplorer } = useChain();
   const [latestStatus, setLatestStatus] = useState(status);
@@ -115,8 +116,9 @@ export default function ActivityItem({
           </span>
 
           <span className="elytro-text-tiny-body text-gray-600">
-            {type === HistoricalActivityTypeEn.Receive ? 'from' : 'to'}{' '}
-            {formatAddressToShort(to)}
+            {type === HistoricalActivityTypeEn.Receive
+              ? `from ${formatAddressToShort(from)}`
+              : `to ${formatAddressToShort(to)}`}
           </span>
         </div>
       </div>
@@ -126,9 +128,10 @@ export default function ActivityItem({
           <span className="text-base font-bold">
             {formatTokenAmount(value, decimals, symbol)}
           </span>
-          {logoURI && (
+          {/* Stop showing logoURI for now*/}
+          {/* {logoURI && (
             <img src={logoURI} alt={symbol} className="size-4 rounded-full" />
-          )}
+          )} */}
         </div>
       ) : null}
     </div>

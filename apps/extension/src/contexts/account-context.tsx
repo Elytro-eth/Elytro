@@ -10,7 +10,6 @@ import { useWallet } from '@/contexts/wallet';
 import { useHashLocation } from 'wouter/use-hash-location';
 import useSearchParams from '@/hooks/use-search-params';
 import { Address, toHex } from 'viem';
-import useTokens, { TokenDTO } from '@/hooks/use-tokens';
 import {
   UserOperationStatusEn,
   HistoricalActivityTypeEn,
@@ -21,43 +20,44 @@ import { EVENT_TYPES } from '@/constants/events';
 import { removeSearchParamsOfCurrentWindow } from '@/utils/url';
 import { query, query_receive_activities } from '@/requests/query';
 import { debounce, DebouncedFunc } from 'lodash';
+import { toast } from '@/hooks/use-toast';
 
 const DEFAULT_ACCOUNT_INFO: TAccountInfo = {
   address: '',
   isDeployed: false,
-  balance: '0',
+  balance: 0,
   chainId: 0,
 };
 
 type IAccountContext = {
   currentAccount: TAccountInfo;
-  updateAccount: DebouncedFunc<() => Promise<void>>;
+  updateAccount: () => Promise<void>;
   loading: boolean;
   tokenInfo: {
-    tokens: TokenDTO[];
-    loadingTokens: boolean;
+    tokens: TTokenInfo[];
+    loading: boolean;
   };
   history: UserOperationHistory[];
   accounts: TAccountInfo[];
-  updateHistory: DebouncedFunc<() => Promise<void>>;
   getAccounts: () => Promise<void>;
   updateTokens: () => Promise<void>;
+  reloadAccount: DebouncedFunc<() => Promise<void>>;
 };
 
 // TODO: extract HistoryContext
 const AccountContext = createContext<IAccountContext>({
   currentAccount: DEFAULT_ACCOUNT_INFO,
-  updateAccount: debounce(async () => {}, 1000),
+  updateAccount: async () => {},
   loading: false,
   tokenInfo: {
     tokens: [],
-    loadingTokens: false,
+    loading: false,
   },
   history: [],
-  updateHistory: debounce(async () => {}, 1000),
   accounts: [],
   getAccounts: async () => {},
   updateTokens: async () => {},
+  reloadAccount: debounce(async () => {}, 1_000),
 });
 
 export const AccountProvider = ({
@@ -74,8 +74,27 @@ export const AccountProvider = ({
   const searchParams = useSearchParams();
   const [history, setHistory] = useState<UserOperationHistory[]>([]);
   const [accounts, setAccounts] = useState<TAccountInfo[]>([]);
+  const [tokens, setTokens] = useState<TTokenInfo[]>([]);
+  const [isTokensLoading, setIsTokensLoading] = useState(false);
 
-  const updateAccount = debounce(async () => {
+  const removeInterval = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    if (searchParams.activating) {
+      intervalRef.current = setInterval(() => {
+        updateAccount();
+      }, 1_000);
+    }
+
+    return removeInterval;
+  }, [searchParams]);
+
+  const updateAccount = async () => {
     if (loading) {
       return;
     }
@@ -85,7 +104,6 @@ export const AccountProvider = ({
 
       const res = (await wallet.getCurrentAccount()) ?? DEFAULT_ACCOUNT_INFO;
       setCurrentAccount(res);
-      updateHistory();
 
       if (intervalRef.current && res.isDeployed) {
         removeSearchParamsOfCurrentWindow('activating');
@@ -96,44 +114,27 @@ export const AccountProvider = ({
     } finally {
       setLoading(intervalRef.current ? true : false);
     }
-  }, 1000);
-
-  const { tokens, loadingTokens, refetchTokens } = useTokens({
-    address: currentAccount.address as Address,
-    chainId: currentAccount.chainId,
-  });
+  };
 
   const updateTokens = async () => {
-    if (loading || !currentAccount.address) {
+    if (isTokensLoading) {
       return;
     }
 
-    await refetchTokens();
-  };
-
-  const updateHistory = debounce(async () => {
-    const localHistory = await wallet.getLatestHistories();
-
-    const receives = await getReceiveActivities();
-
-    const res = [...localHistory, ...receives].sort(
-      (a, b) => b.timestamp - a.timestamp
-    );
-
-    setHistory(res);
-  }, 1000);
-
-  useEffect(() => {
-    if (!history) {
-      updateHistory();
+    try {
+      setIsTokensLoading(true);
+      const tokens = await wallet.getCurrentAccountTokens();
+      setTokens((tokens as TTokenInfo[]) || []);
+    } catch {
+      toast({
+        title: 'Failed to get assets',
+        description: 'Please try again',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsTokensLoading(false);
     }
-
-    RuntimeMessage.onMessage(EVENT_TYPES.HISTORY.ITEMS_UPDATED, updateHistory);
-
-    return () => {
-      RuntimeMessage.offMessage(updateHistory);
-    };
-  }, []);
+  };
 
   const getReceiveActivities = async () => {
     try {
@@ -147,19 +148,17 @@ export const AccountProvider = ({
         chainId: toHex(account?.chainId ?? 0),
       })) as SafeAny;
 
-      const transactions = res.transactions.map((item: SafeAny) => {
-        return {
-          type: HistoricalActivityTypeEn.Receive,
-          from: item.list[0].asset_from,
-          to: item.list[0].asset_to,
-          value: item.list[0].asset_value,
-          timestamp: item.timestamp * 1000,
-          opHash: item.opHash || item.txhash,
-          status: UserOperationStatusEn.confirmedSuccess,
-          decimals: item.list[0].decimals,
-          symbol: item.list[0].symbol,
-        };
-      });
+      const transactions = res.transactions.map((item: SafeAny) => ({
+        type: HistoricalActivityTypeEn.Receive,
+        from: item.list[0].asset_from,
+        to: item.list[0].asset_to,
+        value: item.list[0].asset_value,
+        timestamp: item.timestamp * 1000,
+        opHash: item.opHash || item.txhash,
+        status: UserOperationStatusEn.confirmedSuccess,
+        decimals: item.list[0].decimals,
+        symbol: item.list[0].symbol,
+      }));
 
       return transactions || [];
     } catch (error) {
@@ -168,28 +167,39 @@ export const AccountProvider = ({
     }
   };
 
-  useEffect(() => {
-    if (!loading && !currentAccount.address) {
-      updateAccount();
-    }
-  }, [pathname]);
+  const updateHistory = async () => {
+    const localHistory = await wallet.getLatestHistories();
 
-  const removeInterval = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
+    const receives = await getReceiveActivities();
+
+    const res = [...localHistory, ...receives].sort(
+      (a, b) => b.timestamp - a.timestamp
+    );
+
+    setHistory(res);
   };
 
   useEffect(() => {
-    if (searchParams.activating) {
-      intervalRef.current = setInterval(() => {
-        updateAccount();
-      }, 1000);
+    if (!currentAccount.address) {
+      reloadAccount();
     }
+  }, [pathname]);
 
-    return removeInterval;
-  }, [searchParams]);
+  const onHistoryUpdated = () => {
+    updateHistory();
+    updateTokens();
+  };
+
+  useEffect(() => {
+    RuntimeMessage.onMessage(
+      EVENT_TYPES.HISTORY.ITEMS_UPDATED,
+      onHistoryUpdated
+    );
+
+    return () => {
+      RuntimeMessage.offMessage(onHistoryUpdated);
+    };
+  }, []);
 
   const getAccounts = async () => {
     const res = await wallet.getAccounts();
@@ -198,9 +208,11 @@ export const AccountProvider = ({
     }
   };
 
-  useEffect(() => {
-    getAccounts();
-  }, []);
+  const reloadAccount = debounce(async () => {
+    await updateAccount();
+    await updateTokens();
+    await updateHistory();
+  }, 1_000);
 
   const contextValue = useMemo(
     () => ({
@@ -208,16 +220,16 @@ export const AccountProvider = ({
       updateAccount,
       tokenInfo: {
         tokens,
-        loadingTokens,
+        loading: isTokensLoading,
       },
       updateTokens,
       history,
-      updateHistory,
       loading,
       accounts,
       getAccounts,
+      reloadAccount,
     }),
-    [currentAccount, tokens, loadingTokens, history, loading, accounts]
+    [currentAccount, tokens, isTokensLoading, history, loading, accounts]
   );
 
   return (

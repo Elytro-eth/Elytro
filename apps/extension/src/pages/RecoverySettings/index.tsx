@@ -6,8 +6,10 @@ import ContactList from './ContactList';
 import ContactDetail from './ContactDetail';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
+import RecoverGuide from './ReocverGuide';
 
 enum ShowType {
+  Guide = 'guide',
   List = 'list',
   Detail = 'detail',
 }
@@ -31,6 +33,7 @@ export default function RecoverySettings() {
       const { guardians = [], threshold = 0 } =
         (await wallet.queryRecoveryContactsByAddress(address)) || {};
 
+      setShowType(guardians.length <= 0 ? ShowType.Guide : ShowType.List);
       setContacts(guardians.map((c) => ({ address: c })));
       setThreshold(threshold);
     } catch (error) {
@@ -80,6 +83,10 @@ export default function RecoverySettings() {
     setThreshold(0);
   };
 
+  const onClickGuide = () => {
+    setShowType(ShowType.List);
+  };
+
   const handleSaveContact = (contact: TRecoveryContact) => {
     if (contacts.find((c) => c.address === contact.address)) {
       const newContacts = contacts.map((c) =>
@@ -104,6 +111,7 @@ export default function RecoverySettings() {
         }
       }}
     >
+      {showType === ShowType.Guide && <RecoverGuide onClick={onClickGuide} />}
       {showType === ShowType.List && (
         <ContactList
           contacts={contacts}

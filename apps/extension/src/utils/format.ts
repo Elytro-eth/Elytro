@@ -5,7 +5,6 @@ import {
   toHex,
   size as getSize,
   pad,
-  formatUnits,
   Block,
   BlockTag,
   isAddress,
@@ -80,16 +79,63 @@ export function formatAddressToShort(address: Nullable<string>) {
 }
 
 export function formatTokenAmount(
-  amount: string | null | undefined,
+  amount: string | null | undefined | number,
   decimals: number = 18,
-  symbol: string = ''
+  symbol: string = '',
+  maxDecimalLength: number = 6,
+  roundingMode: boolean = true
 ): string {
-  // todo: format amount. 8 decimal places is enough?
-  try {
-    return `${formatUnits(BigInt(amount!), decimals)} ${symbol}`;
-  } catch {
-    return '--';
+  if (amount === null || amount === undefined || Number.isNaN(Number(amount))) {
+    return symbol ? `0 ${symbol}` : '0';
   }
+
+  let numericAmount: number;
+  try {
+    if (typeof amount === 'string') {
+      if (amount.length > 15) {
+        const amountBigInt = BigInt(amount);
+        const divisor = BigInt(10 ** decimals);
+        const integerPart = amountBigInt / divisor;
+        const fractionalPart = amountBigInt % divisor;
+
+        const fractionalStr = fractionalPart.toString().padStart(decimals, '0');
+        numericAmount = Number(`${integerPart}.${fractionalStr}`);
+      } else {
+        numericAmount = Number(amount) / 10 ** decimals;
+      }
+    } else {
+      numericAmount = Number(amount) / 10 ** decimals;
+    }
+  } catch (error) {
+    console.error('Error formatting token amount:', error);
+    return symbol ? `0 ${symbol}` : '0';
+  }
+
+  let result: string;
+  if (roundingMode) {
+    result = numericAmount.toFixed(maxDecimalLength);
+
+    result = result.replace(/\.?0+$/, '');
+
+    if (result.endsWith('.')) {
+      result = result.slice(0, -1);
+    }
+  } else {
+    const integerPart = Math.floor(numericAmount);
+    let fractionalPart = String(numericAmount).split('.')[1] || '';
+
+    fractionalPart = fractionalPart.substring(0, maxDecimalLength);
+
+    while (fractionalPart.endsWith('0')) {
+      fractionalPart = fractionalPart.slice(0, -1);
+    }
+
+    result = fractionalPart
+      ? `${integerPart}.${fractionalPart}`
+      : `${integerPart}`;
+  }
+
+  return symbol ? `${result} ${symbol}` : result;
 }
 
 export function formatSimulationResultToTxDetail(

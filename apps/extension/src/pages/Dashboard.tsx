@@ -4,17 +4,15 @@ import Spin from '@/components/ui/Spin';
 import Activities from '@/components/biz/Activities';
 import { useAccount } from '@/contexts/account-context';
 import Assets from '@/components/biz/Assets';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { navigateTo } from '@/utils/navigation';
+import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 // import { Button } from '@/components/ui/button';
 // import { Plus } from 'lucide-react';
-import { useEffect } from 'react';
 
 export default function Dashboard() {
-  const { loading, getAccounts, updateAccount } = useAccount();
-
-  useEffect(() => {
-    getAccounts();
-    updateAccount();
-  }, []);
+  const { loading } = useAccount();
 
   return (
     <div className="w-full h-full flex flex-col gap-2xl bg-gray-150 p-sm">
@@ -39,14 +37,17 @@ export default function Dashboard() {
         </Tabs>
       </div>
 
-      {/* <Button
+      <Button
         variant="secondary"
         size="tiny"
         className="fixed bottom-6 left-1/2 transform -translate-x-1/2"
+        onClick={() => {
+          navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportToken);
+        }}
       >
         <Plus className="w-3 h-3 mr-1 duration-100 group-hover:stroke-white" />
         Import token
-      </Button> */}
+      </Button>
     </div>
   );
 }

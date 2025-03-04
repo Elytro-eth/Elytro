@@ -26,6 +26,7 @@ export type TChainItem = Chain & {
   recovery: string; // social recovery module address
   validator: string; // validator address
   infoRecorder?: string; // info recorder address
+  infoRecorderFromBlock?: bigint; // info recorder from block
   // onchain config. If provided, it will be used to initialize the SDK and the SDK won't check chain config anymore.
   onchainConfig: {
     chainId: number;
@@ -49,6 +50,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
     validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
     infoRecorder: '0x0eb1ec2c9031ca30f0a28adef79b5b73b91692c2',
+    infoRecorderFromBlock: 128763383n,
     opExplorer: 'https://optimism.blockscout.com/op/',
     onchainConfig: {
       chainId: optimism.id,
@@ -70,6 +72,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
     // TODO: for now only support optimism sepolia
     infoRecorder: '0x0eb1ec2c9031ca30f0a28adef79b5b73b91692c2',
+    infoRecorderFromBlock: 20661477n,
     onchainConfig: {
       chainId: optimismSepolia.id,
       entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
@@ -81,14 +84,15 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     ...sepolia,
     icon: 'https://etherscan.io/images/svg/brands/ethereum-original.svg',
     endpoint:
-      // 'https://eth-sepolia.g.alchemy.com/v2/7EJnXZWkG9HIhjj0ZLx7vk_lexCq25Pr',
-      'https://ethereum-sepolia-rpc.publicnode.com',
+      'https://eth-sepolia.g.alchemy.com/v2/7EJnXZWkG9HIhjj0ZLx7vk_lexCq25Pr',
+    // 'https://ethereum-sepolia-rpc.publicnode.com',
     bundler:
       'https://api.pimlico.io/v2/11155111/rpc?apikey=pim_7KhEvjRKpLviLbtDBuHySr',
     factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
     fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
     recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
     infoRecorder: '0x0eb1ec2c9031ca30f0a28adef79b5b73b91692c2',
+    infoRecorderFromBlock: 7194730n,
     validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
     onchainConfig: {
       chainId: sepolia.id,

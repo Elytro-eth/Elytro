@@ -5,10 +5,10 @@ import TokenItem from '@/components/ui/TokenItem';
 
 export default function Assets() {
   const {
-    tokenInfo: { tokens, loadingTokens },
+    tokenInfo: { tokens, loading },
   } = useAccount();
 
-  if (loadingTokens)
+  if (loading)
     return (
       <div className="space-y-4 px-4 mt-3">
         <Skeleton className="w-full h-[40px]" />
@@ -17,11 +17,11 @@ export default function Assets() {
       </div>
     );
 
-  if (tokens)
+  if (tokens.length > 0)
     return (
       <div className="flex flex-col">
         {tokens.map((item) => {
-          return <TokenItem key={item.name} token={item} />;
+          return <TokenItem key={item.address} token={item} />;
         })}
       </div>
     );

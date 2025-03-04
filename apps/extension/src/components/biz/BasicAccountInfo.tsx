@@ -9,20 +9,11 @@ import { navigateTo } from '@/utils/navigation';
 import ActionButton from './ActionButton';
 import ActivateButton from './ActivateButton';
 import { useAccount } from '@/contexts/account-context';
-import { useChain } from '@/contexts/chain-context';
 import AccountsDropdown from './AccountsDropdown';
 import Copy from '@/components/ui/Copy';
-import { useEffect } from 'react';
 
 export default function BasicAccountInfo() {
-  const {
-    currentAccount,
-    updateTokens,
-    updateAccount,
-    getAccounts,
-    updateHistory,
-  } = useAccount();
-  const { getCurrentChain } = useChain();
+  const { currentAccount, reloadAccount } = useAccount();
 
   const onClickMore = () => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Settings);
@@ -35,18 +26,6 @@ export default function BasicAccountInfo() {
   const onClickReceive = () => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Receive);
   };
-
-  const reloadAccount = async () => {
-    await getCurrentChain();
-    await getAccounts();
-    await updateAccount();
-    await updateTokens();
-    await updateHistory();
-  };
-
-  useEffect(() => {
-    reloadAccount();
-  }, []);
 
   return (
     <div className="flex flex-col p-sm pb-0 ">

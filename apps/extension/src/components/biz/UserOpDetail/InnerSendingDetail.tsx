@@ -2,7 +2,7 @@ import TokenAmountItem from '../TokenAmountItem';
 import FragmentedAddress from '../FragmentedAddress';
 import { DecodeResult } from '@soulwallet/decoder';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
-import { useChain } from '@/contexts/chain-context';
+import { useAccount } from '@/contexts/account-context';
 
 interface IInnerSendingDetailProps {
   decodedUserOp: Nullable<DecodeResult>;
@@ -11,7 +11,7 @@ interface IInnerSendingDetailProps {
 export default function InnerSendingDetail({
   decodedUserOp,
 }: IInnerSendingDetailProps) {
-  const { currentChain } = useChain();
+  const { currentAccount } = useAccount();
 
   if (!decodedUserOp) {
     return null;
@@ -33,7 +33,7 @@ export default function InnerSendingDetail({
       <FragmentedAddress
         size="md"
         address={decodedUserOp?.to}
-        chainId={currentChain?.id}
+        chainId={currentAccount?.chainId}
         className="bg-gray-150 px-lg py-md rounded-md"
       />
     </>

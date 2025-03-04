@@ -8,14 +8,13 @@ import AccountOption from './AccountOption';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
 import { formatAddressToShort } from '@/utils/format';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { groupBy } from 'lodash';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { useWallet } from '@/contexts/wallet';
-import { useChain } from '@/contexts/chain-context';
 import { useAccount } from '@/contexts/account-context';
 import { navigateTo } from '@/utils/navigation';
 import Spin from '@/components/ui/Spin';
@@ -24,30 +23,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AccountsDropdown() {
   const [open, setOpen] = useState(false);
-  const {
-    currentAccount,
-    accounts,
-    updateTokens,
-    updateAccount,
-    getAccounts,
-    updateHistory,
-  } = useAccount();
+  const { currentAccount, accounts, getAccounts, reloadAccount } = useAccount();
   const { wallet } = useWallet();
-  const { currentChain, getCurrentChain } = useChain();
 
-  const reloadAccount = async () => {
-    await getCurrentChain();
-    await getAccounts();
-    await updateAccount();
-    await updateTokens();
-    await updateHistory();
-  };
-
-  useEffect(() => {
-    reloadAccount();
-  }, []);
-
-  if (!currentChain || !currentAccount) {
+  if (!currentAccount) {
     return <Spin isLoading />;
   }
 
@@ -63,7 +42,6 @@ export default function AccountsDropdown() {
   const handleSelectAccount = async (account: TAccountInfo) => {
     try {
       await wallet.switchAccountByChain(account.chainId);
-
       await reloadAccount();
     } catch (error) {
       console.error(error);
@@ -79,6 +57,7 @@ export default function AccountsDropdown() {
     try {
       await wallet.removeAccount(account.address);
       await reloadAccount();
+      await getAccounts();
       toast({
         title: 'Account removed successfully',
       });
@@ -89,6 +68,8 @@ export default function AccountsDropdown() {
         description: 'Please try again',
         variant: 'destructive',
       });
+    } finally {
+      setOpen(false);
     }
   };
 
@@ -101,9 +82,16 @@ export default function AccountsDropdown() {
     setOpen(false);
   };
 
+  const handleOpenChange = async (open: boolean) => {
+    if (open) {
+      await getAccounts();
+    }
+    setOpen(open);
+  };
+
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <div onClick={() => setOpen(!open)}>
+    <DropdownMenu open={open} onOpenChange={handleOpenChange}>
+      <div onClick={() => handleOpenChange(!open)}>
         <div className="max-w-fit cursor-pointer flex items-center gap-x-sm border border-gray-200 rounded-[8px] bg-white px-sm py-xs text-gray-750 hover:bg-gray-100">
           <DropdownMenuTrigger asChild>
             <Avatar className="size-4">
