@@ -25,7 +25,7 @@
     --muted-foreground: 240 3.8% 46.1%;
     --accent: 240 4.8% 95.9%;
     --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 331 50% 25%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
@@ -75,11 +75,13 @@
   }
   @font-face {
     font-family: 'ElytroSoehne';
+    font-family: 'ElytroSoehne';
     src:  url('/src/assets/fonts/soehne-buch.woff2') format('woff2'),
           url('/src/assets/fonts/soehne-buch.woff') format('woff');
     font-weight: 400;
   }
   @font-face {
+    font-family: 'ElytroSoehne';
     font-family: 'ElytroSoehne';
     src:  url('/src/assets/fonts/soehne-kraftig.woff2') format('woff2'),
           url('/src/assets/fonts/soehne-kraftig.woff') format('woff');
@@ -89,8 +91,10 @@
     @apply bg-background text-foreground;
     user-select: none;
     font-family: ElytroSoehne;
+    font-family: ElytroSoehne;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-variant-ligatures: no-contextual;
     font-variant-ligatures: no-contextual;
   }
 }
@@ -153,7 +157,7 @@
   }
 
   .elytro-gradient-bg-2 {
-    background: linear-gradient(319deg, #f9fbfb 0%, #f7f3f0 70%, #dfecf3 100%);
+    background: linear-gradient(319deg, #f9fbfb 0%, #f7f3f0 10%, #f7f3f0 60%, #dfecf3 100%);
     background-blend-mode: overlay;
   }
 

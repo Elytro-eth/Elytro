@@ -56,7 +56,7 @@ const CreateAccount: React.FC = () => {
         size="large"
         onClick={handleCreateAccount}
       >
-        Create
+        Continue
       </Button>
     </SecondaryPageWrapper>
   );

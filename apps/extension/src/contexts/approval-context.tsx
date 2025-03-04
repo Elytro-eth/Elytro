@@ -42,8 +42,7 @@ export const ApprovalProvider = ({
             ...newApproval?.data,
             options: {
               name: 'wallet rpc',
-              reason:
-                'Your current account is not deployed yet, please activate it first',
+              reason: 'Please activate your account first.',
             },
           } as TApprovalData,
         });
