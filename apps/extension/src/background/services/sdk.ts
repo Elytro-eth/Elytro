@@ -625,7 +625,7 @@ class ElytroSDK {
     const logs = await _client.getLogs({
       address: this._config.infoRecorder as Address,
       toBlock: 'latest',
-      fromBlock: 20661477n, // !TODOthis block number only works for optimism sepolia.
+      fromBlock: 20661477n, // TODO: this block number only works for optimism sepolia.
       event: parseAbiItem(
         'event DataRecorded(address indexed wallet, bytes32 indexed category, bytes data)'
       ),
