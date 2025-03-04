@@ -144,13 +144,15 @@ export default function TxConfirm() {
       {/* Footer */}
       <div className="flex w-full mt-10">
         <div className="flex w-full gap-x-2">
-          <Button
-            variant="ghost"
-            onClick={handleCancel}
-            className="flex-1 rounded-md border border-gray-200"
-          >
-            Cancel
-          </Button>
+          {!isPacking && (
+            <Button
+              variant="ghost"
+              onClick={handleCancel}
+              className="flex-1 rounded-md border border-gray-200"
+            >
+              Cancel
+            </Button>
+          )}
           <Button
             onClick={handleConfirm}
             className="flex-1 rounded-md"
