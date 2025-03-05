@@ -94,3 +94,12 @@ export const query_receive_activities = gql`
     }
   }
 `;
+
+export const query_token_price = gql`
+  query TokenPrice($chainId: String!, $contractAddresses: [String!]!) {
+    tokenPrices(chainID: $chainId, contractAddresses: $contractAddresses) {
+      address
+      price
+    }
+  }
+`;

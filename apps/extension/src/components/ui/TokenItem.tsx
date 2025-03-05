@@ -1,27 +1,37 @@
 import DefaultTokenIcon from '@/assets/icons/ether.svg';
+import { useAccount } from '@/contexts/account-context';
+import { formatPrice, formatTokenAmount } from '@/utils/format';
 
-import { formatTokenAmount } from '@/utils/format';
-export default function TokenItem({ token }: { token: TTokenInfo }) {
-  const balance = formatTokenAmount(
-    String(token.balance),
-    token.decimals,
-    token.symbol
-  );
+export default function TokenItem({
+  token: { balance, decimals, symbol, logoURI, name, address },
+}: {
+  token: TTokenInfo;
+}) {
+  const {
+    tokenInfo: { tokenPrices },
+  } = useAccount();
+  const tokenAmount = formatTokenAmount(String(balance), decimals);
+  const price = tokenPrices.find((item) => item.address === address)?.price;
 
-  // const price = token.price ? Number(balance) * Number(token.price) : 0;
   return (
     <div className="flex flex-row items-center justify-between h-16 px-4">
       <div className="flex flex-row items-center gap-x-2">
         <img
-          src={token.logoURI || DefaultTokenIcon}
-          alt={token.name}
+          src={logoURI || DefaultTokenIcon}
+          alt={name}
           className="size-8 rounded-full"
         />
-        <p className="text-lg font-bold">{token.name || token.symbol}</p>
+        <p className="text-lg font-bold">{name || symbol}</p>
       </div>
       <div className="flex flex-col items-end gap-x-2">
-        <p className="text-lg font-bold text-gray-900">{balance}</p>
-        {/* <p className="text-sm font-medium text-gray-300">${price}</p> */}
+        <p className="text-lg font-bold text-gray-900">
+          {tokenAmount} {symbol}
+        </p>
+        {price && price > 0 && (
+          <p className="text-sm font-medium text-gray-600">
+            {formatPrice(tokenAmount, price)}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -412,3 +412,17 @@ export function formatStringifiedObject(str: SafeAny) {
 
   return str;
 }
+
+export function formatPrice(
+  tokenAmount?: number | string,
+  price?: number,
+  maxDecimalLength: number = 2
+) {
+  const tokenAmountNumber = Number(tokenAmount);
+
+  if (Number.isNaN(tokenAmountNumber) || !price) {
+    return '--';
+  }
+
+  return `$${(price * tokenAmountNumber).toFixed(maxDecimalLength)}`;
+}

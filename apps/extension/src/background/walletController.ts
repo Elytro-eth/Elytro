@@ -495,6 +495,7 @@ class WalletController {
         balance: accountManager.currentAccount?.balance,
         decimals: 18,
         symbol: 'ETH',
+        address: '0x0000000000000000000000000000000000000000',
         logoURI:
           'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
       },
