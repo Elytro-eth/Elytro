@@ -14,7 +14,7 @@ import { UserOpType } from '@/contexts/tx-context';
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
 import { PencilLine, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ContactsImg from '@/assets/contacts.png';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 
@@ -61,6 +61,29 @@ export default function ContactList({
       setLoading(false);
     }
   };
+
+  const [isRecoverContactChanged, setIsRecoverContactChanged] = useState(false);
+  useEffect(() => {
+    let active = true;
+    async function check() {
+      if (!active) {
+        return;
+      }
+      const changed = await wallet.checkRecoveryContactsSettingChanged(
+        contacts.map((contact) => contact.address),
+        Number(myThreshold)
+      );
+      if (!active) {
+        return;
+      }
+      setIsRecoverContactChanged(changed);
+    }
+    check();
+
+    return () => {
+      active = false;
+    };
+  }, [contacts, myThreshold]);
 
   return (
     <div className="flex flex-col justify-between">
@@ -163,7 +186,12 @@ export default function ContactList({
       {contacts.length ? (
         <Button
           className="w-full mt-10"
-          disabled={!contacts.length || loading || Number(myThreshold) < 1}
+          disabled={
+            !contacts.length ||
+            loading ||
+            Number(myThreshold) < 1 ||
+            !isRecoverContactChanged
+          }
           onClick={handleConfirmContacts}
         >
           {loading ? 'Confirming...' : 'Confirm contacts'}
