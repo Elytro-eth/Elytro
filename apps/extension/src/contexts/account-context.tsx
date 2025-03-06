@@ -18,7 +18,11 @@ import {
 import RuntimeMessage from '@/utils/message/runtimeMessage';
 import { EVENT_TYPES } from '@/constants/events';
 import { removeSearchParamsOfCurrentWindow } from '@/utils/url';
-import { query, query_receive_activities } from '@/requests/query';
+import {
+  query,
+  query_receive_activities,
+  query_token_price,
+} from '@/requests/query';
 import { debounce, DebouncedFunc } from 'lodash';
 import { toast } from '@/hooks/use-toast';
 
@@ -36,6 +40,7 @@ type IAccountContext = {
   tokenInfo: {
     tokens: TTokenInfo[];
     loading: boolean;
+    tokenPrices: TTokenPrice[];
   };
   history: UserOperationHistory[];
   accounts: TAccountInfo[];
@@ -52,6 +57,7 @@ const AccountContext = createContext<IAccountContext>({
   tokenInfo: {
     tokens: [],
     loading: false,
+    tokenPrices: [],
   },
   history: [],
   accounts: [],
@@ -75,6 +81,7 @@ export const AccountProvider = ({
   const [history, setHistory] = useState<UserOperationHistory[]>([]);
   const [accounts, setAccounts] = useState<TAccountInfo[]>([]);
   const [tokens, setTokens] = useState<TTokenInfo[]>([]);
+  const [tokenPrices, setTokenPrices] = useState<TTokenPrice[]>([]);
   const [isTokensLoading, setIsTokensLoading] = useState(false);
 
   const removeInterval = () => {
@@ -115,6 +122,26 @@ export const AccountProvider = ({
       setLoading(intervalRef.current ? true : false);
     }
   };
+
+  const updateTokenPrices = async () => {
+    if (tokens.length === 0 || isTokensLoading || !currentAccount.chainId) {
+      return;
+    }
+
+    try {
+      const res = (await query(query_token_price, {
+        chainId: toHex(currentAccount.chainId),
+        contractAddresses: tokens.map((token) => token.address),
+      })) as SafeAny;
+      setTokenPrices(res?.tokenPrices || []);
+    } catch {
+      setTokenPrices([]);
+    }
+  };
+
+  useEffect(() => {
+    updateTokenPrices();
+  }, [tokens]);
 
   const updateTokens = async () => {
     if (isTokensLoading) {
@@ -221,6 +248,7 @@ export const AccountProvider = ({
       tokenInfo: {
         tokens,
         loading: isTokensLoading,
+        tokenPrices,
       },
       updateTokens,
       history,

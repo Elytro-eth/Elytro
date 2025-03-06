@@ -110,4 +110,10 @@ type TTokenInfo = {
   logoURI: string;
   balance?: number; // in minimum unit
   importedByUser?: boolean;
+  price?: number;
+};
+
+type TTokenPrice = {
+  address: string;
+  price: number;
 };
