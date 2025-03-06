@@ -12,7 +12,7 @@ import {
 } from '@/utils/format';
 import historyManager from './services/history';
 import { HistoricalActivityTypeEn } from '@/constants/operations';
-import { Abi, Address, Hex, isHex, toHex } from 'viem';
+import { Abi, Address, Hex, isHex, toHex, zeroAddress } from 'viem';
 import chainService from './services/chain';
 import accountManager from './services/account';
 import type { Transaction } from '@soulwallet/sdk';
@@ -495,7 +495,7 @@ class WalletController {
         balance: accountManager.currentAccount?.balance,
         decimals: 18,
         symbol: 'ETH',
-        address: '0x0000000000000000000000000000000000000000',
+        address: zeroAddress,
         logoURI:
           'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
       },
