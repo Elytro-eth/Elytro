@@ -367,17 +367,39 @@ class WalletController {
     return await elytroSDK.queryRecoveryContacts(address);
   }
 
+  private async getRecoveryContactsHash(contacts: string[], threshold: number) {
+    const [newHash, prevInfo] = await Promise.all([
+      elytroSDK.calculateRecoveryContactsHash(contacts, threshold),
+      elytroSDK.getRecoveryInfo(accountManager.currentAccount?.address),
+    ]);
+    const prevHash = prevInfo?.contactsHash;
+
+    return {
+      prevHash,
+      newHash,
+    };
+  }
+
+  public async checkRecoveryContactsSettingChanged(
+    contacts: string[],
+    threshold: number
+  ): Promise<boolean> {
+    const { prevHash, newHash } = await this.getRecoveryContactsHash(
+      contacts,
+      threshold
+    );
+
+    return prevHash !== newHash;
+  }
+
   public async generateRecoveryContactsSettingTxs(
     contacts: string[],
     threshold: number
   ) {
-    const newHash = await elytroSDK.calculateRecoveryContactsHash(
+    const { prevHash, newHash } = await this.getRecoveryContactsHash(
       contacts,
       threshold
     );
-    const prevHash = (
-      await elytroSDK.getRecoveryInfo(accountManager.currentAccount?.address)
-    )?.contactsHash;
 
     if (prevHash === newHash) {
       throw new Error(
