@@ -7,7 +7,7 @@ import { UserOperationStatusEn } from '@/constants/operations';
 import { useState } from 'react';
 import { EVENT_TYPES } from '@/constants/events';
 import RuntimeMessage from '@/utils/message/runtimeMessage';
-import { formatAddressToShort, formatTokenAmount } from '@/utils/format';
+import { formatAddressToShort } from '@/utils/format';
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -16,6 +16,7 @@ import {
   ShieldQuestion,
 } from 'lucide-react';
 import { useChain } from '@/contexts/chain-context';
+import TokenBalanceItem from '../TokenBalanceItem';
 
 const ActivityTypeMap = {
   [HistoricalActivityTypeEn.Send]: {
@@ -123,17 +124,12 @@ export default function ActivityItem({
         </div>
       </div>
 
-      {value ? (
-        <div className="flex flex-row items-center gap-2">
-          <span className="text-base font-bold">
-            {formatTokenAmount(value, decimals, symbol)}
-          </span>
-          {/* Stop showing logoURI for now*/}
-          {/* {logoURI && (
-            <img src={logoURI} alt={symbol} className="size-4 rounded-full" />
-          )} */}
-        </div>
-      ) : null}
+      <TokenBalanceItem
+        amount={Number(value)}
+        decimals={decimals}
+        symbol={symbol}
+        address={from as `0x${string}`}
+      />
     </div>
   );
 }

@@ -23,7 +23,7 @@ export default function InnerSendingDetail({
     <>
       <div className="elytro-text-bold-body">You are sending</div>
       <div className="flex items-center justify-between px-lg py-md rounded-md bg-gray-150 ">
-        <TokenAmountItem {...transferredTokenInfo} />
+        <TokenAmountItem {...transferredTokenInfo} showPrice />
         {/* TODO: no token price API. */}
         {/* <span className="elytro-text-smaller-body text-gray-600">--</span> */}
       </div>

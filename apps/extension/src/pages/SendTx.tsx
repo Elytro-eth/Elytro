@@ -87,14 +87,6 @@ export default function SendTx() {
             )
           : 0;
 
-        console.log(
-          'token',
-          form.getValues('token'),
-          maxAmount,
-          data,
-          Number(data) > maxAmount
-        );
-
         if (Number(data) > maxAmount) {
           ctx.addIssue({
             code: 'custom',

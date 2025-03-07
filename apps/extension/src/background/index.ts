@@ -41,7 +41,6 @@ const getFcmToken = async (scope: SafeAny) => {
   })
     .then(async (token) => {
       await localStorage.save({ fcmToken: token });
-      console.log('yes, my fcm token is ', token);
     })
     .catch((err) => {
       console.error('getFcmToken error', err);

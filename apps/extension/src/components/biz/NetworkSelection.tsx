@@ -20,10 +20,7 @@ export default function NetworkSelection({
   const { testnetChains, mainnetChains } = useMemo(() => {
     const disabledChainsThatHasAccount = (targetChains: TChainItem[]) => {
       return targetChains.map((chain) => {
-        const disabled = accounts.some(({ chainId }) => {
-          console.log(chainId, chain.id, chainId === chain.id);
-          return chainId === chain.id;
-        });
+        const disabled = accounts.some(({ chainId }) => chainId === chain.id);
         return {
           ...chain,
           disabled,

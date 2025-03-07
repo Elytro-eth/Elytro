@@ -10,6 +10,7 @@ import ActivateDetail from './ActivationDetail';
 import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
 import { ChevronUp, ChevronDown } from 'lucide-react';
+import { useAccount } from '@/contexts/account-context';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -38,6 +39,7 @@ export function UserOpDetail({
   from,
 }: IUserOpDetailProps) {
   const [showRawData, setShowRawData] = useState(false);
+  const { getDollarBalanceByToken } = useAccount();
 
   const DetailContent = useMemo(() => {
     switch (opType) {
@@ -55,6 +57,12 @@ export function UserOpDetail({
     }
   }, [opType, decodedUserOp]);
 
+  const gasInETH = formatGasUsed(calcResult?.gasUsed);
+  const gasInDollar = getDollarBalanceByToken({
+    balance: Number(gasInETH),
+    symbol: 'ETH',
+  });
+
   return (
     <div className="flex flex-col w-full gap-y-md">
       {/* DApp Info: no need for sending transaction */}
@@ -71,7 +79,7 @@ export function UserOpDetail({
         <InfoCardItem
           label="Network cost"
           content={
-            <span className="elytro-text-small-bold text-gray-600">
+            <span className="elytro-text-small-bold text-gray-600 truncate">
               {calcResult?.hasSponsored && (
                 <span className="px-xs py-3xs bg-light-green elytro-text-tiny-body mr-sm rounded-xs">
                   Sponsored
@@ -79,11 +87,16 @@ export function UserOpDetail({
               )}
               <span
                 className={cn({
-                  'line-through font-bold text-sm text-gray-600':
+                  'line-through font-bold text-sm text-gray-600 ':
                     calcResult?.hasSponsored,
                 })}
               >
-                {formatGasUsed(calcResult?.gasUsed)} ETH
+                {gasInETH} ETH
+                {gasInDollar && (
+                  <span className="elytro-text-small-body text-gray-600 ml-2xs">
+                    ({gasInDollar})
+                  </span>
+                )}
               </span>
             </span>
           }

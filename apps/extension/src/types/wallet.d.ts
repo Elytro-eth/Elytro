@@ -116,4 +116,5 @@ type TTokenInfo = {
 type TTokenPrice = {
   address: string;
   price: number;
+  symbol: string;
 };

@@ -1,3 +1,4 @@
+import { useAccount } from '@/contexts/account-context';
 import { formatTokenAmount } from '@/utils/format';
 import { cn } from '@/utils/shadcn/utils';
 import { TokenInfo } from '@soulwallet/decoder';
@@ -7,6 +8,7 @@ interface ITokenAmountItemProps
   value?: string;
   className?: string;
   size?: 'sm' | 'md';
+  showPrice?: boolean;
 }
 
 export default function TokenAmountItem({
@@ -16,8 +18,20 @@ export default function TokenAmountItem({
   value,
   className,
   size = 'md',
+  showPrice = false,
 }: ITokenAmountItemProps) {
+  const { getDollarBalanceByToken } = useAccount();
+
   if (!value) return '--';
+
+  const tokenAmount = formatTokenAmount(String(value), decimals);
+
+  const displayPrice = showPrice
+    ? getDollarBalanceByToken({
+        symbol,
+        balance: Number(tokenAmount),
+      })
+    : null;
 
   return (
     <span
@@ -36,7 +50,10 @@ export default function TokenAmountItem({
         src={logoURI}
         alt={symbol}
       />
-      <span>{formatTokenAmount(value, decimals, symbol)}</span>
+      <span>
+        {tokenAmount} {symbol}
+      </span>
+      {displayPrice && <span className=" text-gray-600">({displayPrice})</span>}
     </span>
   );
 }
