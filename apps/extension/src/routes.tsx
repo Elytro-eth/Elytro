@@ -22,11 +22,13 @@ import TxSuccess from './pages/TxSuccess';
 import RetrieveContacts from './pages/AccountRecovery/RetrieveContacts';
 import ChangePassword from './pages/ChangePassword';
 import ImportToken from './pages/ImportToken';
+import NetworkConfiguration from './pages/NetworkConfiguration';
 
 export const SIDE_PANEL_ROUTE_PATHS = {
   Home: '/',
   Settings: '/settings',
   ChangePassword: '/settings/change-password',
+  NetworkConfiguration: '/settings/network-configuration',
   Dashboard: '/dashboard',
   Activate: '/activate',
   Receive: '/receive',
@@ -66,6 +68,10 @@ export const routes: TRoute[] = [
   {
     path: SIDE_PANEL_ROUTE_PATHS.Settings,
     component: Settings,
+  },
+  {
+    path: SIDE_PANEL_ROUTE_PATHS.NetworkConfiguration,
+    component: NetworkConfiguration,
   },
   {
     path: SIDE_PANEL_ROUTE_PATHS.ChangePassword,

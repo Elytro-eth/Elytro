@@ -8,12 +8,9 @@ interface LabelInputProps extends InputProps {
 export function LabelInput({ label, ...rest }: LabelInputProps) {
   return (
     <div className="flex flex-col gap-y-2xs text-gray-600">
-      <p className="elytro-text-smaller-body ">{label}</p>
+      <label className="elytro-text-smaller-body">{label}</label>
       <Input
-        className={cn(
-          'bg-gray-150 rounded-md py-sm px-lg h-auto',
-          rest?.className
-        )}
+        className={cn('rounded-md py-sm px-lg h-auto', rest?.className)}
         {...rest}
       />
     </div>

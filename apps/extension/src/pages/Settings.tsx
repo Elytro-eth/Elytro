@@ -6,7 +6,7 @@ import {
   ExternalLinkIcon,
   LayoutGridIcon,
   LockKeyholeIcon,
-  // Settings2Icon,
+  Settings2Icon,
   ShieldIcon,
   UserRoundIcon,
 } from 'lucide-react';
@@ -50,17 +50,14 @@ export default function Settings() {
         <div className="space-y-2">
           <SettingItem
             icon={UserRoundIcon}
-            label="Device Profile"
+            label="Device profile"
             path={SIDE_PANEL_ROUTE_PATHS.LocalProfile}
           />
-          {/*
-          // TODO: add network configuration page
           <SettingItem
             icon={Settings2Icon}
             label="Network configuration"
-            path={''} //SIDE_PANEL_ROUTE_PATHS.Network}
+            path={SIDE_PANEL_ROUTE_PATHS.NetworkConfiguration}
           />
-          */}
         </div>
         <div className="flex flex-col space-y-2 w-full my-8">
           <Button variant="secondary" onClick={handleLock}>
