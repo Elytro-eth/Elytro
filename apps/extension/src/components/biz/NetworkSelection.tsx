@@ -6,19 +6,23 @@ import { useMemo } from 'react';
 
 interface INetworkSelectionProps {
   selectedChain: TChainItem | null;
+  disabledChainsWhichHasExistAccount?: boolean;
   handleSelectChain: (chain: TChainItem) => void;
 }
 
 export default function NetworkSelection({
   selectedChain,
+  disabledChainsWhichHasExistAccount,
   handleSelectChain,
 }: INetworkSelectionProps) {
   const { chains } = useChain();
-
   const { accounts } = useAccount();
 
   const { testnetChains, mainnetChains } = useMemo(() => {
     const disabledChainsThatHasAccount = (targetChains: TChainItem[]) => {
+      if (disabledChainsWhichHasExistAccount === false) {
+        return targetChains;
+      }
       return targetChains.map((chain) => {
         const disabled = accounts.some(({ chainId }) => chainId === chain.id);
         return {
@@ -39,21 +43,24 @@ export default function NetworkSelection({
       testnetChains,
       mainnetChains,
     };
-  }, [chains, accounts]);
+  }, [chains, accounts, disabledChainsWhichHasExistAccount]);
 
-  const renderChains = (chains: TChainItem[], title: string) => (
-    <div className="flex flex-col gap-y-sm">
-      <div className="elytro-text-body text-gray-600">{title}</div>
-      {chains.map((chain) => (
-        <ChainItem
-          key={chain.id}
-          chain={chain}
-          isSelected={selectedChain?.id === chain.id}
-          onClick={() => handleSelectChain(chain)}
-        />
-      ))}
-    </div>
-  );
+  const renderChains = (chains: TChainItem[], title: string) => {
+    if (!chains.length) return null;
+    return (
+      <div className="flex flex-col gap-y-sm">
+        <div className="elytro-text-body text-gray-600">{title}</div>
+        {chains.map((chain) => (
+          <ChainItem
+            key={chain.id}
+            chain={chain}
+            isSelected={selectedChain?.id === chain.id}
+            onClick={() => handleSelectChain(chain)}
+          />
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div>

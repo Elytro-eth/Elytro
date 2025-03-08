@@ -122,7 +122,7 @@ export default function ImportToken() {
   }, [token.address]);
 
   return (
-    <SecondaryPageWrapper title="Import Token" showBack={false} closeable>
+    <SecondaryPageWrapper title="Import token">
       <div className="flex flex-col gap-y-md ">
         <SearchInput<TTokenInfo>
           label="Currency symbol"
@@ -173,7 +173,7 @@ export default function ImportToken() {
         />
 
         <LabelInput
-          label="Token Name"
+          label="Token name"
           value={token.name}
           onChange={(e) =>
             setToken((prev) => ({ ...prev, name: e.target.value }))
