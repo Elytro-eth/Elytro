@@ -2,7 +2,7 @@ import {
   Chain,
   optimism,
   optimismSepolia,
-  scrollSepolia,
+  // scrollSepolia,
   sepolia,
 } from 'viem/chains';
 
@@ -38,7 +38,7 @@ export type TChainItem = Chain & {
 export const SUPPORTED_CHAINS: TChainItem[] = [
   {
     ...optimism,
-    icon: 'https://optimistic.etherscan.io/assets/optimism/images/svg/logos/token-secondary-light.svg',
+    icon: 'https://raw.githubusercontent.com/blockscout/frontend-configs/main/configs/network-icons/optimism-mainnet-light.svg',
     endpoint:
       'https://opt-mainnet.g.alchemy.com/v2/GCSFuO3fOSch0AQ4JQThV5CO_McJvA0V', //this.chain.rpcUrls.default.http[0], //
     bundler:
@@ -58,7 +58,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
   },
   {
     ...optimismSepolia,
-    icon: 'https://optimistic.etherscan.io/assets/optimism/images/svg/logos/token-secondary-light.svg',
+    icon: 'https://raw.githubusercontent.com/blockscout/frontend-configs/main/configs/network-icons/optimism-mainnet-light.svg',
     endpoint:
       'https://opt-sepolia.g.alchemy.com/v2/7EJnXZWkG9HIhjj0ZLx7vk_lexCq25Pr',
     // 'https://optimism-sepolia-rpc.publicnode.com',
@@ -97,24 +97,24 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     },
     opExplorer: 'https://jiffyscan.xyz/userOpHash/',
   },
-  {
-    ...scrollSepolia,
-    icon: 'https://assets.coingecko.com/coins/images/50571/standard/scroll.jpg',
-    endpoint:
-      'https://scroll-sepolia.g.alchemy.com/v2/7EJnXZWkG9HIhjj0ZLx7vk_lexCq25Pr',
-    bundler:
-      'https://api.pimlico.io/v2/534351/rpc?apikey=pim_7KhEvjRKpLviLbtDBuHySr',
-    factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
-    fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
-    recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
-    validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
-    onchainConfig: {
-      chainId: scrollSepolia.id,
-      entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
-      soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
-    },
-    opExplorer: 'https://jiffyscan.xyz/userOpHash/',
-  },
+  // {
+  //   ...scrollSepolia,
+  //   icon: 'https://icons.llamao.fi/icons/chains/rsz_scroll.jpg',
+  //   endpoint:
+  //     'https://scroll-sepolia.g.alchemy.com/v2/7EJnXZWkG9HIhjj0ZLx7vk_lexCq25Pr',
+  //   bundler:
+  //     'https://api.pimlico.io/v2/534351/rpc?apikey=pim_7KhEvjRKpLviLbtDBuHySr',
+  //   factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
+  //   fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
+  //   recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
+  //   validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
+  //   onchainConfig: {
+  //     chainId: scrollSepolia.id,
+  //     entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+  //     soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
+  //   },
+  //   opExplorer: 'https://jiffyscan.xyz/userOpHash/',
+  // },
 ];
 
 export const SUPPORTED_CHAIN_IDS = SUPPORTED_CHAINS.map((chain) => chain.id);
@@ -133,5 +133,13 @@ export const FROM_BLOCK_NUMBER_OF_INFO_RECORDER_MAP: Record<
   [optimism.id]: 128763383n,
   [optimismSepolia.id]: 20661477n,
   [sepolia.id]: 7194730n,
-  [scrollSepolia.id]: 'latest',
+  // [scrollSepolia.id]: 'latest',
+};
+
+// EIP-3770
+export const EIP3770_CHAIN_PREFIX_MAP: Record<number, string> = {
+  [optimism.id]: 'op',
+  [optimismSepolia.id]: 'opsep',
+  [sepolia.id]: 'sepolia',
+  // [scrollSepolia.id]: 'scrollsep',
 };

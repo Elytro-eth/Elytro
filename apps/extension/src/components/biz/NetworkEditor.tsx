@@ -1,19 +1,14 @@
 import { Button } from '@/components/ui/button';
-// import { Input } from '@/components/ui/input';
-// import { Label } from '@/components/ui/label';
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectSeparator,
-//   SelectTrigger,
-//   SelectValue,
-// } from '@/components/ui/select';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { TChainItem } from '@/constants/chains';
 import { LabelInput } from './LabelInput';
 import { useWallet } from '@/contexts/wallet';
+
+type TEditedChain = Pick<
+  TChainItem,
+  'id' | 'name' | 'icon' | 'endpoint' | 'bundler' | 'nativeCurrency' | 'rpcUrls'
+>;
 
 export default function NetworkEditor({
   chain,
@@ -24,21 +19,19 @@ export default function NetworkEditor({
 }) {
   const { toast } = useToast();
   const { wallet } = useWallet();
-  console.log('debug change', chain);
-  const [currChain, setCurrChain] = useState<TChainItem>(chain);
-
-  // const mockBundlers = [
-  //   {
-  //     name: 'Bundler 01',
-  //   },
-  //   {
-  //     name: 'Bundler 02',
-  //   },
-  // ];
+  const [editedChain, setEditedChain] = useState<TEditedChain>({
+    id: chain.id,
+    name: chain.name,
+    icon: chain.icon,
+    endpoint: chain.endpoint,
+    bundler: chain.bundler,
+    nativeCurrency: chain.nativeCurrency,
+    rpcUrls: chain.rpcUrls,
+  });
 
   const onSave = async () => {
     try {
-      await wallet.updateChainConfig(currChain.id, currChain);
+      await wallet.updateChainConfig(editedChain.id, editedChain);
       onChanged();
       toast({
         description: `${chain.name} Network updated`,
@@ -51,10 +44,10 @@ export default function NetworkEditor({
     }
   };
 
-  const originRpc = chain?.rpcUrls?.default?.http?.[0];
-  const newRpc = currChain?.rpcUrls?.default?.http?.[0];
+  const originRpc = chain?.endpoint;
+  const newRpc = editedChain?.endpoint;
   const formChanged =
-    originRpc !== newRpc || currChain.bundler !== chain.bundler;
+    originRpc !== newRpc || editedChain.bundler !== chain.bundler;
 
   return (
     <div className="space-y-4">
@@ -72,13 +65,17 @@ export default function NetworkEditor({
         <LabelInput
           label="RPC"
           placeholder="Input address"
-          value={currChain.rpcUrls.default.http[0]}
+          value={editedChain.endpoint}
           onChange={(e) =>
-            setCurrChain((prev) => ({
+            setEditedChain((prev) => ({
               ...prev,
+              endpoint: e?.target?.value,
               rpcUrls: {
                 default: {
-                  http: [e?.target?.value],
+                  http: [
+                    e?.target?.value,
+                    ...(editedChain.rpcUrls?.default?.http || []),
+                  ],
                 },
               },
             }))
@@ -89,9 +86,9 @@ export default function NetworkEditor({
         <LabelInput
           label="Bundler"
           placeholder="Input address"
-          value={currChain.bundler}
+          value={editedChain.bundler}
           onChange={(e) =>
-            setCurrChain((prev) => ({
+            setEditedChain((prev) => ({
               ...prev,
               bundler: e?.target?.value,
             }))
@@ -141,7 +138,7 @@ export default function NetworkEditor({
         <LabelInput
           label="Chian ID"
           placeholder="Input address"
-          value={currChain.id}
+          value={editedChain.id}
           disabled
         />
       </div>
@@ -150,7 +147,7 @@ export default function NetworkEditor({
           label="Currency Symbol"
           className="bg-gray-150 rounded-md py-sm px-lg h-auto"
           placeholder="Input address"
-          value={currChain.nativeCurrency.symbol}
+          value={editedChain.nativeCurrency.symbol}
           disabled
         />
       </div>
@@ -158,7 +155,7 @@ export default function NetworkEditor({
         <Button
           className="flex-1 rounded-full"
           onClick={onSave}
-          disabled={!newRpc || !currChain.bundler || !formChanged}
+          disabled={!newRpc || !editedChain.bundler || !formChanged}
         >
           Save
         </Button>
