@@ -18,6 +18,8 @@ export type TChainConfigItem = {
 };
 
 export type TChainItem = Chain & {
+  id: number;
+  name: string;
   icon?: string;
   endpoint: string; // rpc url
   bundler: string; // bundler url

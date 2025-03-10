@@ -25,7 +25,7 @@ import { toast } from '@/hooks/use-toast';
 import WalletImg from '@/assets/wallet.png';
 import { TRecoveryStatus } from '@/constants/recovery';
 import { safeOpen } from '@/utils/safeOpen';
-import { useAccount } from '@/contexts/account-context';
+import { useChain } from '@/contexts/chain-context';
 
 type TShareInfo = {
   type: 'link' | 'email';
@@ -37,9 +37,8 @@ const RECOVERY_APP_URL = 'https://elytro.vercel.app/';
 function PageContent() {
   const { wallet } = useWallet();
   const { address } = useSearchParams();
-  const {
-    currentAccount: { chainId },
-  } = useAccount();
+  const { currentChain } = useChain();
+  const chainId = currentChain?.id;
   const [loading, setLoading] = useState(false);
   const [recoveryContacts, setRecoveryContacts] = useState<TRecoveryContact[]>(
     []
