@@ -114,7 +114,7 @@ export default function AccountRecovery() {
   };
 
   return (
-    <SecondaryPageWrapper title="Recovery" closeable>
+    <SecondaryPageWrapper title="Recovery">
       <div className="flex flex-col gap-y-sm mb-md">
         <h1 className="elytro-text-bold-body">Account Address</h1>
         <p className="elytro-text-smaller-body text-gray-600">
