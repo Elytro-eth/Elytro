@@ -109,13 +109,13 @@ function PageContent() {
 
   if (!recoveryContacts.length) {
     return (
-      <div className="h-full flex flex-col items-center justify-between gap-y-sm">
+      <div className="flex flex-col items-center justify-between gap-y-sm">
         {loading ? (
           <ProcessingTip body="Fetching" subBody="" className="flex-1" />
         ) : (
           <ErrorTip title="Sorry we didn’t find any recovery contact" />
         )}
-        <Button className="w-full" onClick={() => history.back()}>
+        <Button className="w-full mt-8" onClick={() => history.back()}>
           Cancel
         </Button>
       </div>
