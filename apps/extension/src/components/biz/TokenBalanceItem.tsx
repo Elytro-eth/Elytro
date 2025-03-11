@@ -24,11 +24,13 @@ export default function TokenBalanceItem({
 
   return (
     <div className="flex flex-col items-end gap-x-sm">
-      <p className="text-lg font-bold text-gray-900">
+      <p className="text-base font-bold text-gray-900">
         {tokenAmount} {symbol}
       </p>
       {displayPrice && (
-        <p className="text-sm font-medium text-gray-600">{displayPrice}</p>
+        <p className="text-sm font-medium text-gray-600 -mt-[.2rem]">
+          {displayPrice}
+        </p>
       )}
     </div>
   );

@@ -63,17 +63,17 @@ export default function AccountOption({
         </span>
       </div>
 
-      <div className="elytro-text-small text-gray-600 flex flex-row items-center gap-sm">
+      <div className="elytro-text-small text-gray-600 flex flex-row items-center">
         <span className="text-gray-600">
           {formatTokenAmount(account?.balance, 18, 'ETH')}
         </span>
         {!isSelected ? (
           <Trash2
-            className="size-4 stroke-gray-600 hover:stroke-gray-900"
+            className="size-4 stroke-gray-600 hover:stroke-gray-900 ml-sm"
             onClick={handleDelete}
           />
         ) : (
-          <span className="w-4 h-4"></span>
+          <span></span>
         )}
       </div>
     </div>

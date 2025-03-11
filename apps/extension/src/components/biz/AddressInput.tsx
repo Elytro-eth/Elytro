@@ -44,8 +44,8 @@ const RecentAddressItem = memo(
             chainId={chainId}
           />
         )}
-        <div className="text-gray-600 text-sm font-normal">
-          {hour > 1 ? `${hour}hrs` : 'An hour'} ago
+        <div className="text-gray-600 text-xs font-normal">
+          {hour > 1 ? `${hour}hrs` : 'An hr'} ago
         </div>
       </div>
     );
@@ -313,7 +313,7 @@ const AddressInput = ({
             !ensInfo &&
             (!recentAddress || Object.values(recentAddress).length === 0) &&
             !value.endsWith('.eth') && (
-              <div className="p-4 text-gray-500 text-center">
+              <div className="p-4 text-gray-500">
                 No recent addresses. Enter an address or ENS name.
               </div>
             )}

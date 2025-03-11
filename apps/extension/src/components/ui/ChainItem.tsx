@@ -20,7 +20,7 @@ export default function ChainItem({
     <div
       onClick={chain.disabled ? undefined : handleClick}
       className={cn(
-        'flex flex-row items-center gap-md p-lg rounded-sm bg-white hover:bg-gray-100 border border-gray-300 cursor-pointer',
+        'flex flex-row items-center gap-md px-lg py-md rounded-sm bg-white hover:bg-gray-100 border border-gray-300 cursor-pointer',
         isSelected && 'bg-gray-100',
         onClick && 'cursor-pointer',
         chain.disabled && 'cursor-not-allowed opacity-50'

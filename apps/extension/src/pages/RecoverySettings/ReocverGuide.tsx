@@ -7,7 +7,11 @@ export default function RecoverGuide({ onClick }: { onClick: () => void }) {
   return (
     <div className="flex flex-col gap-y-xl items-center">
       <img src={ContactsImg} className="size-36" />
-      <div className="elytro-text-subtitle">How recovery contact works</div>
+      <div className="elytro-text-subtitle text-center">
+        How recovery
+        <br />
+        contact works
+      </div>
       <div>
         <TipItem
           title="1. Each account has own contacts"

@@ -44,7 +44,7 @@ export default function TokenAmountItem({
       {/* TODO: no fromInfo. no logo & name */}
       <img
         className={cn(
-          'size-6 rounded-full ring-1 ring-gray-150 bg-white',
+          'size-8 rounded-full ring-1 ring-gray-150 bg-white p-1',
           size === 'sm' && 'size-4'
         )}
         src={logoURI}
