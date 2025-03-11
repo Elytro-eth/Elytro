@@ -10,13 +10,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import Image from 'next/image';
 
 import { X } from 'lucide-react';
 import AddressWithChain from './AddressWithChain';
 import { toast } from '@/hooks/use-toast';
 import { useRecoveryRecord } from '@/contexts';
 import { isConnectedAccountAContact } from '@/lib/contact';
+import WrappedImage from './WrappedImage';
 
 const ConnectorItem = ({
   connector,
@@ -30,9 +30,10 @@ const ConnectorItem = ({
       onClick={() => handleConnect(connector)}
       className="rounded-md p-lg flex items-center gap-2 border border-gray-300 bg-white hover:bg-gray-150 cursor-pointer"
     >
-      <Image
+      <WrappedImage
         src={
-          connector?.icon || `https://placehold.co/24x24?text=${connector.name}`
+          connector?.icon ||
+          `https://placehold.co/24x24?text=${connector.name?.[0]}`
         }
         alt={connector.name}
         className="rounded-full size-6"
