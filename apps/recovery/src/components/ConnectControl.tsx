@@ -36,7 +36,7 @@ const ConnectorItem = ({
           `https://placehold.co/24x24?text=${connector.name?.[0]}`
         }
         alt={connector.name}
-        className="rounded-full size-6"
+        className="rounded-sm size-6"
         width={24}
         height={24}
       />
