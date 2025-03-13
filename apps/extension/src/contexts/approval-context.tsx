@@ -68,8 +68,6 @@ export const ApprovalProvider = ({
       return;
     }
 
-    console.log('approval:', approval, pathname);
-
     if (approval) {
       const currentAccount = await wallet.getCurrentAccount();
       if (!currentAccount?.isDeployed) {
