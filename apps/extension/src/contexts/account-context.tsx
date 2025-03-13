@@ -207,14 +207,9 @@ export const AccountProvider = ({
 
   const getReceiveActivities = async () => {
     try {
-      const account = await wallet.getCurrentAccount();
-      if (!account?.address) {
-        throw new Error('Elytro: No account');
-      }
-
       const res = (await query(query_receive_activities, {
-        address: account?.address as Address,
-        chainId: toHex(account?.chainId ?? 0),
+        address: currentAccount?.address as Address,
+        chainId: toHex(currentAccount?.chainId ?? 0),
       })) as SafeAny;
 
       const transactions = res.transactions.map((item: SafeAny) => ({
@@ -230,13 +225,16 @@ export const AccountProvider = ({
       }));
 
       return transactions || [];
-    } catch (error) {
-      console.error(error);
+    } catch {
       return [];
     }
   };
 
   const updateHistory = async () => {
+    if (!currentAccount.address) {
+      return;
+    }
+
     const localHistory = await wallet.getLatestHistories();
 
     const receives = await getReceiveActivities();
@@ -279,9 +277,14 @@ export const AccountProvider = ({
 
   const reloadAccount = debounce(async () => {
     await updateAccount();
-    await updateTokens();
-    await updateHistory();
   }, 1_000);
+
+  useEffect(() => {
+    if (currentAccount.address) {
+      updateHistory();
+      updateTokens();
+    }
+  }, [currentAccount.address]);
 
   const contextValue = useMemo(
     () => ({

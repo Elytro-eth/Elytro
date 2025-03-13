@@ -18,3 +18,13 @@ export const removeSearchParamsOfCurrentWindow = (paramName: string) => {
 
   window.history.replaceState({}, '', urlObj);
 };
+
+export const getCurrentSearchParams = (key?: string) => {
+  const urlObj = new URL(window.location.href);
+
+  if (key) {
+    return urlObj.searchParams.get(key);
+  }
+
+  return Object.fromEntries(urlObj.searchParams.entries());
+};

@@ -40,7 +40,7 @@ const initRuntimeMessage = () => {
         uuid: data.uuid,
         payload: {
           method: data.method,
-          response: data.data,
+          response: data.response,
         },
       });
     }

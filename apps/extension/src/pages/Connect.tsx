@@ -29,7 +29,6 @@ export default function Connect() {
 
   const handleReject = () => {
     reject(ethErrors.provider.userRejectedRequest());
-    window.close();
   };
 
   return (

@@ -152,6 +152,30 @@ const initContentScriptAndPageProviderMessage = (port: chrome.runtime.Port) => {
         return;
       }
 
+      const needsApproval = [
+        'eth_requestAccounts',
+        'wallet_requestPermissions',
+        'wallet_addEthereumChain',
+        'wallet_switchEthereumChain',
+        'eth_sendTransaction',
+        'personal_sign',
+        'eth_signTypedData_v1',
+        'eth_signTypedData_v3',
+        'eth_signTypedData_v4',
+        'eth_sign',
+        'eth_getEncryptionPublicKey',
+      ].includes(payload.method);
+
+      if (needsApproval) {
+        try {
+          await chrome.sidePanel.open({
+            tabId: tab.id,
+          });
+        } catch (error) {
+          console.error('Failed to open side panel:', error);
+        }
+      }
+
       sessionManager.createSession(tab.id, origin, providerPortManager);
 
       const dAppInfo = await getDAppInfoFromSender(port.sender!);
@@ -161,13 +185,14 @@ const initContentScriptAndPageProviderMessage = (port: chrome.runtime.Port) => {
       };
 
       try {
+        console.log('0. providerReq:', providerReq);
         const result = await rpcFlow(providerReq);
-
+        console.log('1. result:', result);
         providerPortManager.sendMessage(
           ElytroMessageTypeEn.RESPONSE_TO_CONTENT_SCRIPT,
           {
             method: payload.method,
-            data: result,
+            response: result,
             uuid,
           },
           origin
@@ -179,7 +204,7 @@ const initContentScriptAndPageProviderMessage = (port: chrome.runtime.Port) => {
           ElytroMessageTypeEn.RESPONSE_TO_CONTENT_SCRIPT,
           {
             method: payload.method,
-            error,
+            response: { error: error || new Error('Unknown error') },
             uuid,
           },
           origin
@@ -226,6 +251,10 @@ const initUIMessage = (port: chrome.runtime.Port) => {
 
   // Wallet Requests
   UIPortManager.onMessage('UI_REQUEST', async (data, port) => {
+    if (!data?.method) {
+      return;
+    }
+
     const msgKey = `UI_RESPONSE_${data.method}`;
     try {
       const result = await handleUIRequestWithCache(data as TUIRequest);
@@ -267,11 +296,6 @@ const initBackgroundMessage = () => {
       }
     );
   });
-
-  // /** Approval */
-  // eventBus.on(EVENT_TYPES.APPROVAL.REQUESTED, (approvalId) => {
-  //   RuntimeMessage.sendMessage(EVENT_TYPES.APPROVAL.REQUESTED, { approvalId });
-  // });
 };
 
 initBackgroundMessage();

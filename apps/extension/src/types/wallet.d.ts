@@ -85,8 +85,7 @@ type TApprovalInfo = {
   id: string;
   data?: TApprovalData;
   resolve: (data?: unknown) => void;
-  reject: (data?: unknown) => void;
-  winId?: number;
+  reject: (reason?: Error) => void;
 };
 
 type TRecoveryContact = {

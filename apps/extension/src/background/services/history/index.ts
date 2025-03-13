@@ -26,7 +26,7 @@ class HistoryManager {
       this.switchAccount(account);
     });
 
-    eventBus.on('historyItemStatusUpdated', (opHash, status) => {
+    eventBus.on(EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED, (opHash, status) => {
       const historyItem = this.find(opHash);
       if (historyItem) {
         this._store.setState({
