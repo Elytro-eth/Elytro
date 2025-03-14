@@ -22,8 +22,6 @@ export default function Connect() {
       resolve();
     } catch (error) {
       reject(error as Error);
-    } finally {
-      window.close();
     }
   };
 

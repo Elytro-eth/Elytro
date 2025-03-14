@@ -61,14 +61,12 @@ export default function ChainChange() {
 
   const handleCancel = () => {
     reject(ethErrors.provider.userRejectedRequest());
-    window.close();
   };
 
   const handleConfirm = async () => {
     try {
       await wallet.switchAccountByChain(Number(targetChainId));
       resolve();
-      window.close();
     } catch (e) {
       reject(e as Error);
     }

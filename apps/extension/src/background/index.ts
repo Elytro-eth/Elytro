@@ -152,6 +152,8 @@ const initContentScriptAndPageProviderMessage = (port: chrome.runtime.Port) => {
         return;
       }
 
+      console.log('payload:', payload);
+
       const needsApproval = [
         'eth_requestAccounts',
         'wallet_requestPermissions',
@@ -185,9 +187,7 @@ const initContentScriptAndPageProviderMessage = (port: chrome.runtime.Port) => {
       };
 
       try {
-        console.log('0. providerReq:', providerReq);
         const result = await rpcFlow(providerReq);
-        console.log('1. result:', result);
         providerPortManager.sendMessage(
           ElytroMessageTypeEn.RESPONSE_TO_CONTENT_SCRIPT,
           {

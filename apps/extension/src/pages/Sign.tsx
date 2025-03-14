@@ -6,7 +6,6 @@ import { SIDE_PANEL_ROUTE_PATHS } from '../routes';
 import { navigateTo } from '@/utils/navigation';
 import SignDetail from '@/components/biz/SignDetail';
 import { useAccount } from '@/contexts/account-context';
-import { getChainNameByChainId } from '@/constants/chains';
 
 export default function Sign() {
   const {
@@ -27,16 +26,19 @@ export default function Sign() {
 
   const handleConfirm = async (signature: string) => {
     resolve(signature);
-    window.close();
+
+    toast({
+      title: 'Success',
+      description: 'Sign successfully',
+    });
   };
 
   const handleCancel = () => {
     reject();
     toast({
-      title: 'Success',
-      description: 'Sign successfully',
+      title: 'Canceled',
+      description: 'Sign canceled',
     });
-
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
   };
 
@@ -47,7 +49,7 @@ export default function Sign() {
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           dapp={approval.data.dApp}
-          chainName={getChainNameByChainId(chainId) as string}
+          chainId={chainId}
           signData={approval.data.sign}
         />
 

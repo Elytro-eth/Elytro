@@ -326,7 +326,7 @@ class WalletController {
   }
 
   public async estimateGas(userOp: ElytroUserOperation) {
-    return formatObjectWithBigInt(await elytroSDK.estimateGas(userOp, true));
+    return formatObjectWithBigInt(await elytroSDK.estimateGas(userOp));
   }
 
   public async packUserOp(userOp: ElytroUserOperation, amount: Hex) {
