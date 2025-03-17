@@ -281,7 +281,7 @@ export const AccountProvider = ({
     await updateAccount();
     await updateTokens();
     await updateHistory();
-  }, 1_000);
+  }, 300);
 
   const contextValue = useMemo(
     () => ({

@@ -4,7 +4,7 @@ import Spin from '@/components/ui/Spin';
 import Activities from '@/components/biz/Activities';
 import { useAccount } from '@/contexts/account-context';
 import Assets from '@/components/biz/Assets';
-import { Plus } from 'lucide-react';
+import { Plus, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
@@ -12,7 +12,7 @@ import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 // import { Plus } from 'lucide-react';
 
 export default function Dashboard() {
-  const { loading } = useAccount();
+  const { loading, reloadAccount } = useAccount();
 
   return (
     <div className="w-full h-full flex flex-col gap-2xl bg-gray-150 p-sm">
@@ -25,6 +25,13 @@ export default function Dashboard() {
           <TabsList className="px-5">
             <TabsTrigger value="assets">Assets</TabsTrigger>
             <TabsTrigger value="activities">Activity</TabsTrigger>
+            <div className="absolute right-8 mt-1">
+              <RefreshCcw
+                className="elytro-clickable-icon"
+                color="gray"
+                onClick={reloadAccount}
+              />
+            </div>
           </TabsList>
           <div className="flex flex-col">
             <TabsContent value="assets">
