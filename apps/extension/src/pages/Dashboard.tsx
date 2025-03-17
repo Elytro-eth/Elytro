@@ -8,6 +8,7 @@ import { Plus, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
+import BetaNotice from '@/components/ui/BetaNotice';
 // import { Button } from '@/components/ui/button';
 // import { Plus } from 'lucide-react';
 
@@ -47,7 +48,7 @@ export default function Dashboard() {
       <Button
         variant="secondary"
         size="tiny"
-        className="fixed bottom-6 left-1/2 transform -translate-x-1/2"
+        className="fixed bottom-12 left-1/2 transform -translate-x-1/2"
         onClick={() => {
           navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportToken);
         }}
@@ -55,6 +56,8 @@ export default function Dashboard() {
         <Plus className="w-3 h-3 mr-1 duration-100 group-hover:stroke-white" />
         Import token
       </Button>
+
+      <BetaNotice text="We're in beta. Please keep deposits small." closeable />
     </div>
   );
 }
