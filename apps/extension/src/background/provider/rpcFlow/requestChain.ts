@@ -2,6 +2,7 @@ import {
   approvalService,
   ApprovalTypeEn,
 } from '@/background/services/approval';
+import chainService from '@/background/services/chain';
 import { SUPPORTED_CHAIN_IDS } from '@/constants/chains';
 import type { TFlowMiddleWareFn } from '@/utils/asyncTaskFlow';
 import { ethErrors } from 'eth-rpc-errors';
@@ -30,6 +31,13 @@ export const requestChain: TFlowMiddleWareFn = async (ctx, next) => {
   // Hex to
   const { chainId } = params?.[0] ?? {};
 
+  if (!chainId || !chainId.startsWith('0x') || !Number.isNaN(Number(chainId))) {
+    return ethErrors.provider.custom({
+      code: 4902,
+      message: 'Invalid chain ID',
+    });
+  }
+
   if (!SUPPORTED_CHAIN_IDS.includes(Number(chainId))) {
     return ethErrors.provider.custom({
       code: 4902,
@@ -37,10 +45,15 @@ export const requestChain: TFlowMiddleWareFn = async (ctx, next) => {
     });
   }
 
+  const currentChain = chainService.currentChain?.id;
+  if (currentChain === Number(chainId)) {
+    return next();
+  }
+
   return await approvalService.request(ApprovalTypeEn.ChainChange, {
     dApp,
     chain: {
-      method: method === 'wallet_switchEthereumChain' ? 'switch' : 'add',
+      method: SWITCH_CHAIN_METHODS.includes(method) ? 'switch' : 'add',
       ...params?.[0],
     },
   });
