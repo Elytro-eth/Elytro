@@ -25,7 +25,7 @@ import { toast } from '@/hooks/use-toast';
 import WalletImg from '@/assets/wallet.png';
 import { TRecoveryStatus } from '@/constants/recovery';
 import { safeOpen } from '@/utils/safeOpen';
-import { useAccount } from '@/contexts/account-context';
+import { useChain } from '@/contexts/chain-context';
 
 type TShareInfo = {
   type: 'link' | 'email';
@@ -37,9 +37,8 @@ const RECOVERY_APP_URL = 'https://elytro.vercel.app/';
 function PageContent() {
   const { wallet } = useWallet();
   const { address } = useSearchParams();
-  const {
-    currentAccount: { chainId },
-  } = useAccount();
+  const { currentChain } = useChain();
+  const chainId = currentChain?.id;
   const [loading, setLoading] = useState(false);
   const [recoveryContacts, setRecoveryContacts] = useState<TRecoveryContact[]>(
     []
@@ -110,13 +109,13 @@ function PageContent() {
 
   if (!recoveryContacts.length) {
     return (
-      <div className="h-full flex flex-col items-center justify-between gap-y-sm">
+      <div className="flex flex-col items-center justify-between gap-y-sm">
         {loading ? (
           <ProcessingTip body="Fetching" subBody="" className="flex-1" />
         ) : (
           <ErrorTip title="Sorry we didn’t find any recovery contact" />
         )}
-        <Button className="w-full" onClick={() => history.back()}>
+        <Button className="w-full mt-8" onClick={() => history.back()}>
           Cancel
         </Button>
       </div>

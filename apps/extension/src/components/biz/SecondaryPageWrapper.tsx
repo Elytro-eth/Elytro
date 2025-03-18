@@ -2,6 +2,7 @@ import { X, ArrowLeft } from 'lucide-react';
 import { navigateTo } from '@/utils/navigation';
 import { cn } from '@/utils/shadcn/utils';
 import React, { PropsWithChildren } from 'react';
+import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 
 interface ISecondaryPageWrapperProps extends PropsWithChildren {
   className?: string;
@@ -26,7 +27,7 @@ export default function SecondaryPageWrapper({
 }: ISecondaryPageWrapperProps) {
   const handleClose = () => {
     onClose?.();
-    navigateTo('side-panel', '/');
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
   };
 
   const handleBack = () => {

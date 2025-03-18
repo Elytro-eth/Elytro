@@ -18,7 +18,11 @@ import {
 import RuntimeMessage from '@/utils/message/runtimeMessage';
 import { EVENT_TYPES } from '@/constants/events';
 import { removeSearchParamsOfCurrentWindow } from '@/utils/url';
-import { query, query_receive_activities } from '@/requests/query';
+import {
+  query,
+  query_receive_activities,
+  query_token_price,
+} from '@/requests/query';
 import { debounce, DebouncedFunc } from 'lodash';
 import { toast } from '@/hooks/use-toast';
 
@@ -36,6 +40,7 @@ type IAccountContext = {
   tokenInfo: {
     tokens: TTokenInfo[];
     loading: boolean;
+    tokenPrices: TTokenPrice[];
   };
   history: UserOperationHistory[];
   accounts: TAccountInfo[];
@@ -52,6 +57,7 @@ const AccountContext = createContext<IAccountContext>({
   tokenInfo: {
     tokens: [],
     loading: false,
+    tokenPrices: [],
   },
   history: [],
   accounts: [],
@@ -75,6 +81,7 @@ export const AccountProvider = ({
   const [history, setHistory] = useState<UserOperationHistory[]>([]);
   const [accounts, setAccounts] = useState<TAccountInfo[]>([]);
   const [tokens, setTokens] = useState<TTokenInfo[]>([]);
+  const [tokenPrices, setTokenPrices] = useState<TTokenPrice[]>([]);
   const [isTokensLoading, setIsTokensLoading] = useState(false);
 
   const removeInterval = () => {
@@ -116,6 +123,35 @@ export const AccountProvider = ({
     }
   };
 
+  const updateTokenPrices = async (lastTokens: TTokenInfo[]) => {
+    if (!lastTokens || lastTokens.length === 0 || !currentAccount.chainId) {
+      return;
+    }
+
+    try {
+      const res = (await query(query_token_price, {
+        chainId: toHex(currentAccount.chainId),
+        contractAddresses: lastTokens.map((token) => token.address),
+      })) as SafeAny;
+
+      const priceMap = new Map(
+        res.tokenPrices.map((item: TTokenPrice) => [item.address, item])
+      );
+
+      const formattedTokenPrices = lastTokens.map((token) => {
+        const price = priceMap.get(token.address) || {};
+        return {
+          ...price,
+          symbol: token.symbol,
+        } as TTokenPrice;
+      });
+
+      setTokenPrices(formattedTokenPrices);
+    } catch {
+      setTokenPrices([]);
+    }
+  };
+
   const updateTokens = async () => {
     if (isTokensLoading) {
       return;
@@ -123,8 +159,9 @@ export const AccountProvider = ({
 
     try {
       setIsTokensLoading(true);
-      const tokens = await wallet.getCurrentAccountTokens();
-      setTokens((tokens as TTokenInfo[]) || []);
+      const tokens = (await wallet.getCurrentAccountTokens()) as TTokenInfo[];
+      setTokens(tokens);
+      updateTokenPrices(tokens);
     } catch {
       toast({
         title: 'Failed to get assets',
@@ -138,14 +175,9 @@ export const AccountProvider = ({
 
   const getReceiveActivities = async () => {
     try {
-      const account = await wallet.getCurrentAccount();
-      if (!account?.address) {
-        throw new Error('Elytro: No account');
-      }
-
       const res = (await query(query_receive_activities, {
-        address: account?.address as Address,
-        chainId: toHex(account?.chainId ?? 0),
+        address: currentAccount?.address as Address,
+        chainId: toHex(currentAccount?.chainId ?? 0),
       })) as SafeAny;
 
       const transactions = res.transactions.map((item: SafeAny) => ({
@@ -161,13 +193,16 @@ export const AccountProvider = ({
       }));
 
       return transactions || [];
-    } catch (error) {
-      console.error(error);
+    } catch {
       return [];
     }
   };
 
   const updateHistory = async () => {
+    if (!currentAccount.address) {
+      return;
+    }
+
     const localHistory = await wallet.getLatestHistories();
 
     const receives = await getReceiveActivities();
@@ -212,7 +247,14 @@ export const AccountProvider = ({
     await updateAccount();
     await updateTokens();
     await updateHistory();
-  }, 1_000);
+  }, 300);
+
+  useEffect(() => {
+    if (currentAccount.address) {
+      updateHistory();
+      updateTokens();
+    }
+  }, [currentAccount.address]);
 
   const contextValue = useMemo(
     () => ({
@@ -221,6 +263,7 @@ export const AccountProvider = ({
       tokenInfo: {
         tokens,
         loading: isTokensLoading,
+        tokenPrices,
       },
       updateTokens,
       history,
@@ -229,7 +272,15 @@ export const AccountProvider = ({
       getAccounts,
       reloadAccount,
     }),
-    [currentAccount, tokens, isTokensLoading, history, loading, accounts]
+    [
+      currentAccount,
+      tokens,
+      isTokensLoading,
+      history,
+      loading,
+      accounts,
+      tokenPrices,
+    ]
   );
 
   return (

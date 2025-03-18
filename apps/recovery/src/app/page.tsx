@@ -29,8 +29,8 @@ const StepBlock = ({
   const borderColor =
     variant === 'available' ? 'border-gray-150' : 'border-gray-300';
   const subborderColor =
-    variant === 'available' ? 'border-gray-900' : 'border-gray-300';
-  const textColor = variant === 'available' ? 'text-gray-900' : 'text-gray-300';
+    variant === 'available' ? 'border-gray-900' : 'border-gray-450';
+  const textColor = variant === 'available' ? 'text-gray-900' : 'text-gray-450';
   const subtextColor =
     variant === 'available' ? 'text-gray-450' : 'text-gray-300';
 
@@ -120,7 +120,7 @@ export default function Home() {
             variant="unavailable"
             actionButton={
               <Button
-                className="border-gray-450 border-1 text-gray-450 bg-gray-0 shadow-none"
+                className="border-gray-450 border-1 text-gray-600 bg-gray-0 shadow-none"
                 disabled={
                   recoveryRecord?.status !== TRecoveryStatus.SIGNATURE_COMPLETED
                 }

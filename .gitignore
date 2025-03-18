@@ -136,3 +136,4 @@ build
 # build output
 **/*.zip
 elytro-*
+**/package-lock.json

@@ -12,7 +12,7 @@ import {
 } from '@/utils/format';
 import historyManager from './services/history';
 import { HistoricalActivityTypeEn } from '@/constants/operations';
-import { Abi, Address, Hex, isHex, toHex } from 'viem';
+import { Abi, Address, Hex, isHex, toHex, zeroAddress } from 'viem';
 import chainService from './services/chain';
 import accountManager from './services/account';
 import type { Transaction } from '@soulwallet/sdk';
@@ -86,8 +86,8 @@ class WalletController {
     return approvalService.resolveApproval(id, data);
   }
 
-  public async rejectApproval(id: string) {
-    return approvalService.rejectApproval(id);
+  public async rejectApproval(id: string, e?: Error) {
+    return approvalService.rejectApproval(id, e);
   }
 
   public async connectSite(dApp: TDAppInfo) {
@@ -326,7 +326,7 @@ class WalletController {
   }
 
   public async estimateGas(userOp: ElytroUserOperation) {
-    return formatObjectWithBigInt(await elytroSDK.estimateGas(userOp, true));
+    return formatObjectWithBigInt(await elytroSDK.estimateGas(userOp));
   }
 
   public async packUserOp(userOp: ElytroUserOperation, amount: Hex) {
@@ -367,17 +367,39 @@ class WalletController {
     return await elytroSDK.queryRecoveryContacts(address);
   }
 
+  private async getRecoveryContactsHash(contacts: string[], threshold: number) {
+    const [newHash, prevInfo] = await Promise.all([
+      elytroSDK.calculateRecoveryContactsHash(contacts, threshold),
+      elytroSDK.getRecoveryInfo(accountManager.currentAccount?.address),
+    ]);
+    const prevHash = prevInfo?.contactsHash;
+
+    return {
+      prevHash,
+      newHash,
+    };
+  }
+
+  public async checkRecoveryContactsSettingChanged(
+    contacts: string[],
+    threshold: number
+  ): Promise<boolean> {
+    const { prevHash, newHash } = await this.getRecoveryContactsHash(
+      contacts,
+      threshold
+    );
+
+    return prevHash !== newHash;
+  }
+
   public async generateRecoveryContactsSettingTxs(
     contacts: string[],
     threshold: number
   ) {
-    const newHash = await elytroSDK.calculateRecoveryContactsHash(
+    const { prevHash, newHash } = await this.getRecoveryContactsHash(
       contacts,
       threshold
     );
-    const prevHash = (
-      await elytroSDK.getRecoveryInfo(accountManager.currentAccount?.address)
-    )?.contactsHash;
 
     if (prevHash === newHash) {
       throw new Error(
@@ -495,6 +517,7 @@ class WalletController {
         balance: accountManager.currentAccount?.balance,
         decimals: 18,
         symbol: 'ETH',
+        address: zeroAddress,
         logoURI:
           'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
       },

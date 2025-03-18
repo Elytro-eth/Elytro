@@ -12,8 +12,9 @@ import { useApproval } from '@/contexts/approval-context';
 
 export default function Launch() {
   const { wallet, status } = useWallet();
-  const { resolve, reject } = useApproval();
+  const { reject } = useApproval();
   const [pwd, setPwd] = useState('');
+
   const handleUnlock = async () => {
     try {
       const locked = await wallet.unlock(pwd);
@@ -22,7 +23,6 @@ export default function Launch() {
         throw new Error('Invalid password');
       } else {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
-        resolve();
       }
     } catch (error) {
       toast({
@@ -106,7 +106,7 @@ export default function Launch() {
 
   return (
     <div className="elytro-gradient-bg flex flex-1 flex-col items-center justify-center px-xl h-full gap-y-3xl">
-      <img src={iconImg} alt="Launch" className="size-[164px]" />
+      <img src={iconImg} alt="Launch" className="size-[128px]" />
       <h1 className="elytro-text-headline text-center">{title}</h1>
       <div className="flex flex-col w-full">{content}</div>
     </div>

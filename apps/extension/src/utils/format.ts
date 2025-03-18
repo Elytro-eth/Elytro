@@ -412,3 +412,44 @@ export function formatStringifiedObject(str: SafeAny) {
 
   return str;
 }
+
+export function formatPrice(
+  tokenAmount?: number | string,
+  price?: number,
+  maxDecimalLength: number = 2
+) {
+  const tokenAmountNumber = Number(tokenAmount);
+
+  if (Number.isNaN(tokenAmountNumber) || !price) {
+    return '--';
+  }
+
+  const formattedPrice = (price * tokenAmountNumber).toFixed(maxDecimalLength);
+  return Number(formattedPrice) > 0.0099 ? `$${formattedPrice}` : null;
+}
+
+export function formatDollarBalance(
+  tokenPrices: TTokenPrice[],
+  {
+    tokenContractAddress,
+    symbol,
+    balance,
+  }: {
+    tokenContractAddress?: string;
+    symbol?: string;
+    balance: number;
+  }
+) {
+  if (!tokenPrices.length) {
+    return null;
+  }
+
+  const price =
+    tokenPrices.find(
+      (item) =>
+        item.address === tokenContractAddress ||
+        item.symbol.toLowerCase() === symbol?.toLowerCase()
+    )?.price || 0;
+
+  return price > 0 ? formatPrice(balance, price) : null;
+}

@@ -1,4 +1,10 @@
-import { encodeFunctionData, formatUnits, isAddress, parseUnits } from 'viem';
+import {
+  encodeFunctionData,
+  formatUnits,
+  isAddress,
+  parseUnits,
+  zeroAddress,
+} from 'viem';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,7 +40,6 @@ export default function SendTx() {
 
   const [isPreparing, setIsPreparing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedToken, setSelectedToken] = useState<TTokenInfo | null>(null);
 
   const filteredTokens = useMemo(() => {
     return tokens.filter((token) => {
@@ -60,11 +65,11 @@ export default function SendTx() {
   const formResolverConfig = z.object({
     token: z.object({
       name: z.string(),
-      logoURI: z.string().nullable(),
-      balance: z.number().nullable().optional(),
+      logoURI: z.union([z.string(), z.null(), z.undefined()]).optional(),
+      balance: z.union([z.number(), z.null(), z.undefined()]).optional(),
       decimals: z.number(),
       symbol: z.string(),
-      address: z.string().nullable().optional(),
+      address: z.string(),
     }),
     amount: z
       .string()
@@ -87,14 +92,6 @@ export default function SendTx() {
               )
             )
           : 0;
-
-        console.log(
-          'token',
-          form.getValues('token'),
-          maxAmount,
-          data,
-          Number(data) > maxAmount
-        );
 
         if (Number(data) > maxAmount) {
           ctx.addIssue({
@@ -128,16 +125,12 @@ export default function SendTx() {
   );
 
   const handleFillMax = () => {
-    changeAmountField(
-      formatTokenAmount(selectedToken?.balance || 0, selectedToken?.decimals)
-    );
+    const token = form.getValues('token');
+    changeAmountField(formatTokenAmount(token?.balance || 0, token?.decimals));
   };
 
   const handleTokenSelect = useCallback(
     (token: TTokenInfo) => {
-      setSelectedToken(token);
-
-      console.log('trigger token', token);
       form.setValue('token', token);
       form.trigger('token');
       form.trigger('amount');
@@ -145,7 +138,6 @@ export default function SendTx() {
     [form]
   );
 
-  // Handle continue button click
   const handleContinue = useCallback(async () => {
     if (!form.formState.isValid || !address) {
       form.trigger();
@@ -172,7 +164,7 @@ export default function SendTx() {
       const txParams: Transaction = { to };
       const parsedAmount = parseUnits(amount || '0', token.decimals).toString();
 
-      if (token.symbol === 'ETH') {
+      if (token.address === zeroAddress) {
         txParams.value = parsedAmount;
       } else if (token.address) {
         txParams.to = token.address;
@@ -234,6 +226,7 @@ export default function SendTx() {
                     <AmountInput
                       field={field}
                       isDisabled={filteredTokens.length < 1}
+                      token={form.getValues('token') as TTokenInfo}
                     />
                   </FormControl>
                   <FormMessage />

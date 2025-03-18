@@ -16,12 +16,9 @@ export default function Activities() {
   // split histories into YYYY/MM
   const historiesByMonth = history.reduce(
     (acc, item) => {
-      const [month, year] = new Date(item.timestamp)
-        .toLocaleDateString('default', {
-          month: 'numeric',
-          year: 'numeric',
-        })
-        .split('/');
+      const date = new Date(item.timestamp);
+      const year = date.getFullYear().toString(); // 确保是 YYYY 格式
+      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 确保是 MM 格式（补零）
 
       const key = `${year}/${month}`;
       acc[key] = acc[key] || [];

@@ -85,8 +85,7 @@ type TApprovalInfo = {
   id: string;
   data?: TApprovalData;
   resolve: (data?: unknown) => void;
-  reject: (data?: unknown) => void;
-  winId?: number;
+  reject: (reason?: Error) => void;
 };
 
 type TRecoveryContact = {
@@ -110,4 +109,11 @@ type TTokenInfo = {
   logoURI: string;
   balance?: number; // in minimum unit
   importedByUser?: boolean;
+  price?: number;
+};
+
+type TTokenPrice = {
+  address: string;
+  price: number;
+  symbol: string;
 };

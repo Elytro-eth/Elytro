@@ -39,16 +39,11 @@ export default function AccountRecovery() {
     return (
       <SecondaryPageWrapper
         title="Recover"
-        footer={
-          <Button className="w-full" onClick={() => setChecked(true)}>
-            Start recover
-          </Button>
-        }
         onBack={() => {
           navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
         }}
       >
-        <div className="flex flex-col items-center space-y-2xl">
+        <div className="flex flex-col items-center space-y-2xl mt-3xl">
           <img src={WalletImg} alt="Wallet" className="size-36" />
           <h1 className="elytro-text-title">How recovery works</h1>
           <div>
@@ -68,6 +63,9 @@ export default function AccountRecovery() {
               Icon={Clock}
             />
           </div>
+          <Button className="w-full" onClick={() => setChecked(true)}>
+            Start recover
+          </Button>
         </div>
       </SecondaryPageWrapper>
     );
@@ -92,23 +90,19 @@ export default function AccountRecovery() {
 
   if (!isChainConfirmed) {
     return (
-      <SecondaryPageWrapper
-        title="Recovery"
-        footer={
-          <div className="w-full grid grid-cols-2 gap-x-sm">
-            <Button variant="outline" onClick={() => setChecked(false)}>
-              Cancel
-            </Button>
-            <Button disabled={!selectedChain} onClick={handleNext}>
-              Next
-            </Button>
-          </div>
-        }
-      >
+      <SecondaryPageWrapper title="Recovery">
         <NetworkSelection
           selectedChain={selectedChain}
           handleSelectChain={handleSelectChain}
         />
+        <div className="w-full grid grid-cols-2 gap-x-sm mt-10">
+          <Button variant="outline" onClick={() => setChecked(false)}>
+            Cancel
+          </Button>
+          <Button disabled={!selectedChain} onClick={handleNext}>
+            Next
+          </Button>
+        </div>
       </SecondaryPageWrapper>
     );
   }
@@ -120,20 +114,7 @@ export default function AccountRecovery() {
   };
 
   return (
-    <SecondaryPageWrapper
-      title="Recovery"
-      closeable
-      footer={
-        <Button
-          className="w-full"
-          disabled={!isAddress(address)}
-          onClick={handleRetrieveContacts}
-        >
-          <Box className="size-4 mr-sm" color="#cce1ea" />
-          Retrieve my contacts
-        </Button>
-      }
-    >
+    <SecondaryPageWrapper title="Recovery">
       <div className="flex flex-col gap-y-sm mb-md">
         <h1 className="elytro-text-bold-body">Account Address</h1>
         <p className="elytro-text-smaller-body text-gray-600">
@@ -146,6 +127,14 @@ export default function AccountRecovery() {
         address={address}
         onChange={setAddress}
       />
+      <Button
+        className="w-full mt-10"
+        disabled={!isAddress(address)}
+        onClick={handleRetrieveContacts}
+      >
+        <Box className="size-4 mr-sm" color="#cce1ea" />
+        Retrieve my contacts
+      </Button>
     </SecondaryPageWrapper>
   );
 }

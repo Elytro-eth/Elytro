@@ -74,12 +74,6 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     setCalcResult(null);
     txTypeRef.current = null;
     userOpRef.current = null;
-
-    // if (history?.length > 1) {
-    //   history.back();
-    // } else {
-    //   window.close();
-    // }
   };
 
   const getTxType = (type: UserOpType) => {

@@ -22,14 +22,11 @@ export default function Connect() {
       resolve();
     } catch (error) {
       reject(error as Error);
-    } finally {
-      window.close();
     }
   };
 
   const handleReject = () => {
     reject(ethErrors.provider.userRejectedRequest());
-    window.close();
   };
 
   return (

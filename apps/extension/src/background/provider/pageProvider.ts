@@ -86,9 +86,13 @@ class PageProvider extends SafeEventEmitter {
         payload: data,
       });
 
-      return new Promise((resolve) => {
-        this._message.onceMessage(uuid, (response) => {
-          resolve(response?.response);
+      return new Promise((resolve, reject) => {
+        this._message.onceMessage(uuid, ({ response }) => {
+          if (response?.error) {
+            reject(response.error);
+          } else {
+            resolve(response);
+          }
         });
       });
     });
