@@ -3,6 +3,16 @@ import { renameSync, createWriteStream } from 'fs';
 import { format } from 'date-fns';
 import archiver from 'archiver';
 
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) {
+    return `${bytes} bytes`;
+  } else if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(2)} KB`;
+  } else {
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  }
+}
+
 function renameAndPackOutputPlugin(): Plugin {
   return {
     name: 'rename-and-pack-output-plugin',
@@ -22,7 +32,7 @@ function renameAndPackOutputPlugin(): Plugin {
 
         output.on('close', () => {
           console.log(
-            `Archive created: ${newDirName}.zip (${archive.pointer()} total bytes)`
+            `Archive created: ${newDirName}.zip (${formatFileSize(archive.pointer())} total bytes)`
           );
         });
 
