@@ -1,4 +1,10 @@
-import { encodeFunctionData, formatUnits, isAddress, parseUnits } from 'viem';
+import {
+  encodeFunctionData,
+  formatUnits,
+  isAddress,
+  parseUnits,
+  zeroAddress,
+} from 'viem';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -59,7 +65,7 @@ export default function SendTx() {
   const formResolverConfig = z.object({
     token: z.object({
       name: z.string(),
-      logoURI: z.string().nullable(),
+      logoURI: z.union([z.string(), z.null(), z.undefined()]).optional(),
       balance: z.union([z.number(), z.null(), z.undefined()]).optional(),
       decimals: z.number(),
       symbol: z.string(),
@@ -132,7 +138,6 @@ export default function SendTx() {
     [form]
   );
 
-  // Handle continue button click
   const handleContinue = useCallback(async () => {
     if (!form.formState.isValid || !address) {
       form.trigger();
@@ -159,7 +164,7 @@ export default function SendTx() {
       const txParams: Transaction = { to };
       const parsedAmount = parseUnits(amount || '0', token.decimals).toString();
 
-      if (token.symbol === 'ETH') {
+      if (token.address === zeroAddress) {
         txParams.value = parsedAmount;
       } else if (token.address) {
         txParams.to = token.address;

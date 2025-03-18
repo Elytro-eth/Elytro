@@ -1,5 +1,6 @@
 import { useAccount } from '@/contexts/account-context';
-import { formatTokenAmount } from '@/utils/format';
+import { formatDollarBalance, formatTokenAmount } from '@/utils/format';
+import { useMemo } from 'react';
 
 interface ITokenBalanceItemProps {
   amount: number | string;
@@ -14,13 +15,20 @@ export default function TokenBalanceItem({
   symbol,
   address,
 }: ITokenBalanceItemProps) {
-  const { getDollarBalanceByToken } = useAccount();
-  const tokenAmount = formatTokenAmount(String(amount), decimals);
-  const displayPrice = getDollarBalanceByToken({
-    tokenContractAddress: address,
-    symbol,
-    balance: Number(tokenAmount),
-  });
+  const {
+    tokenInfo: { tokenPrices },
+  } = useAccount();
+
+  const [tokenAmount, displayPrice] = useMemo(() => {
+    const tokenAmount = formatTokenAmount(String(amount), decimals);
+    const displayPrice = formatDollarBalance(tokenPrices, {
+      tokenContractAddress: address,
+      symbol,
+      balance: Number(tokenAmount),
+    });
+
+    return [tokenAmount, displayPrice];
+  }, [amount, decimals, address, symbol, tokenPrices]);
 
   return (
     <div className="flex flex-col items-end gap-x-sm">

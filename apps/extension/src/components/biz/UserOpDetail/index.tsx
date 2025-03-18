@@ -2,7 +2,11 @@ import { UserOpType } from '@/contexts/tx-context';
 import InfoCard from '@/components/biz/InfoCard';
 import { formatEther } from 'viem';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';
-import { formatBalance, formatRawData } from '@/utils/format';
+import {
+  formatBalance,
+  formatDollarBalance,
+  formatRawData,
+} from '@/utils/format';
 import { DecodeResult } from '@soulwallet/decoder';
 import { useMemo, useState } from 'react';
 import { cn } from '@/utils/shadcn/utils';
@@ -39,7 +43,9 @@ export function UserOpDetail({
   from,
 }: IUserOpDetailProps) {
   const [showRawData, setShowRawData] = useState(false);
-  const { getDollarBalanceByToken } = useAccount();
+  const {
+    tokenInfo: { tokenPrices },
+  } = useAccount();
 
   const DetailContent = useMemo(() => {
     switch (opType) {
@@ -57,11 +63,19 @@ export function UserOpDetail({
     }
   }, [opType, decodedUserOp]);
 
-  const gasInETH = formatGasUsed(calcResult?.gasUsed);
-  const gasInDollar = getDollarBalanceByToken({
-    balance: Number(gasInETH),
-    symbol: 'ETH',
-  });
+  const [gasInETH, gasInDollar] = useMemo(() => {
+    if (!calcResult?.gasUsed) {
+      return ['--', '--'];
+    }
+
+    const gasInETH = formatGasUsed(calcResult?.gasUsed);
+    const gasInDollar = formatDollarBalance(tokenPrices, {
+      balance: Number(gasInETH),
+      symbol: 'ETH',
+    });
+
+    return [gasInETH, gasInDollar];
+  }, [calcResult?.gasUsed, tokenPrices]);
 
   return (
     <div className="flex flex-col w-full gap-y-md">

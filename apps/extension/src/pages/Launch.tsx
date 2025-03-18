@@ -12,8 +12,9 @@ import { useApproval } from '@/contexts/approval-context';
 
 export default function Launch() {
   const { wallet, status } = useWallet();
-  const { resolve, reject } = useApproval();
+  const { reject } = useApproval();
   const [pwd, setPwd] = useState('');
+
   const handleUnlock = async () => {
     try {
       const locked = await wallet.unlock(pwd);
@@ -22,7 +23,6 @@ export default function Launch() {
         throw new Error('Invalid password');
       } else {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
-        resolve();
       }
     } catch (error) {
       toast({

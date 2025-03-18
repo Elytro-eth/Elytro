@@ -86,8 +86,8 @@ class WalletController {
     return approvalService.resolveApproval(id, data);
   }
 
-  public async rejectApproval(id: string) {
-    return approvalService.rejectApproval(id);
+  public async rejectApproval(id: string, e?: Error) {
+    return approvalService.rejectApproval(id, e);
   }
 
   public async connectSite(dApp: TDAppInfo) {
@@ -326,7 +326,7 @@ class WalletController {
   }
 
   public async estimateGas(userOp: ElytroUserOperation) {
-    return formatObjectWithBigInt(await elytroSDK.estimateGas(userOp, true));
+    return formatObjectWithBigInt(await elytroSDK.estimateGas(userOp));
   }
 
   public async packUserOp(userOp: ElytroUserOperation, amount: Hex) {

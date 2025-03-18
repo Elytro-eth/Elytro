@@ -1,11 +1,14 @@
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-
+import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
 interface IDAppDetail {
   dapp: TDAppInfo;
-  chainName: string;
+  chainId: number;
 }
 
-export default function DAppDetail({ dapp, chainName }: IDAppDetail) {
+export default function DAppDetail({ dapp, chainId }: IDAppDetail) {
+  const chainName = getChainNameByChainId(chainId);
+  const chainLogo = getIconByChainId(chainId);
+
   return (
     <div className="flex items-center mb-2 w-full flex-grow">
       {/* DApp Icon & Chain Icon */}
@@ -15,13 +18,8 @@ export default function DAppDetail({ dapp, chainName }: IDAppDetail) {
           <AvatarFallback>{dapp.name.slice(0, 2).toUpperCase()}</AvatarFallback>
         </Avatar>
 
-        <Avatar className="h-6 w-6 absolute -bottom-2 -right-2 ">
-          <AvatarImage
-            src={
-              'https://assets.coingecko.com/coins/images/25244/standard/Optimism.png'
-            }
-            alt={`${chainName} logo`}
-          />
+        <Avatar className="h-6 w-6 absolute -bottom-2 -right-2 bg-white rounded-full">
+          <AvatarImage src={chainLogo} alt={`${chainName} logo`} />
           <AvatarFallback>
             {chainName?.slice(0, 2)?.toUpperCase()}
           </AvatarFallback>

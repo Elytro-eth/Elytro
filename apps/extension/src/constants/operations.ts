@@ -22,12 +22,11 @@ export type TTxDetail = {
 };
 
 export enum ApprovalTypeEn {
-  Unlock = 'Unlock',
-  Connect = 'Connect',
-  SendTx = 'SendTx',
-  Alert = 'Alert',
-  Sign = 'Sign',
-  ChainChange = 'ChainChange',
+  Connect = '/connect',
+  TxConfirm = '/tx-confirm',
+  Alert = '/alert',
+  Sign = '/sign',
+  ChainChange = '/chain-change',
 }
 
 // export enum TxStatusEn {
