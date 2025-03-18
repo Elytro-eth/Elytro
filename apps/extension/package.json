@@ -30,7 +30,6 @@
     "@soulwallet/decoder": "^0.3.4",
     "@soulwallet/keyvault": "^0.3.3",
     "@soulwallet/sdk": "^0.3.13",
-    "ahooks": "^3.8.4",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
     "buffer": "^6.0.3",

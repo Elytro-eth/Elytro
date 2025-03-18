@@ -1,6 +1,5 @@
 import { X } from 'lucide-react';
-import { useCallback, useState } from 'react';
-import { useAsyncEffect } from 'ahooks';
+import { useCallback, useState, useEffect } from 'react';
 import { localStorage } from '@/utils/storage/local';
 
 interface IBetaNoticeProps {
@@ -12,27 +11,36 @@ interface IBetaNoticeProps {
 const BETA_NOTICE_STORAGE_KEY = 'beta_notice_storage_key';
 const DAYS = 24 * 60 * 60 * 1000;
 
-export default function BetaNotice(props: IBetaNoticeProps) {
+export default function BetaNotice({
+  text,
+  closeable,
+  onClose,
+}: IBetaNoticeProps) {
   const [isShow, setIsShow] = useState(false);
 
-  useAsyncEffect(async () => {
-    const lastCloseTimestamp =
-      (await localStorage.get<number>(BETA_NOTICE_STORAGE_KEY)) || 0;
-    if (
-      !lastCloseTimestamp ||
-      Date.now() - (lastCloseTimestamp as number) > 30 * DAYS
-    ) {
-      setIsShow(true);
-    }
+  useEffect(() => {
+    const checkNoticeVisibility = async () => {
+      const lastCloseTimestamp =
+        (await localStorage.get<number>(BETA_NOTICE_STORAGE_KEY)) || 0;
+
+      if (
+        !lastCloseTimestamp ||
+        Date.now() - (lastCloseTimestamp as number) > 30 * DAYS
+      ) {
+        setIsShow(true);
+      }
+    };
+
+    checkNoticeVisibility();
   }, []);
 
-  const onClose = useCallback(() => {
+  const handleClose = useCallback(() => {
     localStorage.save({
       [BETA_NOTICE_STORAGE_KEY]: Date.now(),
     });
     setIsShow(false);
-    props?.onClose?.();
-  }, []);
+    onClose?.();
+  }, [onClose]);
 
   if (!isShow) {
     return null;
@@ -46,11 +54,11 @@ export default function BetaNotice(props: IBetaNoticeProps) {
           'radial-gradient(100% 336.18% at 0% 0%, #F1E8DF 0%, #F7F7F0 25.15%, #DAECEE 100%)',
       }}
     >
-      <div>{props.text}</div>
-      {props.closeable && (
+      <div>{text}</div>
+      {closeable && (
         <X
           className="elytro-clickable-icon absolute right-2"
-          onClick={onClose}
+          onClick={handleClose}
         />
       )}
     </div>

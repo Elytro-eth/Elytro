@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { TChainItem } from '@/constants/chains';
 import { LabelInput } from './LabelInput';
@@ -16,11 +15,55 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Bundler } from '@soulwallet/sdk';
+import { useEffect } from 'react';
 
-type TEditedChain = Pick<
-  TChainItem,
-  'id' | 'name' | 'icon' | 'endpoint' | 'bundler' | 'nativeCurrency' | 'rpcUrls'
->;
+type NetworkFormValues = Pick<TChainItem, 'name' | 'endpoint' | 'bundler'>;
+
+const createNetworkFormSchema = (chainId: number) => {
+  return z.object({
+    name: z.string().min(1, "Name can't be empty"),
+    endpoint: z
+      .string()
+      .min(1, "RPC URL can't be empty")
+      .refine(
+        async (value) => {
+          try {
+            if (!value) return false;
+            const client = createPublicClient({
+              transport: http(value),
+            });
+            const id = await client.getChainId();
+            return id === chainId;
+          } catch {
+            return false;
+          }
+        },
+        {
+          message: 'Invalid RPC URL or chain ID mismatch',
+        }
+      ),
+    bundler: z
+      .string()
+      .min(1, "Bundler URL can't be empty")
+      .refine(
+        async (value) => {
+          try {
+            if (!value) return false;
+            const b = new Bundler(value);
+            const bundle_hash =
+              '0x7c1f4cca45de6c34781f628667ccf071b1992d00ef74b68c2bfa276af84ae2c7';
+            const r = await b.eth_getUserOperationReceipt(bundle_hash);
+            return !r.isErr();
+          } catch {
+            return false;
+          }
+        },
+        {
+          message: 'Invalid Bundler URL',
+        }
+      ),
+  });
+};
 
 export default function NetworkEditor({
   chain,
@@ -31,79 +74,36 @@ export default function NetworkEditor({
 }) {
   const { toast } = useToast();
   const { wallet } = useWallet();
-  const [editedChain, setEditedChain] = useState<TEditedChain>({
-    id: chain.id,
-    name: chain.name,
-    icon: chain.icon,
-    endpoint: chain.endpoint,
-    bundler: chain.bundler,
-    nativeCurrency: chain.nativeCurrency,
-    rpcUrls: chain.rpcUrls,
+
+  const form = useForm<NetworkFormValues>({
+    resolver: zodResolver(createNetworkFormSchema(chain.id)),
+    defaultValues: {
+      name: chain.name,
+      endpoint: chain.endpoint,
+      bundler: chain.bundler,
+    },
+    mode: 'onChange',
   });
 
-  const checkRpc = async (rpc: string) => {
+  const formValues = form.watch();
+  const formChanged =
+    formValues.endpoint !== chain.endpoint ||
+    formValues.bundler !== chain.bundler;
+
+  const onSubmit = async (data: NetworkFormValues) => {
     try {
-      const client = createPublicClient({
-        transport: http(rpc),
-      });
-      const chainId = await client.getChainId();
-      if (chainId === editedChain.id) {
-        return true;
-      }
-      return false;
-    } catch {
-      return false;
-    }
-  };
+      const updatedChain = {
+        name: data.name,
+        endpoint: data.endpoint,
+        bundler: data.bundler,
+        rpcUrls: {
+          default: {
+            http: [...chain.rpcUrls.default.http, data.endpoint],
+          },
+        },
+      };
 
-  const checkBundler = async (bundler: string) => {
-    try {
-      const b = new Bundler(bundler);
-      const bundle_hash =
-        '0x7c1f4cca45de6c34781f628667ccf071b1992d00ef74b68c2bfa276af84ae2c7';
-      const r = await b.eth_getUserOperationReceipt(bundle_hash);
-      return !r.isErr();
-    } catch {
-      return false;
-    }
-  };
-
-  const networkFormSchema = z.object({
-    endpoint: z.string().refine(
-      async (/*value*/) => {
-        try {
-          return await checkRpc(editedChain.endpoint);
-        } catch {
-          return false;
-        }
-      },
-      {
-        message: 'Invalid RPC',
-      }
-    ),
-    bundler: z.string().refine(
-      async (/*value*/) => {
-        try {
-          return await checkBundler(editedChain.bundler);
-        } catch {
-          return false;
-        }
-      },
-      {
-        message: 'Invalid Bundler',
-      }
-    ),
-  });
-
-  const form = useForm<z.infer<typeof networkFormSchema>>({
-    resolver: zodResolver(networkFormSchema),
-    defaultValues: editedChain,
-    mode: 'onBlur',
-  });
-
-  const onSave = async () => {
-    try {
-      await wallet.updateChainConfig(editedChain.id, editedChain);
+      await wallet.updateChainConfig(chain.id, updatedChain);
       onChanged();
       toast({
         description: `${chain.name} Network updated`,
@@ -112,14 +112,18 @@ export default function NetworkEditor({
       toast({
         title: 'Oops! Something went wrong. Try again later.',
         description: error?.toString(),
+        variant: 'destructive',
       });
     }
   };
 
-  const originRpc = chain?.endpoint;
-  const newRpc = editedChain?.endpoint;
-  const formChanged =
-    originRpc !== newRpc || editedChain.bundler !== chain.bundler;
+  useEffect(() => {
+    form.reset({
+      name: chain.name,
+      endpoint: chain.endpoint,
+      bundler: chain.bundler,
+    });
+  }, [chain, form]);
 
   return (
     <div className="space-y-4">
@@ -135,98 +139,75 @@ export default function NetworkEditor({
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSave)}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
             name="endpoint"
-            render={({ field }) => {
-              const { ref: _ref, ...rest } = field;
-              return (
-                <FormItem>
-                  <FormControl>
-                    <LabelInput
-                      {...rest}
-                      label="RPC"
-                      placeholder="Input RPC"
-                      value={editedChain.endpoint}
-                      onChange={(e) => {
-                        setEditedChain((prev) => ({
-                          ...prev,
-                          endpoint: e?.target?.value,
-                          rpcUrls: {
-                            default: {
-                              http: [e?.target?.value],
-                            },
-                          },
-                        }));
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              );
-            }}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <LabelInput
+                    label="RPC"
+                    placeholder="Input RPC URL"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
+
           <FormField
             control={form.control}
             name="bundler"
-            render={({ field }) => {
-              const { ref: _ref, ...rest } = field;
-              return (
-                <FormItem>
-                  <FormControl>
-                    <LabelInput
-                      {...rest}
-                      label="Bundler"
-                      placeholder="Input bundler"
-                      value={editedChain?.bundler}
-                      onChange={(e) =>
-                        setEditedChain((prev) => ({
-                          ...prev,
-                          bundler: e?.target?.value,
-                        }))
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              );
-            }}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <LabelInput
+                    label="Bundler"
+                    placeholder="Input bundler URL"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
+
+          <div className="space-y-2">
+            <LabelInput
+              label="Chain ID"
+              placeholder="Chain ID"
+              value={chain.id}
+              disabled
+            />
+          </div>
+
+          <div className="space-y-2">
+            <LabelInput
+              label="Currency Symbol"
+              className="bg-gray-150 rounded-md py-sm px-lg h-auto"
+              placeholder="Currency symbol"
+              value={chain.nativeCurrency.symbol}
+              disabled
+            />
+          </div>
+
+          <div className="flex space-x-2 pt-2">
+            <Button
+              type="submit"
+              className="flex-1 rounded-full"
+              disabled={
+                !formChanged ||
+                form.formState.isSubmitting ||
+                !form.formState.isValid
+              }
+            >
+              {form.formState.isSubmitting ? 'Saving...' : 'Save'}
+            </Button>
+          </div>
         </form>
       </Form>
-
-      <div className="space-y-2">
-        <LabelInput
-          label="Chian ID"
-          placeholder="Input address"
-          value={editedChain.id}
-          disabled
-        />
-      </div>
-      <div className="space-y-2">
-        <LabelInput
-          label="Currency Symbol"
-          className="bg-gray-150 rounded-md py-sm px-lg h-auto"
-          placeholder="Input address"
-          value={editedChain.nativeCurrency.symbol}
-          disabled
-        />
-      </div>
-      <div className="flex space-x-2">
-        <Button
-          className="flex-1 rounded-full"
-          onClick={onSave}
-          disabled={
-            !newRpc ||
-            !editedChain.bundler ||
-            !formChanged ||
-            !form.formState.isValid
-          }
-        >
-          Save
-        </Button>
-      </div>
     </div>
   );
 }
