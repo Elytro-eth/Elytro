@@ -247,7 +247,7 @@ export const AccountProvider = ({
     await updateAccount();
     await updateTokens();
     await updateHistory();
-  }, 1_000);
+  }, 300);
 
   useEffect(() => {
     if (currentAccount.address) {
