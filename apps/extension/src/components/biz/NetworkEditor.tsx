@@ -1,14 +1,69 @@
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { TChainItem } from '@/constants/chains';
 import { LabelInput } from './LabelInput';
 import { useWallet } from '@/contexts/wallet';
+import { createPublicClient, http } from 'viem';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@/components/ui/form';
+import { Bundler } from '@soulwallet/sdk';
+import { useEffect } from 'react';
 
-type TEditedChain = Pick<
-  TChainItem,
-  'id' | 'name' | 'icon' | 'endpoint' | 'bundler' | 'nativeCurrency' | 'rpcUrls'
->;
+type NetworkFormValues = Pick<TChainItem, 'name' | 'endpoint' | 'bundler'>;
+
+const createNetworkFormSchema = (chainId: number) => {
+  return z.object({
+    name: z.string().min(1, "Name can't be empty"),
+    endpoint: z
+      .string()
+      .min(1, "RPC URL can't be empty")
+      .refine(
+        async (value) => {
+          try {
+            if (!value) return false;
+            const client = createPublicClient({
+              transport: http(value),
+            });
+            const id = await client.getChainId();
+            return id === chainId;
+          } catch {
+            return false;
+          }
+        },
+        {
+          message: 'Invalid RPC URL or chain ID mismatch',
+        }
+      ),
+    bundler: z
+      .string()
+      .min(1, "Bundler URL can't be empty")
+      .refine(
+        async (value) => {
+          try {
+            if (!value) return false;
+            const b = new Bundler(value);
+            const bundle_hash =
+              '0x7c1f4cca45de6c34781f628667ccf071b1992d00ef74b68c2bfa276af84ae2c7';
+            const r = await b.eth_getUserOperationReceipt(bundle_hash);
+            return !r.isErr();
+          } catch {
+            return false;
+          }
+        },
+        {
+          message: 'Invalid Bundler URL',
+        }
+      ),
+  });
+};
 
 export default function NetworkEditor({
   chain,
@@ -19,19 +74,36 @@ export default function NetworkEditor({
 }) {
   const { toast } = useToast();
   const { wallet } = useWallet();
-  const [editedChain, setEditedChain] = useState<TEditedChain>({
-    id: chain.id,
-    name: chain.name,
-    icon: chain.icon,
-    endpoint: chain.endpoint,
-    bundler: chain.bundler,
-    nativeCurrency: chain.nativeCurrency,
-    rpcUrls: chain.rpcUrls,
+
+  const form = useForm<NetworkFormValues>({
+    resolver: zodResolver(createNetworkFormSchema(chain.id)),
+    defaultValues: {
+      name: chain.name,
+      endpoint: chain.endpoint,
+      bundler: chain.bundler,
+    },
+    mode: 'onChange',
   });
 
-  const onSave = async () => {
+  const formValues = form.watch();
+  const formChanged =
+    formValues.endpoint !== chain.endpoint ||
+    formValues.bundler !== chain.bundler;
+
+  const onSubmit = async (data: NetworkFormValues) => {
     try {
-      await wallet.updateChainConfig(editedChain.id, editedChain);
+      const updatedChain = {
+        name: data.name,
+        endpoint: data.endpoint,
+        bundler: data.bundler,
+        rpcUrls: {
+          default: {
+            http: [...chain.rpcUrls.default.http, data.endpoint],
+          },
+        },
+      };
+
+      await wallet.updateChainConfig(chain.id, updatedChain);
       onChanged();
       toast({
         description: `${chain.name} Network updated`,
@@ -40,14 +112,18 @@ export default function NetworkEditor({
       toast({
         title: 'Oops! Something went wrong. Try again later.',
         description: error?.toString(),
+        variant: 'destructive',
       });
     }
   };
 
-  const originRpc = chain?.endpoint;
-  const newRpc = editedChain?.endpoint;
-  const formChanged =
-    originRpc !== newRpc || editedChain.bundler !== chain.bundler;
+  useEffect(() => {
+    form.reset({
+      name: chain.name,
+      endpoint: chain.endpoint,
+      bundler: chain.bundler,
+    });
+  }, [chain, form]);
 
   return (
     <div className="space-y-4">
@@ -61,105 +137,77 @@ export default function NetworkEditor({
           {chain?.name}
         </div>
       </div>
-      <div className="space-y-2">
-        <LabelInput
-          label="RPC"
-          placeholder="Input address"
-          value={editedChain.endpoint}
-          onChange={(e) =>
-            setEditedChain((prev) => ({
-              ...prev,
-              endpoint: e?.target?.value,
-              rpcUrls: {
-                default: {
-                  http: [
-                    e?.target?.value,
-                    ...(editedChain.rpcUrls?.default?.http || []),
-                  ],
-                },
-              },
-            }))
-          }
-        />
-      </div>
-      <div className="space-y-2">
-        <LabelInput
-          label="Bundler"
-          placeholder="Input address"
-          value={editedChain.bundler}
-          onChange={(e) =>
-            setEditedChain((prev) => ({
-              ...prev,
-              bundler: e?.target?.value,
-            }))
-          }
-        />
-      </div>
-      {/*
-      <div className="space-y-2">
-        <Label className="font-normal">Bundler</Label>
-        <div className="flex flex-row gap-x-md items-center">
-        <Select value={bundler} onValueChange={(value) => setBundler(value)}>
-          <SelectTrigger className="">
-            <SelectValue placeholder="Select a bundler" />
-          </SelectTrigger>
-          <SelectContent>
-            {mockBundlers.map((item) => (
-              <SelectItem
-                key={item.name}
-                value={item.name}
-                className="py-4 cursor-pointer"
-              >
-                {item.name}
-              </SelectItem>
-            ))}
-            <SelectSeparator />
-            <SelectItem value="customize" className="py-4 cursor-pointer">
-              Customize
-            </SelectItem>
-          </SelectContent>
-        </Select>
-        </div>
-      </div>
-      {bundler === 'customize' ? (
-        <div className="space-y-2">
-          <div className="py-3 rounded-md border-none flex flex-row items-center font-medium text-lg">
-            <Input
-              className="rounded-md py-sm px-lg h-auto"
-              placeholder="Input address"
-              value={customBundler}
-              onChange={(e) => setCustomBundler(e.target.value)}
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="endpoint"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <LabelInput
+                    label="RPC"
+                    placeholder="Input RPC URL"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="bundler"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <LabelInput
+                    label="Bundler"
+                    placeholder="Input bundler URL"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="space-y-2">
+            <LabelInput
+              label="Chain ID"
+              placeholder="Chain ID"
+              value={chain.id}
+              disabled
             />
           </div>
-        </div>
-      ) : null}
-      */}
-      <div className="space-y-2">
-        <LabelInput
-          label="Chian ID"
-          placeholder="Input address"
-          value={editedChain.id}
-          disabled
-        />
-      </div>
-      <div className="space-y-2">
-        <LabelInput
-          label="Currency Symbol"
-          className="bg-gray-150 rounded-md py-sm px-lg h-auto"
-          placeholder="Input address"
-          value={editedChain.nativeCurrency.symbol}
-          disabled
-        />
-      </div>
-      <div className="flex space-x-2">
-        <Button
-          className="flex-1 rounded-full"
-          onClick={onSave}
-          disabled={!newRpc || !editedChain.bundler || !formChanged}
-        >
-          Save
-        </Button>
-      </div>
+
+          <div className="space-y-2">
+            <LabelInput
+              label="Currency Symbol"
+              className="bg-gray-150 rounded-md py-sm px-lg h-auto"
+              placeholder="Currency symbol"
+              value={chain.nativeCurrency.symbol}
+              disabled
+            />
+          </div>
+
+          <div className="flex space-x-2 pt-2">
+            <Button
+              type="submit"
+              className="flex-1 rounded-full"
+              disabled={
+                !formChanged ||
+                form.formState.isSubmitting ||
+                !form.formState.isValid
+              }
+            >
+              {form.formState.isSubmitting ? 'Saving...' : 'Save'}
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }

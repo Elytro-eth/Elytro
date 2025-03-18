@@ -1,9 +1,4 @@
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  Settings2Icon,
-  RefreshCcw,
-} from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Settings2Icon } from 'lucide-react';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
 import ActionButton from './ActionButton';
@@ -13,7 +8,7 @@ import AccountsDropdown from './AccountsDropdown';
 import Copy from '@/components/ui/Copy';
 
 export default function BasicAccountInfo() {
-  const { currentAccount, reloadAccount } = useAccount();
+  const { currentAccount } = useAccount();
 
   const onClickMore = () => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Settings);
@@ -36,10 +31,6 @@ export default function BasicAccountInfo() {
           <Copy text={currentAccount.address} />
         </div>
         <div className="flex flex-row gap-x-md">
-          <RefreshCcw
-            className="elytro-clickable-icon"
-            onClick={reloadAccount}
-          />
           <Settings2Icon
             className="elytro-clickable-icon"
             onClick={onClickMore}
