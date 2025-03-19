@@ -218,6 +218,10 @@ class ElytroSDK {
               resolve({ txHash: targetLog.transactionHash, opHash });
             }
           },
+          onError: () => {
+            unwatch?.();
+            resolve({ opHash });
+          },
         });
       }),
       new Promise<{ opHash: string }>(
