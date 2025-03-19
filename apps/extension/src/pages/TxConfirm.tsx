@@ -65,35 +65,24 @@ export default function TxConfirm() {
 
   const onSendSuccess = async (
     opHash: string,
-    currentUserOp: ElytroUserOperation
+    currentUserOp: ElytroUserOperation,
+    txHash?: string
   ) => {
     wallet.addNewHistory({
       type: txType!,
       opHash,
+      txHash,
       userOp: currentUserOp!,
       decodedDetail: decodedDetail!,
     });
 
-    const goSuccessPage = () => {
-      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxSuccess, {
-        opHash,
-      });
-    };
-
-    switch (opType) {
-      case UserOpType.ApproveTransaction:
-        resolve(opHash);
-        goSuccessPage();
-        break;
-      case UserOpType.SendTransaction:
-        goSuccessPage();
-        break;
-      case UserOpType.DeployWallet:
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard, {
-          activating: '1',
-        });
-        break;
+    if (opType === UserOpType.ApproveTransaction) {
+      resolve(txHash);
     }
+
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard, {
+      activating: opType === UserOpType.DeployWallet ? '1' : '0',
+    });
   };
 
   const handleConfirm = async () => {
@@ -117,9 +106,12 @@ export default function TxConfirm() {
       //   await elytroSDK.simulateUserOperation(currentUserOp);
       // const txDetail = formatSimulationResultToTxDetail(simulationResult);
 
-      await wallet.sendUserOperation(currentUserOp!);
+      const { txHash, opHash: txOpHash } = await wallet.sendUserOperation(
+        currentUserOp!,
+        opHash
+      );
 
-      onSendSuccess(opHash, currentUserOp!);
+      onSendSuccess(txOpHash, currentUserOp!, txHash);
     } catch (error) {
       toast({
         title: 'Failed to send transaction',
@@ -148,6 +140,7 @@ export default function TxConfirm() {
             <Button
               variant="ghost"
               onClick={handleCancel}
+              disabled={isSending}
               className="flex-1 rounded-md border border-gray-200"
             >
               Cancel

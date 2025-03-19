@@ -109,9 +109,13 @@ class WalletController {
     return await elytroSDK.signUserOperation(deformatObjectWithBigInt(userOp));
   }
 
-  public async sendUserOperation(userOp: ElytroUserOperation) {
+  public async sendUserOperation(userOp: ElytroUserOperation, opHash: string) {
     return await elytroSDK.sendUserOperation(
-      deformatObjectWithBigInt(userOp, ['maxFeePerGas', 'maxPriorityFeePerGas'])
+      deformatObjectWithBigInt(userOp, [
+        'maxFeePerGas',
+        'maxPriorityFeePerGas',
+      ]),
+      opHash
     );
   }
 
@@ -153,11 +157,13 @@ class WalletController {
   public async addNewHistory({
     type,
     opHash,
+    txHash,
     userOp,
     decodedDetail,
   }: {
     type: HistoricalActivityTypeEn;
     opHash: string;
+    txHash?: string;
     userOp: ElytroUserOperation;
     decodedDetail: DecodeResult;
   }) {
@@ -165,6 +171,7 @@ class WalletController {
       timestamp: Date.now(),
       type,
       opHash,
+      txHash,
       from: userOp.sender,
       ...getTransferredTokenInfo(decodedDetail),
     });
