@@ -24,11 +24,7 @@ export default function TxSuccess() {
   }, 1000);
 
   const handleClose = () => {
-    if (fromAppCall === '1') {
-      window.close();
-    } else {
-      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
-    }
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
   };
 
   return (

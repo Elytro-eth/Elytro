@@ -17,14 +17,14 @@ interface ISendTxProps {
   dapp: TDAppInfo;
   onConfirm: (signature: string) => void;
   onCancel: () => void;
-  chainName: string;
+  chainId: number;
 }
 
 export default function SignDetail({
   onConfirm,
   onCancel,
   dapp,
-  chainName,
+  chainId,
   signData: { method, params },
 }: ISendTxProps) {
   const { wallet } = useWallet();
@@ -65,7 +65,7 @@ export default function SignDetail({
   return (
     <Card className="w-full max-w-md mx-auto flex-grow flex flex-col min-w-[430px]">
       <CardHeader>
-        <DAppDetail dapp={dapp} chainName={chainName} />
+        <DAppDetail dapp={dapp} chainId={chainId} />
       </CardHeader>
 
       <CardContent className="space-y-4 flex-grow">

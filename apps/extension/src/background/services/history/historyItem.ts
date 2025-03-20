@@ -4,6 +4,7 @@ import {
 } from '@/constants/operations';
 import { elytroSDK } from '../sdk';
 import eventBus from '@/utils/eventBus';
+import { EVENT_TYPES } from '@/constants/events';
 
 const FETCH_INTERVAL = 1_000;
 
@@ -56,7 +57,11 @@ class HistoryItem {
   }
 
   private _broadcastStatusChange() {
-    eventBus.emit('historyItemStatusUpdated', this._data.opHash, this.status);
+    eventBus.emit(
+      EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED,
+      this._data.opHash,
+      this.status
+    );
   }
 
   private _initWatcher() {

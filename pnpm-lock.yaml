@@ -69,6 +69,7 @@ importers:
       archiver: ^7.0.1
       autoprefixer: ^10.4.20
       axios: ^1.7.7
+      babel-plugin-transform-remove-console: ^6.9.4
       buffer: ^6.0.3
       class-variance-authority: ^0.7.0
       clsx: ^2.1.1
@@ -165,6 +166,7 @@ importers:
       '@types/uuid': 10.0.0
       '@vitejs/plugin-react': 4.3.4_vite@5.4.11
       archiver: 7.0.1
+      babel-plugin-transform-remove-console: 6.9.4
       date-fns: 4.1.0
       eslint: 9.11.1
       eslint-plugin-react-hooks: 5.1.0_eslint@9.11.1
@@ -5625,6 +5627,10 @@ packages:
 
   /b4a/1.6.7:
     resolution: {integrity: sha512-OnAYlL5b7LEkALw87fUVafQw5rVR9RjwGd4KUwNQ6DrrNmaVaUCgLipfVlzrPQ4tWOR9P0IXGNOx50jYCCdSJg==}
+    dev: true
+
+  /babel-plugin-transform-remove-console/6.9.4:
+    resolution: {integrity: sha512-88blrUrMX3SPiGkT1GnvVY8E/7A+k6oj3MNvUtTIxJflFzXTw1bHkuJ/y039ouhFMp2prRn5cQGzokViYi1dsg==}
     dev: true
 
   /balanced-match/1.0.2:

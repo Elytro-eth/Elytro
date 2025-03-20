@@ -23,34 +23,35 @@ import RetrieveContacts from './pages/AccountRecovery/RetrieveContacts';
 import ChangePassword from './pages/ChangePassword';
 import ImportToken from './pages/ImportToken';
 import NetworkConfiguration from './pages/NetworkConfiguration';
+import { ApprovalTypeEn } from './constants/operations';
 
-export const SIDE_PANEL_ROUTE_PATHS = {
-  Home: '/',
-  Settings: '/settings',
-  ChangePassword: '/settings/change-password',
-  NetworkConfiguration: '/settings/network-configuration',
-  Dashboard: '/dashboard',
-  Activate: '/activate',
-  Receive: '/receive',
-  Connect: '/connect',
-  SendTx: '/sendTx',
-  Alert: '/alert',
-  Sign: '/sign',
-  TxConfirm: '/tx-confirm',
-  CreatePasscode: '/create-passcode',
-  YouAreIn: '/you-are-in',
-  CreateAccount: '/create-account',
-  CreateNewAddress: '/create-new-address',
-  LocalProfile: '/local-profile',
-  Connection: '/connection',
-  ChainChange: '/chain-change',
-  RecoverySetting: '/recovery-setting',
-  AccountRecovery: '/account-recovery',
-  RetrieveContacts: '/retrieve-contacts',
-  Transfer: '/transfer',
-  TxSuccess: '/tx-success',
-  ImportToken: '/import-token',
-} as const;
+export enum SIDE_PANEL_ROUTE_PATHS {
+  Home = '/',
+  Settings = '/settings',
+  ChangePassword = '/settings/change-password',
+  NetworkConfiguration = '/settings/network-configuration',
+  Dashboard = '/dashboard',
+  Activate = '/activate',
+  Receive = '/receive',
+  Connect = ApprovalTypeEn.Connect,
+  SendTx = '/send-tx',
+  Alert = ApprovalTypeEn.Alert,
+  Sign = ApprovalTypeEn.Sign,
+  TxConfirm = ApprovalTypeEn.TxConfirm,
+  CreatePasscode = '/create-passcode',
+  YouAreIn = '/you-are-in',
+  CreateAccount = '/create-account',
+  CreateNewAddress = '/create-new-address',
+  LocalProfile = '/local-profile',
+  Connection = '/connection',
+  ChainChange = ApprovalTypeEn.ChainChange,
+  RecoverySetting = '/recovery-setting',
+  AccountRecovery = '/account-recovery',
+  RetrieveContacts = '/retrieve-contacts',
+  Transfer = '/transfer',
+  TxSuccess = '/tx-success',
+  ImportToken = '/import-token',
+}
 
 export const routes: TRoute[] = [
   {

@@ -25,7 +25,6 @@ import {
 } from '@/requests/query';
 import { debounce, DebouncedFunc } from 'lodash';
 import { toast } from '@/hooks/use-toast';
-import { formatPrice } from '@/utils/format';
 
 const DEFAULT_ACCOUNT_INFO: TAccountInfo = {
   address: '',
@@ -48,11 +47,6 @@ type IAccountContext = {
   getAccounts: () => Promise<void>;
   updateTokens: () => Promise<void>;
   reloadAccount: DebouncedFunc<() => Promise<void>>;
-  getDollarBalanceByToken: (info: {
-    tokenContractAddress?: string;
-    symbol?: string;
-    balance: number;
-  }) => string | null;
 };
 
 // TODO: extract HistoryContext
@@ -70,7 +64,6 @@ const AccountContext = createContext<IAccountContext>({
   getAccounts: async () => {},
   updateTokens: async () => {},
   reloadAccount: debounce(async () => {}, 1_000),
-  getDollarBalanceByToken: () => null,
 });
 
 export const AccountProvider = ({
@@ -130,27 +123,22 @@ export const AccountProvider = ({
     }
   };
 
-  const updateTokenPrices = async () => {
-    if (
-      !tokens ||
-      tokens.length === 0 ||
-      isTokensLoading ||
-      !currentAccount.chainId
-    ) {
+  const updateTokenPrices = async (lastTokens: TTokenInfo[]) => {
+    if (!lastTokens || lastTokens.length === 0 || !currentAccount.chainId) {
       return;
     }
 
     try {
       const res = (await query(query_token_price, {
         chainId: toHex(currentAccount.chainId),
-        contractAddresses: tokens.map((token) => token.address),
+        contractAddresses: lastTokens.map((token) => token.address),
       })) as SafeAny;
 
       const priceMap = new Map(
         res.tokenPrices.map((item: TTokenPrice) => [item.address, item])
       );
 
-      const formattedTokenPrices = tokens.map((token) => {
+      const formattedTokenPrices = lastTokens.map((token) => {
         const price = priceMap.get(token.address) || {};
         return {
           ...price,
@@ -164,27 +152,6 @@ export const AccountProvider = ({
     }
   };
 
-  useEffect(() => {
-    updateTokenPrices();
-  }, [tokens]);
-
-  const getDollarBalanceByToken = ({
-    tokenContractAddress,
-    symbol,
-    balance,
-  }: {
-    tokenContractAddress?: string;
-    symbol?: string;
-    balance: number;
-  }) => {
-    const price =
-      tokenPrices.find(
-        (item) =>
-          item.address === tokenContractAddress || item.symbol === symbol
-      )?.price || 0;
-    return price > 0 ? formatPrice(balance, price) : null;
-  };
-
   const updateTokens = async () => {
     if (isTokensLoading) {
       return;
@@ -192,8 +159,9 @@ export const AccountProvider = ({
 
     try {
       setIsTokensLoading(true);
-      const tokens = await wallet.getCurrentAccountTokens();
-      setTokens((tokens as TTokenInfo[]) || []);
+      const tokens = (await wallet.getCurrentAccountTokens()) as TTokenInfo[];
+      setTokens(tokens);
+      updateTokenPrices(tokens);
     } catch {
       toast({
         title: 'Failed to get assets',
@@ -207,14 +175,9 @@ export const AccountProvider = ({
 
   const getReceiveActivities = async () => {
     try {
-      const account = await wallet.getCurrentAccount();
-      if (!account?.address) {
-        throw new Error('Elytro: No account');
-      }
-
       const res = (await query(query_receive_activities, {
-        address: account?.address as Address,
-        chainId: toHex(account?.chainId ?? 0),
+        address: currentAccount?.address as Address,
+        chainId: toHex(currentAccount?.chainId ?? 0),
       })) as SafeAny;
 
       const transactions = res.transactions.map((item: SafeAny) => ({
@@ -230,13 +193,16 @@ export const AccountProvider = ({
       }));
 
       return transactions || [];
-    } catch (error) {
-      console.error(error);
+    } catch {
       return [];
     }
   };
 
   const updateHistory = async () => {
+    if (!currentAccount.address) {
+      return;
+    }
+
     const localHistory = await wallet.getLatestHistories();
 
     const receives = await getReceiveActivities();
@@ -281,7 +247,14 @@ export const AccountProvider = ({
     await updateAccount();
     await updateTokens();
     await updateHistory();
-  }, 1_000);
+  }, 300);
+
+  useEffect(() => {
+    if (currentAccount.address) {
+      updateHistory();
+      updateTokens();
+    }
+  }, [currentAccount.address]);
 
   const contextValue = useMemo(
     () => ({
@@ -298,9 +271,16 @@ export const AccountProvider = ({
       accounts,
       getAccounts,
       reloadAccount,
-      getDollarBalanceByToken,
     }),
-    [currentAccount, tokens, isTokensLoading, history, loading, accounts]
+    [
+      currentAccount,
+      tokens,
+      isTokensLoading,
+      history,
+      loading,
+      accounts,
+      tokenPrices,
+    ]
   );
 
   return (

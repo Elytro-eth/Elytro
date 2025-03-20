@@ -1,12 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import LogoWithCircle from '@/assets/logoWithCircle.svg';
 import { CheckIcon } from 'lucide-react';
 
@@ -25,42 +19,47 @@ export default function ConnectionConfirmation({
     'Access to your balance and activities',
     'Send you requests for transactions',
   ];
+
   return (
-    <Card className="w-full h-full flex flex-col justify-between border-none rounded-none shadow-none">
-      <CardHeader className="text-center mb-6 mt-20">
-        <div className="flex justify-center mb-2">
-          <Avatar className="w-20 h-20 relative left-4 z-10 rounded-none">
-            <AvatarImage src={LogoWithCircle} alt={`${dApp.name} icon`} />
-            <AvatarFallback>{dApp.name}</AvatarFallback>
-          </Avatar>
-          <Avatar className="w-20 h-20 relative z-0 rounded-none mr-4">
-            <AvatarImage src={dApp.icon} alt={`${dApp.name} icon`} />
-            <AvatarFallback>{dApp.name}</AvatarFallback>
-          </Avatar>
-        </div>
-        <CardTitle>
-          <div className="text-xl font-bold mb-3">Connect to {dApp.name}</div>
-          <div className="text-gray-600 text-lg font-normal">{dApp.origin}</div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col">
-        <ul className="space-y-2">
+    <Card className="w-full h-full p-6 flex flex-col border-none rounded-none shadow-none">
+      <div className="flex justify-center ">
+        <Avatar className="size-5xl  left-4 z-10 rounded-full">
+          <AvatarImage src={LogoWithCircle} alt={`${dApp.name} icon`} />
+          <AvatarFallback>{dApp.name}</AvatarFallback>
+        </Avatar>
+        <Avatar className="size-5xl  z-0 rounded-full mr-4">
+          <AvatarImage src={dApp.icon} alt={`${dApp.name} icon`} />
+          <AvatarFallback>{dApp.name}</AvatarFallback>
+        </Avatar>
+      </div>
+
+      <div className="text-center mb-8">
+        <h2 className="elytro-text-bold-body">Connect to {dApp.name}</h2>
+        <p className="elytro-text-small mt-sm text-gray-600">{dApp.origin}</p>
+      </div>
+
+      <div className="mb-8">
+        <p className="text-gray-700 mb-sm font-medium">
+          This site will be able to:
+        </p>
+        <ul className="space-y-2xs">
           {tips.map((tip) => (
-            <li className="flex justify-center text-sm" key={tip}>
-              <CheckIcon className="text-green-100 mr-2" />
-              <div>{tip}</div>
+            <li className="flex items-start text-sm  align-center" key={tip}>
+              <CheckIcon className="text-green-100 mr-sm flex-shrink-0 size-lg my-auto" />
+              <span>{tip}</span>
             </li>
           ))}
         </ul>
-      </CardContent>
-      <CardFooter className="flex justify-between space-x-2">
+      </div>
+
+      <div className="flex space-x-4">
         <Button variant="outline" className="flex-1" onClick={onCancel}>
           Cancel
         </Button>
         <Button className="flex-1" onClick={onConfirm}>
           Connect
         </Button>
-      </CardFooter>
+      </div>
     </Card>
   );
 }
