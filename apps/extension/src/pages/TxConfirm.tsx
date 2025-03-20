@@ -11,6 +11,7 @@ import { toast } from '@/hooks/use-toast';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { UserOpDetail } from '@/components/biz/UserOpDetail';
 import { useAccount } from '@/contexts/account-context';
+
 const UserOpTitleMap = {
   [UserOpType.DeployWallet]: 'Activate account',
   [UserOpType.SendTransaction]: 'Send',
@@ -35,6 +36,8 @@ export default function TxConfirm() {
   const { reject, resolve } = useApproval();
 
   const renderContent = useMemo(() => {
+    if (isSending) return <ProcessingTip body="Confirming..." />;
+
     if (isPacking) return <ProcessingTip />;
 
     if (opType) {
@@ -51,7 +54,11 @@ export default function TxConfirm() {
 
     // TODO: error tip
     return null;
-  }, [isPacking, opType, calcResult, decodedDetail, chainId]);
+  }, [isPacking, opType, calcResult, decodedDetail, chainId, isSending]);
+
+  const handleBackToDashboard = () => {
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+  };
 
   const handleCancel = () => {
     if (opType === UserOpType.ApproveTransaction) {
@@ -59,7 +66,7 @@ export default function TxConfirm() {
     } else if (history.length > 1) {
       history.back();
     } else {
-      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+      handleBackToDashboard();
     }
   };
 
@@ -134,33 +141,37 @@ export default function TxConfirm() {
       <div className="flex flex-col gap-y-md">{renderContent}</div>
 
       {/* Footer */}
-      <div className="flex w-full mt-10">
-        <div className="flex w-full gap-x-2">
-          {!isPacking && (
+      {!isPacking && (
+        <div className="flex w-full gap-x-sm [&>button]:flex-1 mt-2xl">
+          {isSending ? (
             <Button
               variant="ghost"
-              onClick={handleCancel}
-              disabled={isSending}
               className="flex-1 rounded-md border border-gray-200"
+              onClick={handleBackToDashboard}
             >
-              Cancel
+              Close
             </Button>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                onClick={handleCancel}
+                disabled={isSending}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                onClick={handleConfirm}
+                className="flex-1 rounded-md"
+                disabled={!hasSufficientBalance || isSending}
+              >
+                {hasSufficientBalance ? 'Confirm' : 'Insufficient balance'}
+              </Button>
+            </>
           )}
-          <Button
-            onClick={handleConfirm}
-            className="flex-1 rounded-md"
-            disabled={isPacking || !hasSufficientBalance || isSending}
-          >
-            {isPacking
-              ? 'Packing...'
-              : hasSufficientBalance
-                ? isSending
-                  ? 'Confirming...'
-                  : 'Confirm'
-                : 'Insufficient balance'}
-          </Button>
         </div>
-      </div>
+      )}
     </SecondaryPageWrapper>
   );
 }
