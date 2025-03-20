@@ -1,6 +1,7 @@
 import { ElytroDuplexMessage, ElytroMessageTypeEn } from '@/utils/message';
 import mainWorldScript from './main-world?script&module';
 import PortMessage from '@/utils/message/portMessage';
+import { RUNTIME_MESSAGE_TYPE } from '@/constants/message';
 
 const portMessage = new PortMessage('elytro-cs');
 
@@ -65,3 +66,13 @@ const injectMainWorldScript = () => {
 };
 
 injectMainWorldScript();
+
+function changeColorSchema(colorSchema: MediaQueryList | MediaQueryListEvent) {
+  chrome.runtime.sendMessage({
+    type: RUNTIME_MESSAGE_TYPE.COLOR_SCHEME_CHANGE,
+    scheme: colorSchema.matches ? 'dark' : 'light',
+  });
+}
+const colorSchema = window.matchMedia('(prefers-color-scheme: dark)');
+colorSchema.addEventListener('change', changeColorSchema);
+changeColorSchema(colorSchema);

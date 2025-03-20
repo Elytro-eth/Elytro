@@ -92,6 +92,17 @@ const initApp = async () => {
     if (msg.type === RUNTIME_MESSAGE_TYPE.DOM_READY) {
       sendResponse(true);
     }
+
+    if (RUNTIME_MESSAGE_TYPE.COLOR_SCHEME_CHANGE === msg.type) {
+      const scheme = msg.scheme;
+      chrome.action.setIcon({
+        path: {
+          16: `logo-${scheme}.png`,
+          48: `logo-${scheme}.png`,
+          128: `logo-${scheme}.png`,
+        },
+      });
+    }
   });
 };
 
