@@ -97,9 +97,9 @@ const initApp = async () => {
       const scheme = msg.scheme;
       chrome.action.setIcon({
         path: {
-          16: `logo-${scheme}.png`,
-          48: `logo-${scheme}.png`,
-          128: `logo-${scheme}.png`,
+          16: `logo-${scheme}-16.png`,
+          48: `logo-${scheme}-48.png`,
+          128: `logo-${scheme}-128.png`,
         },
       });
     }
