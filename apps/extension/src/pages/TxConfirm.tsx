@@ -1,177 +1,114 @@
-import { useMemo, useState } from 'react';
-import { UserOpType, useTx } from '@/contexts/tx-context';
+import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import ProcessingTip from '@/components/ui/ProcessingTip';
 import { Button } from '@/components/ui/button';
-import { navigateTo } from '@/utils/navigation';
-import { SIDE_PANEL_ROUTE_PATHS } from '../routes';
-import { useApproval } from '@/contexts/approval-context';
-import { useWallet } from '@/contexts/wallet';
-import { formatObjectWithBigInt } from '@/utils/format';
-import { toast } from '@/hooks/use-toast';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { UserOpDetail } from '@/components/biz/UserOpDetail';
 import { useAccount } from '@/contexts/account-context';
+import { AlertCircle } from 'lucide-react';
 
 const UserOpTitleMap = {
-  [UserOpType.DeployWallet]: 'Activate account',
-  [UserOpType.SendTransaction]: 'Send',
-  [UserOpType.ApproveTransaction]: 'Confirm transaction',
+  [TxRequestTypeEn.DeployWallet]: 'Activate account',
+  [TxRequestTypeEn.SendTransaction]: 'Send',
+  [TxRequestTypeEn.ApproveTransaction]: 'Confirm transaction',
 };
 
-export default function TxConfirm() {
-  const { wallet } = useWallet();
+function TxConfirm() {
   const {
-    opType,
-    txType,
+    requestType,
     isPacking,
+    isSending,
+    errorMsg,
     hasSufficientBalance,
     userOp,
     calcResult,
     decodedDetail,
+    onConfirm,
+    onCancel,
+    onRetry,
   } = useTx();
   const {
     currentAccount: { chainId },
   } = useAccount();
-  const [isSending, setIsSending] = useState(false);
-  const { reject, resolve } = useApproval();
 
-  const renderContent = useMemo(() => {
-    if (isSending) return <ProcessingTip body="Confirming..." />;
+  if (isPacking || isSending) {
+    return (
+      <ProcessingTip body={isSending ? 'Confirming...' : 'Preparing...'} />
+    );
+  }
 
-    if (isPacking) return <ProcessingTip />;
+  if (errorMsg || !requestType) {
+    return (
+      <div className="flex flex-col w-full items-center justify-center  p-6">
+        <AlertCircle className="size-12 text-destructive animate-pulse mb-md" />
 
-    if (opType) {
-      return (
+        <h2 className="text-lg font-semibold text-foreground mb-xs">
+          Transaction Failed
+        </h2>
+
+        <div className="text-center text-muted-foreground text-sm mb-6 max-w-[280px]">
+          {errorMsg || 'Please try again or contact support'}
+        </div>
+
+        <Button onClick={onRetry} className="w-full">
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* Content */}
+      <div className="flex flex-col gap-y-md">
         <UserOpDetail
-          opType={opType}
+          requestType={requestType}
           calcResult={calcResult}
           chainId={chainId!}
           decodedUserOp={decodedDetail}
           from={userOp?.sender}
         />
-      );
-    }
+      </div>
 
-    // TODO: error tip
-    return null;
-  }, [isPacking, opType, calcResult, decodedDetail, chainId, isSending]);
+      {/* Footer */}
+      <div className="flex w-full gap-x-sm [&>button]:flex-1 mt-2xl">
+        {isSending ? (
+          <Button
+            variant="ghost"
+            className="flex-1 rounded-md border border-gray-200"
+            onClick={onCancel}
+          >
+            Close
+          </Button>
+        ) : (
+          <>
+            <Button variant="ghost" onClick={onCancel} disabled={isSending}>
+              Cancel
+            </Button>
 
-  const handleBackToDashboard = () => {
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
-  };
+            <Button
+              onClick={onConfirm}
+              className="flex-1 rounded-md"
+              disabled={!hasSufficientBalance || isSending}
+            >
+              {hasSufficientBalance ? 'Confirm' : 'Insufficient balance'}
+            </Button>
+          </>
+        )}
+      </div>
+    </>
+  );
+}
 
-  const handleCancel = () => {
-    if (opType === UserOpType.ApproveTransaction) {
-      reject();
-    } else if (history.length > 1) {
-      history.back();
-    } else {
-      handleBackToDashboard();
-    }
-  };
-
-  const onSendSuccess = async (
-    opHash: string,
-    currentUserOp: ElytroUserOperation,
-    txHash?: string
-  ) => {
-    wallet.addNewHistory({
-      type: txType!,
-      opHash,
-      txHash,
-      userOp: currentUserOp!,
-      decodedDetail: decodedDetail!,
-    });
-
-    if (opType === UserOpType.ApproveTransaction) {
-      resolve(txHash);
-    }
-
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard, {
-      activating: opType === UserOpType.DeployWallet ? '1' : '0',
-    });
-  };
-
-  const handleConfirm = async () => {
-    try {
-      setIsSending(true);
-
-      let currentUserOp = userOp;
-
-      // TODO: check this logic
-      if (!currentUserOp?.paymaster) {
-        currentUserOp = await wallet.estimateGas(currentUserOp!);
-      }
-
-      const { signature, opHash } = await wallet.signUserOperation(
-        formatObjectWithBigInt(currentUserOp!)
-      );
-
-      currentUserOp!.signature = signature;
-
-      // const simulationResult =
-      //   await elytroSDK.simulateUserOperation(currentUserOp);
-      // const txDetail = formatSimulationResultToTxDetail(simulationResult);
-
-      const { txHash, opHash: txOpHash } = await wallet.sendUserOperation(
-        currentUserOp!,
-        opHash
-      );
-
-      onSendSuccess(txOpHash, currentUserOp!, txHash);
-    } catch (error) {
-      toast({
-        title: 'Failed to send transaction',
-        description:
-          (error as Error).message ||
-          String(error) ||
-          'Unknown error, please try again',
-      });
-    } finally {
-      setIsSending(false);
-    }
-  };
+export default function TxConfirmPage() {
+  const { requestType, onCancel } = useTx();
 
   return (
     <SecondaryPageWrapper
       className="flex flex-col p-md"
-      title={UserOpTitleMap[opType!]}
+      title={UserOpTitleMap[requestType!]}
+      onBack={onCancel}
     >
-      {/* Content */}
-      <div className="flex flex-col gap-y-md">{renderContent}</div>
-
-      {/* Footer */}
-      {!isPacking && (
-        <div className="flex w-full gap-x-sm [&>button]:flex-1 mt-2xl">
-          {isSending ? (
-            <Button
-              variant="ghost"
-              className="flex-1 rounded-md border border-gray-200"
-              onClick={handleBackToDashboard}
-            >
-              Close
-            </Button>
-          ) : (
-            <>
-              <Button
-                variant="ghost"
-                onClick={handleCancel}
-                disabled={isSending}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                onClick={handleConfirm}
-                className="flex-1 rounded-md"
-                disabled={!hasSufficientBalance || isSending}
-              >
-                {hasSufficientBalance ? 'Confirm' : 'Insufficient balance'}
-              </Button>
-            </>
-          )}
-        </div>
-      )}
+      <TxConfirm />
     </SecondaryPageWrapper>
   );
 }

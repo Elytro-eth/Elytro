@@ -303,7 +303,7 @@ class WalletController {
     this._onAccountChanged();
   }
 
-  public async createDeployUserOp() {
+  public async createDeployUserOp(): Promise<ElytroUserOperation> {
     if (!keyring.owner?.address) {
       throw new Error('Elytro: No owner address. Try create owner first.');
     }
@@ -317,7 +317,9 @@ class WalletController {
     return formatObjectWithBigInt(deployUserOp);
   }
 
-  public async createTxUserOp(txs: Transaction[]) {
+  public async createTxUserOp(
+    txs: Transaction[]
+  ): Promise<ElytroUserOperation> {
     const userOp = await elytroSDK.createUserOpFromTxs(
       accountManager.currentAccount?.address as string,
       txs
@@ -332,7 +334,9 @@ class WalletController {
     );
   }
 
-  public async estimateGas(userOp: ElytroUserOperation) {
+  public async estimateGas(
+    userOp: ElytroUserOperation
+  ): Promise<ElytroUserOperation> {
     return formatObjectWithBigInt(await elytroSDK.estimateGas(userOp));
   }
 

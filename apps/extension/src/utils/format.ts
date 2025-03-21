@@ -453,3 +453,7 @@ export function formatDollarBalance(
 
   return price > 0 ? formatPrice(balance, price) : null;
 }
+
+export function formatErrorMsg(error: SafeAny) {
+  return (error as Error)?.message || String(error) || 'Unknown Error';
+}

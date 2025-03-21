@@ -1,4 +1,4 @@
-import { UserOpType } from '@/contexts/tx-context';
+import { TxRequestTypeEn } from '@/contexts/tx-context';
 import InfoCard from '@/components/biz/InfoCard';
 import { formatEther } from 'viem';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';
@@ -20,7 +20,7 @@ const { InfoCardItem, InfoCardList } = InfoCard;
 
 interface IUserOpDetailProps {
   session?: TDAppInfo;
-  opType: UserOpType;
+  requestType: TxRequestTypeEn;
   calcResult: Nullable<TUserOperationPreFundResult>;
   chainId: number;
   decodedUserOp: Nullable<DecodeResult>;
@@ -36,7 +36,7 @@ const formatGasUsed = (gasUsed?: string) => {
 };
 
 export function UserOpDetail({
-  opType,
+  requestType,
   calcResult,
   chainId,
   decodedUserOp,
@@ -48,20 +48,20 @@ export function UserOpDetail({
   } = useAccount();
 
   const DetailContent = useMemo(() => {
-    switch (opType) {
-      case UserOpType.DeployWallet:
+    switch (requestType) {
+      case TxRequestTypeEn.DeployWallet:
         return <ActivateDetail />;
 
-      case UserOpType.SendTransaction:
+      case TxRequestTypeEn.SendTransaction:
         return <InnerSendingDetail decodedUserOp={decodedUserOp} />;
 
-      case UserOpType.ApproveTransaction:
+      case TxRequestTypeEn.ApproveTransaction:
         return <ApprovalDetail decodedUserOp={decodedUserOp} />;
 
       default:
         return null;
     }
-  }, [opType, decodedUserOp]);
+  }, [requestType, decodedUserOp]);
 
   const [gasInETH, gasInDollar] = useMemo(() => {
     if (!calcResult?.gasUsed) {
@@ -118,7 +118,7 @@ export function UserOpDetail({
       </InfoCardList>
 
       {/* Transaction Raw Data: Only show for approve transaction */}
-      {opType === UserOpType.ApproveTransaction && (
+      {requestType === TxRequestTypeEn.ApproveTransaction && (
         <div>
           <button
             className="flex items-center justify-center gap-x-2xs elytro-text-tiny-body text-gray-750 mb-sm"

@@ -152,8 +152,6 @@ const initContentScriptAndPageProviderMessage = (port: chrome.runtime.Port) => {
         return;
       }
 
-      console.log('payload:', payload);
-
       const needsApproval = [
         'eth_requestAccounts',
         'wallet_requestPermissions',
