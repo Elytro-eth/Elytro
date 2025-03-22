@@ -54,4 +54,5 @@ export type UserOperationHistory = {
   opHash: string;
   status?: UserOperationStatusEn;
   type: Nullable<HistoricalActivityTypeEn>;
+  txHash?: string;
 };

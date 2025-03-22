@@ -92,6 +92,17 @@ const initApp = async () => {
     if (msg.type === RUNTIME_MESSAGE_TYPE.DOM_READY) {
       sendResponse(true);
     }
+
+    if (RUNTIME_MESSAGE_TYPE.COLOR_SCHEME_CHANGE === msg.type) {
+      const scheme = msg.scheme;
+      chrome.action.setIcon({
+        path: {
+          16: `logo-${scheme}-16.png`,
+          48: `logo-${scheme}-48.png`,
+          128: `logo-${scheme}-128.png`,
+        },
+      });
+    }
   });
 };
 
@@ -151,8 +162,6 @@ const initContentScriptAndPageProviderMessage = (port: chrome.runtime.Port) => {
       if (!origin || !tab?.id) {
         return;
       }
-
-      console.log('payload:', payload);
 
       const needsApproval = [
         'eth_requestAccounts',

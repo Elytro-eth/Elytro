@@ -1,4 +1,4 @@
-import { iconElytro } from '@/assets/icons';
+import { iconElytroDark, iconElytroLight } from '@/assets/icons';
 import PageProvider from '@/background/provider/pageProvider';
 
 declare global {
@@ -16,6 +16,8 @@ const generateUUID4 = () =>
   });
 
 const mainWorld = () => {
+  const colorSchema = window?.matchMedia?.('(prefers-color-scheme: dark)');
+  const iconElytro = colorSchema?.matches ? iconElytroDark : iconElytroLight;
   const info: EIP6963ProviderInfo = {
     uuid: generateUUID4(),
     name: 'Elytro',

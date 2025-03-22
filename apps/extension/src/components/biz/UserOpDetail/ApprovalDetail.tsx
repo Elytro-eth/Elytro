@@ -5,7 +5,7 @@ import TokenAmountItem from '../TokenAmountItem';
 import FragmentedAddress from '../FragmentedAddress';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { useApproval } from '@/contexts/approval-context';
-import { UserOpType } from '@/contexts/tx-context';
+import { TxRequestTypeEn } from '@/contexts/tx-context';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -29,7 +29,7 @@ export default function ApprovalDetail({
     <>
       <SessionCard
         session={
-          approval?.type === UserOpType.ApproveTransaction
+          approval?.type === TxRequestTypeEn.ApproveTransaction
             ? approval?.data?.dApp
             : undefined
         }

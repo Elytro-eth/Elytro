@@ -64,10 +64,6 @@ export const ApprovalProvider = ({
   };
 
   const onApprovalChanged = async () => {
-    if (pathname === SIDE_PANEL_ROUTE_PATHS.TxSuccess) {
-      return;
-    }
-
     if (approval) {
       const currentAccount = await wallet.getCurrentAccount();
       if (!currentAccount?.isDeployed) {
@@ -119,7 +115,6 @@ export const ApprovalProvider = ({
     if (!approval || isProcessingRef.current) {
       return;
     }
-
     try {
       isProcessingRef.current = true;
       await wallet.resolveApproval(approval.id, data);
