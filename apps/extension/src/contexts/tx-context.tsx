@@ -8,141 +8,262 @@ import { toHex } from 'viem';
 import { SIDE_PANEL_ROUTE_PATHS } from '../routes';
 import { useApproval } from './approval-context';
 import { HistoricalActivityTypeEn } from '@/constants/operations';
+import { formatErrorMsg, formatObjectWithBigInt } from '@/utils/format';
 
-export enum UserOpType {
+export enum TxRequestTypeEn {
   DeployWallet = 1,
   SendTransaction,
   ApproveTransaction,
 }
 
-// TODO: move approvals to tx-context. means that there is no isXXXTxVisible but which tx is open
 type ITxContext = {
-  opType: Nullable<UserOpType>;
+  // Tx/UserOp type
+  requestType: Nullable<TxRequestTypeEn>;
+  historyType: Nullable<HistoricalActivityTypeEn>;
+
+  // UI
   isPacking: boolean;
+  isSending: boolean;
   hasSufficientBalance: boolean;
+  errorMsg: Nullable<string>;
+  // UserOp/Tx info
   userOp: Nullable<ElytroUserOperation>;
   calcResult: Nullable<TUserOperationPreFundResult>;
   decodedDetail: Nullable<DecodeResult>;
-  txType: Nullable<HistoricalActivityTypeEn>;
-  // TODO: params can be an array of transactions
-  openUserOpConfirmTx: (opType: UserOpType, params?: Transaction[]) => void;
-  closeUserOpConfirmTx: () => void;
+
+  // Actions
+  handleTxRequest: (
+    requestType: TxRequestTypeEn,
+    params?: Transaction[]
+  ) => void;
+  onConfirm: () => void;
+  onCancel: () => void;
+  onRetry: () => void;
 };
 
 const TxContext = createContext<ITxContext>({
-  opType: null,
+  requestType: null,
+  historyType: null,
   isPacking: true,
+  isSending: false,
   hasSufficientBalance: false,
+  errorMsg: null,
   userOp: null,
   calcResult: null,
   decodedDetail: null,
-  openUserOpConfirmTx: () => {},
-  closeUserOpConfirmTx: () => {},
-  txType: null,
+  handleTxRequest: () => {},
+  onConfirm: () => {},
+  onCancel: () => {},
+  onRetry: () => {},
 });
 
-// TODO: maybe move this to tx-confirm page?
 export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
+  const { approval, resolve, reject } = useApproval();
+
   const userOpRef = useRef<Nullable<ElytroUserOperation>>();
   const txTypeRef = useRef<Nullable<HistoricalActivityTypeEn>>(null);
-  const { approval } = useApproval();
+  const txParamsRef = useRef<Nullable<Transaction[]>>(null);
 
-  const [opType, setOpType] = useState<Nullable<UserOpType>>(null);
+  const [requestType, setRequestType] =
+    useState<Nullable<TxRequestTypeEn>>(null);
   const [isPacking, setIsPacking] = useState(true);
+  const [isSending, setIsSending] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<Nullable<string>>(null);
+
   const [decodedDetail, setDecodedDetail] =
     useState<Nullable<DecodeResult>>(null);
   const [hasSufficientBalance, setHasSufficientBalance] = useState(false);
   const [calcResult, setCalcResult] =
     useState<Nullable<TUserOperationPreFundResult>>(null);
 
-  const openUserOpConfirmTx = async (
-    type: UserOpType,
+  const handleTxRequest = async (
+    type: TxRequestTypeEn,
     params?: Transaction[]
   ) => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm, {
-      fromAppCall: type === UserOpType.ApproveTransaction ? '1' : '0',
+      fromAppCall: type === TxRequestTypeEn.ApproveTransaction ? '1' : '0',
     });
+
     packUserOp(type, params);
   };
 
-  const closeUserOpConfirmTx = () => {
-    setOpType(null);
-    setDecodedDetail(null);
-    setHasSufficientBalance(false);
-    setIsPacking(false);
-    setCalcResult(null);
-    txTypeRef.current = null;
-    userOpRef.current = null;
-  };
-
-  const getTxType = (type: UserOpType) => {
+  const getTxType = (type: TxRequestTypeEn) => {
     switch (type) {
-      case UserOpType.DeployWallet:
+      case TxRequestTypeEn.DeployWallet:
         return HistoricalActivityTypeEn.ActivateAccount;
-      case UserOpType.SendTransaction:
+      case TxRequestTypeEn.SendTransaction:
         return HistoricalActivityTypeEn.Send;
-      // TODO: no 'receive' tx type yet.
       default:
         return HistoricalActivityTypeEn.ContractInteraction;
     }
   };
 
-  const packUserOp = async (type: UserOpType, params?: Transaction[]) => {
+  const generateDeployUserOp = async () => {
+    const userOp = await wallet.createDeployUserOp();
+    return await wallet.estimateGas(userOp);
+  };
+
+  const generateTxUserOp = async () => {
+    if (!txParamsRef.current) {
+      throw new Error('Invalid user operation');
+    }
+
+    return await wallet.createTxUserOp(txParamsRef.current);
+  };
+
+  const packUserOp = async (type: TxRequestTypeEn, params?: Transaction[]) => {
     try {
       setIsPacking(true);
-      setOpType(type);
+      setRequestType(type);
+      txParamsRef.current = params;
+      txTypeRef.current = getTxType(type);
 
       let transferAmount = 0n;
       let currentUserOp: ElytroUserOperation;
 
-      if (type === UserOpType.DeployWallet) {
-        currentUserOp = await wallet.createDeployUserOp();
-        currentUserOp = await wallet.estimateGas(currentUserOp);
+      if (type === TxRequestTypeEn.DeployWallet) {
+        currentUserOp = await generateDeployUserOp();
       } else {
-        if (!params) {
-          throw new Error('Invalid user operation');
-        }
-
-        currentUserOp = await wallet.createTxUserOp(params);
-        // TODO: use the first decoded result only. what if there are multiple decoded results?
-
+        currentUserOp = await generateTxUserOp();
         const decodeRes = (await wallet.decodeUserOp(currentUserOp))?.[0];
-
         if (!decodeRes) {
           throw new Error('Failed to decode user operation');
         }
-
         transferAmount = BigInt(decodeRes.value); // hex to bigint
         setDecodedDetail(decodeRes);
       }
 
-      const res = await wallet.packUserOp(currentUserOp, toHex(transferAmount));
+      const packedUserOp = await wallet.packUserOp(
+        currentUserOp,
+        toHex(transferAmount)
+      );
 
-      userOpRef.current = res.userOp;
-      setCalcResult(res.calcResult);
-      setHasSufficientBalance(!res.calcResult.needDeposit);
-      txTypeRef.current = getTxType(type);
-    } catch (err: unknown) {
-      const errMsg = (err as Error)?.message || String(err) || 'Unknown Error';
+      userOpRef.current = packedUserOp.userOp;
+      setCalcResult(packedUserOp.calcResult);
+      setHasSufficientBalance(!packedUserOp.calcResult.needDeposit);
+    } catch (err) {
+      const msg = formatErrorMsg(err);
+      setErrorMsg(msg);
       toast({
         title: 'Failed to pack user operation',
         variant: 'destructive',
-        description: errMsg,
+        description: msg,
       });
-      console.error(errMsg);
     } finally {
       setIsPacking(false);
     }
   };
 
+  const resetTxContext = () => {
+    setRequestType(null);
+    setDecodedDetail(null);
+    setHasSufficientBalance(false);
+    setIsPacking(true);
+    setCalcResult(null);
+    txTypeRef.current = null;
+    txParamsRef.current = null;
+    userOpRef.current = null;
+  };
+
+  const onSendSuccess = async (
+    opHash: string,
+    currentUserOp: ElytroUserOperation,
+    txHash?: string
+  ) => {
+    wallet.addNewHistory({
+      type: txTypeRef.current!,
+      opHash,
+      txHash,
+      userOp: currentUserOp!,
+      decodedDetail: decodedDetail!,
+    });
+
+    if (requestType === TxRequestTypeEn.ApproveTransaction) {
+      resolve(txHash);
+    }
+    resetTxContext();
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard, {
+      activating: requestType === TxRequestTypeEn.DeployWallet ? '1' : '0',
+    });
+  };
+
+  const onConfirm = async () => {
+    try {
+      setIsSending(true);
+
+      let currentUserOp = userOpRef.current;
+
+      // TODO: check this logic
+      if (!currentUserOp?.paymaster) {
+        currentUserOp = await wallet.estimateGas(currentUserOp!);
+      }
+
+      const { signature, opHash } = await wallet.signUserOperation(
+        formatObjectWithBigInt(currentUserOp!)
+      );
+
+      currentUserOp!.signature = signature;
+
+      // const simulationResult =
+      //   await elytroSDK.simulateUserOperation(currentUserOp);
+      // const txDetail = formatSimulationResultToTxDetail(simulationResult);
+
+      const { txHash, opHash: txOpHash } = await wallet.sendUserOperation(
+        currentUserOp!,
+        opHash
+      );
+
+      onSendSuccess(txOpHash, currentUserOp!, txHash);
+    } catch (error) {
+      const msg = formatErrorMsg(error);
+      setErrorMsg(msg);
+      toast({
+        title: 'Failed to send transaction',
+        description: msg,
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleBackToDashboard = () => {
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+  };
+
+  const onCancel = () => {
+    if (requestType === TxRequestTypeEn.ApproveTransaction && !isSending) {
+      reject();
+    }
+    resetTxContext();
+    if (history.length > 1) {
+      history.back();
+    } else {
+      handleBackToDashboard();
+    }
+  };
+
+  const onRetry = () => {
+    if (!requestType || !txParamsRef.current) {
+      toast({
+        title: 'Failed to retry',
+        description: 'Invalid request type or transaction parameters',
+      });
+      return;
+    }
+
+    setErrorMsg(null);
+    packUserOp(requestType!, txParamsRef.current);
+  };
+
   useEffect(() => {
+    console.log('approval test', approval);
     const txInfo = approval?.data?.tx as Transaction[];
     if (txInfo?.[0]) {
       const type =
         !txInfo[0].data || txInfo[0].data === '0x'
-          ? UserOpType.SendTransaction
-          : UserOpType.ApproveTransaction;
+          ? TxRequestTypeEn.SendTransaction
+          : TxRequestTypeEn.ApproveTransaction;
 
       packUserOp(type, txInfo);
     }
@@ -152,14 +273,18 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     <TxContext.Provider
       value={{
         userOp: userOpRef.current,
-        txType: txTypeRef.current,
-        opType,
+        historyType: txTypeRef.current,
+        requestType,
         isPacking,
-        calcResult,
+        isSending,
         hasSufficientBalance,
+        errorMsg,
+        calcResult,
         decodedDetail,
-        openUserOpConfirmTx,
-        closeUserOpConfirmTx,
+        handleTxRequest,
+        onConfirm,
+        onCancel,
+        onRetry,
       }}
     >
       {children}
@@ -167,6 +292,4 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useTx = () => {
-  return useContext(TxContext);
-};
+export const useTx = () => useContext(TxContext);

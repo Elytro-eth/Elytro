@@ -24,7 +24,7 @@ import AddressInput from '@/components/biz/AddressInput';
 import TokenSelector from '@/components/biz/TokenSelector';
 import AmountInput from '@/components/biz/AmountInput';
 import { useTx } from '@/contexts/tx-context';
-import { UserOpType } from '@/contexts/tx-context';
+import { TxRequestTypeEn } from '@/contexts/tx-context';
 import { ABI_ERC20_TRANSFER } from '@/constants/abi';
 import { toast } from '@/hooks/use-toast';
 import { formatTokenAmount } from '@/utils/format';
@@ -36,7 +36,7 @@ export default function SendTx() {
     currentAccount: { address, chainId },
     updateTokens,
   } = useAccount();
-  const { openUserOpConfirmTx } = useTx();
+  const { handleTxRequest } = useTx();
 
   const [isPreparing, setIsPreparing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -177,7 +177,7 @@ export default function SendTx() {
         throw new Error('Invalid token address');
       }
 
-      openUserOpConfirmTx(UserOpType.SendTransaction, [txParams]);
+      handleTxRequest(TxRequestTypeEn.SendTransaction, [txParams]);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to prepare transaction';
@@ -190,7 +190,7 @@ export default function SendTx() {
     } finally {
       setIsPreparing(false);
     }
-  }, [form, address, openUserOpConfirmTx]);
+  }, [form, address, handleTxRequest]);
 
   // Check if the form is valid
   const isFormValid = useMemo(() => {

@@ -187,17 +187,47 @@ class ElytroSDK {
     return code !== undefined && code !== '0x';
   }
 
-  public async sendUserOperation(userOp: ElytroUserOperation) {
-    // estimate gas before sending userOp, but can not do it here (for the case of sign tx)
-    // await this.estimateGas(userOp);
-
+  public async sendUserOperation(
+    userOp: ElytroUserOperation,
+    opHash: string
+  ): Promise<{ txHash?: string; opHash: string }> {
     const res = await this._sdk.sendUserOperation(userOp);
-
     if (res.isErr()) {
       throw res.ERR;
-    } else {
-      return res.OK;
     }
+
+    const client = this._getClient();
+
+    return Promise.race([
+      new Promise<{ txHash?: string; opHash: string }>((resolve) => {
+        const unwatch = client.watchEvent({
+          address: this._config.onchainConfig.entryPoint as Address,
+          event: parseAbiItem(
+            'event UserOperationEvent(bytes32 indexed userOpHash, address indexed sender, address indexed paymaster, uint256 nonce, bool success, uint256 actualGasCost, uint256 actualGasUsed)'
+          ),
+          args: {
+            userOpHash: opHash as Hex,
+            sender: userOp.sender,
+          },
+          onLogs: (logs) => {
+            const targetLog = logs.find(
+              (log) => log.args?.userOpHash === opHash
+            );
+            if (targetLog) {
+              unwatch?.();
+              resolve({ txHash: targetLog.transactionHash, opHash });
+            }
+          },
+          onError: () => {
+            unwatch?.();
+            resolve({ opHash });
+          },
+        });
+      }),
+      new Promise<{ opHash: string }>(
+        (resolve) => setTimeout(() => resolve({ opHash }), 20_000) // 20s timeout. tune it later if needed.
+      ),
+    ]);
   }
 
   public async signUserOperation(userOp: ElytroUserOperation) {

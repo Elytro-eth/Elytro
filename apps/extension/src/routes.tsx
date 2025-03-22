@@ -18,7 +18,6 @@ import Launch from './pages/Launch';
 import RecoverySetting from './pages/RecoverySettings/index';
 import Transfer from './pages/Transfer';
 import AccountRecovery from './pages/AccountRecovery';
-import TxSuccess from './pages/TxSuccess';
 import RetrieveContacts from './pages/AccountRecovery/RetrieveContacts';
 import ChangePassword from './pages/ChangePassword';
 import ImportToken from './pages/ImportToken';
@@ -49,7 +48,6 @@ export enum SIDE_PANEL_ROUTE_PATHS {
   AccountRecovery = '/account-recovery',
   RetrieveContacts = '/retrieve-contacts',
   Transfer = '/transfer',
-  TxSuccess = '/tx-success',
   ImportToken = '/import-token',
 }
 
@@ -146,10 +144,6 @@ export const routes: TRoute[] = [
   {
     path: SIDE_PANEL_ROUTE_PATHS.RetrieveContacts,
     component: RetrieveContacts,
-  },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.TxSuccess,
-    component: TxSuccess,
   },
   {
     path: SIDE_PANEL_ROUTE_PATHS.ImportToken,

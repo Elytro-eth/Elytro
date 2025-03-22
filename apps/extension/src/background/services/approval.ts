@@ -18,7 +18,7 @@ class ApprovalService {
 
     return new Promise((resolve, reject) => {
       // compose approval info
-      const approval = {
+      this._currentApproval = {
         type,
         id: UUIDv4(),
         data,
@@ -29,8 +29,6 @@ class ApprovalService {
           return reject(reason || ethErrors.provider.userRejectedRequest());
         },
       };
-
-      this._currentApproval = approval;
 
       RuntimeMessage.sendMessage(EVENT_TYPES.APPROVAL.REQUESTED);
     });
