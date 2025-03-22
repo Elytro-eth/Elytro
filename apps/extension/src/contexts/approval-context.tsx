@@ -31,16 +31,14 @@ export const ApprovalProvider = ({
   const { wallet } = useWallet();
   const [approval, setApproval] = useState<Nullable<TApprovalInfo>>(null);
   const [pathname] = useHashLocation();
-  const isApprovalRequestedRef = useRef(false);
-  const isProcessingRef = useRef(false);
+  const isApprovalProcessing = useRef(false);
 
   const getCurrentApproval = async () => {
-    if (isApprovalRequestedRef.current || isProcessingRef.current) {
+    if (isApprovalProcessing.current) {
       return;
     }
 
     try {
-      isApprovalRequestedRef.current = true;
       const isLocked = await wallet.getLockStatus();
       if (isLocked) {
         return;
@@ -52,21 +50,25 @@ export const ApprovalProvider = ({
         (newApproval && approval && newApproval.id !== approval.id)
       ) {
         setApproval(newApproval);
+        isApprovalProcessing.current = false;
       } else if (!newApproval && approval) {
         setApproval(null);
+        isApprovalProcessing.current = false;
       }
     } catch (error) {
       console.error(error);
       setApproval(null);
-    } finally {
-      isApprovalRequestedRef.current = false;
+      isApprovalProcessing.current = false;
     }
   };
 
   const onApprovalChanged = async () => {
     if (approval) {
       const currentAccount = await wallet.getCurrentAccount();
-      if (!currentAccount?.isDeployed) {
+      if (
+        !currentAccount?.isDeployed &&
+        approval.type !== ApprovalTypeEn.Alert
+      ) {
         setApproval({
           ...approval,
           type: ApprovalTypeEn.Alert,
@@ -112,31 +114,29 @@ export const ApprovalProvider = ({
   }, []);
 
   const resolve = async (data: unknown) => {
-    if (!approval || isProcessingRef.current) {
+    if (!approval || isApprovalProcessing.current) {
       return;
     }
     try {
-      isProcessingRef.current = true;
       await wallet.resolveApproval(approval.id, data);
       setApproval(null);
+      isApprovalProcessing.current = false;
     } catch (error) {
       console.error(error);
-    } finally {
-      isProcessingRef.current = false;
     }
   };
 
   const reject = async (e?: Error) => {
-    if (!approval || isProcessingRef.current) {
+    if (isApprovalProcessing.current || !approval) {
       return;
     }
 
     try {
-      isProcessingRef.current = true;
       await wallet.rejectApproval(approval.id, e);
       setApproval(null);
-    } finally {
-      isProcessingRef.current = false;
+      isApprovalProcessing.current = false;
+    } catch (error) {
+      console.error(error);
     }
   };
 
