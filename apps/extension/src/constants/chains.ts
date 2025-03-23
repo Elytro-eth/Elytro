@@ -115,10 +115,10 @@ export const FROM_BLOCK_NUMBER_OF_INFO_RECORDER_MAP: Record<
   // [scrollSepolia.id]: 'latest',
 };
 
-// EIP-3770
+// EIP-3770: get short chain name from :https://github.com/ethereum-lists/chains/tree/55e0b3bb7d8678f083d0549c0b2d16ec675c4378/_data/chains
 export const EIP3770_CHAIN_PREFIX_MAP: Record<number, string> = {
-  [optimism.id]: 'op',
+  [optimism.id]: 'oeth',
   [optimismSepolia.id]: 'opsep',
-  [sepolia.id]: 'sepolia',
+  [sepolia.id]: 'sep',
   // [scrollSepolia.id]: 'scrollsep',
 };
