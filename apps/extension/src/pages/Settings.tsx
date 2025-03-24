@@ -19,7 +19,7 @@ export default function Settings() {
   const { wallet } = useWallet();
   const handleLock = async () => {
     await wallet.lock();
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Lock);
   };
   const appVersion = pkg.version;
 
