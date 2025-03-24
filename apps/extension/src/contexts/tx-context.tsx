@@ -81,10 +81,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     type: TxRequestTypeEn,
     params?: Transaction[]
   ) => {
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm, {
-      fromAppCall: type === TxRequestTypeEn.ApproveTransaction ? '1' : '0',
-    });
-
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm);
     packUserOp(type, params);
   };
 
@@ -178,14 +175,8 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       userOp: currentUserOp!,
       decodedDetail: decodedDetail!,
     });
-
-    if (requestType === TxRequestTypeEn.ApproveTransaction) {
-      resolve(txHash);
-    }
-    resetTxContext();
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard, {
-      activating: requestType === TxRequestTypeEn.DeployWallet ? '1' : '0',
-    });
+    await resolve(txHash);
+    handleBack();
   };
 
   const onConfirm = async () => {
@@ -227,20 +218,27 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const handleBackToDashboard = () => {
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
-  };
-
-  const onCancel = () => {
-    if (requestType === TxRequestTypeEn.ApproveTransaction && !isSending) {
-      reject();
-    }
+  const handleBack = () => {
+    const prevType = requestType;
     resetTxContext();
-    if (history.length > 1) {
+
+    if (approval) {
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+    } else if (history.length > 1) {
       history.back();
     } else {
-      handleBackToDashboard();
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard, {
+        activating: prevType === TxRequestTypeEn.DeployWallet ? '1' : '0',
+      });
     }
+  };
+
+  const onCancel = async () => {
+    if (!isSending) {
+      await reject();
+    }
+
+    handleBack();
   };
 
   const onRetry = () => {
@@ -257,7 +255,6 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    console.log('approval test', approval);
     const txInfo = approval?.data?.tx as Transaction[];
     if (txInfo?.[0]) {
       const type =
