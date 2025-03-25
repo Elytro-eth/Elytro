@@ -242,7 +242,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const onRetry = () => {
-    if (!requestType || !txParamsRef.current) {
+    if (!requestType) {
       toast({
         title: 'Failed to retry',
         description: 'Invalid request type or transaction parameters',
@@ -251,7 +251,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     setErrorMsg(null);
-    packUserOp(requestType!, txParamsRef.current);
+    packUserOp(requestType!, txParamsRef.current as unknown as Transaction[]);
   };
 
   useEffect(() => {

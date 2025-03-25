@@ -61,7 +61,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     endpoint:
       optimismSepolia.rpcUrls.default.http[0] ||
       `https://opt-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
-    bundler: `https://api.pimlico.io/v2/11155111/rpc?apikey=${import.meta.env.VITE_PIMLICO_API_KEY}`,
+    bundler: `https://api.pimlico.io/v2/11155420/rpc?apikey=${import.meta.env.VITE_PIMLICO_API_KEY}`,
     factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
     fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
     recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
