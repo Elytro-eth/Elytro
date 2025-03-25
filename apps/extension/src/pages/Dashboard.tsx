@@ -15,6 +15,10 @@ import BetaNotice from '@/components/ui/BetaNotice';
 export default function Dashboard() {
   const { loading, reloadAccount } = useAccount();
 
+  const handleReload = () => {
+    reloadAccount(true);
+  };
+
   return (
     <div className="w-full h-full flex flex-col gap-2xl bg-gray-150 p-sm">
       <Spin isLoading={loading} />
@@ -30,7 +34,7 @@ export default function Dashboard() {
               <RefreshCcw
                 className="elytro-clickable-icon"
                 color="gray"
-                onClick={reloadAccount}
+                onClick={handleReload}
               />
             </div>
           </TabsList>
