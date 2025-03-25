@@ -224,12 +224,12 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (approval) {
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+    } else if (prevType === TxRequestTypeEn.DeployWallet) {
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard, {
+        activating: '1',
+      });
     } else if (history.length > 1) {
       history.back();
-    } else {
-      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard, {
-        activating: prevType === TxRequestTypeEn.DeployWallet ? '1' : '0',
-      });
     }
   };
 
