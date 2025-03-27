@@ -7,7 +7,6 @@ import { useInterval } from 'usehooks-ts';
 import { useHashLocation } from 'wouter/use-hash-location';
 import { EVENT_TYPES } from '@/constants/events';
 import { RuntimeMessage } from '@/utils/message';
-import { getCurrentSearchParams } from '@/utils/url';
 
 type IApprovalContext = {
   approval: Nullable<TApprovalInfo>;
@@ -50,20 +49,29 @@ export const ApprovalProvider = ({
         (newApproval && approval && newApproval.id !== approval.id)
       ) {
         setApproval(newApproval);
-        isApprovalProcessing.current = false;
       } else if (!newApproval && approval) {
         setApproval(null);
-        isApprovalProcessing.current = false;
       }
     } catch (error) {
       console.error(error);
       setApproval(null);
-      isApprovalProcessing.current = false;
     }
   };
 
   const onApprovalChanged = async () => {
-    if (approval) {
+    if (!approval) {
+      isApprovalProcessing.current = false;
+
+      // Only approval routes can be redirected based on need
+      if (APPROVAL_ROUTES.includes(pathname as ApprovalTypeEn)) {
+        if (pathname === SIDE_PANEL_ROUTE_PATHS.TxConfirm) {
+          return; // internal send tx
+        }
+        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+      }
+    } else if (!isApprovalProcessing.current && approval.type !== pathname) {
+      isApprovalProcessing.current = true;
+
       const currentAccount = await wallet.getCurrentAccount();
       if (
         !currentAccount?.isDeployed &&
@@ -84,14 +92,7 @@ export const ApprovalProvider = ({
         return;
       }
       navigateTo('side-panel', approval.type);
-    } else if (APPROVAL_ROUTES.includes(pathname as SafeAny)) {
-      if (
-        pathname === SIDE_PANEL_ROUTE_PATHS.TxConfirm &&
-        getCurrentSearchParams('fromAppCall') === '0'
-      ) {
-        return; // internal send tx
-      }
-      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+      return;
     }
   };
 
@@ -114,27 +115,25 @@ export const ApprovalProvider = ({
   }, []);
 
   const resolve = async (data: unknown) => {
-    if (!approval || isApprovalProcessing.current) {
+    if (!approval) {
       return;
     }
     try {
       await wallet.resolveApproval(approval.id, data);
       setApproval(null);
-      isApprovalProcessing.current = false;
     } catch (error) {
       console.error(error);
     }
   };
 
   const reject = async (e?: Error) => {
-    if (isApprovalProcessing.current || !approval) {
+    if (!approval) {
       return;
     }
 
     try {
       await wallet.rejectApproval(approval.id, e);
       setApproval(null);
-      isApprovalProcessing.current = false;
     } catch (error) {
       console.error(error);
     }

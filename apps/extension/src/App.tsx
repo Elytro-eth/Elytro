@@ -11,6 +11,9 @@ import { routes } from '@/routes';
 import { client } from '@/requests';
 import { TxProvider } from '@/contexts/tx-context';
 import { AlerterProvider } from '@/components/ui/alerter';
+import { initializeSecurity } from '@/utils/security';
+
+initializeSecurity({ isUI: true });
 
 const main = () => {
   const SidePanelApp: React.FC = () => (

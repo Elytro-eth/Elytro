@@ -17,10 +17,10 @@ class ApprovalService {
     }
 
     return new Promise((resolve, reject) => {
-      // compose approval info
+      const id = UUIDv4();
       this._currentApproval = {
         type,
-        id: UUIDv4(),
+        id,
         data,
         resolve: (data: unknown) => {
           return resolve(data);
@@ -29,6 +29,11 @@ class ApprovalService {
           return reject(reason || ethErrors.provider.userRejectedRequest());
         },
       };
+
+      // // Reject after 60 seconds
+      // setTimeout(() => {
+      //   this.rejectApproval(id, new Error('Timeout'));
+      // }, 60_000);
 
       RuntimeMessage.sendMessage(EVENT_TYPES.APPROVAL.REQUESTED);
     });

@@ -14,7 +14,6 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form';
-import { Bundler } from '@soulwallet/sdk';
 import { useEffect } from 'react';
 
 type NetworkFormValues = Pick<TChainItem, 'name' | 'endpoint' | 'bundler'>;
@@ -49,11 +48,15 @@ const createNetworkFormSchema = (chainId: number) => {
         async (value) => {
           try {
             if (!value) return false;
-            const b = new Bundler(value);
-            const bundle_hash =
-              '0x7c1f4cca45de6c34781f628667ccf071b1992d00ef74b68c2bfa276af84ae2c7';
-            const r = await b.eth_getUserOperationReceipt(bundle_hash);
-            return !r.isErr();
+            const client = createPublicClient({
+              transport: http(value),
+            });
+            const entryPoints = (await client.request({
+              method: 'eth_supportedEntryPoints' as SafeAny,
+            })) as `0x${string}`[];
+
+            //!! TODO: also need to check if the entry point is same as user's entry point?
+            return entryPoints.length > 0;
           } catch {
             return false;
           }
