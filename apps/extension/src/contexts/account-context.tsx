@@ -90,7 +90,7 @@ export const AccountProvider = ({
   };
 
   useEffect(() => {
-    if (searchParams.activating) {
+    if (searchParams.activating === '1') {
       intervalRef.current = setInterval(() => {
         updateAccount();
       }, 1_000);
