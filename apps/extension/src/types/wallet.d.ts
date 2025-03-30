@@ -69,7 +69,7 @@ type TApprovalData = {
   };
   sign?: TSignData;
   chain?: {
-    method: 'switch' | 'add';
+    method: ChainOperationEn;
     chainId: number;
     chainName: string;
     rpcUrls: string[];
