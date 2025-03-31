@@ -29,6 +29,16 @@ export const ABI_RECOVERY_INFO_RECORDER = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
+  {
+    inputs: [
+      { internalType: 'address', name: 'addr', type: 'address' },
+      { internalType: 'bytes32', name: 'category', type: 'bytes32' },
+    ],
+    name: 'latestRecordAt',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
 ];
 
 export const ABI_ERC20_BALANCE_OF = [
