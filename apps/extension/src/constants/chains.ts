@@ -111,3 +111,8 @@ export const EIP3770_CHAIN_PREFIX_MAP: Record<number, string> = {
   [sepolia.id]: 'sep',
   // [scrollSepolia.id]: 'scrollsep',
 };
+
+export enum ChainOperationEn {
+  Switch = 'switch',
+  Update = 'update',
+}
