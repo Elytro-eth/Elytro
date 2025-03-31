@@ -51,7 +51,7 @@ export default function Receive() {
             <div className="flex flex-col">
               <div className="elytro-text-bold-body">{chainName}</div>
               <div className="elytro-text-tiny-body text-gray-600">
-                This address only accepts {chainName} assets.
+                This wallet only accepts {chainName} tokens.
               </div>
             </div>
           </div>

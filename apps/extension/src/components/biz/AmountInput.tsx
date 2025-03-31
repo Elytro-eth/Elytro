@@ -145,15 +145,15 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
 
         <div
           className={cn(
-            'z-10 absolute right-md top-1/2 -translate-y-1/2 flex items-center gap-1 px-sm py-2xs rounded bg-gray-150 cursor-pointer',
+            'z-10 absolute right-md top-1/2 -translate-y-1/2 flex items-center gap-1 px-md py-xs rounded-md bg-gray-150 cursor-pointer hover:bg-gray-300',
             (isDisabled || tokenPrice <= 0) && 'opacity-50 cursor-not-allowed'
           )}
           onClick={handleToggleMode}
         >
-          <ArrowRightLeftIcon className="size-3" />
-          <span className="text-xs font-medium">
+          <span className="text-sm font-medium">
             {inputMode === InputMode.TOKEN ? token?.symbol || 'Token' : 'USD'}
           </span>
+          <ArrowRightLeftIcon className="size-4" />
         </div>
       </div>
     </div>

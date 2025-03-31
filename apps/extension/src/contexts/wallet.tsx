@@ -7,7 +7,7 @@ import PortMessage from '@/utils/message/portMessage';
 import { toast } from '@/hooks/use-toast';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
-import { useHashLocation } from 'wouter/use-hash-location';
+import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';
 
 const portMessage = new PortMessage('elytro-ui');
 
@@ -47,7 +47,7 @@ const WalletContext = createContext<IWalletContext>({
 
 export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
   const [status, setStatus] = useState<WalletStatusEn>(WalletStatusEn.NoOwner);
-  const [pathname] = useHashLocation();
+  const [pathname] = useEnhancedHashLocation();
 
   const getWalletStatus = async () => {
     try {
@@ -68,7 +68,6 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    // TODO: maybe only get wallet status when the page is Home
     getWalletStatus();
   }, [walletControllerProxy, pathname]);
 

@@ -538,7 +538,7 @@ class WalletController {
 
   public async importToken(token: TTokenInfo) {
     if (!accountManager.currentAccount) {
-      throw new Error('No current account');
+      throw new Error('No current wallet');
     }
 
     await updateUserImportedTokens(

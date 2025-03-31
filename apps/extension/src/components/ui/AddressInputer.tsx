@@ -17,7 +17,7 @@ export default function AddressInputWithChainIcon({
       <img src={getIconByChainId(chainId)} className=" size-8" />
       <Input
         className="border-none bg-transparent text-lg"
-        placeholder="Enter account address"
+        placeholder="Enter wallet address"
         value={address}
         onChange={(e) => onChange(e.target.value)}
       />

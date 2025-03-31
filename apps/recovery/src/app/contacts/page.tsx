@@ -27,7 +27,7 @@ export default function Contacts() {
     }
 
     return {
-      subtitle: 'Select the account you will use to sign',
+      subtitle: 'Select the wallet you will use to sign',
       content: <Status />,
     };
   }, [recoveryRecord, address]);

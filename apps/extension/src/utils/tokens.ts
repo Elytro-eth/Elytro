@@ -86,6 +86,12 @@ export const updateUserImportedTokens = async (
   const prevTokens =
     ((await localStorage.get(storageKey)) as TTokenInfo[]) || [];
 
+  const isDuplicate = prevTokens.some((t) => t.address === token.address);
+
+  if (isDuplicate) {
+    return;
+  }
+
   await localStorage.save({
     [storageKey]: [
       ...prevTokens,

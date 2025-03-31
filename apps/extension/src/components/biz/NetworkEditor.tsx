@@ -14,7 +14,6 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form';
-import { Bundler } from '@soulwallet/sdk';
 import { useEffect } from 'react';
 
 type NetworkFormValues = Pick<TChainItem, 'name' | 'endpoint' | 'bundler'>;
@@ -24,7 +23,39 @@ const createNetworkFormSchema = (chainId: number) => {
     name: z.string().min(1, "Name can't be empty"),
     endpoint: z
       .string()
-      .min(1, "RPC URL can't be empty")
+      .min(1, 'RPC URL is required')
+      .superRefine(async (value, ctx) => {
+        try {
+          if (!value.startsWith('https://')) {
+            ctx.addIssue({
+              code: 'custom',
+              message: 'RPC URL must use HTTPS protocol for security',
+            });
+            return;
+          }
+
+          const client = createPublicClient({
+            transport: http(value),
+          });
+          const id = await client.getChainId();
+
+          if (id !== chainId) {
+            ctx.addIssue({
+              code: 'custom',
+              message: `RPC URL chain ID (${id}) does not match expected chain ID (${chainId})`,
+            });
+          }
+        } catch {
+          ctx.addIssue({
+            code: 'custom',
+            message:
+              'Unable to connect to RPC URL. Please check if the URL is correct and accessible.',
+          });
+        }
+      }),
+    bundler: z
+      .string()
+      .min(1, 'Bundler URL is required')
       .refine(
         async (value) => {
           try {
@@ -32,34 +63,18 @@ const createNetworkFormSchema = (chainId: number) => {
             const client = createPublicClient({
               transport: http(value),
             });
-            const id = await client.getChainId();
-            return id === chainId;
+            const entryPoints = (await client.request({
+              method: 'eth_supportedEntryPoints' as SafeAny,
+            })) as `0x${string}`[];
+
+            return entryPoints.length > 0;
           } catch {
             return false;
           }
         },
         {
-          message: 'Invalid RPC URL or chain ID mismatch',
-        }
-      ),
-    bundler: z
-      .string()
-      .min(1, "Bundler URL can't be empty")
-      .refine(
-        async (value) => {
-          try {
-            if (!value) return false;
-            const b = new Bundler(value);
-            const bundle_hash =
-              '0x7c1f4cca45de6c34781f628667ccf071b1992d00ef74b68c2bfa276af84ae2c7';
-            const r = await b.eth_getUserOperationReceipt(bundle_hash);
-            return !r.isErr();
-          } catch {
-            return false;
-          }
-        },
-        {
-          message: 'Invalid Bundler URL',
+          message:
+            'Unable to connect to bundler URL or no supported entry points found',
         }
       ),
   });
@@ -106,7 +121,7 @@ export default function NetworkEditor({
       await wallet.updateChainConfig(chain.id, updatedChain);
       onChanged();
       toast({
-        description: `${chain.name} Network updated`,
+        description: `${chain.name} network updated`,
       });
     } catch (error) {
       toast({

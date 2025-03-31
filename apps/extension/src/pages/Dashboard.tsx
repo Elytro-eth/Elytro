@@ -15,6 +15,10 @@ import BetaNotice from '@/components/ui/BetaNotice';
 export default function Dashboard() {
   const { loading, reloadAccount } = useAccount();
 
+  const handleReload = () => {
+    reloadAccount(true);
+  };
+
   return (
     <div className="w-full h-full flex flex-col gap-2xl bg-gray-150 p-sm">
       <Spin isLoading={loading} />
@@ -23,14 +27,14 @@ export default function Dashboard() {
 
       <div className="h-full bg-white rounded-3xl ">
         <Tabs defaultValue="assets">
-          <TabsList className="px-5">
-            <TabsTrigger value="assets">Assets</TabsTrigger>
+          <TabsList className="px-5 relative">
+            <TabsTrigger value="assets">Tokens</TabsTrigger>
             <TabsTrigger value="activities">Activity</TabsTrigger>
             <div className="absolute right-8 mt-1">
               <RefreshCcw
                 className="elytro-clickable-icon"
                 color="gray"
-                onClick={reloadAccount}
+                onClick={handleReload}
               />
             </div>
           </TabsList>

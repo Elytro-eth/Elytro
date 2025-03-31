@@ -20,6 +20,9 @@ import { getToken } from 'firebase/messaging';
 import { initializeApp } from 'firebase/app';
 import { localStorage } from '@/utils/storage/local';
 import { FIREBASE_CONFIG, FIREBASE_VAPID_KEY } from '@/constants/fcm';
+import { initializeSecurity } from '@/utils/security';
+
+initializeSecurity();
 
 const app = initializeApp(FIREBASE_CONFIG);
 const messaging = getMessaging(app);

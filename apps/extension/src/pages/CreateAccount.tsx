@@ -22,7 +22,7 @@ const CreateAccount: React.FC = () => {
     if (!selectedChain) {
       toast({
         title: 'Please select a chain',
-        description: 'Please select a chain to create your account',
+        description: 'Please select a chain to create your wallet',
       });
       return;
     }
@@ -44,7 +44,7 @@ const CreateAccount: React.FC = () => {
   };
 
   return (
-    <SecondaryPageWrapper title="Create account">
+    <SecondaryPageWrapper title="Create wallet">
       <NetworkSelection
         selectedChain={selectedChain}
         handleSelectChain={handleSelectChain}

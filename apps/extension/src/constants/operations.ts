@@ -38,7 +38,7 @@ export enum ApprovalTypeEn {
 export enum HistoricalActivityTypeEn {
   Send = 'Send',
   Receive = 'Receive',
-  ActivateAccount = 'Activate Account',
+  ActivateAccount = 'Activate Wallet',
   ContractInteraction = 'Contract Interaction',
 }
 

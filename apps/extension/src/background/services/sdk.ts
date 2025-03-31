@@ -1,8 +1,4 @@
-import {
-  SUPPORTED_CHAIN_IDS,
-  TChainItem,
-  FROM_BLOCK_NUMBER_OF_INFO_RECORDER_MAP,
-} from '@/constants/chains';
+import { SUPPORTED_CHAIN_IDS, TChainItem } from '@/constants/chains';
 import {
   getDomainSeparator,
   getEncoded1271MessageHash,
@@ -39,6 +35,7 @@ import {
   parseAbiParameters,
   decodeAbiParameters,
   parseAbiItem,
+  parseAbi,
 } from 'viem';
 import { createAccount } from '@/utils/ethRpc/create-account';
 import { ethErrors } from 'eth-rpc-errors';
@@ -47,7 +44,17 @@ import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 import { ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
 
-class ElytroSDK {
+export class SDKService {
+  private readonly _REQUIRED_CHAIN_FIELDS: (keyof TChainItem)[] = [
+    'id',
+    'endpoint',
+    'factory',
+    'fallback',
+    'recovery',
+    'onchainConfig',
+    'bundler',
+  ];
+
   private _sdk!: SoulWallet;
   private _bundler!: Bundler;
   private _config!: TChainItem;
@@ -75,19 +82,32 @@ class ElytroSDK {
   }
 
   public resetSDK(chainConfig: TChainItem) {
-    if (chainConfig.id === this._config?.id) {
-      console.log('Elytro::SDK: chainId is the same, no need to reset.');
-      return;
-    }
-
     if (!SUPPORTED_CHAIN_IDS.includes(chainConfig.id)) {
       throw new Error(
         `Elytro: chain ${chainConfig.id} is not supported for now.`
       );
     }
 
-    const { factory, fallback, recovery, onchainConfig, bundler, endpoint } =
-      chainConfig;
+    if (this._isConfigUnchanged(chainConfig)) {
+      console.log('Elytro::SDK: chain config unchanged, no reset needed.');
+      return;
+    }
+
+    this.initializeSDK(chainConfig);
+  }
+
+  private _isConfigUnchanged(newConfig: TChainItem): boolean {
+    if (!this._config) return false;
+
+    return this._REQUIRED_CHAIN_FIELDS.every(
+      (field) => newConfig[field] === this._config?.[field]
+    );
+  }
+
+  private initializeSDK(config: TChainItem) {
+    const { endpoint, bundler, factory, fallback, recovery, onchainConfig } =
+      config;
+
     this._sdk = new SoulWallet(
       endpoint,
       bundler,
@@ -98,7 +118,7 @@ class ElytroSDK {
     );
 
     this._bundler = new Bundler(bundler);
-    this._config = chainConfig;
+    this._config = config;
   }
 
   // TODO: temp, make sure it's unique later.
@@ -647,6 +667,21 @@ class ElytroSDK {
     };
   }
 
+  private async _getInfoRecorderStartBlock(address: Address) {
+    const _client = this._getClient();
+
+    const latestRecordAt = await _client.readContract({
+      address: this._config.infoRecorder as Address,
+      abi: parseAbi([
+        'function latestRecordAt(address addr, bytes32 category) external view returns (uint256 blockNumber)',
+      ]),
+      functionName: 'latestRecordAt',
+      args: [address, GUARDIAN_INFO_KEY],
+    });
+
+    return latestRecordAt;
+  }
+
   public async queryRecoveryContacts(address: Address) {
     if (!this._config.infoRecorder) {
       throw new Error(
@@ -654,12 +689,19 @@ class ElytroSDK {
       );
     }
 
+    const startBlock = await this._getInfoRecorderStartBlock(address);
+
+    if (startBlock === 0n) {
+      return null;
+    }
+
     const _client = this._getClient();
+    const fromBlock = startBlock - 10n > 0n ? startBlock - 10n : 0n;
 
     const logs = await _client.getLogs({
       address: this._config.infoRecorder as Address,
-      toBlock: 'latest',
-      fromBlock: FROM_BLOCK_NUMBER_OF_INFO_RECORDER_MAP[this._config.id],
+      toBlock: startBlock,
+      fromBlock,
       event: parseAbiItem(
         'event DataRecorded(address indexed wallet, bytes32 indexed category, bytes data)'
       ),
@@ -734,4 +776,4 @@ class ElytroSDK {
   // }
 }
 
-export const elytroSDK = new ElytroSDK();
+export const elytroSDK = new SDKService();

@@ -283,8 +283,7 @@ export default function SendTx() {
             {/* Warning message */}
             <div className="flex text-gray-750">
               <CircleHelp className="w-4 h-4 text-gray-750 mr-2" />
-              Your tokens will be lost if the recipient is not on the same
-              network.
+              Tokens will be lost if sent to a different network.
             </div>
           </div>
         </Form>

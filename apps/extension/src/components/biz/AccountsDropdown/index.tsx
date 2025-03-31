@@ -46,7 +46,7 @@ export default function AccountsDropdown() {
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Failed to switch account',
+        title: 'Failed to switch wallet',
         description: 'Please try again',
         variant: 'destructive',
       });
@@ -59,12 +59,12 @@ export default function AccountsDropdown() {
       await reloadAccount();
       await getAccounts();
       toast({
-        title: 'Account removed successfully',
+        title: 'Wallet removed successfully',
       });
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Failed to delete account',
+        title: 'Failed to delete wallet',
         description: 'Please try again',
         variant: 'destructive',
       });
@@ -122,7 +122,7 @@ export default function AccountsDropdown() {
       >
         <div className="flex items-center justify-between  gap-x-3xl px-lg pb-sm">
           <span className="elytro-text-small-bold text-gray-900">
-            Switch account
+            Switch wallet
           </span>
           <Button
             variant="outline"
@@ -130,7 +130,7 @@ export default function AccountsDropdown() {
             className="elytro-text-tiny-body"
             onClick={handleAddAccount}
           >
-            Add new account
+            Add new wallet
           </Button>
         </div>
 

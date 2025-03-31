@@ -81,10 +81,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     type: TxRequestTypeEn,
     params?: Transaction[]
   ) => {
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm, {
-      fromAppCall: type === TxRequestTypeEn.ApproveTransaction ? '1' : '0',
-    });
-
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm);
     packUserOp(type, params);
   };
 
@@ -178,14 +175,8 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       userOp: currentUserOp!,
       decodedDetail: decodedDetail!,
     });
-
-    if (requestType === TxRequestTypeEn.ApproveTransaction) {
-      resolve(txHash);
-    }
-    resetTxContext();
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard, {
-      activating: requestType === TxRequestTypeEn.DeployWallet ? '1' : '0',
-    });
+    await resolve(txHash);
+    handleBack();
   };
 
   const onConfirm = async () => {
@@ -227,24 +218,33 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const handleBackToDashboard = () => {
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+  const handleBack = (isCancel = false) => {
+    const prevType = requestType;
+    resetTxContext();
+
+    if (approval) {
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+    } else if (prevType === TxRequestTypeEn.DeployWallet) {
+      navigateTo(
+        'side-panel',
+        SIDE_PANEL_ROUTE_PATHS.Dashboard,
+        isCancel ? undefined : { activating: '1' }
+      );
+    } else if (history.length > 1) {
+      history.back();
+    }
   };
 
-  const onCancel = () => {
-    if (requestType === TxRequestTypeEn.ApproveTransaction && !isSending) {
-      reject();
+  const onCancel = async () => {
+    if (!isSending) {
+      await reject();
     }
-    resetTxContext();
-    if (history.length > 1) {
-      history.back();
-    } else {
-      handleBackToDashboard();
-    }
+
+    handleBack(true);
   };
 
   const onRetry = () => {
-    if (!requestType || !txParamsRef.current) {
+    if (!requestType) {
       toast({
         title: 'Failed to retry',
         description: 'Invalid request type or transaction parameters',
@@ -253,11 +253,10 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     setErrorMsg(null);
-    packUserOp(requestType!, txParamsRef.current);
+    packUserOp(requestType!, txParamsRef.current as unknown as Transaction[]);
   };
 
   useEffect(() => {
-    console.log('approval test', approval);
     const txInfo = approval?.data?.tx as Transaction[];
     if (txInfo?.[0]) {
       const type =

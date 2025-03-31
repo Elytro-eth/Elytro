@@ -89,7 +89,7 @@ const mainWorld = () => {
         },
       });
     } catch (e) {
-      console.error(e);
+      console.error('Elytro:: Failed to inject provider:', e);
       window.ethereum = injectedProvider;
       window.elytro = injectedProvider;
     }

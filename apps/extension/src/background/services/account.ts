@@ -76,7 +76,7 @@ class AccountManager {
 
     if (account) {
       console.log(
-        'Elytro::AccountManager::createAccount: account already exists'
+        'Elytro::AccountManager::createAccount: wallet already exists'
       );
       // return account;
       return;
@@ -108,7 +108,7 @@ class AccountManager {
 
     if (!account) {
       throw new Error(
-        'Elytro::AccountManager::switchAccountByChainId: account not found'
+        'Elytro::AccountManager::switchAccountByChainId: wallet not found'
       );
     }
 
