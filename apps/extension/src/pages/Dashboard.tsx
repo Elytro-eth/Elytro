@@ -28,7 +28,7 @@ export default function Dashboard() {
       <div className="h-full bg-white rounded-3xl ">
         <Tabs defaultValue="assets">
           <TabsList className="px-5 relative">
-            <TabsTrigger value="assets">Assets</TabsTrigger>
+            <TabsTrigger value="assets">Tokens</TabsTrigger>
             <TabsTrigger value="activities">Activity</TabsTrigger>
             <div className="absolute right-8 mt-1">
               <RefreshCcw

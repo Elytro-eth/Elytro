@@ -163,7 +163,7 @@ export const AccountProvider = ({
       updateTokenPrices(tokens);
     } catch {
       toast({
-        title: 'Failed to get assets',
+        title: 'Failed to get tokens',
         description: 'Please try again',
         variant: 'destructive',
       });

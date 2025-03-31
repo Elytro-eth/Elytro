@@ -12,7 +12,7 @@ import LinkWithQuery from '@/components/LinkWithQuery';
 
 interface IStepBlockProps {
   title: string;
-  description: string;
+  //description: string;
   index: number;
   actionButton: React.ReactNode;
   variant: 'available' | 'unavailable';
@@ -20,7 +20,7 @@ interface IStepBlockProps {
 
 const StepBlock = ({
   title,
-  description,
+  //description,
   index,
   actionButton,
   variant,
@@ -50,7 +50,7 @@ const StepBlock = ({
         <div
           className={`text-tiny text-gray-450 ${subtextColor} whitespace-pre-wrap`}
         >
-          {description}
+          {/* {description} */}
         </div>
       </div>
       {actionButton}
@@ -88,7 +88,7 @@ export default function Home() {
   }
 
   return (
-    <ContentWrapper title="Account recovery for">
+    <ContentWrapper title="Wallet recovery for">
       <div className="flex flex-col gap-xl items-center">
         <AddressWithChain
           className="bg-gray-150 w-fit "
@@ -99,8 +99,7 @@ export default function Home() {
         <div className="flex flex-row gap-x-2 justify-between">
           <StepBlock
             index={1}
-            title="Sign the recovery"
-            description="A minimum number of signatures are needed for recovery"
+            title="For Recovery Contacts"
             variant="available"
             actionButton={
               <Button
@@ -109,14 +108,13 @@ export default function Home() {
                   TRecoveryStatus.WAITING_FOR_SIGNATURE
                 }
               >
-                <LinkWithQuery href="/contacts">Sign</LinkWithQuery>
+                <LinkWithQuery href="/contacts">Sign recovery</LinkWithQuery>
               </Button>
             }
           />
           <StepBlock
             index={2}
-            title="Begin & Complete recovery"
-            description="48 hours security time is required after you begin the recovery"
+            title="For Wallet Owner"
             variant="unavailable"
             actionButton={
               <Button
@@ -125,7 +123,7 @@ export default function Home() {
                   recoveryRecord?.status !== TRecoveryStatus.SIGNATURE_COMPLETED
                 }
               >
-                <LinkWithQuery href="/start">Begin recovery</LinkWithQuery>
+                <LinkWithQuery href="/start">Start recovery</LinkWithQuery>
               </Button>
             }
           />
@@ -161,7 +159,7 @@ export default function Home() {
   //       <div className="flex flex-col items-center gap-y-sm text-center">
   //         <h1 className="text-title">Recovery already in progress</h1>
   //         <p className="text-smaller text-gray-600">
-  //           Other contacts are assisting your friend with account recovery.
+  //           Other contacts are assisting your friend with wallet recovery.
   //           <br />
   //           No further action required.
   //         </p>

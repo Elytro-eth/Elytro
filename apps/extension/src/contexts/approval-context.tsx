@@ -84,7 +84,7 @@ export const ApprovalProvider = ({
             ...approval?.data,
             options: {
               name: 'wallet rpc',
-              reason: 'Please activate your account first.',
+              reason: 'Please activate your wallet first.',
             },
           } as TApprovalData,
         });

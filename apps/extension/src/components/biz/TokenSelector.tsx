@@ -29,7 +29,7 @@ const SelectedToken = memo(({ token }: { token?: TTokenInfo }) => {
         </div>
 
         <div className="text-gray-600 -mt-0.5">
-          Balance:{' '}
+          {' '}
           {formatTokenAmount(token.balance || 0, token.decimals, token.symbol)}
         </div>
       </div>

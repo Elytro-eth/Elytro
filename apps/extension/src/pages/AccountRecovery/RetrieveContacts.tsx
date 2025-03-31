@@ -137,7 +137,7 @@ function PageContent() {
         <div className="flex flex-col gap-y-sm">
           <h1 className="elytro-text-title ">Enough signatures collected</h1>
           <p className="text-gray-600 elytro-text-smaller-body">
-            Begin & Complete your recovery in recovery app
+            Begin your recovery in recovery app
           </p>
         </div>
         <Button
@@ -155,7 +155,7 @@ function PageContent() {
 
   return (
     <div className="flex flex-col gap-y-md">
-      <h1 className="elytro-text-bold-body ">Account recovery</h1>
+      <h1 className="elytro-text-bold-body ">Wallet recovery</h1>
 
       <HelperText
         title={`${recoveryRecord?.guardianInfo?.threshold} confirmations required`}
@@ -197,8 +197,7 @@ function PageContent() {
           <DialogHeader>
             <DialogTitle>Recovery {shareInfo?.type || '--'} copied</DialogTitle>
             <DialogDescription>
-              Paste and send the link to this recovery contact for them to
-              confirm your recovery.
+              Send this link to your contact so they can confirm.
             </DialogDescription>
           </DialogHeader>
 

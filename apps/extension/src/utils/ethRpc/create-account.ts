@@ -44,7 +44,7 @@ export const createAccount = async (
     }
   } catch (error) {
     console.error(
-      'Elytro: Something went wrong when send create account info to backend',
+      'Elytro: Something went wrong when send create wallet info to backend',
       error
     );
   }

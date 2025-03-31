@@ -71,7 +71,7 @@ export default function Launch() {
         iconImg: LaunchImg,
         content: (
           <>
-            {/* TODO: navigate to new create account page */}
+            {/* TODO: navigate to new create wallet page */}
             <Button
               size="large"
               className="mb-3"
@@ -90,7 +90,7 @@ export default function Launch() {
                 navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Transfer)
               }
             >
-              Already have an account
+              Already have a wallet
             </Button>
           </>
         ),
