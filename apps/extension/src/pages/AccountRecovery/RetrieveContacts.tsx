@@ -155,7 +155,7 @@ function PageContent() {
 
   return (
     <div className="flex flex-col gap-y-md">
-      <h1 className="elytro-text-bold-body ">Account recovery</h1>
+      <h1 className="elytro-text-bold-body ">Wallet recovery</h1>
 
       <HelperText
         title={`${recoveryRecord?.guardianInfo?.threshold} confirmations required`}

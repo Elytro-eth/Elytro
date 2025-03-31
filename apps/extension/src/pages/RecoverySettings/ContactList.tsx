@@ -142,7 +142,7 @@ export default function ContactList({
               </h1>
 
               <p className="elytro-text-smaller-body text-gray-600 mb-md">
-                How many recovery contacts are needed for your account recovery
+                How many recovery contacts are needed for your wallet recovery
               </p>
 
               <div className="flex flex-row gap-x-md items-center">

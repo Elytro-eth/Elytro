@@ -14,18 +14,18 @@ export default function RecoverGuide({ onClick }: { onClick: () => void }) {
       </div>
       <div>
         <TipItem
-          title="1. Each account has own contacts"
-          description="You will need to add recovery contacts for each of your Elytro accounts."
+          title="1. Each wallet has own contacts"
+          description="You will need to add recovery contacts for each of your Elytro wallets."
           Icon={Mail}
         />
         <TipItem
           title="2. Add by address or email"
-          description="Each contact can be stored either as an account address contact or an email contact "
+          description="Each contact can be stored either as an wallet address contact or an email contact "
           Icon={Shield}
         />
         <TipItem
           title="3. Contacts help you recover"
-          description="If you lost access of the account, recovery contacts can confirm the recovery so you can regain access"
+          description="If you lost access of the wallet, recovery contacts can confirm the recovery so you can regain access"
           Icon={Clock}
         />
       </div>

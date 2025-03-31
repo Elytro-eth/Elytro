@@ -30,7 +30,7 @@ const ActivityTypeMap = {
     bg: 'bg-light-green',
   },
   [HistoricalActivityTypeEn.ActivateAccount]: {
-    name: 'Activate Account',
+    name: 'Activate Wallet',
     IconComponent: Check,
     bg: 'bg-gray-300',
   },

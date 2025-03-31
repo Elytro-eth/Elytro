@@ -26,8 +26,8 @@ export default function AccountOption({
 
     if (isSelected) {
       toast({
-        title: 'Cannot delete current account',
-        description: 'Please switch to another account',
+        title: 'Cannot delete current wallet',
+        description: 'Please switch to another wallet',
         variant: 'destructive',
       });
       return;
@@ -36,7 +36,7 @@ export default function AccountOption({
     elytroAlert({
       title: 'Delete from this device',
       description:
-        'The account is still functional but is no longer accessible from this device. You can add it back any time.',
+        'The wallet is still functional but is no longer accessible from this device. You can add it back any time.',
       onConfirm: onDelete,
     });
   };

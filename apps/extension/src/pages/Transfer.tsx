@@ -13,10 +13,10 @@ export default function Transfer() {
         <h1 className="elytro-text-subtitle mb-2">
           Manage your
           <br />
-          Elytro accounts
+          Elytro wallets
         </h1>
         <p className="elytro-text-smaller-body text-gray-600">
-          Smart contract accounts created on Elytro only
+          Smart contract wallets created on Elytro only
         </p>
       </div>
       <div className="flex flex-col gap-y-md w-full">
@@ -28,7 +28,7 @@ export default function Transfer() {
             });
           }}
         >
-          Recover an account
+          Recover a wallet
         </Button>
         <Button
           size="large"
@@ -40,7 +40,7 @@ export default function Transfer() {
             })
           }
         >
-          Import an account
+          Import a wallet
         </Button>
       </div>
     </FullPageWrapper>

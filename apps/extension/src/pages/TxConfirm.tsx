@@ -7,7 +7,7 @@ import { useAccount } from '@/contexts/account-context';
 import { AlertCircle } from 'lucide-react';
 
 const UserOpTitleMap = {
-  [TxRequestTypeEn.DeployWallet]: 'Activate account',
+  [TxRequestTypeEn.DeployWallet]: 'Activate wallet',
   [TxRequestTypeEn.SendTransaction]: 'Send',
   [TxRequestTypeEn.ApproveTransaction]: 'Confirm transaction',
 };
