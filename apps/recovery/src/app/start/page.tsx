@@ -151,8 +151,7 @@ export default function Start() {
       subtitle={
         <span
           dangerouslySetInnerHTML={{
-            __html:
-              'It will take effect in 48 hours. You can access your <br />wallet after the countdown.',
+            __html: 'You’ll regain wallet access in 48 hours.',
           }}
         />
       }
