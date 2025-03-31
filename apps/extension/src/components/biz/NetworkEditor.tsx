@@ -23,36 +23,39 @@ const createNetworkFormSchema = (chainId: number) => {
     name: z.string().min(1, "Name can't be empty"),
     endpoint: z
       .string()
-      .min(1, "RPC URL can't be empty")
-      .superRefine(
-        async (value, ctx) => {
-          try {
-            if (!value) return false;
-
-            if (!value.startsWith('https://')) {
-              ctx.addIssue({
-                code: 'custom',
-                message: 'RPC URL must use HTTPS protocol for security',
-              });
-              return false;
-            }
-
-            const client = createPublicClient({
-              transport: http(value),
+      .min(1, 'RPC URL is required')
+      .superRefine(async (value, ctx) => {
+        try {
+          if (!value.startsWith('https://')) {
+            ctx.addIssue({
+              code: 'custom',
+              message: 'RPC URL must use HTTPS protocol for security',
             });
-            const id = await client.getChainId();
-            return id === chainId;
-          } catch {
-            return false;
+            return;
           }
-        },
-        {
-          message: 'Invalid RPC URL or chain ID mismatch',
+
+          const client = createPublicClient({
+            transport: http(value),
+          });
+          const id = await client.getChainId();
+
+          if (id !== chainId) {
+            ctx.addIssue({
+              code: 'custom',
+              message: `RPC URL chain ID (${id}) does not match expected chain ID (${chainId})`,
+            });
+          }
+        } catch {
+          ctx.addIssue({
+            code: 'custom',
+            message:
+              'Unable to connect to RPC URL. Please check if the URL is correct and accessible.',
+          });
         }
-      ),
+      }),
     bundler: z
       .string()
-      .min(1, "Bundler URL can't be empty")
+      .min(1, 'Bundler URL is required')
       .refine(
         async (value) => {
           try {
@@ -64,14 +67,14 @@ const createNetworkFormSchema = (chainId: number) => {
               method: 'eth_supportedEntryPoints' as SafeAny,
             })) as `0x${string}`[];
 
-            //!! TODO: also need to check if the entry point is same as user's entry point?
             return entryPoints.length > 0;
           } catch {
             return false;
           }
         },
         {
-          message: 'Invalid Bundler URL',
+          message:
+            'Unable to connect to bundler URL or no supported entry points found',
         }
       ),
   });
