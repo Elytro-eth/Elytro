@@ -88,7 +88,7 @@ export default function Home() {
   }
 
   return (
-    <ContentWrapper title="Account recovery for">
+    <ContentWrapper title="Wallet recovery for">
       <div className="flex flex-col gap-xl items-center">
         <AddressWithChain
           className="bg-gray-150 w-fit "
@@ -161,7 +161,7 @@ export default function Home() {
   //       <div className="flex flex-col items-center gap-y-sm text-center">
   //         <h1 className="text-title">Recovery already in progress</h1>
   //         <p className="text-smaller text-gray-600">
-  //           Other contacts are assisting your friend with account recovery.
+  //           Other contacts are assisting your friend with wallet recovery.
   //           <br />
   //           No further action required.
   //         </p>

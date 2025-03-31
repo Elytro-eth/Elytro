@@ -152,7 +152,7 @@ export default function Start() {
         <span
           dangerouslySetInnerHTML={{
             __html:
-              'It will take effect in 48 hours. You can access your <br />account after the countdown.',
+              'It will take effect in 48 hours. You can access your <br />wallet after the countdown.',
           }}
         />
       }

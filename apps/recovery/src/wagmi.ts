@@ -16,7 +16,7 @@ export function getConfig() {
       injected(),
       metaMask(),
       coinbaseWallet({
-        appName: 'Elytro Account Recovery',
+        appName: 'Elytro Wallet Recovery',
       }),
       walletConnect({
         projectId: WALLETCONNECT_PROJECT_ID,

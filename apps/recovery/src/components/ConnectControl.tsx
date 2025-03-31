@@ -100,12 +100,12 @@ export default function ConnectControl() {
       )
     ) {
       toast({
-        title: 'Account connected successfully',
+        title: 'Wallet connected successfully',
       });
     } else {
       toast({
         title:
-          'You’re not connected to the right account. Please try to switch account or client.',
+          'You’re not connected to the right wallet. Please try to switch wallet or client.',
         variant: 'destructive',
       });
     }
@@ -139,7 +139,7 @@ export default function ConnectControl() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Select an account client</DialogTitle>
+          <DialogTitle>Select an wallet client</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-2">
