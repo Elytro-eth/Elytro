@@ -24,10 +24,19 @@ const createNetworkFormSchema = (chainId: number) => {
     endpoint: z
       .string()
       .min(1, "RPC URL can't be empty")
-      .refine(
-        async (value) => {
+      .superRefine(
+        async (value, ctx) => {
           try {
             if (!value) return false;
+
+            if (!value.startsWith('https://')) {
+              ctx.addIssue({
+                code: 'custom',
+                message: 'RPC URL must use HTTPS protocol for security',
+              });
+              return false;
+            }
+
             const client = createPublicClient({
               transport: http(value),
             });
