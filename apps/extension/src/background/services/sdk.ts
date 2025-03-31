@@ -47,7 +47,17 @@ import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 import { ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
 
-class ElytroSDK {
+export class SDKService {
+  private readonly _REQUIRED_CHAIN_FIELDS: (keyof TChainItem)[] = [
+    'id',
+    'endpoint',
+    'factory',
+    'fallback',
+    'recovery',
+    'onchainConfig',
+    'bundler',
+  ];
+
   private _sdk!: SoulWallet;
   private _bundler!: Bundler;
   private _config!: TChainItem;
@@ -75,19 +85,32 @@ class ElytroSDK {
   }
 
   public resetSDK(chainConfig: TChainItem) {
-    if (chainConfig.id === this._config?.id) {
-      console.log('Elytro::SDK: chainId is the same, no need to reset.');
-      return;
-    }
-
     if (!SUPPORTED_CHAIN_IDS.includes(chainConfig.id)) {
       throw new Error(
         `Elytro: chain ${chainConfig.id} is not supported for now.`
       );
     }
 
-    const { factory, fallback, recovery, onchainConfig, bundler, endpoint } =
-      chainConfig;
+    if (this._isConfigUnchanged(chainConfig)) {
+      console.log('Elytro::SDK: chain config unchanged, no reset needed.');
+      return;
+    }
+
+    this.initializeSDK(chainConfig);
+  }
+
+  private _isConfigUnchanged(newConfig: TChainItem): boolean {
+    if (!this._config) return false;
+
+    return this._REQUIRED_CHAIN_FIELDS.every(
+      (field) => newConfig[field] === this._config?.[field]
+    );
+  }
+
+  private initializeSDK(config: TChainItem) {
+    const { endpoint, bundler, factory, fallback, recovery, onchainConfig } =
+      config;
+
     this._sdk = new SoulWallet(
       endpoint,
       bundler,
@@ -98,7 +121,7 @@ class ElytroSDK {
     );
 
     this._bundler = new Bundler(bundler);
-    this._config = chainConfig;
+    this._config = config;
   }
 
   // TODO: temp, make sure it's unique later.
@@ -187,17 +210,47 @@ class ElytroSDK {
     return code !== undefined && code !== '0x';
   }
 
-  public async sendUserOperation(userOp: ElytroUserOperation) {
-    // estimate gas before sending userOp, but can not do it here (for the case of sign tx)
-    // await this.estimateGas(userOp);
-
+  public async sendUserOperation(
+    userOp: ElytroUserOperation,
+    opHash: string
+  ): Promise<{ txHash?: string; opHash: string }> {
     const res = await this._sdk.sendUserOperation(userOp);
-
     if (res.isErr()) {
       throw res.ERR;
-    } else {
-      return res.OK;
     }
+
+    const client = this._getClient();
+
+    return Promise.race([
+      new Promise<{ txHash?: string; opHash: string }>((resolve) => {
+        const unwatch = client.watchEvent({
+          address: this._config.onchainConfig.entryPoint as Address,
+          event: parseAbiItem(
+            'event UserOperationEvent(bytes32 indexed userOpHash, address indexed sender, address indexed paymaster, uint256 nonce, bool success, uint256 actualGasCost, uint256 actualGasUsed)'
+          ),
+          args: {
+            userOpHash: opHash as Hex,
+            sender: userOp.sender,
+          },
+          onLogs: (logs) => {
+            const targetLog = logs.find(
+              (log) => log.args?.userOpHash === opHash
+            );
+            if (targetLog) {
+              unwatch?.();
+              resolve({ txHash: targetLog.transactionHash, opHash });
+            }
+          },
+          onError: () => {
+            unwatch?.();
+            resolve({ opHash });
+          },
+        });
+      }),
+      new Promise<{ opHash: string }>(
+        (resolve) => setTimeout(() => resolve({ opHash }), 20_000) // 20s timeout. tune it later if needed.
+      ),
+    ]);
   }
 
   public async signUserOperation(userOp: ElytroUserOperation) {
@@ -704,4 +757,4 @@ class ElytroSDK {
   // }
 }
 
-export const elytroSDK = new ElytroSDK();
+export const elytroSDK = new SDKService();

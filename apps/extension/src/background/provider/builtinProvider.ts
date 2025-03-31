@@ -1,6 +1,6 @@
 // import walletClient from '../walletClient';
 import { SafeEventEmitter } from '@/utils/safeEventEmitter';
-import { Address, BlockTag, Hex, toHex } from 'viem';
+import { Address, BlockTag, toHex } from 'viem';
 import walletClient from '../services/walletClient';
 import { ethErrors } from 'eth-rpc-errors';
 import { rpcCacheManager } from '@/utils/cache/rpcCacheManager';
@@ -69,9 +69,10 @@ class BuiltinProvider extends SafeEventEmitter {
         return await walletClient.estimateGas(
           ...(params as [SafeAny, BlockTag | bigint])
         );
-      case 'eth_getTransactionByHash':
-        this._validateArrayParams(params);
-        return await walletClient.getTransactionReceipt((params as [Hex])[0]);
+      // case 'eth_getTransactionByHash':
+      //   this._validateArrayParams(params);
+      //   // return await walletClient.getTransactionReceipt((params as [Hex])[0]);
+      //   return await walletClient.rpcRequest(method, params);
       default:
         return await walletClient.rpcRequest(method, params);
     }

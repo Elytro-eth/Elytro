@@ -109,9 +109,13 @@ class WalletController {
     return await elytroSDK.signUserOperation(deformatObjectWithBigInt(userOp));
   }
 
-  public async sendUserOperation(userOp: ElytroUserOperation) {
+  public async sendUserOperation(userOp: ElytroUserOperation, opHash: string) {
     return await elytroSDK.sendUserOperation(
-      deformatObjectWithBigInt(userOp, ['maxFeePerGas', 'maxPriorityFeePerGas'])
+      deformatObjectWithBigInt(userOp, [
+        'maxFeePerGas',
+        'maxPriorityFeePerGas',
+      ]),
+      opHash
     );
   }
 
@@ -153,11 +157,13 @@ class WalletController {
   public async addNewHistory({
     type,
     opHash,
+    txHash,
     userOp,
     decodedDetail,
   }: {
     type: HistoricalActivityTypeEn;
     opHash: string;
+    txHash?: string;
     userOp: ElytroUserOperation;
     decodedDetail: DecodeResult;
   }) {
@@ -165,6 +171,7 @@ class WalletController {
       timestamp: Date.now(),
       type,
       opHash,
+      txHash,
       from: userOp.sender,
       ...getTransferredTokenInfo(decodedDetail),
     });
@@ -296,7 +303,7 @@ class WalletController {
     this._onAccountChanged();
   }
 
-  public async createDeployUserOp() {
+  public async createDeployUserOp(): Promise<ElytroUserOperation> {
     if (!keyring.owner?.address) {
       throw new Error('Elytro: No owner address. Try create owner first.');
     }
@@ -310,7 +317,9 @@ class WalletController {
     return formatObjectWithBigInt(deployUserOp);
   }
 
-  public async createTxUserOp(txs: Transaction[]) {
+  public async createTxUserOp(
+    txs: Transaction[]
+  ): Promise<ElytroUserOperation> {
     const userOp = await elytroSDK.createUserOpFromTxs(
       accountManager.currentAccount?.address as string,
       txs
@@ -325,7 +334,9 @@ class WalletController {
     );
   }
 
-  public async estimateGas(userOp: ElytroUserOperation) {
+  public async estimateGas(
+    userOp: ElytroUserOperation
+  ): Promise<ElytroUserOperation> {
     return formatObjectWithBigInt(await elytroSDK.estimateGas(userOp));
   }
 

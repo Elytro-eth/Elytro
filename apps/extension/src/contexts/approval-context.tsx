@@ -7,7 +7,6 @@ import { useInterval } from 'usehooks-ts';
 import { useHashLocation } from 'wouter/use-hash-location';
 import { EVENT_TYPES } from '@/constants/events';
 import { RuntimeMessage } from '@/utils/message';
-import { getCurrentSearchParams } from '@/utils/url';
 
 type IApprovalContext = {
   approval: Nullable<TApprovalInfo>;
@@ -31,16 +30,14 @@ export const ApprovalProvider = ({
   const { wallet } = useWallet();
   const [approval, setApproval] = useState<Nullable<TApprovalInfo>>(null);
   const [pathname] = useHashLocation();
-  const isApprovalRequestedRef = useRef(false);
-  const isProcessingRef = useRef(false);
+  const isApprovalProcessing = useRef(false);
 
   const getCurrentApproval = async () => {
-    if (isApprovalRequestedRef.current || isProcessingRef.current) {
+    if (isApprovalProcessing.current) {
       return;
     }
 
     try {
-      isApprovalRequestedRef.current = true;
       const isLocked = await wallet.getLockStatus();
       if (isLocked) {
         return;
@@ -58,19 +55,28 @@ export const ApprovalProvider = ({
     } catch (error) {
       console.error(error);
       setApproval(null);
-    } finally {
-      isApprovalRequestedRef.current = false;
     }
   };
 
   const onApprovalChanged = async () => {
-    if (pathname === SIDE_PANEL_ROUTE_PATHS.TxSuccess) {
-      return;
-    }
+    if (!approval) {
+      isApprovalProcessing.current = false;
 
-    if (approval) {
+      // Only approval routes can be redirected based on need
+      if (APPROVAL_ROUTES.includes(pathname as ApprovalTypeEn)) {
+        if (pathname === SIDE_PANEL_ROUTE_PATHS.TxConfirm) {
+          return; // internal send tx
+        }
+        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+      }
+    } else if (!isApprovalProcessing.current && approval.type !== pathname) {
+      isApprovalProcessing.current = true;
+
       const currentAccount = await wallet.getCurrentAccount();
-      if (!currentAccount?.isDeployed) {
+      if (
+        !currentAccount?.isDeployed &&
+        approval.type !== ApprovalTypeEn.Alert
+      ) {
         setApproval({
           ...approval,
           type: ApprovalTypeEn.Alert,
@@ -86,14 +92,7 @@ export const ApprovalProvider = ({
         return;
       }
       navigateTo('side-panel', approval.type);
-    } else if (APPROVAL_ROUTES.includes(pathname as SafeAny)) {
-      if (
-        pathname === SIDE_PANEL_ROUTE_PATHS.TxConfirm &&
-        getCurrentSearchParams('fromAppCall') === '0'
-      ) {
-        return; // internal send tx
-      }
-      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+      return;
     }
   };
 
@@ -116,32 +115,27 @@ export const ApprovalProvider = ({
   }, []);
 
   const resolve = async (data: unknown) => {
-    if (!approval || isProcessingRef.current) {
+    if (!approval) {
       return;
     }
-
     try {
-      isProcessingRef.current = true;
       await wallet.resolveApproval(approval.id, data);
       setApproval(null);
     } catch (error) {
       console.error(error);
-    } finally {
-      isProcessingRef.current = false;
     }
   };
 
   const reject = async (e?: Error) => {
-    if (!approval || isProcessingRef.current) {
+    if (!approval) {
       return;
     }
 
     try {
-      isProcessingRef.current = true;
       await wallet.rejectApproval(approval.id, e);
       setApproval(null);
-    } finally {
-      isProcessingRef.current = false;
+    } catch (error) {
+      console.error(error);
     }
   };
 

@@ -1,16 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { useAccount } from '@/contexts/account-context';
 import { toast } from '@/hooks/use-toast';
-import { useTx, UserOpType } from '@/contexts/tx-context';
+import { useTx, TxRequestTypeEn } from '@/contexts/tx-context';
 
 export default function ActivateButton() {
   const { currentAccount } = useAccount();
-  const { openUserOpConfirmTx } = useTx();
+  const { handleTxRequest } = useTx();
 
   const onClickActivate = async () => {
     try {
-      // TODO: send userOp to Send Tx Modal
-      openUserOpConfirmTx(UserOpType.DeployWallet);
+      handleTxRequest(TxRequestTypeEn.DeployWallet);
     } catch (error) {
       toast({
         title: 'Activate account failed',

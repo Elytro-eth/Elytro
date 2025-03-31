@@ -63,7 +63,10 @@ type TSignData = {
 type TApprovalData = {
   dApp: TDAppInfo;
   tx?: TTransactionInfo[];
-  options?: unknown;
+  options?: {
+    reason?: string;
+    name?: string;
+  };
   sign?: TSignData;
   chain?: {
     method: 'switch' | 'add';

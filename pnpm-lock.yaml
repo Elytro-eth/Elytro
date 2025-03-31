@@ -91,6 +91,7 @@ importers:
       react: ^18.3.1
       react-dom: ^18.3.1
       react-hook-form: ^7.53.0
+      ses: ^1.12.0
       tailwind-merge: ^2.5.2
       tailwindcss: ^3.4.11
       tailwindcss-animate: ^1.0.7
@@ -144,6 +145,7 @@ importers:
       react: 18.3.1
       react-dom: 18.3.1_react@18.3.1
       react-hook-form: 7.54.1_react@18.3.1
+      ses: 1.12.0
       tailwind-merge: 2.5.5
       tailwindcss: 3.4.16
       tailwindcss-animate: 1.0.7_tailwindcss@3.4.16
@@ -749,6 +751,10 @@ packages:
     dependencies:
       tslib: 2.8.1
     dev: true
+
+  /@endo/env-options/1.1.8:
+    resolution: {integrity: sha512-Xtxw9n33I4guo8q0sDyZiRuxlfaopM454AKiELgU7l3tqsylCut6IBZ0fPy4ltSHsBib7M3yF7OEMoIuLwzWVg==}
+    dev: false
 
   /@esbuild/aix-ppc64/0.21.5:
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -11559,6 +11565,12 @@ packages:
     resolution: {integrity: sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==}
     engines: {node: '>=10'}
     hasBin: true
+
+  /ses/1.12.0:
+    resolution: {integrity: sha512-jvmwXE2lFxIIY1j76hFjewIIhYMR9Slo3ynWZGtGl5M7VUCw3EA0wetS+JCIbl2UcSQjAT0yGAHkyxPJreuC9w==}
+    dependencies:
+      '@endo/env-options': 1.1.8
+    dev: false
 
   /set-blocking/2.0.0:
     resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}

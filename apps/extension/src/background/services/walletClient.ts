@@ -35,7 +35,10 @@ class ElytroWalletClient {
   }
 
   public init(chain: TChainItem) {
-    if (chain.id && chain.id !== this._client?.chain?.id) {
+    if (
+      (chain.id && chain.id !== this._client?.chain?.id) ||
+      (chain.endpoint && chain.endpoint !== this._client?.transport.url)
+    ) {
       this._client = createPublicClient({
         chain,
         transport: http(chain.endpoint || chain.rpcUrls.default.http[0]),

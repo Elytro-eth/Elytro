@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select';
 import { useAccount } from '@/contexts/account-context';
 import { useTx } from '@/contexts/tx-context';
-import { UserOpType } from '@/contexts/tx-context';
+import { TxRequestTypeEn } from '@/contexts/tx-context';
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
 import { PencilLine, Plus, Trash2 } from 'lucide-react';
@@ -35,7 +35,7 @@ export default function ContactList({
 }: IContactListProps) {
   const { currentAccount: currentAccount } = useAccount();
   const { wallet } = useWallet();
-  const { openUserOpConfirmTx } = useTx();
+  const { handleTxRequest } = useTx();
   const [loading, setLoading] = useState(false);
   const [myThreshold, setMyThreshold] = useState<string>(threshold.toString());
 
@@ -50,7 +50,7 @@ export default function ContactList({
         Number(myThreshold)
       );
 
-      openUserOpConfirmTx(UserOpType.ApproveTransaction, txs);
+      handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs);
     } catch (error) {
       toast({
         title: 'Confirm contacts failed',
