@@ -54,12 +54,12 @@ export default function AccountRecovery() {
             />
             <TipItem
               title="2. Ask your contacts to recover"
-              description="Once we retrieved your recovery contacts, you will notified your contact to help you recover."
+              description="You need to collect enough recovery confirmations."
               Icon={Shield}
             />
             <TipItem
               title="3. Wait 48 hours until recovered "
-              description="Once your required number of contacts have approved, you will need to wait 48 hours before the wallet is accessible."
+              description="This is for extra security."
               Icon={Clock}
             />
           </div>
@@ -118,7 +118,7 @@ export default function AccountRecovery() {
       <div className="flex flex-col gap-y-sm mb-md">
         <h1 className="elytro-text-bold-body">Wallet Address</h1>
         <p className="elytro-text-smaller-body text-gray-600">
-          Enter your wallet address for us to retrieve your recovery contacts
+          We need it to find your recovery contacts
         </p>
       </div>
 

@@ -19,7 +19,7 @@ const YouAreIn: React.FC = () => {
       }
     : {
         title: 'Welcome!',
-        description: 'Ready to create your first smart contract wallet?',
+        description: 'Let’s create your first smart contract wallet',
         action: 'Create wallet',
         actionPath: SIDE_PANEL_ROUTE_PATHS.CreateAccount,
       };

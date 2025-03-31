@@ -197,8 +197,7 @@ function PageContent() {
           <DialogHeader>
             <DialogTitle>Recovery {shareInfo?.type || '--'} copied</DialogTitle>
             <DialogDescription>
-              Paste and send the link to this recovery contact for them to
-              confirm your recovery.
+              Send this link to your contact so they can confirm.
             </DialogDescription>
           </DialogHeader>
 

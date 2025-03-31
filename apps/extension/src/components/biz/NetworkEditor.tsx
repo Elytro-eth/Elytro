@@ -109,7 +109,7 @@ export default function NetworkEditor({
       await wallet.updateChainConfig(chain.id, updatedChain);
       onChanged();
       toast({
-        description: `${chain.name} Network updated`,
+        description: `${chain.name} network updated`,
       });
     } catch (error) {
       toast({

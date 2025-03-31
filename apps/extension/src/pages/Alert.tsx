@@ -31,7 +31,9 @@ export default function BlockedAlert() {
             </Avatar>
           </div>
           <div className="mb-6">
-            <div className="elytro-text-body font-bold mb-2">{dApp.name}</div>
+            <div className="elytro-text-body font-bold mb-2">
+              Connect to App
+            </div>
             <div className="elytro-text-tiny-body text-gray-600">
               {dApp.origin}
             </div>

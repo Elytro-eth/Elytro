@@ -9,7 +9,7 @@ export default function Activities() {
   if (!history.length)
     return (
       <div className="flex min-h-[50vh] items-center">
-        <EmptyTip tip="You don’t have any activities yet" />
+        <EmptyTip tip="No activities yet" />
       </div>
     );
 
