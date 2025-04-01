@@ -5,6 +5,7 @@ import {
   useState,
   useCallback,
   memo,
+  useRef,
 } from 'react';
 import { FieldValues } from 'react-hook-form';
 import { isAddress } from 'viem';
@@ -70,6 +71,7 @@ const AddressInput = ({
   const [recentAddress, setRecentAddress] = useState<{
     [key: string]: EnsAddress;
   } | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleClickENS = useCallback(
     (ens?: EnsAddress) => {
@@ -164,29 +166,29 @@ const AddressInput = ({
     [ensInfo, field]
   );
 
-  const handleFocus = useCallback(() => {
+  const handleFocus = () => {
     setIsFocused(true);
-  }, []);
+  };
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setValue(value);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setValue(value);
 
-      if (value.endsWith('.eth')) {
-        setLoading(true);
-        debouncedGetENSAddress(value);
-      } else if (ensInfo) {
-        setEnsInfo(null);
-      }
-    },
-    [ensInfo, debouncedGetENSAddress]
-  );
+    if (value.endsWith('.eth')) {
+      setLoading(true);
+      debouncedGetENSAddress(value);
+    } else if (ensInfo) {
+      setEnsInfo(null);
+    }
+  };
 
   const genInputResult = useCallback(() => {
     if (displayLabel) {
       return (
-        <div className="absolute bg-white">
+        <div
+          className="absolute bg-white"
+          onClick={() => inputRef.current?.focus()}
+        >
           <FragmentedAddress
             address={displayLabel}
             chainId={chainId}
@@ -241,6 +243,7 @@ const AddressInput = ({
     <div className="bg-white rounded-md p-sm flex flex-col mb-4 relative">
       <div className="flex items-center relative">
         <Input
+          ref={inputRef}
           className="text-lg border-none"
           placeholder={
             !isFocused && !(displayLabel || ensInfo)
