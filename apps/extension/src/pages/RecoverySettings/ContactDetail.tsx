@@ -57,7 +57,7 @@ export default function ContactDetail({
         disabled={!isAddress(address)}
         onClick={() => onSaveContact({ address, name })}
       >
-        Continue
+        Next
       </Button>
     </div>
   );

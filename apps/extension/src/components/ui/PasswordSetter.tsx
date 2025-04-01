@@ -106,7 +106,7 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
           disabled={loading}
           size="large"
         >
-          {loading ? 'Creating...' : 'Continue'}
+          {loading ? 'Creating...' : 'Next'}
         </Button>
       </form>
     </Form>

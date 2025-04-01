@@ -171,11 +171,11 @@ export default function ContactList({
         ) : (
           <div className="flex flex-col gap-y-md items-center mt-4xl">
             <img src={ContactsImg} className="size-36" />
-            <span className="elytro-text-subtitle">Add a new contact</span>
+            <span className="elytro-text-subtitle">Add a recovery contact</span>
 
             <Button variant="secondary" size="tiny" onClick={onAddContact}>
               <Plus className="h-4 w-4 mr-1 stroke-[1.5px] group-hover:stroke-white" />
-              Add contact
+              Add
             </Button>
           </div>
         )}

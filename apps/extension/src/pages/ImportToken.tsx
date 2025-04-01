@@ -191,7 +191,7 @@ export default function ImportToken() {
             hasAddressError
           }
         >
-          Continue
+          Next
         </Button>
       </div>
     </SecondaryPageWrapper>

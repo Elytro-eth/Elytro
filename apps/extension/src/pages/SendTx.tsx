@@ -288,7 +288,7 @@ export default function SendTx() {
           </div>
         </Form>
 
-        {/* Continue button */}
+        {/* Next button */}
         <Button
           variant="secondary"
           size="large"
@@ -302,7 +302,7 @@ export default function SendTx() {
               Preparing...
             </>
           ) : (
-            'Continue'
+            'Next'
           )}
         </Button>
       </div>

@@ -15,9 +15,6 @@ export default function Transfer() {
           <br />
           Elytro wallets
         </h1>
-        <p className="elytro-text-smaller-body text-gray-600">
-          Smart contract wallets created on Elytro only
-        </p>
       </div>
       <div className="flex flex-col gap-y-md w-full">
         <Button
