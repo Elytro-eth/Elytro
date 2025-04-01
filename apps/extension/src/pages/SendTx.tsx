@@ -290,7 +290,6 @@ export default function SendTx() {
 
         {/* Next button */}
         <Button
-          variant="secondary"
           size="large"
           className="w-full gap-xl"
           disabled={!isFormValid}

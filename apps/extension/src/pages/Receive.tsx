@@ -67,7 +67,7 @@ export default function Receive() {
         <div className="flex flex-row items-center gap-2 w-full text-left">
           <CircleAlert className="elytro-clickable-icon size-3" />
           <div className="elytro-text-tiny-body text-gray-600">
-            Copy address & paste it to your sender to receive tokens.
+            Copy and share this address to receive tokens.
           </div>
         </div>
 

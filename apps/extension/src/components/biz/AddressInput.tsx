@@ -44,8 +44,8 @@ const RecentAddressItem = memo(
             chainId={chainId}
           />
         )}
-        <div className="text-gray-600 text-xs font-normal">
-          {hour > 1 ? `${hour}hrs` : 'An hr'} ago
+        <div className="text-gray-600 text-xs font-normal ml-2">
+          {hour > 1 ? `${hour}hrs` : '1hr'} ago
         </div>
       </div>
     );

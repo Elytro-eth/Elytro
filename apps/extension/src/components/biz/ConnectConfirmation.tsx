@@ -34,7 +34,7 @@ export default function ConnectionConfirmation({
       </div>
 
       <div className="text-center mb-8">
-        <h2 className="elytro-text-bold-body">Connect to {dApp.name}</h2>
+        <h2 className="elytro-text-bold-body mt-4">Connect to app</h2>
         <p className="elytro-text-small mt-sm text-gray-600">{dApp.origin}</p>
       </div>
 

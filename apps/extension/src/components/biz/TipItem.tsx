@@ -20,7 +20,7 @@ export default function TipItem({
       <Icon className="size-4 mt-1 flex-shrink-0" />
 
       <div className="flex flex-col gap-y-2xs leading-none ml-md">
-        <span className="elytro-text-bold-body">
+        <span className="elytro-text-bold-body text-dark-blue">
           {index ? index : ''} {title}
         </span>
         <span className="elytro-text-tiny-body text-gray-600">
