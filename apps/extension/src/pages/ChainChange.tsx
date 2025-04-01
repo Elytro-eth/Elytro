@@ -11,7 +11,11 @@ import { Button } from '@/components/ui/button';
 import { ethErrors } from 'eth-rpc-errors';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
-import { SUPPORTED_CHAINS } from '@/constants/chains';
+import {
+  SUPPORTED_CHAINS,
+  ChainOperationEn,
+  TChainItem,
+} from '@/constants/chains';
 import { getChainNameByChainId } from '@/constants/chains';
 
 function URLSection({ title, items }: { title: string; items: string[] }) {
@@ -65,7 +69,29 @@ export default function ChainChange() {
 
   const handleConfirm = async () => {
     try {
-      await wallet.switchAccountByChain(Number(targetChainId));
+      if (method === ChainOperationEn.Switch) {
+        await wallet.switchAccountByChain(Number(targetChainId));
+      } else {
+        const updateConfig = {} as TChainItem;
+
+        if (chainName) updateConfig.name = chainName;
+        if (nativeCurrency) updateConfig.nativeCurrency = nativeCurrency;
+        if (rpcUrls?.[0]) {
+          updateConfig.endpoint = rpcUrls[0];
+          updateConfig.rpcUrls = {
+            default: { http: rpcUrls },
+          };
+        }
+        if (blockExplorerUrls?.[0]) {
+          updateConfig.blockExplorers = {
+            default: {
+              name: 'Default',
+              url: blockExplorerUrls[0],
+            },
+          };
+        }
+        await wallet.updateChainConfig(Number(targetChainId), updateConfig);
+      }
       resolve();
     } catch (e) {
       reject(e as Error);
@@ -83,9 +109,10 @@ export default function ChainChange() {
           {dApp.name} wants to <span className="font-bold">{method}</span> chain
         </div>
       </CardHeader>
+
       <CardContent className="flex flex-col h-full p-6 space-y-6 border-1 border-gray-200 rounded-lg mx-lg my-md">
         {/* Description of the chain change */}
-        {method === 'switch' && (
+        {method === ChainOperationEn.Switch && (
           <div className="text-base text-gray-700">
             <p>
               Current chain is{' '}
@@ -104,11 +131,12 @@ export default function ChainChange() {
           </div>
         )}
 
-        {method === 'add' && (
+        {method === ChainOperationEn.Update && (
           <div className="text-base text-gray-700 space-y-4">
             <p>
               Chain <span className="font-bold">{chainName}</span> (
-              {targetChainId}) will be added to your wallet.
+              {targetChainId}) will be{' '}
+              <span className="font-bold">updated</span> in your wallet.
             </p>
             <div className="border-t pt-4">
               <h3 className="font-bold text-lg">Native Currency</h3>
@@ -122,12 +150,13 @@ export default function ChainChange() {
           </div>
         )}
       </CardContent>
+
       <CardFooter className="grid grid-cols-2 gap-4">
         <Button variant="outline" onClick={handleCancel}>
           Cancel
         </Button>
         <Button variant="default" onClick={handleConfirm}>
-          {method === 'switch' ? 'Switch' : 'Add'}
+          {method.charAt(0).toUpperCase() + method.slice(1)}
         </Button>
       </CardFooter>
     </Card>

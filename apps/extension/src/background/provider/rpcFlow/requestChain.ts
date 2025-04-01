@@ -2,21 +2,21 @@ import {
   approvalService,
   ApprovalTypeEn,
 } from '@/background/services/approval';
-import chainService from '@/background/services/chain';
-import { SUPPORTED_CHAIN_IDS } from '@/constants/chains';
+import { ChainOperationEn, SUPPORTED_CHAIN_IDS } from '@/constants/chains';
 import type { TFlowMiddleWareFn } from '@/utils/asyncTaskFlow';
 import { ethErrors } from 'eth-rpc-errors';
 
-const SWITCH_CHAIN_METHODS: ProviderMethodType[] = [
-  'wallet_switchEthereumChain',
-];
-
-const ADD_CHAIN_METHODS: ProviderMethodType[] = ['wallet_addEthereumChain'];
-
 const RELATED_METHODS: ProviderMethodType[] = [
-  ...SWITCH_CHAIN_METHODS,
-  ...ADD_CHAIN_METHODS,
+  'wallet_switchEthereumChain',
+  'wallet_addEthereumChain',
 ];
+
+const CHAIN_OPERATION_MAP: Partial<
+  Record<ProviderMethodType, ChainOperationEn>
+> = {
+  wallet_switchEthereumChain: ChainOperationEn.Switch,
+  wallet_addEthereumChain: ChainOperationEn.Update,
+};
 
 export const requestChain: TFlowMiddleWareFn = async (ctx, next) => {
   const {
@@ -31,29 +31,29 @@ export const requestChain: TFlowMiddleWareFn = async (ctx, next) => {
   // Hex to
   const { chainId } = params?.[0] ?? {};
 
-  if (!chainId || !chainId.startsWith('0x') || !Number.isNaN(Number(chainId))) {
+  if (!chainId || !chainId.startsWith('0x') || Number.isNaN(Number(chainId))) {
     return ethErrors.provider.custom({
       code: 4902,
       message: 'Invalid chain ID',
     });
   }
 
-  if (!SUPPORTED_CHAIN_IDS.includes(Number(chainId))) {
-    return ethErrors.provider.custom({
-      code: 4902,
-      message: `Unrecognized chain ID ${chainId}.`,
-    });
-  }
+  const operation = CHAIN_OPERATION_MAP[method as ProviderMethodType];
 
-  const currentChain = chainService.currentChain?.id;
-  if (currentChain === Number(chainId)) {
-    return next();
+  if (!SUPPORTED_CHAIN_IDS.includes(Number(chainId))) {
+    return await approvalService.request(ApprovalTypeEn.Alert, {
+      dApp,
+      options: {
+        name: method,
+        reason: `You are trying to ${operation} an unsupported chain.`,
+      },
+    });
   }
 
   return await approvalService.request(ApprovalTypeEn.ChainChange, {
     dApp,
     chain: {
-      method: SWITCH_CHAIN_METHODS.includes(method) ? 'switch' : 'add',
+      method: operation,
       ...params?.[0],
     },
   });

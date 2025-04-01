@@ -47,7 +47,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
     recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
     validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
-    infoRecorder: '0x0eb1ec2c9031ca30f0a28adef79b5b73b91692c2',
+    infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
     opExplorer: 'https://optimism.blockscout.com/op/',
     onchainConfig: {
       chainId: optimism.id,
@@ -67,7 +67,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
     validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
     // TODO: for now only support optimism sepolia
-    infoRecorder: '0x0eb1ec2c9031ca30f0a28adef79b5b73b91692c2',
+    infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
     onchainConfig: {
       chainId: optimismSepolia.id,
       entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
@@ -85,7 +85,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
     fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
     recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
-    infoRecorder: '0x0eb1ec2c9031ca30f0a28adef79b5b73b91692c2',
+    infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
     validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
     onchainConfig: {
       chainId: sepolia.id,
@@ -104,17 +104,6 @@ export const getIconByChainId = (chainId: number | undefined) =>
 export const getChainNameByChainId = (chainId: number) =>
   SUPPORTED_CHAINS.find((chain) => chain.id === chainId)?.name;
 
-// from block number of info recorder
-export const FROM_BLOCK_NUMBER_OF_INFO_RECORDER_MAP: Record<
-  number,
-  bigint | 'latest'
-> = {
-  [optimism.id]: 128763383n,
-  [optimismSepolia.id]: 20661477n,
-  [sepolia.id]: 7194730n,
-  // [scrollSepolia.id]: 'latest',
-};
-
 // EIP-3770: get short chain name from :https://github.com/ethereum-lists/chains/tree/55e0b3bb7d8678f083d0549c0b2d16ec675c4378/_data/chains
 export const EIP3770_CHAIN_PREFIX_MAP: Record<number, string> = {
   [optimism.id]: 'oeth',
@@ -122,3 +111,8 @@ export const EIP3770_CHAIN_PREFIX_MAP: Record<number, string> = {
   [sepolia.id]: 'sep',
   // [scrollSepolia.id]: 'scrollsep',
 };
+
+export enum ChainOperationEn {
+  Switch = 'switch',
+  Update = 'update',
+}

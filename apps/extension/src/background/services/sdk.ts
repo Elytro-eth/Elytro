@@ -1,8 +1,4 @@
-import {
-  SUPPORTED_CHAIN_IDS,
-  TChainItem,
-  FROM_BLOCK_NUMBER_OF_INFO_RECORDER_MAP,
-} from '@/constants/chains';
+import { SUPPORTED_CHAIN_IDS, TChainItem } from '@/constants/chains';
 import {
   getDomainSeparator,
   getEncoded1271MessageHash,
@@ -39,6 +35,7 @@ import {
   parseAbiParameters,
   decodeAbiParameters,
   parseAbiItem,
+  parseAbi,
 } from 'viem';
 import { createAccount } from '@/utils/ethRpc/create-account';
 import { ethErrors } from 'eth-rpc-errors';
@@ -670,6 +667,21 @@ export class SDKService {
     };
   }
 
+  private async _getInfoRecorderStartBlock(address: Address) {
+    const _client = this._getClient();
+
+    const latestRecordAt = await _client.readContract({
+      address: this._config.infoRecorder as Address,
+      abi: parseAbi([
+        'function latestRecordAt(address addr, bytes32 category) external view returns (uint256 blockNumber)',
+      ]),
+      functionName: 'latestRecordAt',
+      args: [address, GUARDIAN_INFO_KEY],
+    });
+
+    return latestRecordAt;
+  }
+
   public async queryRecoveryContacts(address: Address) {
     if (!this._config.infoRecorder) {
       throw new Error(
@@ -677,12 +689,19 @@ export class SDKService {
       );
     }
 
+    const startBlock = await this._getInfoRecorderStartBlock(address);
+
+    if (startBlock === 0n) {
+      return null;
+    }
+
     const _client = this._getClient();
+    const fromBlock = startBlock - 10n > 0n ? startBlock - 10n : 0n;
 
     const logs = await _client.getLogs({
       address: this._config.infoRecorder as Address,
-      toBlock: 'latest',
-      fromBlock: FROM_BLOCK_NUMBER_OF_INFO_RECORDER_MAP[this._config.id],
+      toBlock: startBlock,
+      fromBlock,
       event: parseAbiItem(
         'event DataRecorded(address indexed wallet, bytes32 indexed category, bytes data)'
       ),
