@@ -33,7 +33,7 @@ const RecentAddressItem = memo(
     return (
       <div
         onClick={onClick}
-        className="px-lg py-md cursor-pointer flex items-center justify-between hover:bg-gray-150"
+        className="px-lg py-md cursor-pointer flex flex-col items-start hover:bg-gray-150"
       >
         {item.name ? (
           <ENSInfoComponent ensInfo={item} />
@@ -44,8 +44,8 @@ const RecentAddressItem = memo(
             chainId={chainId}
           />
         )}
-        <div className="text-gray-600 text-xs font-normal ml-2">
-          {hour > 1 ? `${hour}hrs` : '1hr'} ago
+        <div className="text-gray-600 text-xs font-normal pl-8">
+          {hour > 1 ? `${hour} hours` : '1 hour'} ago
         </div>
       </div>
     );
