@@ -202,7 +202,7 @@ export default function SendTx() {
       <div>
         {/* Error display */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-4 mb-4">
+          <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-4">
             <div className="flex">
               <AlertCircle className="h-5 w-5 mr-2" />
               <div>
@@ -214,32 +214,14 @@ export default function SendTx() {
         )}
 
         <Form {...form}>
-          <div className="bg-light-green rounded-sm">
+          <div className="bg-light-green rounded-sm pb-4 mb-4">
             <h3 className="text-lg font-bold px-4 py-3">Sending</h3>
-            {/* Amount input */}
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem className="px-4">
-                  <FormControl>
-                    <AmountInput
-                      field={field}
-                      isDisabled={filteredTokens.length < 1}
-                      token={form.getValues('token') as TTokenInfo}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             {/* Token selector */}
             <FormField
               control={form.control}
               name="token"
               render={() => (
-                <div className="relative mb-4 py-2">
+                <div className="relative py-2">
                   <FormItem>
                     <FormControl>
                       <TokenSelector
@@ -252,12 +234,31 @@ export default function SendTx() {
 
                     <Button
                       disabled={!form.getValues('token')}
-                      className="absolute right-4 top-6 bg-green !text-white !py-2"
+                      className="absolute right-4 top-4 bg-green !text-white !py-2"
                       size="tiny"
                       onClick={handleFillMax}
                     >
                       Max
                     </Button>
+                  </FormItem>
+                </div>
+              )}
+            />
+            {/* Amount input */}
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <div className="">
+                  <FormItem className=" px-4">
+                    <FormControl>
+                      <AmountInput
+                        field={field}
+                        isDisabled={filteredTokens.length < 1}
+                        token={form.getValues('token') as TTokenInfo}
+                      />
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 </div>
               )}
