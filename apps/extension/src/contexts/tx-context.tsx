@@ -16,6 +16,8 @@ export enum TxRequestTypeEn {
   ApproveTransaction,
 }
 
+type TMyDecodeResult = Pick<DecodeResult, 'method' | 'toInfo' | 'to'>;
+
 type ITxContext = {
   // Tx/UserOp type
   requestType: Nullable<TxRequestTypeEn>;
@@ -34,7 +36,8 @@ type ITxContext = {
   // Actions
   handleTxRequest: (
     requestType: TxRequestTypeEn,
-    params?: Transaction[]
+    params?: Transaction[],
+    innerDecodedDetail?: TMyDecodeResult
   ) => void;
   onConfirm: () => void;
   onCancel: () => void;
@@ -79,10 +82,11 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleTxRequest = async (
     type: TxRequestTypeEn,
-    params?: Transaction[]
+    params?: Transaction[],
+    decodedDetail?: TMyDecodeResult
   ) => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm);
-    packUserOp(type, params);
+    packUserOp(type, params, decodedDetail);
   };
 
   const getTxType = (type: TxRequestTypeEn) => {
@@ -109,7 +113,11 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     return await wallet.createTxUserOp(txParamsRef.current);
   };
 
-  const packUserOp = async (type: TxRequestTypeEn, params?: Transaction[]) => {
+  const packUserOp = async (
+    type: TxRequestTypeEn,
+    params?: Transaction[],
+    decodedDetail?: TMyDecodeResult
+  ) => {
     try {
       setIsPacking(true);
       setRequestType(type);
@@ -123,11 +131,16 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         currentUserOp = await generateDeployUserOp();
       } else {
         currentUserOp = await generateTxUserOp();
-        const decodeRes = (await wallet.decodeUserOp(currentUserOp))?.[0];
+        let decodeRes = (await wallet.decodeUserOp(currentUserOp))?.[0];
         if (!decodeRes) {
           throw new Error('Failed to decode user operation');
         }
         transferAmount = BigInt(decodeRes.value); // hex to bigint
+
+        if (type === TxRequestTypeEn.SendTransaction && decodedDetail) {
+          decodeRes = { ...decodeRes, ...decodedDetail };
+        }
+
         setDecodedDetail(decodeRes);
       }
 
@@ -175,6 +188,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       userOp: currentUserOp!,
       decodedDetail: decodedDetail!,
     });
+    toast({ title: 'Transaction sent successfully' });
     await resolve(txHash);
     handleBack();
   };

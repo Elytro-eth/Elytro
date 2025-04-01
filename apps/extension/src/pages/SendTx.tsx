@@ -177,7 +177,14 @@ export default function SendTx() {
         throw new Error('Invalid token address');
       }
 
-      handleTxRequest(TxRequestTypeEn.SendTransaction, [txParams]);
+      handleTxRequest(TxRequestTypeEn.SendTransaction, [txParams], {
+        to,
+        method: {
+          name: 'transfer',
+          params: [to, parsedAmount],
+        } as SafeAny,
+        toInfo: { ...token } as SafeAny,
+      });
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to prepare transaction';
