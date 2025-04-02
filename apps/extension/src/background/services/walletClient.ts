@@ -13,7 +13,6 @@ import {
 import { ethErrors } from 'eth-rpc-errors';
 import { formatBlockInfo, formatBlockParam } from '@/utils/format';
 import { normalize } from 'viem/ens';
-import { elytroSDK } from './sdk';
 import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 
@@ -123,11 +122,6 @@ class ElytroWalletClient {
     } catch (error) {
       throw ethErrors.rpc.internal((error as Error)?.message);
     }
-  }
-
-  public async getTransactionReceipt(hash: Hex) {
-    // TODO: check if it's a user operation hash
-    return await elytroSDK.getUserOperationReceipt(hash);
   }
 }
 
