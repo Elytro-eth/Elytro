@@ -1,10 +1,4 @@
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  CardFooter,
-} from '@/components/ui/card';
 import DAppDetail from '../DAppDetail';
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
@@ -63,13 +57,13 @@ export default function SignDetail({
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto flex-grow flex flex-col min-w-[430px]">
-      <CardHeader>
+    <div className="w-full mx-auto">
+      <div className="mb-2 border-b">
         <DAppDetail dapp={dapp} chainId={chainId} />
-      </CardHeader>
+      </div>
 
-      <CardContent className="space-y-4 flex-grow">
-        <div className="rounded-2xl">
+      <div className="space-4">
+        <div className="rounded-2xl p-4">
           {/* TODO: 区分 */}
           <div className="text-lg font-bold mb-3">{title}</div>
 
@@ -77,24 +71,27 @@ export default function SignDetail({
 
           <pre
             className="
-              border-gray-500 bg-gray-200  rounded-2xl p-4 
+              w-full
+              whitespace-normal
+              bg-gray-200 rounded-2xl p-4 
               text-sm text-gray-500 
-              w-full min-h-40 max-h-[calc(100vh-400px)] overflow-auto
+              min-h-40 max-h-[calc(100vh-400px)] !overflow-auto
             "
+            style={{ wordBreak: 'break-word' }}
           >
             {format(params)}
           </pre>
         </div>
-      </CardContent>
+      </div>
 
-      <CardFooter className="flex flex-col gap-y-4">
-        <div className="text-xs text-gray-300 mb-4 border-t border-gray-200">
-          <div className="mt-4">
+      <div className="flex flex-col gap-y-4">
+        <div className="text-xs text-gray-300 my-4 border-gray-200">
+          <div className="px-4">
             By confirming, you will allow the smart contract to access your fund
             and make transactions.
           </div>
         </div>
-        <div className="flex w-full justify-between gap-x-2">
+        <div className="flex w-full justify-between gap-x-2 px-4">
           <Button
             variant="ghost"
             onClick={handleCancel}
@@ -106,7 +103,7 @@ export default function SignDetail({
             Sign
           </Button>
         </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }

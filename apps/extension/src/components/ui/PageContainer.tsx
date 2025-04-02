@@ -18,7 +18,7 @@ function PageContainer({ children, className }: IPageContainerProps) {
       <ErrorBoundary>
         <div
           className={cn(
-            'w-screen h-screen flex justify-center mx-auto max-w-screen-md min-w-[360px]',
+            'w-screen h-screen flex justify-center mx-auto max-w-screen-md',
             className
           )}
         >
