@@ -1,7 +1,7 @@
 import { useApproval } from '@/contexts/approval-context';
 import { ethErrors } from 'eth-rpc-errors';
 import Spin from '@/components/ui/Spin';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -21,7 +21,7 @@ export default function BlockedAlert() {
   };
 
   return (
-    <div className="w-full h-full flex justify-center items-center min-h-screen p-4">
+    <div className="w-full h-full bg-white flex justify-center items-center min-h-screen p-4">
       <Card className="w-full h-full flex flex-col justify-between border-none rounded-none shadow-none">
         <CardContent className="flex flex-col p-6 text-center">
           <div className="flex justify-center mb-2">
@@ -42,12 +42,10 @@ export default function BlockedAlert() {
             Can’t connect to this app. <br />
             {options?.reason || 'Unknown reason'}
           </div>
-        </CardContent>
-        <CardFooter className="flex justify-between space-x-4">
-          <Button className="flex-1" onClick={handleReject}>
+          <Button className="flex-1 mt-10" onClick={handleReject}>
             OK
           </Button>
-        </CardFooter>
+        </CardContent>
       </Card>
     </div>
   );
