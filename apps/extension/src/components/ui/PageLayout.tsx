@@ -1,54 +1,36 @@
 import { cn } from '@/utils/shadcn/utils';
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 
-export interface IPageLayoutProps {
-  children: ReactElement | ReactElement[];
+interface IPageLayoutProps {
+  children: ReactNode;
   className?: string;
 }
 
-export function PageLayout(props: IPageLayoutProps) {
-  const { children } = props;
+function PageLayout({ children, className }: IPageLayoutProps) {
   return (
-    <div
-      className="page-layout"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        boxSizing: 'border-box',
-      }}
-    >
+    <div className={cn('flex flex-col h-screen box-border', className)}>
       {children}
     </div>
   );
 }
 
-export function PageLayoutBody(props: IPageLayoutProps) {
-  const { children, className } = props;
+function PageLayoutBody({ children, className }: IPageLayoutProps) {
   return (
-    <div
-      className={cn('page-layout-body', className)}
-      style={{
-        flex: '1',
-        boxSizing: 'border-box',
-        overflow: 'auto',
-      }}
-    >
+    <div className={cn('flex-1 box-border overflow-auto', className)}>
       {children}
     </div>
   );
 }
 
-export function PageLayoutHeader(props: IPageLayoutProps) {
-  const { children, className } = props;
-  return (
-    <div className={cn('page-layout-fixed-top', className)}>{children}</div>
-  );
+function PageLayoutHeader({ children, className }: IPageLayoutProps) {
+  return <div className={className}>{children}</div>;
 }
 
-export function PageLayoutFooter(props: IPageLayoutProps) {
-  const { children, className } = props;
-  return (
-    <div className={cn('page-layout-fixed-top', className)}>{children}</div>
-  );
+function PageLayoutFooter({ children, className }: IPageLayoutProps) {
+  return <div className={className}>{children}</div>;
 }
+
+PageLayout.Body = PageLayoutBody;
+PageLayout.Header = PageLayoutHeader;
+PageLayout.Footer = PageLayoutFooter;
+export default PageLayout;
