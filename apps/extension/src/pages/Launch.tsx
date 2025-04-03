@@ -62,6 +62,7 @@ const UnlockComponent = () => {
         onValueChange={setPassword}
         placeholder="Enter your passcode"
         disabled={isLoading}
+        autoFocus
       />
       <Button
         onClick={handleUnlock}
