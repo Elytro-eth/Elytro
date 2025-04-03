@@ -5,6 +5,7 @@ import { toast } from '@/hooks/use-toast';
 import { SignTypeEn, getProcessingFromSignType } from './utils';
 import DomainDetail from './DomainDetail';
 import { WalletController } from '@/background/walletController';
+import { cn } from '@/utils/shadcn/utils';
 
 interface ISendTxProps {
   signData: TSignData;
@@ -70,14 +71,10 @@ export default function SignDetail({
           {showDetail && <DomainDetail message={params[messageIdx]} />}
 
           <pre
-            className="
-              w-full
-              whitespace-normal
-              bg-gray-200 rounded-2xl p-4 
-              text-sm text-gray-500 
-              min-h-40 max-h-[calc(100vh-400px)] !overflow-auto
-            "
-            style={{ wordBreak: 'break-word' }}
+            className={cn(
+              'w-full whitespace-normal bg-gray-150 rounded-2xl p-4 text-sm text-gray-500 min-h-40 max-h-[calc(100vh-400px)] !overflow-auto',
+              signMethod === 'signMessage' ? 'break-words' : ''
+            )}
           >
             {format(params)}
           </pre>
