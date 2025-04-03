@@ -73,7 +73,7 @@ export default function SignDetail({
             className="
               w-full
               whitespace-normal
-              bg-gray-200 rounded-2xl p-4 
+              bg-gray-150 rounded-2xl p-4 
               text-sm text-gray-500 
               min-h-40 max-h-[calc(100vh-400px)] !overflow-auto
             "
