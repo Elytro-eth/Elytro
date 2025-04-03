@@ -28,7 +28,7 @@ export default function Dashboard() {
   return (
     <div className="w-full h-screen bg-gray-150">
       <PageLayout>
-        <PageLayoutHeader className="py-2">
+        <PageLayoutHeader className="p-2">
           <Spin isLoading={loading} />
           {/* Account Basic Info */}
           <BasicAccountInfo />
