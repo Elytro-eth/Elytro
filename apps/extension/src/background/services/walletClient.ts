@@ -100,8 +100,8 @@ class ElytroWalletClient {
         name: normalize(name),
       });
       return ensAddress;
-    } catch (error) {
-      throw ethErrors.rpc.internal((error as Error)?.message);
+    } catch {
+      return null;
     }
   }
 
@@ -110,7 +110,7 @@ class ElytroWalletClient {
       this?.client?.chain?.contracts?.ensUniversalResolver?.address;
 
     if (!ensResolverAddress) {
-      throw new Error('Elytro: Chain does not support ENS');
+      return null;
     }
 
     try {
@@ -119,8 +119,8 @@ class ElytroWalletClient {
         universalResolverAddress: ensResolverAddress,
       });
       return avatar;
-    } catch (error) {
-      throw ethErrors.rpc.internal((error as Error)?.message);
+    } catch {
+      return null;
     }
   }
 }

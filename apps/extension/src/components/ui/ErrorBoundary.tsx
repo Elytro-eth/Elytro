@@ -33,7 +33,7 @@ class ErrorBoundary<P extends ErrorBoundaryProps> extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-2xl">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
             Oops! Something went wrong. Try to refresh the page.
           </h1>

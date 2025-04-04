@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/form';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useAccount } from '@/contexts/account-context';
-import AddressInput from '@/components/biz/AddressInput';
 import TokenSelector from '@/components/biz/TokenSelector';
 import AmountInput from '@/components/biz/AmountInput';
 import { useTx } from '@/contexts/tx-context';
@@ -29,6 +28,7 @@ import { ABI_ERC20_TRANSFER } from '@/constants/abi';
 import { toast } from '@/hooks/use-toast';
 import { formatTokenAmount } from '@/utils/format';
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import AddressInput from '@/components/biz/AddressInput';
 
 export default function SendTx() {
   const {

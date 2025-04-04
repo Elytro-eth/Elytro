@@ -120,3 +120,10 @@ type TTokenPrice = {
   price: number;
   symbol: string;
 };
+
+type TRecentAddress = {
+  address: string;
+  name?: string;
+  time: string;
+  avatar?: string;
+};

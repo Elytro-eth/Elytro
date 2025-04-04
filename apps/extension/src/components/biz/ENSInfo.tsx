@@ -1,16 +1,8 @@
-import SplittedGrayAddress from '@/components/ui/SplittedGrayAddress';
-
-export interface EnsAddress {
-  address: string;
-  time: string;
-  name?: string;
-  avatar?: string;
-}
-
-const ENSInfo = ({ ensInfo }: { ensInfo: EnsAddress }) => {
-  if (!ensInfo) return null;
+import FragmentedAddress from './FragmentedAddress';
+const ENSInfo = ({ ensInfo }: { ensInfo: TRecentAddress }) => {
+  if (!ensInfo || !ensInfo.address) return null;
   return (
-    <div className="flex items-center h-16">
+    <div className="flex items-center">
       {ensInfo.avatar ? (
         <img
           src={ensInfo.avatar}
@@ -25,7 +17,7 @@ const ENSInfo = ({ ensInfo }: { ensInfo: EnsAddress }) => {
       <div className="text-base">
         <div>{ensInfo.name}</div>
         <div className="text-xs font-normal">
-          <SplittedGrayAddress address={ensInfo.address} />
+          <FragmentedAddress address={ensInfo?.address} />
         </div>
       </div>
     </div>
