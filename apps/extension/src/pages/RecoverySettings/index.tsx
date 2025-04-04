@@ -49,7 +49,7 @@ export default function RecoverySettings() {
 
   if (loading) {
     return (
-      <div className="relative h-full w-full flex flex-col items-center gap-y-sm p-4">
+      <div className="relative h-full w-full bg-white flex flex-col items-center gap-y-sm p-4">
         <ProcessingTip body="Getting recovery contacts" />
         <Button
           size="large"

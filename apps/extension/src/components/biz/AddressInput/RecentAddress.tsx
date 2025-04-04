@@ -14,7 +14,6 @@ const RecentAddressItem = ({
   onClick,
 }: IRecentAddressItemProps) => {
   if (!item.address || !item.time) return null;
-  const hour = dayjs().diff(item.time, 'h');
 
   return (
     <div
@@ -26,8 +25,8 @@ const RecentAddressItem = ({
       ) : (
         <FragmentedAddress size="md" address={item.address} chainId={chainId} />
       )}
-      <div className="text-gray-600 text-xs font-normal">
-        {hour > 1 ? `${hour}hrs` : 'An hr'} ago
+      <div className="text-gray-600 text-xs font-normal pl-3xl">
+        {dayjs(item.time).fromNow()}
       </div>
     </div>
   );

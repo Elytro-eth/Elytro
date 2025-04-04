@@ -7,7 +7,7 @@ export default function LocalProfile() {
     <SecondaryPageWrapper title="Device profile">
       <div className="space-y-2">
         <div
-          className="elytro-rounded-border-item-wrapper hover:bg-gray-150"
+          className="elytro-rounded-border-item-wrapper font-normal hover:bg-gray-150"
           onClick={() =>
             navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ChangePassword)
           }

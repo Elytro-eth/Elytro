@@ -8,7 +8,7 @@ export default function Activities() {
 
   if (!history.length)
     return (
-      <div className="flex min-h-[50vh] items-center">
+      <div className="flex mt-10">
         <EmptyTip tip="No activities yet" />
       </div>
     );

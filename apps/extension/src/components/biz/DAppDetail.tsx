@@ -10,7 +10,7 @@ export default function DAppDetail({ dapp, chainId }: IDAppDetail) {
   const chainLogo = getIconByChainId(chainId);
 
   return (
-    <div className="flex items-center mb-2 w-full flex-grow">
+    <div className="flex items-center mb-2 p-2 w-full flex-grow">
       {/* DApp Icon & Chain Icon */}
       <div className="relative mr-4">
         <Avatar className="h-12 w-12  ">
@@ -28,7 +28,7 @@ export default function DAppDetail({ dapp, chainId }: IDAppDetail) {
 
       {/* DApp Name & Origin */}
       <div className="flex flex-col">
-        <h2 className="text-xl font-bold">{dapp.name}</h2>
+        <h2 className="text-lg font-bold">{dapp.name}</h2>
         {dapp.origin && (
           <a
             href={dapp.origin}

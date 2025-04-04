@@ -62,6 +62,7 @@ const UnlockComponent = () => {
         onValueChange={setPassword}
         placeholder="Enter your passcode"
         disabled={isLoading}
+        autoFocus
       />
       <Button
         onClick={handleUnlock}
@@ -136,8 +137,8 @@ export default function Launch() {
   const { title, content, iconImg } = renderContent;
 
   return (
-    <div className="elytro-gradient-bg flex flex-1 flex-col items-center justify-center px-xl h-full gap-y-3xl">
-      <img src={iconImg} alt="Launch" className="size-[128px]" />
+    <div className="elytro-gradient-bg flex flex-1 flex-col items-center px-xl h-full gap-y-3xl pt-10">
+      <img src={iconImg} alt="Launch" className="size-[128px] mt-10" />
       <h1 className="elytro-text-headline text-center">{title}</h1>
       <div className="flex flex-col w-full">{content}</div>
     </div>
