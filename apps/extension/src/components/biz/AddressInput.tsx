@@ -29,12 +29,10 @@ const RecentAddressItem = memo(
     chainId: number;
     onClick: () => void;
   }) => {
-    const hour = dayjs().diff(item.time, 'h');
-
     return (
       <div
         onClick={onClick}
-        className="px-lg py-md cursor-pointer flex items-center justify-between hover:bg-gray-150"
+        className="px-lg py-md cursor-pointer flex-column items-center justify-between hover:bg-gray-150"
       >
         {item.name ? (
           <ENSInfoComponent ensInfo={item} />
@@ -45,8 +43,8 @@ const RecentAddressItem = memo(
             chainId={chainId}
           />
         )}
-        <div className="text-gray-600 text-xs font-normal">
-          {hour > 1 ? `${hour}hrs` : 'An hr'} ago
+        <div className="text-gray-600 text-xs font-normal pl-8">
+          {dayjs(item.time).fromNow()}
         </div>
       </div>
     );

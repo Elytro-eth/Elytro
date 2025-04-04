@@ -1,4 +1,8 @@
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { RUNTIME_MESSAGE_TYPE } from '@/constants/message';
+
+dayjs.extend(relativeTime);
 
 export const bootstrap = (mainFunction: () => void) => {
   const attemptBootstrap = () => {
