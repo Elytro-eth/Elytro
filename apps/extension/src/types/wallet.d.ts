@@ -124,6 +124,6 @@ type TTokenPrice = {
 type TRecentAddress = {
   address: string;
   name?: string;
-  time: string;
+  time: number;
   avatar?: string;
 };

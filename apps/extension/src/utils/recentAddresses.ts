@@ -5,9 +5,7 @@ const ELYTRO_RECENT_ADDRESS_STORE = 'ELYTRO_RECENT_ADDRESS_STORE';
 /**
  * Save an address to recent addresses
  */
-export const saveRecentAddress = async (
-  data: TRecentAddress
-): Promise<void> => {
+export const saveRecentAddress = async (address: string): Promise<void> => {
   try {
     const storedData = await localStorage.get<Record<string, TRecentAddress>>(
       ELYTRO_RECENT_ADDRESS_STORE
@@ -18,8 +16,11 @@ export const saveRecentAddress = async (
       parsedData = storedData as Record<string, TRecentAddress>;
     }
 
-    if (!parsedData[data.address]) {
-      parsedData[data.address] = data;
+    if (!parsedData[address]) {
+      parsedData[address] = {
+        address,
+        time: new Date().getTime(),
+      };
       localStorage.save({
         [ELYTRO_RECENT_ADDRESS_STORE]: parsedData,
       });

@@ -55,7 +55,7 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
         const newEnsInfo: TRecentAddress = {
           address: ensAddr.address,
           name: ensName,
-          time: new Date().toISOString(),
+          time: new Date().getTime(),
         };
 
         setEnsInfo(newEnsInfo);
