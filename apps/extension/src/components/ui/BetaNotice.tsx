@@ -48,7 +48,7 @@ export default function BetaNotice({
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 h-9 p-2 flex"
+      className="h-9 p-2 flex"
       style={{
         background:
           'radial-gradient(100% 336.18% at 0% 0%, #F1E8DF 0%, #F7F7F0 25.15%, #DAECEE 100%)',

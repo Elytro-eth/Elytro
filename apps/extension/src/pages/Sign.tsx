@@ -43,7 +43,7 @@ export default function Sign() {
   };
 
   return (
-    <div className="w-full h-full flex justify-center items-center">
+    <div className="w-full h-full bg-white flex justify-center items-center">
       <div className="max-w-screen-sm h-full flex py-4">
         <SignDetail
           onConfirm={handleConfirm}

@@ -232,6 +232,10 @@ export const AccountProvider = ({
   };
 
   useEffect(() => {
+    if (!currentAccount.address) {
+      return;
+    }
+
     RuntimeMessage.onMessage(
       EVENT_TYPES.HISTORY.ITEMS_UPDATED,
       onHistoryUpdated
@@ -240,7 +244,7 @@ export const AccountProvider = ({
     return () => {
       RuntimeMessage.offMessage(onHistoryUpdated);
     };
-  }, []);
+  }, [currentAccount.address]);
 
   const getAccounts = async () => {
     const res = await wallet.getAccounts();
