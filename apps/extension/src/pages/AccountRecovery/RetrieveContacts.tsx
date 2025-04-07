@@ -38,7 +38,6 @@ function PageContent() {
   const { wallet } = useWallet();
   const { address } = useSearchParams();
   const { currentChain } = useChain();
-  const chainId = currentChain?.id;
   const [loading, setLoading] = useState(false);
   const [recoveryContacts, setRecoveryContacts] = useState<TRecoveryContact[]>(
     []
@@ -78,10 +77,10 @@ function PageContent() {
   };
 
   useEffect(() => {
-    if (Number(chainId)) {
+    if (Number(currentChain?.id)) {
       getRecoveryRecord();
     }
-  }, [address, chainId]);
+  }, [address, currentChain?.id]);
 
   const handleShareContact = (contact: TRecoveryContact) => {
     if (!recoveryRecord || !recoveryRecord.recoveryRecordID) {
@@ -163,7 +162,7 @@ function PageContent() {
         className="bg-light-green text-gray-750"
       />
 
-      <ShortedAddress address={address} chainId={chainId} />
+      <ShortedAddress address={address} chainId={currentChain?.id} />
 
       <div className="flex flex-col gap-y-sm">
         {recoveryContacts.map((contact) => (

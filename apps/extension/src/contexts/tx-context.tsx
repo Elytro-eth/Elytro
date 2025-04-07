@@ -236,17 +236,13 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     const prevType = requestType;
     resetTxContext();
 
-    if (approval) {
-      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
-    } else if (prevType === TxRequestTypeEn.DeployWallet) {
-      navigateTo(
-        'side-panel',
-        SIDE_PANEL_ROUTE_PATHS.Dashboard,
-        isCancel ? undefined : { activating: '1' }
-      );
-    } else if (history.length > 1) {
-      history.back();
-    }
+    navigateTo(
+      'side-panel',
+      SIDE_PANEL_ROUTE_PATHS.Dashboard,
+      prevType !== TxRequestTypeEn.DeployWallet && isCancel
+        ? undefined
+        : { activating: '1' }
+    );
   };
 
   const onCancel = async () => {

@@ -47,7 +47,7 @@ export default function ImportToken() {
   const {
     currentAccount: { chainId },
     tokenInfo: { tokens: existingTokens },
-    reloadAccount,
+    updateTokens,
   } = useAccount();
   const { wallet } = useWallet();
 
@@ -108,7 +108,7 @@ export default function ImportToken() {
 
     try {
       await wallet.importToken({ ...token, name: token?.name || token.symbol });
-      reloadAccount();
+      updateTokens();
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
     } catch (error) {
       console.error('Elytro: Import token failed', error);

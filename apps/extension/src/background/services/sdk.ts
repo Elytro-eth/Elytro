@@ -273,7 +273,7 @@ export class SDKService {
       if (res?.isErr()) {
         throw res.ERR;
       } else if (res?.OK) {
-        return { ...res.OK.receipt };
+        return { ...res.OK.receipt, success: res.OK.success };
       }
     } catch (error) {
       console.error('Elytro: Failed to get user operation receipt.', error);

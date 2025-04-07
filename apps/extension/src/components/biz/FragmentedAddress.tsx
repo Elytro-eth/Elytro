@@ -55,7 +55,7 @@ export default function FragmentedAddress({
       )}
       <div className={cn('flex items-center gap-sm', text)}>
         <span>{prefix}</span>
-        <Tooltip>
+        <Tooltip delayDuration={0}>
           <TooltipTrigger>
             <span
               className="px-1 bg-gray-300 rounded-xs"

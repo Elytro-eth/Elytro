@@ -1,10 +1,4 @@
-import {
-  encodeFunctionData,
-  formatUnits,
-  isAddress,
-  parseUnits,
-  zeroAddress,
-} from 'viem';
+import { encodeFunctionData, isAddress, parseUnits, zeroAddress } from 'viem';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,7 +14,6 @@ import {
 } from '@/components/ui/form';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useAccount } from '@/contexts/account-context';
-import AddressInput from '@/components/biz/AddressInput';
 import TokenSelector from '@/components/biz/TokenSelector';
 import AmountInput from '@/components/biz/AmountInput';
 import { useTx } from '@/contexts/tx-context';
@@ -29,6 +22,8 @@ import { ABI_ERC20_TRANSFER } from '@/constants/abi';
 import { toast } from '@/hooks/use-toast';
 import { formatTokenAmount } from '@/utils/format';
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import AddressInput from '@/components/biz/AddressInput';
+import { saveRecentAddress } from '@/utils/recentAddresses';
 
 export default function SendTx() {
   const {
@@ -47,18 +42,7 @@ export default function SendTx() {
         return false;
       }
 
-      try {
-        const formattedBalance = formatUnits(
-          BigInt(token.balance),
-          token.decimals
-        );
-        const numericBalance = parseFloat(formattedBalance);
-
-        return numericBalance > 0.000001; //
-      } catch (error) {
-        console.error(`Error filtering token ${token.symbol}:`, error);
-        return false;
-      }
+      return true;
     });
   }, [tokens]);
 
@@ -177,6 +161,7 @@ export default function SendTx() {
         throw new Error('Invalid token address');
       }
 
+      saveRecentAddress(to);
       handleTxRequest(TxRequestTypeEn.SendTransaction, [txParams], {
         to,
         method: {
