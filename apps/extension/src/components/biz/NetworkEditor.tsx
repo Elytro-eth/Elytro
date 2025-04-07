@@ -113,7 +113,9 @@ export default function NetworkEditor({
         bundler: data.bundler,
         rpcUrls: {
           default: {
-            http: [...chain.rpcUrls.default.http, data.endpoint],
+            http: chain?.rpcUrls?.default?.http
+              ? [...chain.rpcUrls.default.http, data.endpoint]
+              : [data.endpoint],
           },
         },
       };
