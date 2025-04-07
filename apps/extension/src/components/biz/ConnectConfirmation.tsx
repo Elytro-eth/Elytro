@@ -24,8 +24,8 @@ export default function ConnectionConfirmation({
     <Card className="w-full h-full p-6 flex flex-col border-none rounded-none shadow-none">
       <div className="flex justify-center ">
         <Avatar className="size-5xl  left-4 z-10 rounded-full">
-          <AvatarImage src={LogoWithCircle} alt={`${dApp.name} icon`} />
-          <AvatarFallback>{dApp.name}</AvatarFallback>
+          <AvatarImage src={LogoWithCircle} alt="Elytro" />
+          <AvatarFallback>Elytro</AvatarFallback>
         </Avatar>
         <Avatar className="size-5xl  z-0 rounded-full mr-4">
           <AvatarImage src={dApp.icon} alt={`${dApp.name} icon`} />

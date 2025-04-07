@@ -131,7 +131,7 @@ function PageContent() {
 
   if (recoveryRecord?.status === TRecoveryStatus.SIGNATURE_COMPLETED) {
     return (
-      <div className="h-full flex flex-col justify-center items-center gap-y-xl text-center">
+      <div className="h-full flex flex-col items-center gap-y-xl text-center">
         <img src={WalletImg} alt="Wallet" className="size-36" />
         <div className="flex flex-col gap-y-sm">
           <h1 className="elytro-text-title ">Enough signatures collected</h1>
