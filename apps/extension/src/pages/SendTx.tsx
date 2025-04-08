@@ -84,8 +84,20 @@ export default function SendTx() {
           });
         }
       }),
-    to: z.string().refine((address) => isAddress(address), {
-      message: 'Please give a valid address.',
+    to: z.string().superRefine((targetAddress, ctx) => {
+      if (!isAddress(targetAddress)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Please give a valid address.',
+        });
+      }
+
+      if (targetAddress.toLowerCase() === address.toLowerCase()) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'You cannot send to yourself',
+        });
+      }
     }),
   });
 

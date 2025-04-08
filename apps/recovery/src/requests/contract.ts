@@ -1,3 +1,4 @@
+import { toast } from '@/hooks/use-toast';
 import { getConfig } from '@/wagmi';
 import { GuardianSignature, SocialRecovery } from '@soulwallet/sdk';
 import { Address, encodeFunctionData, Hex, isAddress } from 'viem';
@@ -660,7 +661,13 @@ export const SocialRecoveryContractConfig = {
 
 export const getWalletNonce = async (wallet?: string, chainId?: number) => {
   try {
-    if (!wallet || !isAddress(wallet)) return null;
+    if (!wallet || !isAddress(wallet)) {
+      toast({
+        title: 'Invalid wallet address',
+        description: 'Please enter a valid wallet address',
+      });
+      return null;
+    }
 
     const res = await readContract(getConfig(), {
       address: SocialRecoveryContractConfig.address,

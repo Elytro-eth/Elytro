@@ -1,10 +1,5 @@
 import { http, cookieStorage, createConfig, createStorage } from 'wagmi';
-import {
-  coinbaseWallet,
-  injected,
-  metaMask,
-  walletConnect,
-} from 'wagmi/connectors';
+import { coinbaseWallet, metaMask, walletConnect } from 'wagmi/connectors';
 import { SUPPORTED_CHAINS } from './constants/chains';
 
 const WALLETCONNECT_PROJECT_ID = '8cbad7c19c42240ceef404623a8e5efc';
@@ -13,7 +8,9 @@ export function getConfig() {
   return createConfig({
     chains: SUPPORTED_CHAINS,
     connectors: [
-      injected(),
+      // injected({
+      //   target: 'metaMask',
+      // }),
       metaMask(),
       coinbaseWallet({
         appName: 'Elytro Wallet Recovery',

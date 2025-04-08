@@ -1,79 +1,90 @@
 import { localStorage } from './storage/local';
 
-const UNISWAP_TOKEN_LIST_URL = 'https://ipfs.io/ipns/tokens.uniswap.org';
-const IPFS_GATEWAY = 'https://ipfs.io/ipfs/';
-const IPFS_PROTOCOL = 'ipfs://';
+const CONFIG = {
+  UNISWAP_API: {
+    TOKEN_LIST_URL: 'https://ipfs.io/ipns/tokens.uniswap.org',
+  },
+  IPFS: {
+    GATEWAY: 'https://ipfs.io/ipfs/',
+    PROTOCOL: 'ipfs://',
+  },
+  CACHE: {
+    DURATION: 1000 * 60 * 60 * 24, // 1 Day
+    KEYS: {
+      TOP_TOKENS: (chainId: number) => `top100Tokens-${chainId}`,
+      USER_TOKENS: (chainId: number) => `userImportedTokens-${chainId}`,
+    },
+  },
+} as const;
+
+interface CachedTokens {
+  tokens: TTokenInfo[];
+  lastUpdated: number;
+}
+
+const transformLogoURI = (logoURI: string): string => {
+  if (!logoURI.includes(CONFIG.IPFS.PROTOCOL)) return logoURI;
+  return `${CONFIG.IPFS.GATEWAY}${logoURI.split(CONFIG.IPFS.PROTOCOL)[1]}`;
+};
+
+const isCacheValid = (lastUpdated: number): boolean => {
+  return Date.now() - lastUpdated < CONFIG.CACHE.DURATION;
+};
 
 export const fetchTokens = async (
   chainId: number,
   maxCount?: number
 ): Promise<TTokenInfo[]> => {
   try {
-    const res = await fetch(UNISWAP_TOKEN_LIST_URL);
-    const { tokens } = await res.json();
-
-    let filteredTokens = (tokens as TTokenInfo[]).filter(
-      (token) => token.chainId === chainId
-    );
-
-    if (maxCount !== undefined) {
-      filteredTokens = filteredTokens.slice(0, maxCount);
+    const response = await fetch(CONFIG.UNISWAP_API.TOKEN_LIST_URL);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return filteredTokens.map((token) => ({
-      address: token.address,
-      name: token.name,
-      symbol: token.symbol,
-      decimals: token.decimals,
-      // change ipfs to https: ipfs://{cid} -> https://ipfs.io/ipfs/{cid}
-      logoURI: token.logoURI.includes(IPFS_PROTOCOL)
-        ? `${IPFS_GATEWAY}${token.logoURI.split(IPFS_PROTOCOL)[1]}`
-        : token.logoURI,
-    }));
+    const { tokens } = await response.json();
+    const filteredTokens = (tokens as TTokenInfo[])
+      .filter((token) => token.chainId === chainId)
+      .map((token) => ({
+        address: token.address,
+        name: token.name,
+        symbol: token.symbol,
+        decimals: token.decimals,
+        logoURI: transformLogoURI(token.logoURI),
+      }));
+
+    return maxCount ? filteredTokens.slice(0, maxCount) : filteredTokens;
   } catch (error) {
-    console.error('Elytro: fetching 100 tokens failed', error);
+    console.error(error instanceof Error ? error.message : 'Unknown error');
     return [];
   }
-};
-
-type TLocalStorageTokenAddresses = {
-  tokens: TTokenInfo[];
-  lastUpdated: number;
-};
-
-const TOP_100_TOKENS_CACHE_TIME = 1000 * 60 * 60 * 24; // 1 Day
-
-const getUserImportedTokensStorageKey = (chainId: number) => {
-  return `userImportedTokens-${chainId}`;
 };
 
 export const getTop100TokenAddresses = async (
   chainId: number
 ): Promise<TTokenInfo[]> => {
-  const storageKey = `top100Tokens-${chainId}`;
-  const top100Tokens = (await localStorage.get(
-    storageKey
-  )) as TLocalStorageTokenAddresses | null;
-
-  if (
-    top100Tokens &&
-    Date.now() - top100Tokens.lastUpdated < TOP_100_TOKENS_CACHE_TIME
-  ) {
-    return top100Tokens.tokens;
-  }
+  const storageKey = CONFIG.CACHE.KEYS.TOP_TOKENS(chainId);
 
   try {
-    const tokens = await fetchTokens(chainId, 100);
+    const cached = (await localStorage.get(storageKey)) as CachedTokens | null;
 
-    localStorage.save({
+    if (cached && isCacheValid(cached.lastUpdated)) {
+      return cached.tokens;
+    }
+
+    const tokens = await fetchTokens(chainId, 100);
+    await localStorage.save({
       [storageKey]: {
         tokens,
         lastUpdated: Date.now(),
       },
     });
+
     return tokens;
   } catch (error) {
-    console.error('Elytro: fetching top 100 token info failed', error);
+    console.error(
+      'Elytro: Failed to get top 100 tokens:',
+      error instanceof Error ? error.message : 'Unknown error'
+    );
     return [];
   }
 };
@@ -81,36 +92,61 @@ export const getTop100TokenAddresses = async (
 export const updateUserImportedTokens = async (
   chainId: number,
   token: TTokenInfo
-) => {
-  const storageKey = getUserImportedTokensStorageKey(chainId);
-  const prevTokens =
-    ((await localStorage.get(storageKey)) as TTokenInfo[]) || [];
+): Promise<void> => {
+  const storageKey = CONFIG.CACHE.KEYS.USER_TOKENS(chainId);
 
-  const isDuplicate = prevTokens.some((t) => t.address === token.address);
+  try {
+    const prevTokens =
+      ((await localStorage.get(storageKey)) as TTokenInfo[]) || [];
 
-  if (isDuplicate) {
-    return;
+    if (
+      prevTokens.some(
+        (t) => t.address.toLowerCase() === token.address.toLowerCase()
+      )
+    ) {
+      return;
+    }
+
+    const newToken = {
+      ...token,
+      chainId,
+      importedByUser: true,
+    };
+
+    await localStorage.save({
+      [storageKey]: [...prevTokens, newToken],
+    });
+  } catch (error) {
+    console.error(
+      'Elytro: Failed to update user tokens:',
+      error instanceof Error ? error.message : 'Unknown error'
+    );
   }
-
-  await localStorage.save({
-    [storageKey]: [
-      ...prevTokens,
-      {
-        ...token,
-        importedByUser: true,
-      },
-    ],
-  });
 };
 
-export const getTokenList = async (chainId: number) => {
-  const top100Tokens = await getTop100TokenAddresses(chainId);
+export const getTokenList = async (chainId: number): Promise<TTokenInfo[]> => {
+  try {
+    const [userTokens, top100Tokens] = await Promise.all([
+      localStorage.get(CONFIG.CACHE.KEYS.USER_TOKENS(chainId)) as Promise<
+        TTokenInfo[]
+      >,
+      getTop100TokenAddresses(chainId),
+    ]);
 
-  const userImportedTokensStorageKey = getUserImportedTokensStorageKey(chainId);
+    const userTokenAddresses = new Set(
+      (userTokens || []).map((token) => token.address.toLowerCase())
+    );
 
-  const userImportedTokens =
-    ((await localStorage.get(userImportedTokensStorageKey)) as TTokenInfo[]) ||
-    [];
+    const filteredTop100Tokens = top100Tokens.filter(
+      (token) => !userTokenAddresses.has(token.address.toLowerCase())
+    );
 
-  return [...top100Tokens, ...userImportedTokens];
+    return [...(userTokens || []), ...filteredTop100Tokens];
+  } catch (error) {
+    console.error(
+      'Elytro: Failed to get token list:',
+      error instanceof Error ? error.message : 'Unknown error'
+    );
+    return [];
+  }
 };

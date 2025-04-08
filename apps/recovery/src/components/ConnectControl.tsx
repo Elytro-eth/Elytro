@@ -104,8 +104,8 @@ export default function ConnectControl() {
       });
     } else {
       toast({
-        title:
-          'You’re not connected to the right wallet. Please try to switch wallet or client.',
+        title: 'Wallet not authorized',
+        description: 'Please connect with a guardian wallet.',
         variant: 'destructive',
       });
     }
@@ -139,7 +139,7 @@ export default function ConnectControl() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Select an wallet client</DialogTitle>
+          <DialogTitle>Select a wallet client</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-2">
