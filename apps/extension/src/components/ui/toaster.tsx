@@ -7,16 +7,37 @@ import {
   ToastTitle,
   ToastViewport,
 } from '@/components/ui/toast';
+import iconSuccess from '@/assets/toast/success.svg';
+import iconError from '@/assets/toast/error.svg';
+
+const IconsMap = {
+  default: undefined,
+  constructive: iconSuccess,
+  destructive: iconError,
+};
 
 export function Toaster() {
   const { toasts } = useToast();
 
   return (
-    <ToastProvider swipeDirection="down" duration={3000}>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
+    <ToastProvider swipeDirection="down" duration={1200}>
+      {toasts.map(function ({
+        id,
+        title,
+        description,
+        action,
+        variant,
+        ...props
+      }) {
+        const icon = variant ? IconsMap[variant] : null;
         return (
-          <Toast key={id} {...props}>
-            <div className="grid gap-1">
+          <Toast key={id} variant={variant} {...props} className="flex">
+            {icon && (
+              <div className="w-5">
+                <img src={icon} className="w-5 h-5" />
+              </div>
+            )}
+            <div className="flex-1">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && (
                 <ToastDescription>{description}</ToastDescription>
