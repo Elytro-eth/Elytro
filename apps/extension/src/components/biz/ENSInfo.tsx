@@ -1,5 +1,12 @@
+import { ReactNode } from 'react';
 import FragmentedAddress from './FragmentedAddress';
-const ENSInfo = ({ ensInfo }: { ensInfo: TRecentAddress }) => {
+const ENSInfo = ({
+  ensInfo,
+  extra,
+}: {
+  ensInfo: TRecentAddress;
+  extra?: ReactNode;
+}) => {
   if (!ensInfo || !ensInfo.address) return null;
   return (
     <div className="flex items-center">
@@ -16,8 +23,8 @@ const ENSInfo = ({ ensInfo }: { ensInfo: TRecentAddress }) => {
       )}
       <div className="text-base">
         <div>{ensInfo.name}</div>
-        <div className="text-xs font-normal">
-          <FragmentedAddress address={ensInfo?.address} />
+        <div className="flex text-xs font-normal">
+          <FragmentedAddress address={ensInfo?.address} extra={extra} />
         </div>
       </div>
     </div>
