@@ -25,7 +25,7 @@ const ENSSearchResults = ({
         {<Spin isLoading={loading} />}
         {ensInfo?.name && (
           <div
-            className="cursor-pointer hover:bg-gray-300 px-lg py-md"
+            className="cursor-pointer hover:bg-gray-150 px-lg py-md"
             onClick={onSelectENS}
           >
             <ENSInfoComponent ensInfo={ensInfo} />

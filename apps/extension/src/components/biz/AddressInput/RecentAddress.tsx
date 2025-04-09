@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import FragmentedAddress from '../FragmentedAddress';
 import ENSInfoComponent from '../ENSInfo';
+import { useMemo } from 'react';
 
 interface IRecentAddressItemProps {
   item: TRecentAddress;
@@ -15,19 +16,30 @@ const RecentAddressItem = ({
 }: IRecentAddressItemProps) => {
   if (!item.address || !item.time) return null;
 
+  const time = useMemo(
+    () => (
+      <div className="text-gray-600 text-xs font-normal">
+        {dayjs(item.time).fromNow()}
+      </div>
+    ),
+    [item.time]
+  );
+
   return (
     <div
       onClick={onClick}
-      className="px-lg py-md cursor-pointer flex items-center justify-between hover:bg-gray-150"
+      className="px-lg py-md cursor-pointer flex-column items-center justify-between hover:bg-gray-150"
     >
       {item.name ? (
-        <ENSInfoComponent ensInfo={item} />
+        <ENSInfoComponent ensInfo={item} extra={time} />
       ) : (
-        <FragmentedAddress size="md" address={item.address} chainId={chainId} />
+        <FragmentedAddress
+          size="md"
+          address={item.address}
+          chainId={chainId}
+          extra={time}
+        />
       )}
-      <div className="text-gray-600 text-xs font-normal pl-3xl">
-        {dayjs(item.time).fromNow()}
-      </div>
     </div>
   );
 };
