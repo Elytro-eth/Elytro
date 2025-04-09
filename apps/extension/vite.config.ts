@@ -4,11 +4,36 @@ import { crx } from '@crxjs/vite-plugin';
 import manifest from './public/manifest.json';
 import { resolve } from 'path';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
-import renameAndPackOutputPlugin from './output-pack-vite-plugin';
+import renameAndPackOutputPlugin from './plugins/output-pack-vite-plugin';
+import versionControlPlugin from './plugins/version-plugin';
+import fixExtensionIdPlugin from './plugins/fixed-extension-id';
+
 const isProd = process.env.NODE_ENV === 'production';
+
+const shouldBumpVersion = () => {
+  if (process.env.VERSION_BUMP === 'false') {
+    return false;
+  }
+  if (process.env.VERSION_BUMP === 'true') {
+    return true;
+  }
+  return isProd;
+};
+
+const getVersionType = () => {
+  const versionType = process.env.VERSION_TYPE;
+  if (versionType && ['major', 'minor', 'patch'].includes(versionType)) {
+    return versionType as 'major' | 'minor' | 'patch';
+  }
+  return 'patch';
+};
 
 export default defineConfig({
   plugins: [
+    versionControlPlugin({
+      type: getVersionType(),
+      autoIncrement: shouldBumpVersion(),
+    }),
     react({
       babel: {
         plugins: isProd ? ['transform-remove-console'] : [],
@@ -19,6 +44,7 @@ export default defineConfig({
     nodePolyfills({
       include: ['process', 'util'],
     }),
+    fixExtensionIdPlugin(),
     renameAndPackOutputPlugin(),
   ],
   resolve: {
@@ -98,8 +124,5 @@ export default defineConfig({
     esbuildOptions: {
       target: 'es2020',
     },
-  },
-  define: {
-    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
   },
 });

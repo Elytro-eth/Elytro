@@ -246,18 +246,23 @@ class WalletController {
     let isDeployed = basicInfo.isDeployed;
 
     // isDeployed maybe undefined when the account is just created, in this case, we need to check if the account is deployed
-    if (!isDeployed) {
-      isDeployed = await elytroSDK.isSmartAccountDeployed(basicInfo.address);
+    try {
+      if (!isDeployed) {
+        isDeployed = await elytroSDK.isSmartAccountDeployed(basicInfo.address);
 
+        accountManager.updateCurrentAccountInfo({
+          isDeployed,
+        });
+      }
+
+      const balance = await walletClient.getBalance(basicInfo.address);
+      basicInfo.balance = Number(balance);
       accountManager.updateCurrentAccountInfo({
-        isDeployed,
+        balance: Number(balance),
       });
+    } catch (error) {
+      console.error('Error checking if account is deployed', error);
     }
-
-    const balance = await walletClient.getBalance(basicInfo.address);
-    accountManager.updateCurrentAccountInfo({
-      balance: Number(balance),
-    });
 
     return {
       ...basicInfo,

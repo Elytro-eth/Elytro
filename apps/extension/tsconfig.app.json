@@ -25,5 +25,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "output-pack-vite-plugin.ts"]
+  "include": ["src", "plugins/**/*.ts"]
 }
