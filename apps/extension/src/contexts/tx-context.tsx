@@ -239,9 +239,9 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     navigateTo(
       'side-panel',
       SIDE_PANEL_ROUTE_PATHS.Dashboard,
-      prevType !== TxRequestTypeEn.DeployWallet && isCancel
-        ? undefined
-        : { activating: '1' }
+      prevType === TxRequestTypeEn.DeployWallet && !isCancel
+        ? { activating: '1' }
+        : undefined
     );
   };
 
