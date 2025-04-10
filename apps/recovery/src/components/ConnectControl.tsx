@@ -17,6 +17,7 @@ import { toast } from '@/hooks/use-toast';
 import { useRecoveryRecord } from '@/contexts';
 import { isConnectedAccountAContact } from '@/lib/contact';
 import WrappedImage from './WrappedImage';
+import { CONNECTOR_ICON_MAP } from '@/wagmi';
 
 const ConnectorItem = ({
   connector,
@@ -36,7 +37,7 @@ const ConnectorItem = ({
           `https://placehold.co/24x24?text=${connector.name?.[0]}`
         }
         alt={connector.name}
-        className="rounded-full size-6"
+        className="rounded-sm size-6"
         width={24}
         height={24}
       />
@@ -59,7 +60,13 @@ export default function ConnectControl() {
         if (connector.type === 'injected') {
           acc.injectedConnectors.push(connector);
         } else {
-          acc.otherConnectors.push(connector);
+          console.log(connector);
+          acc.otherConnectors.push({
+            ...connector,
+            icon: CONNECTOR_ICON_MAP[
+              connector.id as keyof typeof CONNECTOR_ICON_MAP
+            ],
+          });
         }
         return acc;
       },
@@ -100,12 +107,12 @@ export default function ConnectControl() {
       )
     ) {
       toast({
-        title: 'Account connected successfully',
+        title: 'Wallet connected successfully',
       });
     } else {
       toast({
-        title:
-          'You’re not connected to the right account. Please try to switch account or client.',
+        title: 'Wallet not authorized',
+        description: 'Please connect with a guardian wallet.',
         variant: 'destructive',
       });
     }
@@ -139,7 +146,7 @@ export default function ConnectControl() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Select an account client</DialogTitle>
+          <DialogTitle>Select a wallet client</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-2">

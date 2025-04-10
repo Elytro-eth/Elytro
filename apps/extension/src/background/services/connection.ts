@@ -34,7 +34,7 @@ class ConnectionManager {
   public async switchAccount(account: TAccountInfo | null) {
     if (!account || !account.address || !account.chainId) {
       console.log(
-        'Elytro::ConnectionManager:: switchAccount failed, no account.'
+        'Elytro::ConnectionManager:: switchAccount failed, no wallet.'
       );
       return;
     }

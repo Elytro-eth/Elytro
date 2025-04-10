@@ -49,7 +49,7 @@ export default function NetworkSelection({
     if (!chains.length) return null;
     return (
       <div className="flex flex-col gap-y-sm">
-        <div className="elytro-text-body text-gray-600">{title}</div>
+        <div className="elytro-text-body text-gray-600 text-base">{title}</div>
         {chains.map((chain) => (
           <ChainItem
             key={chain.id}

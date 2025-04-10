@@ -14,7 +14,7 @@ export default function ActivityGroup({
         {date}
       </div>
       {items.map((item) => (
-        <ActivityItem key={item.opHash || item.timestamp} {...item} />
+        <ActivityItem key={item.txHash || item.opHash} {...item} />
       ))}
     </div>
   );

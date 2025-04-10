@@ -28,7 +28,7 @@ export default function Settings() {
     <SecondaryPageWrapper title="Settings">
       <div className="bg-gray-150 p-lg rounded-sm space-y-2">
         <h2 className="elytro-text-small-bold text-gray-600 pd-md">
-          Account settings
+          Wallet settings
         </h2>
         <div className="space-y-2">
           <AccountsDropdown />

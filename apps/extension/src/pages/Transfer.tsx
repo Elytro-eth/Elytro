@@ -8,15 +8,15 @@ import FullPageWrapper from '@/components/biz/FullPageWrapper';
 export default function Transfer() {
   return (
     <FullPageWrapper className="elytro-gradient-bg-2">
-      <img src={WalletImg} alt="Wallet" className="size-[144px]" />
+      <img src={WalletImg} alt="Wallet" className="size-[144px] mt-10" />
       <div className="text-center flex flex-col ap-y-2xs">
         <h1 className="elytro-text-subtitle mb-2">
           Manage your
           <br />
-          Elytro accounts
+          Elytro wallets
         </h1>
         <p className="elytro-text-smaller-body text-gray-600">
-          Smart contract accounts created on Elytro only
+          Smart contract wallets created on Elytro only
         </p>
       </div>
       <div className="flex flex-col gap-y-md w-full">
@@ -28,7 +28,7 @@ export default function Transfer() {
             });
           }}
         >
-          Recover an account
+          Recover a wallet
         </Button>
         <Button
           size="large"
@@ -40,7 +40,7 @@ export default function Transfer() {
             })
           }
         >
-          Import an account
+          Import a wallet
         </Button>
       </div>
     </FullPageWrapper>

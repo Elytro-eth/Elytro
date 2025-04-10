@@ -12,7 +12,7 @@ export default function ActivateButton() {
       handleTxRequest(TxRequestTypeEn.DeployWallet);
     } catch (error) {
       toast({
-        title: 'Activate account failed',
+        title: 'Activate wallet failed',
         description: (error as Error)?.message,
       });
       console.error(error);
@@ -21,7 +21,7 @@ export default function ActivateButton() {
 
   return (
     <Button onClick={onClickActivate} disabled={!currentAccount}>
-      Activate account
+      Activate wallet
     </Button>
   );
 }

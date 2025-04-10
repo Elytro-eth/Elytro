@@ -19,12 +19,10 @@ const passwordForm = z
     password: z
       .string()
       .min(6, {
-        message:
-          'Must be more than 6 characters with more than 1 capitalized letter.',
+        message: 'More than 6 characters with at least 1 capitalized letter.',
       })
       .refine((value) => /[A-Z]/.test(value), {
-        message:
-          'Must be more than 6 characters with more than 1 capitalized letter.',
+        message: 'More than 6 characters with at least 1 capitalized letter.',
       }),
     confirm: z.string(),
   })

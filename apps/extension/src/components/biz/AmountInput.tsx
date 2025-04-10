@@ -2,7 +2,7 @@ import { Input } from '@/components/ui/input';
 import { FieldValues } from 'react-hook-form';
 import { cn } from '@/utils/shadcn/utils';
 import { memo, useCallback, useState, useEffect, useRef } from 'react';
-import { ArrowRightLeftIcon } from 'lucide-react';
+import { ArrowUpDownIcon } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
 
 interface AmountInputProps {
@@ -16,10 +16,23 @@ enum InputMode {
   TOKEN = 'token',
 }
 
+const INPUT_CONFIG = {
+  [InputMode.DOLLAR]: {
+    prefix: '$',
+    postfix: '',
+  },
+  [InputMode.TOKEN]: {
+    prefix: '',
+    postfix: '',
+  },
+};
+
 const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
   const [fontSize, setFontSize] = useState('text-xl');
   const [inputMode, setInputMode] = useState<InputMode>(InputMode.TOKEN);
-  const [displayValue, setDisplayValue] = useState('');
+  const [eqMode, setEqMode] = useState<InputMode>(InputMode.DOLLAR);
+  const [inputValue, setInputValue] = useState('');
+  const [eqValue, setEqValue] = useState('');
 
   const isInternalUpdate = useRef(false);
 
@@ -38,19 +51,19 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
     }
 
     if (!field.value) {
-      setDisplayValue('');
+      setInputValue('');
       return;
     }
 
     if (inputMode === InputMode.TOKEN) {
-      setDisplayValue(field.value);
+      setInputValue(field.value);
     } else {
       if (tokenPrice > 0) {
         const dollarValue = parseFloat(field.value) * tokenPrice;
-        setDisplayValue(dollarValue.toFixed(2));
+        setInputValue(dollarValue.toFixed(2));
       } else {
         setInputMode(InputMode.TOKEN);
-        setDisplayValue(field.value);
+        setInputValue(field.value);
       }
     }
   }, [field.value, inputMode, tokenPrice]);
@@ -59,20 +72,20 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
     if (!field.value) return;
 
     if (inputMode === InputMode.TOKEN) {
-      setDisplayValue(field.value);
+      setInputValue(field.value);
     } else if (tokenPrice > 0) {
       const dollarValue = parseFloat(field.value) * tokenPrice;
-      setDisplayValue(dollarValue.toFixed(2));
+      setInputValue(dollarValue.toFixed(2));
     }
   }, [inputMode]);
 
   useEffect(() => {
-    if (!displayValue) {
+    if (!inputValue) {
       setFontSize('text-xl');
       return;
     }
 
-    const length = displayValue.length;
+    const length = inputValue.length;
     if (length > 20) {
       setFontSize('text-sm');
     } else if (length > 15) {
@@ -80,18 +93,18 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
     } else {
       setFontSize('text-xl');
     }
-  }, [displayValue]);
+  }, [inputValue]);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
+      const value = e.target.value?.trim();
 
-      if (value === '' || /^[0-9]*\.?[0-9]*$/.test(value)) {
-        setDisplayValue(value);
+      if (value === '' || /^(?:[0-9]*\.)?[0-9]*$/.test(value)) {
+        setInputValue(value);
 
         if (inputMode === InputMode.TOKEN) {
           isInternalUpdate.current = true;
-          field.onChange(value.trim());
+          field.onChange(value);
         } else {
           if (tokenPrice > 0 && value !== '') {
             const tokenAmount = parseFloat(value) / tokenPrice;
@@ -120,9 +133,9 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
       if (field.value) {
         if (newMode === InputMode.DOLLAR && tokenPrice > 0) {
           const dollarValue = parseFloat(field.value) * tokenPrice;
-          setDisplayValue(dollarValue.toFixed(2));
+          setInputValue(dollarValue.toFixed(2));
         } else {
-          setDisplayValue(field.value);
+          setInputValue(field.value);
         }
       }
 
@@ -130,30 +143,68 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
     });
   }, [isDisabled, tokenPrice, field.value]);
 
+  useEffect(() => {
+    setEqMode(
+      inputMode === InputMode.TOKEN ? InputMode.DOLLAR : InputMode.TOKEN
+    );
+    if (tokenPrice > 0) {
+      if (inputMode === InputMode.TOKEN) {
+        const dollarValue = parseFloat(inputValue) * tokenPrice;
+        setEqValue(dollarValue.toFixed(2));
+      } else if (inputMode === InputMode.DOLLAR) {
+        const tokenAmount = parseFloat(inputValue) / tokenPrice;
+        const decimals = token?.decimals || 18;
+        const precision = Math.min(decimals, 8);
+        setEqValue(tokenAmount.toFixed(precision));
+      }
+    }
+  }, [inputMode, inputValue]);
+
+  const inputPrefix = INPUT_CONFIG[inputMode].prefix;
+  const inputPostfix = INPUT_CONFIG[inputMode].postfix;
+  const eqPrefix = INPUT_CONFIG[eqMode].prefix;
+  const eqPostfix = INPUT_CONFIG[eqMode].postfix;
+
   return (
-    <div className="bg-white px-2 py-3 rounded-md flex flex-row items-center relative">
+    <div className="bg-white px-4 py-3 rounded-md flex flex-row items-center relative">
       <div className="relative flex-1">
-        <Input
-          value={displayValue}
-          onChange={handleChange}
-          className={cn('border-none', fontSize, 'font-bold pr-24')}
-          placeholder="0"
-          disabled={isDisabled}
-          type="text"
-          inputMode="decimal"
-        />
+        <div className="flex">
+          {inputPrefix && (
+            <div className={cn('flex-none', fontSize)}>{inputPrefix}</div>
+          )}
+          <Input
+            value={inputValue}
+            onChange={handleChange}
+            className={cn(
+              'flex-1 border-none',
+              fontSize,
+              'font-bold pr-24 pl-px'
+            )}
+            placeholder="0"
+            disabled={isDisabled}
+            type="text"
+            inputMode="decimal"
+          />
+          {inputPostfix && (
+            <div className={cn('flex-none', fontSize)}>{inputPostfix}</div>
+          )}
+        </div>
+        {tokenPrice > 0 && eqValue && !isNaN(Number(eqValue)) && (
+          <div>
+            {eqPrefix}
+            {eqValue}
+            {eqPostfix}
+          </div>
+        )}
 
         <div
           className={cn(
-            'z-10 absolute right-md top-1/2 -translate-y-1/2 flex items-center gap-1 px-sm py-2xs rounded bg-gray-150 cursor-pointer',
+            'z-10 absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1 p-2 rounded-md bg-gray-150 cursor-pointer hover:bg-gray-300',
             (isDisabled || tokenPrice <= 0) && 'opacity-50 cursor-not-allowed'
           )}
           onClick={handleToggleMode}
         >
-          <ArrowRightLeftIcon className="size-3" />
-          <span className="text-xs font-medium">
-            {inputMode === InputMode.TOKEN ? token?.symbol || 'Token' : 'USD'}
-          </span>
+          <ArrowUpDownIcon className="size-4" />
         </div>
       </div>
     </div>

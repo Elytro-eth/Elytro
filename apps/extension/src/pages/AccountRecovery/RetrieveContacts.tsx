@@ -38,7 +38,6 @@ function PageContent() {
   const { wallet } = useWallet();
   const { address } = useSearchParams();
   const { currentChain } = useChain();
-  const chainId = currentChain?.id;
   const [loading, setLoading] = useState(false);
   const [recoveryContacts, setRecoveryContacts] = useState<TRecoveryContact[]>(
     []
@@ -78,10 +77,10 @@ function PageContent() {
   };
 
   useEffect(() => {
-    if (Number(chainId)) {
+    if (Number(currentChain?.id)) {
       getRecoveryRecord();
     }
-  }, [address, chainId]);
+  }, [address, currentChain?.id]);
 
   const handleShareContact = (contact: TRecoveryContact) => {
     if (!recoveryRecord || !recoveryRecord.recoveryRecordID) {
@@ -132,12 +131,12 @@ function PageContent() {
 
   if (recoveryRecord?.status === TRecoveryStatus.SIGNATURE_COMPLETED) {
     return (
-      <div className="h-full flex flex-col justify-center items-center gap-y-xl text-center">
+      <div className="h-full flex flex-col items-center gap-y-xl text-center">
         <img src={WalletImg} alt="Wallet" className="size-36" />
         <div className="flex flex-col gap-y-sm">
           <h1 className="elytro-text-title ">Enough signatures collected</h1>
           <p className="text-gray-600 elytro-text-smaller-body">
-            Begin & Complete your recovery in recovery app
+            Begin your recovery in recovery app
           </p>
         </div>
         <Button
@@ -155,7 +154,7 @@ function PageContent() {
 
   return (
     <div className="flex flex-col gap-y-md">
-      <h1 className="elytro-text-bold-body ">Account recovery</h1>
+      <h1 className="elytro-text-bold-body ">Wallet recovery</h1>
 
       <HelperText
         title={`${recoveryRecord?.guardianInfo?.threshold} confirmations required`}
@@ -163,7 +162,7 @@ function PageContent() {
         className="bg-light-green text-gray-750"
       />
 
-      <ShortedAddress address={address} chainId={chainId} />
+      <ShortedAddress address={address} chainId={currentChain?.id} />
 
       <div className="flex flex-col gap-y-sm">
         {recoveryContacts.map((contact) => (
@@ -197,8 +196,7 @@ function PageContent() {
           <DialogHeader>
             <DialogTitle>Recovery {shareInfo?.type || '--'} copied</DialogTitle>
             <DialogDescription>
-              Paste and send the link to this recovery contact for them to
-              confirm your recovery.
+              Send this link to your contact so they can confirm.
             </DialogDescription>
           </DialogHeader>
 

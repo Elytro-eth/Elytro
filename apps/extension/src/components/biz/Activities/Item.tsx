@@ -30,7 +30,7 @@ const ActivityTypeMap = {
     bg: 'bg-light-green',
   },
   [HistoricalActivityTypeEn.ActivateAccount]: {
-    name: 'Activate Account',
+    name: 'Activate Wallet',
     IconComponent: Check,
     bg: 'bg-gray-300',
   },
@@ -63,6 +63,7 @@ const ActivityStatusMap = {
 };
 
 export default function ActivityItem({
+  txHash,
   opHash,
   status = UserOperationStatusEn.pending,
   from,
@@ -99,9 +100,7 @@ export default function ActivityItem({
   return (
     <div
       className="flex items-center justify-between px-lg cursor-pointer py-md hover:bg-gray-150 "
-      onClick={() =>
-        openExplorer(opHash, type !== HistoricalActivityTypeEn.Receive)
-      }
+      onClick={() => openExplorer(txHash!)}
     >
       <div className="flex items-center gap-3">
         <IconComponent className={`size-8 p-2 ${bg} rounded-full`} />

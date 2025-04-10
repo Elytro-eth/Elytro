@@ -35,7 +35,6 @@ const DEFAULT_ACCOUNT_INFO: TAccountInfo = {
 
 type IAccountContext = {
   currentAccount: TAccountInfo;
-  updateAccount: () => Promise<void>;
   loading: boolean;
   tokenInfo: {
     tokens: TTokenInfo[];
@@ -46,13 +45,12 @@ type IAccountContext = {
   accounts: TAccountInfo[];
   getAccounts: () => Promise<void>;
   updateTokens: () => Promise<void>;
-  reloadAccount: DebouncedFunc<() => Promise<void>>;
+  reloadAccount: DebouncedFunc<(isForce?: boolean) => Promise<void>>;
 };
 
 // TODO: extract HistoryContext
 const AccountContext = createContext<IAccountContext>({
   currentAccount: DEFAULT_ACCOUNT_INFO,
-  updateAccount: async () => {},
   loading: false,
   tokenInfo: {
     tokens: [],
@@ -92,7 +90,7 @@ export const AccountProvider = ({
   };
 
   useEffect(() => {
-    if (searchParams.activating) {
+    if (searchParams.activating === '1') {
       intervalRef.current = setInterval(() => {
         updateAccount();
       }, 1_000);
@@ -110,6 +108,7 @@ export const AccountProvider = ({
       setLoading(true);
 
       const res = (await wallet.getCurrentAccount()) ?? DEFAULT_ACCOUNT_INFO;
+
       setCurrentAccount(res);
 
       if (intervalRef.current && res.isDeployed) {
@@ -164,7 +163,7 @@ export const AccountProvider = ({
       updateTokenPrices(tokens);
     } catch {
       toast({
-        title: 'Failed to get assets',
+        title: 'Failed to get tokens',
         description: 'Please try again',
         variant: 'destructive',
       });
@@ -220,12 +219,23 @@ export const AccountProvider = ({
     }
   }, [pathname]);
 
+  useEffect(() => {
+    if (currentAccount.address) {
+      updateHistory();
+      updateTokens();
+    }
+  }, [currentAccount.address]);
+
   const onHistoryUpdated = () => {
     updateHistory();
     updateTokens();
   };
 
   useEffect(() => {
+    if (!currentAccount.address) {
+      return;
+    }
+
     RuntimeMessage.onMessage(
       EVENT_TYPES.HISTORY.ITEMS_UPDATED,
       onHistoryUpdated
@@ -234,7 +244,7 @@ export const AccountProvider = ({
     return () => {
       RuntimeMessage.offMessage(onHistoryUpdated);
     };
-  }, []);
+  }, [currentAccount.address]);
 
   const getAccounts = async () => {
     const res = await wallet.getAccounts();
@@ -243,23 +253,18 @@ export const AccountProvider = ({
     }
   };
 
-  const reloadAccount = debounce(async () => {
+  const reloadAccount = debounce(async (isForce?: boolean) => {
     await updateAccount();
-    await updateTokens();
-    await updateHistory();
-  }, 300);
 
-  useEffect(() => {
-    if (currentAccount.address) {
-      updateHistory();
-      updateTokens();
+    if (isForce) {
+      await updateHistory();
+      await updateTokens();
     }
-  }, [currentAccount.address]);
+  }, 300);
 
   const contextValue = useMemo(
     () => ({
       currentAccount,
-      updateAccount,
       tokenInfo: {
         tokens,
         loading: isTokensLoading,

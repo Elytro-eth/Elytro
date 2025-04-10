@@ -13,7 +13,6 @@ import {
 import { ethErrors } from 'eth-rpc-errors';
 import { formatBlockInfo, formatBlockParam } from '@/utils/format';
 import { normalize } from 'viem/ens';
-import { elytroSDK } from './sdk';
 import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 
@@ -35,7 +34,10 @@ class ElytroWalletClient {
   }
 
   public init(chain: TChainItem) {
-    if (chain.id && chain.id !== this._client?.chain?.id) {
+    if (
+      (chain.id && chain.id !== this._client?.chain?.id) ||
+      (chain.endpoint && chain.endpoint !== this._client?.transport.url)
+    ) {
       this._client = createPublicClient({
         chain,
         transport: http(chain.endpoint || chain.rpcUrls.default.http[0]),
@@ -98,8 +100,8 @@ class ElytroWalletClient {
         name: normalize(name),
       });
       return ensAddress;
-    } catch (error) {
-      throw ethErrors.rpc.internal((error as Error)?.message);
+    } catch {
+      return null;
     }
   }
 
@@ -108,7 +110,7 @@ class ElytroWalletClient {
       this?.client?.chain?.contracts?.ensUniversalResolver?.address;
 
     if (!ensResolverAddress) {
-      throw new Error('Elytro: Chain does not support ENS');
+      return null;
     }
 
     try {
@@ -117,14 +119,9 @@ class ElytroWalletClient {
         universalResolverAddress: ensResolverAddress,
       });
       return avatar;
-    } catch (error) {
-      throw ethErrors.rpc.internal((error as Error)?.message);
+    } catch {
+      return null;
     }
-  }
-
-  public async getTransactionReceipt(hash: Hex) {
-    // TODO: check if it's a user operation hash
-    return await elytroSDK.getUserOperationReceipt(hash);
   }
 }
 

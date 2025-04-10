@@ -5,6 +5,7 @@ import {
 } from '@/components/ui/tooltip';
 import { SUPPORTED_CHAINS } from '@/constants/chains';
 import { cn } from '@/utils/shadcn/utils';
+import { ReactNode } from 'react';
 import { isAddress } from 'viem';
 
 interface IProps {
@@ -14,6 +15,7 @@ interface IProps {
   size?: keyof typeof SIZE_MAP;
   dotColor?: string;
   showChainIcon?: boolean;
+  extra?: ReactNode;
 }
 
 const SIZE_MAP = {
@@ -38,6 +40,7 @@ export default function FragmentedAddress({
   className,
   dotColor,
   showChainIcon = true,
+  extra,
 }: IProps) {
   if (!address || !isAddress(address)) {
     return '--';
@@ -53,26 +56,29 @@ export default function FragmentedAddress({
       {showChainIcon && chain && (
         <img src={chain.icon} alt={chain.name} className={icon} />
       )}
-      <div className={cn('flex items-center gap-sm', text)}>
-        <span>{prefix}</span>
-        <Tooltip>
-          <TooltipTrigger>
-            <span
-              className="px-1 bg-gray-300 rounded-xs"
-              style={{ backgroundColor: dotColor }}
-            >
-              …
-            </span>
-          </TooltipTrigger>
-          <TooltipContent className="bg-dark-blue p-4 ">
-            <div className="text-blue">
-              <span className="text-light-blue font-bold">{prefix}</span>
-              {address.slice(6, -6)}
-              <span className="text-light-blue font-bold">{suffix}</span>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-        <span>{suffix}</span>
+      <div className="flex-column">
+        <div className={cn('flex items-center gap-sm', text)}>
+          <span>{prefix}</span>
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger>
+              <span
+                className="px-1 bg-gray-300 rounded-xs"
+                style={{ backgroundColor: dotColor }}
+              >
+                …
+              </span>
+            </TooltipTrigger>
+            <TooltipContent className="bg-dark-blue p-4">
+              <div className="text-blue">
+                <span className="text-light-blue font-bold">{prefix}</span>
+                {address.slice(6, -6)}
+                <span className="text-light-blue font-bold">{suffix}</span>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+          <span>{suffix}</span>
+        </div>
+        {extra && <div>{extra}</div>}
       </div>
     </div>
   );

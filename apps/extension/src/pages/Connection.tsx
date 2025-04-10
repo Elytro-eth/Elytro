@@ -81,8 +81,10 @@ export default function Connection() {
           ))}
         </div>
       ) : (
-        <div className="flex justify-center items-center h-full">
-          <p className="elytro-text-body text-gray-500">No connected apps</p>
+        <div className="flex justify-center h-full">
+          <p className="elytro-text-body text-gray-500 mt-10">
+            No connected apps
+          </p>
         </div>
       )}
     </SecondaryPageWrapper>

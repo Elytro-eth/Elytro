@@ -85,7 +85,7 @@ export function UserOpDetail({
       {/* UserOp Pay Info */}
       <InfoCardList>
         <InfoCardItem
-          label="From account"
+          label="From wallet"
           content={<FragmentedAddress address={from} chainId={chainId} />}
         />
 

@@ -3,6 +3,7 @@ import { formatDollarBalance, formatTokenAmount } from '@/utils/format';
 import { cn } from '@/utils/shadcn/utils';
 import { TokenInfo } from '@soulwallet/decoder';
 import { useMemo } from 'react';
+import DefaultTokenIcon from '@/assets/icons/ether.svg';
 
 interface ITokenAmountItemProps
   extends Partial<Pick<TokenInfo, 'logoURI' | 'symbol' | 'decimals'>> {
@@ -48,10 +49,10 @@ export default function TokenAmountItem({
     >
       <img
         className={cn(
-          'size-6 rounded-full ring-1 ring-gray-150 bg-white',
+          'size-8 rounded-full ring-1 ring-gray-150 bg-white p-1',
           size === 'sm' && 'size-4'
         )}
-        src={logoURI}
+        src={logoURI || DefaultTokenIcon}
         alt={symbol}
       />
       <span>

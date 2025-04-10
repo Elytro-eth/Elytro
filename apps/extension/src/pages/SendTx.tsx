@@ -1,10 +1,4 @@
-import {
-  encodeFunctionData,
-  formatUnits,
-  isAddress,
-  parseUnits,
-  zeroAddress,
-} from 'viem';
+import { encodeFunctionData, isAddress, parseUnits, zeroAddress } from 'viem';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,7 +14,6 @@ import {
 } from '@/components/ui/form';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useAccount } from '@/contexts/account-context';
-import AddressInput from '@/components/biz/AddressInput';
 import TokenSelector from '@/components/biz/TokenSelector';
 import AmountInput from '@/components/biz/AmountInput';
 import { useTx } from '@/contexts/tx-context';
@@ -29,6 +22,8 @@ import { ABI_ERC20_TRANSFER } from '@/constants/abi';
 import { toast } from '@/hooks/use-toast';
 import { formatTokenAmount } from '@/utils/format';
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import AddressInput from '@/components/biz/AddressInput';
+import { saveRecentAddress } from '@/utils/recentAddresses';
 
 export default function SendTx() {
   const {
@@ -47,18 +42,7 @@ export default function SendTx() {
         return false;
       }
 
-      try {
-        const formattedBalance = formatUnits(
-          BigInt(token.balance),
-          token.decimals
-        );
-        const numericBalance = parseFloat(formattedBalance);
-
-        return numericBalance > 0.000001; //
-      } catch (error) {
-        console.error(`Error filtering token ${token.symbol}:`, error);
-        return false;
-      }
+      return true;
     });
   }, [tokens]);
 
@@ -100,8 +84,20 @@ export default function SendTx() {
           });
         }
       }),
-    to: z.string().refine((address) => isAddress(address), {
-      message: 'Please give a valid address.',
+    to: z.string().superRefine((targetAddress, ctx) => {
+      if (!isAddress(targetAddress)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Please give a valid address.',
+        });
+      }
+
+      if (targetAddress.toLowerCase() === address.toLowerCase()) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'You cannot send to yourself',
+        });
+      }
     }),
   });
 
@@ -177,7 +173,15 @@ export default function SendTx() {
         throw new Error('Invalid token address');
       }
 
-      handleTxRequest(TxRequestTypeEn.SendTransaction, [txParams]);
+      saveRecentAddress(to);
+      handleTxRequest(TxRequestTypeEn.SendTransaction, [txParams], {
+        to,
+        method: {
+          name: 'transfer',
+          params: [to, parsedAmount],
+        } as SafeAny,
+        toInfo: { ...token } as SafeAny,
+      });
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to prepare transaction';
@@ -202,7 +206,7 @@ export default function SendTx() {
       <div>
         {/* Error display */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-4 mb-4">
+          <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-4">
             <div className="flex">
               <AlertCircle className="h-5 w-5 mr-2" />
               <div>
@@ -214,32 +218,14 @@ export default function SendTx() {
         )}
 
         <Form {...form}>
-          <div className="bg-light-green rounded-sm">
+          <div className="bg-light-green rounded-sm pb-4 mb-4">
             <h3 className="text-lg font-bold px-4 py-3">Sending</h3>
-            {/* Amount input */}
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem className="px-4">
-                  <FormControl>
-                    <AmountInput
-                      field={field}
-                      isDisabled={filteredTokens.length < 1}
-                      token={form.getValues('token') as TTokenInfo}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             {/* Token selector */}
             <FormField
               control={form.control}
               name="token"
               render={() => (
-                <div className="relative mb-4 py-2">
+                <div className="relative py-2">
                   <FormItem>
                     <FormControl>
                       <TokenSelector
@@ -252,12 +238,31 @@ export default function SendTx() {
 
                     <Button
                       disabled={!form.getValues('token')}
-                      className="absolute right-4 top-6 bg-green !text-white !py-2"
+                      className="absolute right-4 top-4 bg-green !text-white !py-2"
                       size="tiny"
                       onClick={handleFillMax}
                     >
                       Max
                     </Button>
+                  </FormItem>
+                </div>
+              )}
+            />
+            {/* Amount input */}
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <div className="">
+                  <FormItem className=" px-4">
+                    <FormControl>
+                      <AmountInput
+                        field={field}
+                        isDisabled={filteredTokens.length < 1}
+                        token={form.getValues('token') as TTokenInfo}
+                      />
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 </div>
               )}
@@ -283,8 +288,7 @@ export default function SendTx() {
             {/* Warning message */}
             <div className="flex text-gray-750">
               <CircleHelp className="w-4 h-4 text-gray-750 mr-2" />
-              Your tokens will be lost if the recipient is not on the same
-              network.
+              Tokens will be lost if sent to a different network.
             </div>
           </div>
         </Form>

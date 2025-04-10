@@ -65,10 +65,10 @@ export default function Start() {
         ),
       });
     } catch (error) {
-      console.error(error);
       toast({
         title: 'Failed to start recovery',
         variant: 'destructive',
+        description: error instanceof Error ? error.message : 'Unknown error',
       });
     } finally {
       setIsLoading(false);
@@ -104,10 +104,10 @@ export default function Start() {
         ),
       });
     } catch (error) {
-      console.error(error);
       toast({
         title: 'Failed to complete recovery',
         variant: 'destructive',
+        description: error instanceof Error ? error.message : 'Unknown error',
       });
     } finally {
       setIsLoading(false);
@@ -151,8 +151,7 @@ export default function Start() {
       subtitle={
         <span
           dangerouslySetInnerHTML={{
-            __html:
-              'It will take effect in 48 hours. You can access your <br />account after the countdown.',
+            __html: 'You’ll regain wallet access in 48 hours.',
           }}
         />
       }

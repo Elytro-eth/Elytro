@@ -25,9 +25,9 @@ export default function BasicAccountInfo() {
   };
 
   return (
-    <div className="flex flex-col p-sm pb-0 ">
+    <div className="flex flex-col p-sm pb-0">
       {/* Chain & Address */}
-      <div className="flex flex-row gap-3 w-full items-center justify-between mb-lg">
+      <div className="flex flex-row gap-3 w-full items-center justify-between mb-2">
         <div className="flex flex-row gap-x-md items-center">
           <AccountsDropdown />
           <Copy text={currentAccount.address} />
@@ -52,7 +52,7 @@ export default function BasicAccountInfo() {
 
       {/* Actions */}
       <div>
-        <div className="flex flex-row gap-md">
+        <div className="flex flex-row gap-md my-sm">
           {currentAccount.isDeployed ? (
             <>
               <ActionButton
