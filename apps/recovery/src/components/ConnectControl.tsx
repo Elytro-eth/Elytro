@@ -17,6 +17,7 @@ import { toast } from '@/hooks/use-toast';
 import { useRecoveryRecord } from '@/contexts';
 import { isConnectedAccountAContact } from '@/lib/contact';
 import WrappedImage from './WrappedImage';
+import { CONNECTOR_ICON_MAP } from '@/wagmi';
 
 const ConnectorItem = ({
   connector,
@@ -59,7 +60,13 @@ export default function ConnectControl() {
         if (connector.type === 'injected') {
           acc.injectedConnectors.push(connector);
         } else {
-          acc.otherConnectors.push(connector);
+          console.log(connector);
+          acc.otherConnectors.push({
+            ...connector,
+            icon: CONNECTOR_ICON_MAP[
+              connector.id as keyof typeof CONNECTOR_ICON_MAP
+            ],
+          });
         }
         return acc;
       },
