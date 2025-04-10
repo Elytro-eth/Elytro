@@ -1,7 +1,6 @@
 import { useToast } from '@/hooks/use-toast';
 import {
   Toast,
-  ToastClose,
   ToastDescription,
   ToastProvider,
   ToastTitle,
@@ -44,7 +43,6 @@ export function Toaster() {
               )}
             </div>
             {action}
-            <ToastClose />
           </Toast>
         );
       })}
