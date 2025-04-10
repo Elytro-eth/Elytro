@@ -60,6 +60,12 @@ const TxContext = createContext<ITxContext>({
   onRetry: () => {},
 });
 
+const ConfirmSuccessMessageMap = {
+  [TxRequestTypeEn.DeployWallet]: 'Activate wallet successfully',
+  [TxRequestTypeEn.SendTransaction]: 'Transaction sent successfully',
+  [TxRequestTypeEn.ApproveTransaction]: 'Recovery contacts confirmed',
+};
+
 export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
   const { approval, resolve, reject } = useApproval();
@@ -188,7 +194,12 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       userOp: currentUserOp!,
       decodedDetail: decodedDetail!,
     });
-    toast({ title: 'Transaction sent successfully' });
+    toast({
+      title: requestType
+        ? ConfirmSuccessMessageMap[requestType]
+        : 'Transaction sent successfully',
+      variant: 'constructive',
+    });
     await resolve(txHash);
     handleBack();
   };
@@ -226,6 +237,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       toast({
         title: 'Failed to send transaction',
         description: msg,
+        variant: 'destructive',
       });
     } finally {
       setIsSending(false);
