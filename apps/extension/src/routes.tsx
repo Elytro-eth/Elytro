@@ -27,7 +27,6 @@ import { ApprovalTypeEn } from './constants/operations';
 
 export enum SIDE_PANEL_ROUTE_PATHS {
   Home = '/',
-  Lock = '/lock',
   Settings = '/settings',
   ChangePassword = '/settings/change-password',
   NetworkConfiguration = '/settings/network-configuration',
@@ -58,10 +57,6 @@ export const routes: TRoute[] = [
   {
     path: SIDE_PANEL_ROUTE_PATHS.Home,
     component: Launch,
-  },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.Lock,
-    component: () => <></>,
   },
   {
     path: SIDE_PANEL_ROUTE_PATHS.RecoverySetting,
