@@ -8,7 +8,7 @@ import { toHex } from 'viem';
 import { SIDE_PANEL_ROUTE_PATHS } from '../routes';
 import { useApproval } from './approval-context';
 import { HistoricalActivityTypeEn } from '@/constants/operations';
-import { formatErrorMsg, formatObjectWithBigInt } from '@/utils/format';
+import { formatErrorMsg } from '@/utils/format';
 
 export enum TxRequestTypeEn {
   DeployWallet = 1,
@@ -60,15 +60,9 @@ const TxContext = createContext<ITxContext>({
   onRetry: () => {},
 });
 
-const ConfirmSuccessMessageMap = {
-  [TxRequestTypeEn.DeployWallet]: 'Activate wallet successfully',
-  [TxRequestTypeEn.SendTransaction]: 'Transaction sent successfully',
-  [TxRequestTypeEn.ApproveTransaction]: 'Recovery contacts confirmed',
-};
-
 export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
-  const { approval, resolve, reject } = useApproval();
+  const { approval, reject } = useApproval();
 
   const userOpRef = useRef<Nullable<ElytroUserOperation>>();
   const txTypeRef = useRef<Nullable<HistoricalActivityTypeEn>>(null);
@@ -182,55 +176,15 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     userOpRef.current = null;
   };
 
-  const onSendSuccess = async (
-    opHash: string,
-    currentUserOp: ElytroUserOperation,
-    txHash?: string
-  ) => {
-    wallet.addNewHistory({
-      type: txTypeRef.current!,
-      opHash,
-      txHash,
-      userOp: currentUserOp!,
-      decodedDetail: decodedDetail!,
-    });
-    toast({
-      title: requestType
-        ? ConfirmSuccessMessageMap[requestType]
-        : 'Transaction sent successfully',
-      variant: 'constructive',
-    });
-    await resolve(txHash);
-    handleBack();
-  };
-
   const onConfirm = async () => {
     try {
       setIsSending(true);
-
-      let currentUserOp = userOpRef.current;
-
-      // TODO: check this logic
-      if (!currentUserOp?.paymaster) {
-        currentUserOp = await wallet.estimateGas(currentUserOp!);
-      }
-
-      const { signature, opHash } = await wallet.signUserOperation(
-        formatObjectWithBigInt(currentUserOp!)
+      wallet.confirmTransaction(
+        txTypeRef.current!,
+        userOpRef.current,
+        decodedDetail
       );
-
-      currentUserOp!.signature = signature;
-
-      // const simulationResult =
-      //   await elytroSDK.simulateUserOperation(currentUserOp);
-      // const txDetail = formatSimulationResultToTxDetail(simulationResult);
-
-      const { txHash, opHash: txOpHash } = await wallet.sendUserOperation(
-        currentUserOp!,
-        opHash
-      );
-
-      onSendSuccess(txOpHash, currentUserOp!, txHash);
+      handleBack();
     } catch (error) {
       const msg = formatErrorMsg(error);
       setErrorMsg(msg);
@@ -248,13 +202,16 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     const prevType = requestType;
     resetTxContext();
 
-    navigateTo(
-      'side-panel',
-      SIDE_PANEL_ROUTE_PATHS.Dashboard,
-      prevType !== TxRequestTypeEn.DeployWallet && isCancel
-        ? undefined
-        : { activating: '1' }
-    );
+    let params;
+    if (!isCancel) {
+      if (prevType === TxRequestTypeEn.DeployWallet) {
+        params = { activating: '1' };
+      } else {
+        params = { defaultTabs: 'activities' };
+      }
+    }
+
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard, params);
   };
 
   const onCancel = async () => {
