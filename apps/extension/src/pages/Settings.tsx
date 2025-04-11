@@ -9,6 +9,7 @@ import {
   Settings2Icon,
   ShieldIcon,
   UserRoundIcon,
+  RefreshCcw,
 } from 'lucide-react';
 import { useWallet } from '@/contexts/wallet';
 import SettingItem from '@/components/ui/SettingItem';
@@ -41,8 +42,15 @@ export default function Settings() {
             label="Connected apps"
             path={SIDE_PANEL_ROUTE_PATHS.Connection}
           />
+          <SettingItem
+            icon={RefreshCcw}
+            label="Update contract"
+            path={SIDE_PANEL_ROUTE_PATHS.UpdateContract}
+            showRedDot
+          />
         </div>
       </div>
+
       <div className="mb-4">
         <h2 className="elytro-text-small-bold text-gray-600 my-4">
           Elytro settings

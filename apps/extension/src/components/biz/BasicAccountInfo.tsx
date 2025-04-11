@@ -6,9 +6,11 @@ import ActivateButton from './ActivateButton';
 import { useAccount } from '@/contexts/account-context';
 import AccountsDropdown from './AccountsDropdown';
 import Copy from '@/components/ui/Copy';
+import { RedDot } from '../ui/Reddot';
 
 export default function BasicAccountInfo() {
   const { currentAccount } = useAccount();
+  const showRedDot = true;
 
   const onClickMore = () => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Settings);
@@ -35,6 +37,9 @@ export default function BasicAccountInfo() {
             className="elytro-clickable-icon"
             onClick={onClickMore}
           />
+          {showRedDot && (
+            <RedDot size="normal" className="absolute right-2 top-4" />
+          )}
         </div>
       </div>
 
