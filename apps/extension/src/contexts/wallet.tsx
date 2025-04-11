@@ -4,12 +4,10 @@ import {
   WalletStatusEn,
 } from '@/background/walletController';
 import PortMessage from '@/utils/message/portMessage';
-import { Toast, toast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
 import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';
-import { RuntimeMessage } from '@/utils/message';
-import { EVENT_TYPES } from '@/constants/events';
 
 const portMessage = new PortMessage('elytro-ui');
 
@@ -36,11 +34,6 @@ const walletControllerProxy = new Proxy(
     },
   }
 ) as WalletController;
-
-// App async toast event listener
-RuntimeMessage.onMessage(EVENT_TYPES.UI.SHOW_TOAST, (data: Toast) => {
-  toast(data);
-});
 
 type IWalletContext = {
   wallet: WalletController;

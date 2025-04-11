@@ -15,7 +15,4 @@ export const EVENT_TYPES = {
     ACCOUNT_INITIALIZED: 'accountInitialized',
     ACCOUNT_CHANGED: 'accountChanged',
   },
-  UI: {
-    SHOW_TOAST: 'showToast',
-  },
 };

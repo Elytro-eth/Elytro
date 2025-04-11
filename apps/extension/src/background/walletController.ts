@@ -26,8 +26,6 @@ import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { TRecoveryStatus } from '@/constants/recovery';
 import { getTokenList, updateUserImportedTokens } from '@/utils/tokens';
 import { ABI_ERC20_BALANCE_OF } from '@/constants/abi';
-import RuntimeMessage from '@/utils/message/runtimeMessage';
-import { EVENT_TYPES } from '@/constants/events';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -36,13 +34,6 @@ enum WalletStatusEn {
   HasAccountAndUnlocked = 'HasAccountAndUnlocked',
   Recovering = 'Recovering',
 }
-
-const ConfirmSuccessMessageMap = {
-  [HistoricalActivityTypeEn.ActivateAccount]: 'Activate wallet successfully',
-  [HistoricalActivityTypeEn.Send]: 'Transaction sent successfully',
-  [HistoricalActivityTypeEn.ContractInteraction]: 'Recovery contacts confirmed',
-  [HistoricalActivityTypeEn.Receive]: 'Transaction successfully',
-};
 
 // ! DO NOT use getter. They can not be proxied.
 // ! Please declare all methods async.
@@ -556,27 +547,15 @@ class WalletController {
     );
   }
 
-  public async confirmTransaction(
-    historyType: HistoricalActivityTypeEn,
-    currentUserOp: Nullable<ElytroUserOperation>,
-    decodedDetail: Nullable<DecodeResult>
+  public async bundleAndSendTransaction(
+    currentUserOp: Nullable<ElytroUserOperation>
   ) {
     // TODO: check this logic
     if (!currentUserOp?.paymaster) {
       currentUserOp = await this.estimateGas(currentUserOp!);
     }
 
-    const { signature, opHash } = await this.signUserOperation(
-      formatObjectWithBigInt(currentUserOp!)
-    );
-    this.addNewHistory({
-      type: historyType,
-      opHash,
-      // txHash,
-      userOp: currentUserOp!,
-      decodedDetail: decodedDetail!,
-    });
-
+    const { signature, opHash } = await this.signUserOperation(currentUserOp!);
     currentUserOp!.signature = signature;
 
     // const simulationResult =
@@ -585,17 +564,11 @@ class WalletController {
 
     const { txHash } = await this.sendUserOperation(currentUserOp!, opHash);
 
-    const newApproval = await this.getCurrentApproval();
-    if (newApproval) {
-      await this.resolveApproval(newApproval.id, txHash);
-    }
-
-    RuntimeMessage.sendMessage(EVENT_TYPES.UI.SHOW_TOAST, {
-      title: historyType
-        ? ConfirmSuccessMessageMap[historyType]
-        : 'Transaction successfully',
-      variant: 'constructive',
-    });
+    return {
+      opHash,
+      txHash,
+      userOp: currentUserOp,
+    };
   }
 }
 

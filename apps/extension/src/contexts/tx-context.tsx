@@ -44,6 +44,12 @@ type ITxContext = {
   onRetry: () => void;
 };
 
+const ConfirmSuccessMessageMap = {
+  [TxRequestTypeEn.DeployWallet]: 'Activate wallet successfully',
+  [TxRequestTypeEn.SendTransaction]: 'Transaction sent successfully',
+  [TxRequestTypeEn.ApproveTransaction]: 'Recovery contacts confirmed',
+};
+
 const TxContext = createContext<ITxContext>({
   requestType: null,
   historyType: null,
@@ -62,7 +68,7 @@ const TxContext = createContext<ITxContext>({
 
 export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
-  const { approval, reject } = useApproval();
+  const { approval, resolve, reject } = useApproval();
 
   const userOpRef = useRef<Nullable<ElytroUserOperation>>();
   const txTypeRef = useRef<Nullable<HistoricalActivityTypeEn>>(null);
@@ -176,15 +182,35 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     userOpRef.current = null;
   };
 
+  const onSendSuccess = async (
+    opHash: string,
+    currentUserOp: ElytroUserOperation,
+    txHash?: string
+  ) => {
+    wallet.addNewHistory({
+      type: txTypeRef.current!,
+      opHash,
+      txHash,
+      userOp: currentUserOp!,
+      decodedDetail: decodedDetail!,
+    });
+
+    toast({
+      title:
+        ConfirmSuccessMessageMap[requestType!] || 'Transaction successfully',
+      variant: 'constructive',
+    });
+    await resolve(txHash);
+    handleBack();
+  };
+
   const onConfirm = async () => {
     try {
       setIsSending(true);
-      wallet.confirmTransaction(
-        txTypeRef.current!,
-        userOpRef.current,
-        decodedDetail
+      const { txHash, opHash, userOp } = await wallet.bundleAndSendTransaction(
+        userOpRef.current
       );
-      handleBack();
+      onSendSuccess(opHash, userOp!, txHash);
     } catch (error) {
       const msg = formatErrorMsg(error);
       setErrorMsg(msg);
