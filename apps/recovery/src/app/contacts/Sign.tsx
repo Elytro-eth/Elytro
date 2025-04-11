@@ -27,6 +27,10 @@ export default function Sign() {
   const sendSignatureRequest = async () => {
     try {
       if (chainId !== Number(recoveryRecord?.chainID)) {
+        toast({
+          title: 'Switch to the correct chain',
+          description: 'Please approve the chain switch in your wallet',
+        });
         switchChain({ chainId: Number(recoveryRecord?.chainID) });
       }
 

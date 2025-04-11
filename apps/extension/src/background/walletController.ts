@@ -562,10 +562,13 @@ class WalletController {
     //   await elytroSDK.simulateUserOperation(currentUserOp);
     // const txDetail = formatSimulationResultToTxDetail(simulationResult);
 
-    const { txHash } = await this.sendUserOperation(currentUserOp!, opHash);
+    const { txHash, opHash: txOpHash } = await this.sendUserOperation(
+      currentUserOp!,
+      opHash
+    );
 
     return {
-      opHash,
+      opHash: txOpHash,
       txHash,
       userOp: currentUserOp,
     };

@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { useWallet } from '@/contexts/wallet';
 import { TChainItem } from '@/constants/chains';
 import { toast } from '@/hooks/use-toast';
@@ -8,7 +14,13 @@ type IChainContext = {
   currentChain: TChainItem | null;
   getCurrentChain: () => Promise<void>;
   getChains: () => Promise<void>;
-  openExplorer: (hash: string, isOp?: boolean) => void;
+  openExplorer: ({
+    txHash,
+    opHash,
+  }: {
+    txHash?: string;
+    opHash: string;
+  }) => void;
 };
 
 const ChainContext = createContext<IChainContext>({
@@ -58,15 +70,28 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
     getCurrentChain();
   }, []);
 
-  const openExplorer = (hash: string, isOp = true) => {
-    const url = isOp
-      ? `${currentChain?.opExplorer || 'https://jiffyscan.xyz/userOpHash/'}${hash}`
-      : `${currentChain?.blockExplorers?.default.url}/tx/${hash}`;
+  const openExplorer = useCallback(
+    ({ txHash, opHash }: { txHash: string; opHash: string }) => {
+      if (txHash && currentChain?.blockExplorers?.default?.url) {
+        const url = `${currentChain.blockExplorers.default.url}/tx/${txHash}`;
+        chrome.tabs.create({
+          url,
+        });
+      } else if (opHash && currentChain?.opExplorer) {
+        const url = `${currentChain.opExplorer}/${opHash}`;
 
-    chrome.tabs.create({
-      url,
-    });
-  };
+        chrome.tabs.create({
+          url,
+        });
+      }
+
+      toast({
+        title: 'Failed to open explorer',
+        description: 'No explorer url or hash',
+      });
+    },
+    [currentChain]
+  );
 
   return (
     <ChainContext.Provider
