@@ -216,6 +216,23 @@ export class SDKService {
       throw res.ERR;
     }
 
+    return await this.getUserOperationResult(userOp, opHash);
+  }
+
+  public async sendUserOperationOnly(
+    userOp: ElytroUserOperation
+  ): Promise<boolean> {
+    const res = await this._sdk.sendUserOperation(userOp);
+    if (res.isErr()) {
+      throw res.ERR;
+    }
+    return true;
+  }
+
+  public async getUserOperationResult(
+    userOp: ElytroUserOperation,
+    opHash: string
+  ) {
     const client = this._getClient();
 
     return Promise.race([

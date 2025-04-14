@@ -109,13 +109,9 @@ class WalletController {
     return await elytroSDK.signUserOperation(deformatObjectWithBigInt(userOp));
   }
 
-  public async sendUserOperation(userOp: ElytroUserOperation, opHash: string) {
-    return await elytroSDK.sendUserOperation(
-      deformatObjectWithBigInt(userOp, [
-        'maxFeePerGas',
-        'maxPriorityFeePerGas',
-      ]),
-      opHash
+  public async sendUserOperation(userOp: ElytroUserOperation) {
+    return await elytroSDK.sendUserOperationOnly(
+      deformatObjectWithBigInt(userOp, ['maxFeePerGas', 'maxPriorityFeePerGas'])
     );
   }
 
@@ -547,7 +543,7 @@ class WalletController {
     );
   }
 
-  public async bundleAndSendTransaction(
+  public async signAndSendTransaction(
     currentUserOp: Nullable<ElytroUserOperation>
   ) {
     // TODO: check this logic
@@ -562,16 +558,20 @@ class WalletController {
     //   await elytroSDK.simulateUserOperation(currentUserOp);
     // const txDetail = formatSimulationResultToTxDetail(simulationResult);
 
-    const { txHash, opHash: txOpHash } = await this.sendUserOperation(
-      currentUserOp!,
-      opHash
-    );
+    await this.sendUserOperation(currentUserOp!);
 
     return {
-      opHash: txOpHash,
-      txHash,
+      opHash,
+      // txHash,
       userOp: currentUserOp,
     };
+  }
+
+  public async getTransactionResult(
+    currentUserOp: Nullable<ElytroUserOperation>,
+    opHash: string
+  ) {
+    return await elytroSDK.getUserOperationResult(currentUserOp!, opHash);
   }
 }
 

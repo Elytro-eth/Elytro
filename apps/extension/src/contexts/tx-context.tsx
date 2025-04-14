@@ -182,35 +182,35 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     userOpRef.current = null;
   };
 
-  const onSendSuccess = async (
-    opHash: string,
-    currentUserOp: ElytroUserOperation,
-    txHash?: string
-  ) => {
-    wallet.addNewHistory({
-      type: txTypeRef.current!,
-      opHash,
-      txHash,
-      userOp: currentUserOp!,
-      decodedDetail: decodedDetail!,
-    });
-
+  const onSendSuccess = async (txHash?: string) => {
     toast({
       title:
         ConfirmSuccessMessageMap[requestType!] || 'Transaction successfully',
       variant: 'constructive',
     });
     await resolve(txHash);
-    handleBack();
   };
 
   const onConfirm = async () => {
     try {
       setIsSending(true);
-      const { txHash, opHash, userOp } = await wallet.bundleAndSendTransaction(
+      const { opHash, userOp } = await wallet.signAndSendTransaction(
         userOpRef.current
       );
-      onSendSuccess(opHash, userOp!, txHash);
+      wallet.addNewHistory({
+        type: txTypeRef.current!,
+        opHash,
+        // txHash,
+        userOp: userOp,
+        decodedDetail: decodedDetail!,
+      });
+      handleBack();
+
+      const { opHash: txHash } = await wallet.getTransactionResult(
+        userOp,
+        opHash
+      );
+      onSendSuccess(txHash);
     } catch (error) {
       const msg = formatErrorMsg(error);
       setErrorMsg(msg);
