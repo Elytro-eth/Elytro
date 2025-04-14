@@ -26,6 +26,7 @@ import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { TRecoveryStatus } from '@/constants/recovery';
 import { getTokenList, updateUserImportedTokens } from '@/utils/tokens';
 import { ABI_ERC20_BALANCE_OF } from '@/constants/abi';
+import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -252,6 +253,18 @@ class WalletController {
       accountManager.updateCurrentAccountInfo({
         isDeployed,
       });
+    } else {
+      const versionInfo = VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId];
+      if (versionInfo) {
+        const currentVersion = await elytroSDK.getContractVersion(
+          basicInfo.address
+        );
+
+        // TODO: use `isLaterThan` to compare version after feat/version is merged
+        accountManager.updateCurrentAccountInfo({
+          needUpgrade: currentVersion !== versionInfo.latestVersion,
+        });
+      }
     }
 
     const balance = await walletClient.getBalance(basicInfo.address);
@@ -544,6 +557,16 @@ class WalletController {
     await updateUserImportedTokens(
       accountManager.currentAccount.chainId,
       token
+    );
+  }
+
+  public async getInstalledModules() {
+    if (!accountManager.currentAccount) {
+      return [];
+    }
+
+    return await elytroSDK.getInstalledModules(
+      accountManager.currentAccount.address
     );
   }
 }

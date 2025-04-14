@@ -81,7 +81,6 @@ export const AccountProvider = ({
   const [tokens, setTokens] = useState<TTokenInfo[]>([]);
   const [tokenPrices, setTokenPrices] = useState<TTokenPrice[]>([]);
   const [isTokensLoading, setIsTokensLoading] = useState(false);
-
   const removeInterval = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -219,31 +218,25 @@ export const AccountProvider = ({
     }
   }, [pathname]);
 
-  useEffect(() => {
-    if (currentAccount.address) {
-      updateHistory();
-      updateTokens();
-    }
-  }, [currentAccount.address]);
-
   const onHistoryUpdated = () => {
     updateHistory();
     updateTokens();
   };
 
   useEffect(() => {
-    if (!currentAccount.address) {
-      return;
+    if (currentAccount.address) {
+      updateHistory();
+      updateTokens();
+
+      RuntimeMessage.onMessage(
+        EVENT_TYPES.HISTORY.ITEMS_UPDATED,
+        onHistoryUpdated
+      );
+
+      return () => {
+        RuntimeMessage.offMessage(onHistoryUpdated);
+      };
     }
-
-    RuntimeMessage.onMessage(
-      EVENT_TYPES.HISTORY.ITEMS_UPDATED,
-      onHistoryUpdated
-    );
-
-    return () => {
-      RuntimeMessage.offMessage(onHistoryUpdated);
-    };
   }, [currentAccount.address]);
 
   const getAccounts = async () => {

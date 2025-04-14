@@ -15,6 +15,7 @@ import { useWallet } from '@/contexts/wallet';
 import SettingItem from '@/components/ui/SettingItem';
 import AccountsDropdown from '@/components/biz/AccountsDropdown';
 import pkg from '../../package.json';
+import { useAccount } from '@/contexts/account-context';
 
 export default function Settings() {
   const { wallet } = useWallet();
@@ -23,6 +24,9 @@ export default function Settings() {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
   };
   const appVersion = pkg.version;
+  const {
+    currentAccount: { needUpgrade },
+  } = useAccount();
 
   return (
     <SecondaryPageWrapper title="Settings">
@@ -44,9 +48,9 @@ export default function Settings() {
           />
           <SettingItem
             icon={RefreshCcw}
-            label="Update contract"
-            path={SIDE_PANEL_ROUTE_PATHS.UpdateContract}
-            showRedDot
+            label="Upgrade contract"
+            path={SIDE_PANEL_ROUTE_PATHS.UpgradeContract}
+            showRedDot={needUpgrade}
           />
         </div>
       </div>

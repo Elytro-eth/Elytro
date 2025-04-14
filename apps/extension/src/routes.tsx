@@ -22,7 +22,7 @@ import RetrieveContacts from './pages/AccountRecovery/RetrieveContacts';
 import ChangePassword from './pages/ChangePassword';
 import ImportToken from './pages/ImportToken';
 import NetworkConfiguration from './pages/NetworkConfiguration';
-import UpdateContract from './pages/UpdateContract';
+import UpgradeContract from './pages/UpgradeContract';
 import { ApprovalTypeEn } from './constants/operations';
 
 export enum SIDE_PANEL_ROUTE_PATHS {
@@ -30,7 +30,7 @@ export enum SIDE_PANEL_ROUTE_PATHS {
   Settings = '/settings',
   ChangePassword = '/settings/change-password',
   NetworkConfiguration = '/settings/network-configuration',
-  UpdateContract = '/settings/update-contract',
+  UpgradeContract = '/settings/upgrade-contract',
   Dashboard = '/dashboard',
   Activate = '/activate',
   Receive = '/receive',
@@ -75,8 +75,8 @@ export const routes: TRoute[] = [
     component: NetworkConfiguration,
   },
   {
-    path: SIDE_PANEL_ROUTE_PATHS.UpdateContract,
-    component: UpdateContract,
+    path: SIDE_PANEL_ROUTE_PATHS.UpgradeContract,
+    component: UpgradeContract,
   },
   {
     path: SIDE_PANEL_ROUTE_PATHS.ChangePassword,

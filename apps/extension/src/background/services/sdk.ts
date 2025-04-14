@@ -732,6 +732,41 @@ export class SDKService {
     return latestRecoveryContacts;
   }
 
+  public async getContractVersion(walletAddress: string) {
+    const _client = this._getClient();
+
+    try {
+      const version = await _client.readContract({
+        address: walletAddress as Address,
+        abi: parseAbi([
+          'function VERSION() public view returns (string memory)',
+        ]),
+        functionName: 'VERSION',
+        args: [],
+      });
+      return version;
+    } catch (error) {
+      console.error('Elytro: Failed to get contract version.', error);
+      return null;
+    }
+  }
+
+  public async getInstalledModules(walletAddress: string) {
+    const _client = this._getClient();
+
+    try {
+      const modules = (await _client.readContract({
+        address: walletAddress as Address,
+        abi: ABI_SoulWallet,
+        functionName: 'listModule',
+      })) as SafeAny[];
+      return modules?.[0] as string[];
+    } catch (error) {
+      console.error('Elytro: Failed to get installed modules.', error);
+      return [];
+    }
+  }
+
   // public async getPreFund(
   //   userOp: ElytroUserOperation,
   //   transferValue: bigint,

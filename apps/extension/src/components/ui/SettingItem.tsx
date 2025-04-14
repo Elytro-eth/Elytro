@@ -1,5 +1,5 @@
 import { Link } from 'wouter';
-import { RedDot } from './Reddot';
+import { RedDot } from './RedDot';
 
 interface ISettingItemProps {
   icon: React.ElementType;
