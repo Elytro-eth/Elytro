@@ -38,7 +38,7 @@ export default function UpgradeContract() {
       );
       const txs = [installModuleTx, upgradeModuleTx, uninstallModuleTx];
 
-      handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs as Transaction[]);
+      handleTxRequest(TxRequestTypeEn.UpgradeContract, txs as Transaction[]);
     } catch (error) {
       console.error(error);
       toast({

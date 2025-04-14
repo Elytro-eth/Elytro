@@ -46,12 +46,14 @@ export default function Settings() {
             label="Connected apps"
             path={SIDE_PANEL_ROUTE_PATHS.Connection}
           />
-          <SettingItem
-            icon={RefreshCcw}
-            label="Upgrade contract"
-            path={SIDE_PANEL_ROUTE_PATHS.UpgradeContract}
-            showRedDot={needUpgrade}
-          />
+          {needUpgrade && (
+            <SettingItem
+              icon={RefreshCcw}
+              label="Upgrade contract"
+              path={SIDE_PANEL_ROUTE_PATHS.UpgradeContract}
+              showRedDot
+            />
+          )}
         </div>
       </div>
 
