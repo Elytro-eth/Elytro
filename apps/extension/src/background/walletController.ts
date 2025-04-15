@@ -347,8 +347,10 @@ class WalletController {
   }
 
   public async getENSInfoByName(name: string) {
-    const address = await walletClient.getENSAddressByName(name);
-    const avatar = await walletClient.getENSAvatarByName(name);
+    const [address, avatar] = await Promise.all([
+      walletClient.getENSAddressByName(name),
+      walletClient.getENSAvatarByName(name),
+    ]);
     return {
       name,
       address,
@@ -414,12 +416,10 @@ class WalletController {
       );
     }
 
-    const infoRecordTx = await elytroSDK.generateRecoveryInfoRecordTx(
-      contacts,
-      threshold
-    );
-    const contactsSettingTx =
-      await elytroSDK.generateRecoveryContactsSettingTxInfo(newHash);
+    const [infoRecordTx, contactsSettingTx] = await Promise.all([
+      elytroSDK.generateRecoveryInfoRecordTx(contacts, threshold),
+      elytroSDK.generateRecoveryContactsSettingTxInfo(newHash),
+    ]);
 
     return [infoRecordTx, contactsSettingTx];
   }

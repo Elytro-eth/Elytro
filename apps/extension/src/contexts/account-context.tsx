@@ -202,9 +202,10 @@ export const AccountProvider = ({
       return;
     }
 
-    const localHistory = await wallet.getLatestHistories();
-
-    const receives = await getReceiveActivities();
+    const [localHistory, receives] = await Promise.all([
+      wallet.getLatestHistories(),
+      getReceiveActivities(),
+    ]);
 
     const res = [...localHistory, ...receives].sort(
       (a, b) => b.timestamp - a.timestamp
@@ -254,11 +255,10 @@ export const AccountProvider = ({
   };
 
   const reloadAccount = debounce(async (isForce?: boolean) => {
-    await updateAccount();
-
     if (isForce) {
-      await updateHistory();
-      await updateTokens();
+      await Promise.all([updateHistory(), updateTokens(), updateAccount()]);
+    } else {
+      await updateAccount();
     }
   }, 300);
 
