@@ -13,34 +13,44 @@ import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import type { Transaction } from '@soulwallet/sdk';
 import { toast } from '@/hooks/use-toast';
 import { formatErrorMsg } from '@/utils/format';
+import { useWallet } from '@/contexts/wallet';
 
 export default function UpgradeContract() {
   const {
     currentAccount: { address, chainId },
   } = useAccount();
+  const { wallet } = useWallet();
   const { handleTxRequest } = useTx();
-  const handleStartUpgrade = () => {
+  const handleStartUpgrade = async () => {
     try {
       const versionInfo = VERSION_MODULE_ADDRESS_MAP[chainId];
+      if (!versionInfo) {
+        throw new Error('Version info not found for current chain');
+      }
+
       const latestVersionContractAddress =
         versionInfo.versionModuleAddress[versionInfo.latestVersion];
-      const installModuleTx = getInstallModuleTx(
-        address,
-        latestVersionContractAddress
-      );
-      const upgradeModuleTx = getUpgradeModuleTx(
-        address,
-        latestVersionContractAddress
-      );
-      const uninstallModuleTx = getUninstallModuleTx(
-        address,
-        latestVersionContractAddress as `0x${string}`
-      );
-      const txs = [installModuleTx, upgradeModuleTx, uninstallModuleTx];
+      if (!latestVersionContractAddress) {
+        throw new Error('Latest version contract address not found');
+      }
+
+      const installedUpgradeModuleAddresses =
+        await wallet.getInstalledUpgradeModules();
+
+      const txs: Partial<Transaction>[] = [
+        getInstallModuleTx(address, latestVersionContractAddress),
+        getUpgradeModuleTx(address, latestVersionContractAddress),
+      ];
+
+      if (installedUpgradeModuleAddresses.length > 0) {
+        for (const module of installedUpgradeModuleAddresses) {
+          txs.push(getUninstallModuleTx(address, module));
+        }
+      }
 
       handleTxRequest(TxRequestTypeEn.UpgradeContract, txs as Transaction[]);
     } catch (error) {
-      console.error(error);
+      console.error('Upgrade contract failed:', error);
       toast({
         title: 'Failed to upgrade contract',
         description: formatErrorMsg(error),

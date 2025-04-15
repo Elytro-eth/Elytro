@@ -560,12 +560,12 @@ class WalletController {
     );
   }
 
-  public async getInstalledModules() {
+  public async getInstalledUpgradeModules() {
     if (!accountManager.currentAccount) {
       return [];
     }
 
-    return await elytroSDK.getInstalledModules(
+    return await elytroSDK.getInstalledUpgradeModules(
       accountManager.currentAccount.address
     );
   }

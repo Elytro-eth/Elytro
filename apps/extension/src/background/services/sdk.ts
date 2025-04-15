@@ -43,6 +43,7 @@ import { ABI_SoulWallet, ABI_SocialRecoveryModule } from '@soulwallet/abi';
 import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 import { ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
+import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 
 export class SDKService {
   private readonly _REQUIRED_CHAIN_FIELDS: (keyof TChainItem)[] = [
@@ -751,7 +752,7 @@ export class SDKService {
     }
   }
 
-  public async getInstalledModules(walletAddress: string) {
+  public async getInstalledUpgradeModules(walletAddress: string) {
     const _client = this._getClient();
 
     try {
@@ -759,10 +760,27 @@ export class SDKService {
         address: walletAddress as Address,
         abi: ABI_SoulWallet,
         functionName: 'listModule',
-      })) as SafeAny[];
-      return modules?.[0] as string[];
+      })) as string[][];
+
+      const upgradeModuleSet = new Set(
+        Object.values(
+          VERSION_MODULE_ADDRESS_MAP[this._config.id]?.versionModuleAddress ??
+            {}
+        )
+      );
+
+      const installedUpgradeModules: `0x${string}`[] = [];
+      for (const moduleGroup of modules) {
+        for (const module of moduleGroup) {
+          if (upgradeModuleSet.has(module as `0x${string}`)) {
+            installedUpgradeModules.push(module as `0x${string}`);
+          }
+        }
+      }
+
+      return installedUpgradeModules;
     } catch (error) {
-      console.error('Elytro: Failed to get installed modules.', error);
+      console.error('Elytro: Failed to get installed upgrade modules.', error);
       return [];
     }
   }
