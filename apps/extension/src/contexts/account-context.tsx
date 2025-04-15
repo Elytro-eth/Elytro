@@ -255,10 +255,10 @@ export const AccountProvider = ({
   };
 
   const reloadAccount = debounce(async (isForce?: boolean) => {
+    await updateAccount();
+
     if (isForce) {
-      await Promise.all([updateHistory(), updateTokens(), updateAccount()]);
-    } else {
-      await updateAccount();
+      await Promise.all([updateHistory(), updateTokens()]);
     }
   }, 300);
 

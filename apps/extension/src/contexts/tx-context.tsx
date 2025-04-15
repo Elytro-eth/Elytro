@@ -7,8 +7,13 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { toHex } from 'viem';
 import { SIDE_PANEL_ROUTE_PATHS } from '../routes';
 import { useApproval } from './approval-context';
-import { HistoricalActivityTypeEn } from '@/constants/operations';
+import {
+  HistoricalActivityTypeEn,
+  UserOperationStatusEn,
+} from '@/constants/operations';
 import { formatErrorMsg } from '@/utils/format';
+import { RuntimeMessage } from '@/utils/message';
+import { EVENT_TYPES } from '@/constants/events';
 
 export enum TxRequestTypeEn {
   DeployWallet = 1,
@@ -85,6 +90,26 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const [hasSufficientBalance, setHasSufficientBalance] = useState(false);
   const [calcResult, setCalcResult] =
     useState<Nullable<TUserOperationPreFundResult>>(null);
+
+  const registerOpStatusListener = (opHash: string) => {
+    const eventKey = `${EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED}_${opHash}`;
+    RuntimeMessage.onMessage(eventKey, (message) => {
+      if (message?.status === UserOperationStatusEn.confirmedSuccess) {
+        if (message?.txHash) {
+          resolve(message.txHash);
+        }
+        toast({
+          title: ConfirmSuccessMessageMap[requestType!],
+        });
+      } else {
+        toast({
+          title: 'Transaction failed',
+          description: 'Please try again',
+          variant: 'destructive',
+        });
+      }
+    });
+  };
 
   const handleTxRequest = async (
     type: TxRequestTypeEn,
@@ -182,48 +207,6 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     userOpRef.current = null;
   };
 
-  const onSendSuccess = async (txHash?: string) => {
-    toast({
-      title:
-        ConfirmSuccessMessageMap[requestType!] || 'Transaction successfully',
-      variant: 'constructive',
-    });
-    await resolve(txHash);
-  };
-
-  const onConfirm = async () => {
-    try {
-      setIsSending(true);
-      const { opHash, userOp } = await wallet.signAndSendTransaction(
-        userOpRef.current
-      );
-      wallet.addNewHistory({
-        type: txTypeRef.current!,
-        opHash,
-        // txHash,
-        userOp: userOp,
-        decodedDetail: decodedDetail!,
-      });
-      handleBack();
-
-      const { opHash: txHash } = await wallet.getTransactionResult(
-        userOp,
-        opHash
-      );
-      onSendSuccess(txHash);
-    } catch (error) {
-      const msg = formatErrorMsg(error);
-      setErrorMsg(msg);
-      toast({
-        title: 'Failed to send transaction',
-        description: msg,
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSending(false);
-    }
-  };
-
   const handleBack = (isCancel = false) => {
     const prevType = requestType;
     resetTxContext();
@@ -259,6 +242,31 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
 
     setErrorMsg(null);
     packUserOp(requestType!, txParamsRef.current as unknown as Transaction[]);
+  };
+
+  const onConfirm = async () => {
+    try {
+      setIsSending(true);
+      const opHash = await wallet.sendUserOperation(userOpRef.current!);
+      registerOpStatusListener(opHash);
+      wallet.addNewHistory({
+        type: txTypeRef.current!,
+        opHash,
+        from: userOpRef.current!.sender,
+        decodedDetail: decodedDetail!,
+      });
+      handleBack();
+    } catch (error) {
+      const msg = formatErrorMsg(error);
+      setErrorMsg(msg);
+      toast({
+        title: 'Failed to send transaction',
+        description: msg,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSending(false);
+    }
   };
 
   useEffect(() => {

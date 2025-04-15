@@ -110,9 +110,17 @@ class WalletController {
   }
 
   public async sendUserOperation(userOp: ElytroUserOperation) {
-    return await elytroSDK.sendUserOperationOnly(
-      deformatObjectWithBigInt(userOp, ['maxFeePerGas', 'maxPriorityFeePerGas'])
-    );
+    // TODO: check this logic
+    if (!userOp?.paymaster) {
+      await elytroSDK.estimateGas(userOp!);
+    }
+
+    const { opHash } = await elytroSDK.signUserOperation(userOp!);
+    // userOp.signature = signature;
+
+    await elytroSDK.sendUserOperation(userOp);
+
+    return opHash;
   }
 
   public async signMessage(message: string) {
@@ -154,13 +162,13 @@ class WalletController {
     type,
     opHash,
     txHash,
-    userOp,
+    from,
     decodedDetail,
   }: {
     type: HistoricalActivityTypeEn;
     opHash: string;
     txHash?: string;
-    userOp: ElytroUserOperation;
+    from: string;
     decodedDetail: DecodeResult;
   }) {
     historyManager.add({
@@ -168,7 +176,7 @@ class WalletController {
       type,
       opHash,
       txHash,
-      from: userOp.sender,
+      from,
       ...getTransferredTokenInfo(decodedDetail),
     });
   }
@@ -541,37 +549,6 @@ class WalletController {
       accountManager.currentAccount.chainId,
       token
     );
-  }
-
-  public async signAndSendTransaction(
-    currentUserOp: Nullable<ElytroUserOperation>
-  ) {
-    // TODO: check this logic
-    if (!currentUserOp?.paymaster) {
-      currentUserOp = await this.estimateGas(currentUserOp!);
-    }
-
-    const { signature, opHash } = await this.signUserOperation(currentUserOp!);
-    currentUserOp!.signature = signature;
-
-    // const simulationResult =
-    //   await elytroSDK.simulateUserOperation(currentUserOp);
-    // const txDetail = formatSimulationResultToTxDetail(simulationResult);
-
-    await this.sendUserOperation(currentUserOp!);
-
-    return {
-      opHash,
-      // txHash,
-      userOp: currentUserOp,
-    };
-  }
-
-  public async getTransactionResult(
-    currentUserOp: Nullable<ElytroUserOperation>,
-    opHash: string
-  ) {
-    return await elytroSDK.getUserOperationResult(currentUserOp!, opHash);
   }
 }
 

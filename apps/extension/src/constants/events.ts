@@ -6,6 +6,7 @@ export const EVENT_TYPES = {
   },
   APPROVAL: {
     REQUESTED: 'approvalRequested',
+    RESOLVED: 'approvalResolved',
   },
   CHAIN: {
     CHAIN_INITIALIZED: 'chainInitialized',
