@@ -44,9 +44,16 @@ import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 import { ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
 import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
+import {
+  DEFAULT_ENTRYPOINT_ADDRESS,
+  SDK_CONFIG_BY_ENTRYPOINT,
+} from '@/constants/entrypoints';
+import { TSDKConfigItem } from '@/constants/entrypoints';
+
+type TSDKChainConfigItem = TChainItem & TSDKConfigItem;
 
 export class SDKService {
-  private readonly _REQUIRED_CHAIN_FIELDS: (keyof TChainItem)[] = [
+  private readonly _REQUIRED_CHAIN_FIELDS: (keyof TSDKChainConfigItem)[] = [
     'id',
     'endpoint',
     'factory',
@@ -58,7 +65,7 @@ export class SDKService {
 
   private _sdk!: SoulWallet;
   private _bundler!: Bundler;
-  private _config!: TChainItem;
+  private _config!: TSDKChainConfigItem;
   private _pimlicoRpc: Nullable<PublicClient> = null;
   private _client: Nullable<PublicClient> = null;
 
@@ -82,22 +89,36 @@ export class SDKService {
     return this._bundler;
   }
 
-  public resetSDK(chainConfig: TChainItem) {
+  public resetSDK(chainConfig: TChainItem, entrypoint?: string) {
     if (!SUPPORTED_CHAIN_IDS.includes(chainConfig.id)) {
       throw new Error(
         `Elytro: chain ${chainConfig.id} is not supported for now.`
       );
     }
 
-    if (this._isConfigUnchanged(chainConfig)) {
+    entrypoint =
+      entrypoint ??
+      this._config?.onchainConfig?.entryPoint ??
+      DEFAULT_ENTRYPOINT_ADDRESS;
+
+    if (!SDK_CONFIG_BY_ENTRYPOINT[entrypoint]) {
+      throw new Error(`Elytro: entrypoint ${entrypoint} is not supported.`);
+    }
+
+    const sdkConfig: TSDKChainConfigItem = {
+      ...chainConfig,
+      ...SDK_CONFIG_BY_ENTRYPOINT[entrypoint],
+    };
+
+    if (this._isConfigUnchanged(sdkConfig)) {
       console.log('Elytro::SDK: chain config unchanged, no reset needed.');
       return;
     }
 
-    this.initializeSDK(chainConfig);
+    this.initializeSDK(sdkConfig);
   }
 
-  private _isConfigUnchanged(newConfig: TChainItem): boolean {
+  private _isConfigUnchanged(newConfig: TSDKChainConfigItem): boolean {
     if (!this._config) return false;
 
     return this._REQUIRED_CHAIN_FIELDS.every(
@@ -105,18 +126,14 @@ export class SDKService {
     );
   }
 
-  private initializeSDK(config: TChainItem) {
+  private initializeSDK(config: TSDKChainConfigItem) {
     const { endpoint, bundler, factory, fallback, recovery, onchainConfig } =
       config;
 
-    this._sdk = new SoulWallet(
-      endpoint,
-      bundler,
-      factory,
-      fallback,
-      recovery,
-      onchainConfig
-    );
+    this._sdk = new SoulWallet(endpoint, bundler, factory, fallback, recovery, {
+      ...onchainConfig,
+      chainId: config.id,
+    });
 
     this._bundler = new Bundler(bundler);
     this._config = config;
@@ -182,6 +199,7 @@ export class SDKService {
     initialGuardianSafePeriod: number = DEFAULT_GUARDIAN_SAFE_PERIOD
   ) {
     const emptyCallData = '0x';
+
     const res = await this._sdk?.createUnsignedDeployWalletUserOp(
       this._index,
       [paddingZero(eoaAddress, 32)],
@@ -198,8 +216,8 @@ export class SDKService {
   }
 
   public async canGetSponsored(userOp: ElytroUserOperation) {
-    const { chainId, entryPoint } = this._config.onchainConfig;
-    return await canUserOpGetSponsor(userOp, chainId, entryPoint);
+    const { id, onchainConfig } = this._config;
+    return await canUserOpGetSponsor(userOp, id, onchainConfig.entryPoint);
   }
 
   public async isSmartAccountDeployed(address: string) {
@@ -475,13 +493,12 @@ export class SDKService {
     }
 
     // todo: sdk can be optimized (fetch balance in sdk)
-
     const res = await this._sdk.estimateUserOperationGas(
       this._config.validator,
       userOp,
       {
         [userOp.sender]: {
-          balance: toHex(parseEther('1')),
+          balance: '0xde0b6b3a7640000', // equals to toHex(parseEther('1')),
           // getHexString(
           //   await this._sdk.provider.getBalance(userOp.sender)
           // ),
@@ -489,6 +506,56 @@ export class SDKService {
       },
       SignkeyType.EOA // 目前仅支持EOA
     );
+
+    // await this.signUserOperation(userOp);
+
+    // const _client = createPublicClient({
+    //   transport: http(this._config.bundler),
+    //   chain: this._config,
+    // });
+
+    // console.log(await this._sdk.entryPoint(), 'entryPoint', this._config);
+
+    // const res = await _client.request({
+    //   method: 'pimlico_simulateAssetChanges' as SafeAny,
+    //   params: [
+    //     {
+    //       nonce: '0x0',
+    //       sender: '0x23FE8D927A06464a5BEE2eDe7aC50b3DC3FB9BAc',
+    //       // factory: '0xdE9845C5349ad08E0A1B3c311aeAfd3C4Fd7fC8F',
+    //       callData: '0x',
+    //       // paymaster: null,
+    //       signature:
+    //         '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c',
+    //       // factoryData:
+    //       //   '0xa1aafc9e00000000000000000000000000000000000000000000000000000000000000406abf0de5e34ce0725e7a10913860e4654ef69ce4eed881e71fb8c9394e378fcc00000000000000000000000000000000000000000000000000000000000001a4ac27308a0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000de5bab4efe758e453dcf7ed2bf08ce373436425d00000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000001000000000000000000000000345de03cd69c4d4ed010a06bc2cb436357a915a7000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000054456e9d9092492ceaa05daf1c590c829674d324720000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002a300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+    //       callGasLimit: '0x0',
+    //       maxFeePerGas: '0x4dcd52',
+    //       // paymasterData: null,
+    //       preVerificationGas: '0x989680',
+    //       maxPriorityFeePerGas: '0x166e30',
+    //       verificationGasLimit: '0x0',
+    //       paymasterPostOpGasLimit: null,
+    //       paymasterVerificationGasLimit: null,
+    //     },
+    //     '0x4337084D9E255Ff0702461CF8895CE9E3b5Ff108',
+    //   ],
+    //   // [
+    //   //   {
+    //   //     ...userOp,
+    //   //     signature:
+    //   //       '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c',
+    //   //   } as SafeAny,
+    //   //   this._config.onchainConfig.entryPoint as `0x${string}`,
+    //   //   {
+    //   //     [userOp.sender]: {
+    //   //       balance: '0xde0b6b3a7640000', // equals to toHex(parseEther('1')),
+    //   //     },
+    //   //   },
+    //   // ],
+    // });
+    // console.log('res', res);
+    // console.log('userOp 2', userOp);
 
     if (res.isErr()) {
       throw res.ERR;
@@ -750,6 +817,18 @@ export class SDKService {
       console.error('Elytro: Failed to get contract version.', error);
       return null;
     }
+  }
+
+  public async getEntrypoint(walletAddress: string) {
+    const _client = this._getClient();
+    const entrypoint = await _client.readContract({
+      address: walletAddress as Address,
+      abi: parseAbi(['function entryPoint() external view returns (address)']),
+      functionName: 'entryPoint',
+      args: [],
+    });
+    console.log('Elytro: entrypoint', entrypoint);
+    return entrypoint as `0x${string}`;
   }
 
   public async getInstalledUpgradeModules(walletAddress: string) {

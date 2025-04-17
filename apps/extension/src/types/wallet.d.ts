@@ -13,6 +13,7 @@ type TAccountInfo = {
   isDeployed: boolean;
   balance?: Nullable<number>;
   needUpgrade?: boolean;
+  entrypoint?: `0x${string}`;
 };
 
 type TTransactionInfo = {

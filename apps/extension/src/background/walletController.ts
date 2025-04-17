@@ -192,7 +192,7 @@ class WalletController {
       throw new Error('Elytro: No current chain config');
     }
 
-    elytroSDK.resetSDK(chainConfig);
+    elytroSDK.resetSDK(chainConfig, accountManager.currentAccount?.entrypoint);
     walletClient.init(chainConfig);
 
     sessionManager.broadcastMessage('chainChanged', toHex(chainConfig.id));
@@ -244,38 +244,34 @@ class WalletController {
       return null;
     }
 
-    let isDeployed = basicInfo.isDeployed;
+    const [isDeployed, balance] = await Promise.all([
+      basicInfo.isDeployed ||
+        elytroSDK.isSmartAccountDeployed(basicInfo.address),
+      walletClient.getBalance(basicInfo.address),
+    ]);
 
-    // isDeployed maybe undefined when the account is just created, in this case, we need to check if the account is deployed
-    if (!isDeployed) {
-      isDeployed = await elytroSDK.isSmartAccountDeployed(basicInfo.address);
-
-      accountManager.updateCurrentAccountInfo({
-        isDeployed,
-      });
-    } else {
+    let needUpgrade = false;
+    let entrypoint = basicInfo.entrypoint;
+    if (isDeployed) {
       const versionInfo = VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId];
       if (versionInfo) {
         const currentVersion = await elytroSDK.getContractVersion(
           basicInfo.address
         );
+        needUpgrade = currentVersion !== versionInfo.latestVersion;
+      }
 
-        // TODO: use `isLaterThan` to compare version after feat/version is merged
-        accountManager.updateCurrentAccountInfo({
-          needUpgrade: currentVersion !== versionInfo.latestVersion,
-        });
+      if (!entrypoint) {
+        entrypoint = await elytroSDK.getEntrypoint(basicInfo.address);
       }
     }
-
-    const balance = await walletClient.getBalance(basicInfo.address);
     accountManager.updateCurrentAccountInfo({
-      balance: Number(balance),
-    });
-
-    return {
-      ...basicInfo,
+      entrypoint,
       isDeployed,
-    };
+      balance: Number(balance),
+      needUpgrade,
+    });
+    return accountManager.currentAccount;
   }
 
   public async createAccount(chainId: number) {
@@ -301,7 +297,7 @@ class WalletController {
   }
 
   private async _onAccountChanged() {
-    await historyManager.switchAccount(accountManager.currentAccount);
+    historyManager.switchAccount(accountManager.currentAccount);
     await connectionManager.switchAccount(accountManager.currentAccount);
 
     this._broadcastToConnectedSites('accountsChanged', [
@@ -310,8 +306,8 @@ class WalletController {
   }
 
   public async switchAccountByChain(chainId: number) {
-    this.switchChain(chainId);
     accountManager.switchAccountByChainId(chainId);
+    this.switchChain(chainId);
     this._broadcastToConnectedSites('accountsChanged', []);
     this._onAccountChanged();
   }
