@@ -300,18 +300,14 @@ const initBackgroundMessage = () => {
     RuntimeMessage.sendMessage(EVENT_TYPES.HISTORY.ITEMS_UPDATED);
   });
 
-  eventBus.on(
-    EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED,
-    (userOpHash, status, txHash) => {
-      RuntimeMessage.sendMessage(
-        `${EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED}_${userOpHash}`,
-        {
-          status,
-          txHash,
-        }
-      );
-    }
-  );
+  eventBus.on(EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED, (userOpHash, status) => {
+    RuntimeMessage.sendMessage(
+      `${EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED}_${userOpHash}`,
+      {
+        status,
+      }
+    );
+  });
 };
 
 initBackgroundMessage();

@@ -164,12 +164,14 @@ class WalletController {
     txHash,
     from,
     decodedDetail,
+    approvalId,
   }: {
     type: HistoricalActivityTypeEn;
     opHash: string;
     txHash?: string;
     from: string;
     decodedDetail: DecodeResult;
+    approvalId?: string;
   }) {
     historyManager.add({
       timestamp: Date.now(),
@@ -178,6 +180,7 @@ class WalletController {
       txHash,
       from,
       ...getTransferredTokenInfo(decodedDetail),
+      approvalId,
     });
   }
 
