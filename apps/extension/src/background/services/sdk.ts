@@ -43,6 +43,7 @@ import { ABI_SoulWallet, ABI_SocialRecoveryModule } from '@soulwallet/abi';
 import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 import { ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
+import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 
 export class SDKService {
   private readonly _REQUIRED_CHAIN_FIELDS: (keyof TChainItem)[] = [
@@ -730,6 +731,58 @@ export class SDKService {
     const latestRecoveryContacts = parseContactFromLog(logs[logs.length - 1]);
 
     return latestRecoveryContacts;
+  }
+
+  public async getContractVersion(walletAddress: string) {
+    const _client = this._getClient();
+
+    try {
+      const version = await _client.readContract({
+        address: walletAddress as Address,
+        abi: parseAbi([
+          'function VERSION() public view returns (string memory)',
+        ]),
+        functionName: 'VERSION',
+        args: [],
+      });
+      return version;
+    } catch (error) {
+      console.error('Elytro: Failed to get contract version.', error);
+      return null;
+    }
+  }
+
+  public async getInstalledUpgradeModules(walletAddress: string) {
+    const _client = this._getClient();
+
+    try {
+      const modules = (await _client.readContract({
+        address: walletAddress as Address,
+        abi: ABI_SoulWallet,
+        functionName: 'listModule',
+      })) as string[][];
+
+      const upgradeModuleSet = new Set(
+        Object.values(
+          VERSION_MODULE_ADDRESS_MAP[this._config.id]?.versionModuleAddress ??
+            {}
+        )
+      );
+
+      const installedUpgradeModules: `0x${string}`[] = [];
+      for (const moduleGroup of modules) {
+        for (const module of moduleGroup) {
+          if (upgradeModuleSet.has(module as `0x${string}`)) {
+            installedUpgradeModules.push(module as `0x${string}`);
+          }
+        }
+      }
+
+      return installedUpgradeModules;
+    } catch (error) {
+      console.error('Elytro: Failed to get installed upgrade modules.', error);
+      return [];
+    }
   }
 
   // public async getPreFund(

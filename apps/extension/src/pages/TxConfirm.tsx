@@ -6,10 +6,11 @@ import { UserOpDetail } from '@/components/biz/UserOpDetail';
 import { useAccount } from '@/contexts/account-context';
 import { AlertCircle } from 'lucide-react';
 
-const UserOpTitleMap = {
+const UserOpTitleMap: Record<TxRequestTypeEn, string> = {
   [TxRequestTypeEn.DeployWallet]: 'Activate wallet',
   [TxRequestTypeEn.SendTransaction]: 'Send',
   [TxRequestTypeEn.ApproveTransaction]: 'Confirm transaction',
+  [TxRequestTypeEn.UpgradeContract]: 'Upgrade contract',
 };
 
 function TxConfirm() {

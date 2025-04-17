@@ -14,6 +14,7 @@ export enum TxRequestTypeEn {
   DeployWallet = 1,
   SendTransaction,
   ApproveTransaction,
+  UpgradeContract,
 }
 
 type TMyDecodeResult = Pick<DecodeResult, 'method' | 'toInfo' | 'to'>;
@@ -171,6 +172,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     setHasSufficientBalance(false);
     setIsPacking(true);
     setCalcResult(null);
+    setErrorMsg(null);
     txTypeRef.current = null;
     txParamsRef.current = null;
     userOpRef.current = null;
@@ -239,7 +241,9 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     navigateTo(
       'side-panel',
       SIDE_PANEL_ROUTE_PATHS.Dashboard,
-      prevType === TxRequestTypeEn.DeployWallet && !isCancel
+      (prevType === TxRequestTypeEn.DeployWallet ||
+        prevType === TxRequestTypeEn.UpgradeContract) &&
+        !isCancel
         ? { activating: '1' }
         : undefined
     );
