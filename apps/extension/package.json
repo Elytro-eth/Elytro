@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "test": "echo jest",
     "lint": "eslint ."
   },
   "dependencies": {

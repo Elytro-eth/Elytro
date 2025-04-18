@@ -8,8 +8,6 @@ export const canUserOpGetSponsor = async (
   chainID: number,
   entryPoint: string
 ) => {
-  let canGetSponsored = false;
-
   try {
     const res = await mutate(mutate_sponsor_op, {
       input: {
@@ -54,11 +52,9 @@ export const canUserOpGetSponsor = async (
       paymasterPostOpGasLimit,
     });
 
-    canGetSponsored = true;
+    return true;
   } catch (error) {
     console.error('Elytro: Failed to check valid for sponsor.', error);
-    canGetSponsored = false;
-  } finally {
-    return canGetSponsored;
+    return false;
   }
 };
