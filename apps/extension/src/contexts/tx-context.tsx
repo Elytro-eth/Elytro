@@ -19,6 +19,7 @@ export enum TxRequestTypeEn {
   DeployWallet = 1,
   SendTransaction,
   ApproveTransaction,
+  UpgradeContract,
 }
 
 type TMyDecodeResult = Pick<DecodeResult, 'method' | 'toInfo' | 'to'>;
@@ -73,7 +74,7 @@ const TxContext = createContext<ITxContext>({
 
 export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
-  const { approval, resolve, reject } = useApproval();
+  const { approval, reject } = useApproval();
 
   const userOpRef = useRef<Nullable<ElytroUserOperation>>();
   const txTypeRef = useRef<Nullable<HistoricalActivityTypeEn>>(null);
@@ -95,9 +96,6 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     const eventKey = `${EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED}_${opHash}`;
     RuntimeMessage.onMessage(eventKey, (message) => {
       if (message?.status === UserOperationStatusEn.confirmedSuccess) {
-        if (message?.txHash) {
-          resolve(message.txHash);
-        }
         toast({
           title: ConfirmSuccessMessageMap[requestType!],
         });
@@ -202,6 +200,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     setHasSufficientBalance(false);
     setIsPacking(true);
     setCalcResult(null);
+    setErrorMsg(null);
     txTypeRef.current = null;
     txParamsRef.current = null;
     userOpRef.current = null;
@@ -213,7 +212,10 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
 
     let params;
     if (!isCancel) {
-      if (prevType === TxRequestTypeEn.DeployWallet) {
+      if (
+        prevType === TxRequestTypeEn.DeployWallet ||
+        prevType === TxRequestTypeEn.UpgradeContract
+      ) {
         params = { activating: '1' };
       } else {
         params = { defaultTabs: 'activities' };
@@ -254,6 +256,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         opHash,
         from: userOpRef.current!.sender,
         decodedDetail: decodedDetail!,
+        approvalId: approval?.id,
       });
       handleBack();
     } catch (error) {

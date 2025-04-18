@@ -49,6 +49,8 @@ class HistoryItem {
   }
 
   private _updateStatus(status: UserOperationStatusEn, txHash?: string) {
+    this._broadcastTxHashReceived(txHash);
+
     if (this._status === status) {
       return;
     }
@@ -61,15 +63,25 @@ class HistoryItem {
     }
 
     this._status = status;
-    this._broadcastStatusChange(txHash);
+    this._broadcastStatusChange();
   }
 
-  private _broadcastStatusChange(txHash?: string) {
+  private _broadcastTxHashReceived(txHash?: string) {
+    if (this._data.approvalId && txHash) {
+      eventBus.emit(
+        `${EVENT_TYPES.HISTORY.TX_HASH_RECEIVED}_${this._data.approvalId}`,
+        {
+          txHash,
+        }
+      );
+    }
+  }
+
+  private _broadcastStatusChange() {
     eventBus.emit(
       EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED,
       this._data.opHash,
-      this.status,
-      txHash
+      this.status
     );
   }
 
@@ -104,7 +116,6 @@ class HistoryItem {
     try {
       this._fetching = true;
       const res = await elytroSDK.getUserOperationReceipt(this._data.opHash);
-      console.log('res', res);
       let newStatus = UserOperationStatusEn.pending;
 
       // status is 0x1 means has confirm result

@@ -26,6 +26,7 @@ import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { TRecoveryStatus } from '@/constants/recovery';
 import { getTokenList, updateUserImportedTokens } from '@/utils/tokens';
 import { ABI_ERC20_BALANCE_OF } from '@/constants/abi';
+import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -115,8 +116,8 @@ class WalletController {
       await elytroSDK.estimateGas(userOp!);
     }
 
-    const { opHash } = await elytroSDK.signUserOperation(userOp!);
-    // userOp.signature = signature;
+    const { opHash, signature } = await elytroSDK.signUserOperation(userOp!);
+    userOp.signature = signature;
 
     await elytroSDK.sendUserOperation(userOp);
 
@@ -164,12 +165,14 @@ class WalletController {
     txHash,
     from,
     decodedDetail,
+    approvalId,
   }: {
     type: HistoricalActivityTypeEn;
     opHash: string;
     txHash?: string;
     from: string;
     decodedDetail: DecodeResult;
+    approvalId?: string;
   }) {
     historyManager.add({
       timestamp: Date.now(),
@@ -178,6 +181,7 @@ class WalletController {
       txHash,
       from,
       ...getTransferredTokenInfo(decodedDetail),
+      approvalId,
     });
   }
 
@@ -256,6 +260,18 @@ class WalletController {
       accountManager.updateCurrentAccountInfo({
         isDeployed,
       });
+    } else {
+      const versionInfo = VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId];
+      if (versionInfo) {
+        const currentVersion = await elytroSDK.getContractVersion(
+          basicInfo.address
+        );
+
+        // TODO: use `isLaterThan` to compare version after feat/version is merged
+        accountManager.updateCurrentAccountInfo({
+          needUpgrade: currentVersion !== versionInfo.latestVersion,
+        });
+      }
     }
 
     const balance = await walletClient.getBalance(basicInfo.address);
@@ -548,6 +564,16 @@ class WalletController {
     await updateUserImportedTokens(
       accountManager.currentAccount.chainId,
       token
+    );
+  }
+
+  public async getInstalledUpgradeModules() {
+    if (!accountManager.currentAccount) {
+      return [];
+    }
+
+    return await elytroSDK.getInstalledUpgradeModules(
+      accountManager.currentAccount.address
     );
   }
 }

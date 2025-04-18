@@ -55,11 +55,10 @@ export function UserOpDetail({
       case TxRequestTypeEn.SendTransaction:
         return <InnerSendingDetail decodedUserOp={decodedUserOp} />;
 
-      case TxRequestTypeEn.ApproveTransaction:
-        return <ApprovalDetail decodedUserOp={decodedUserOp} />;
-
+      // case TxRequestTypeEn.ApproveTransaction:
+      // TODO: add upgrade contract detail
       default:
-        return null;
+        return <ApprovalDetail decodedUserOp={decodedUserOp} />;
     }
   }, [requestType, decodedUserOp]);
 
@@ -118,7 +117,8 @@ export function UserOpDetail({
       </InfoCardList>
 
       {/* Transaction Raw Data: Only show for approve transaction */}
-      {requestType === TxRequestTypeEn.ApproveTransaction && (
+      {(requestType === TxRequestTypeEn.ApproveTransaction ||
+        requestType === TxRequestTypeEn.UpgradeContract) && (
         <div>
           <button
             className="flex items-center justify-center gap-x-2xs elytro-text-tiny-body text-gray-750 mb-sm"
