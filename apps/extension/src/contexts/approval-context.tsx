@@ -33,10 +33,6 @@ export const ApprovalProvider = ({
   const isApprovalProcessing = useRef(false);
 
   const getCurrentApproval = async () => {
-    if (isApprovalProcessing.current) {
-      return;
-    }
-
     try {
       const isLocked = await wallet.getLockStatus();
       if (isLocked) {

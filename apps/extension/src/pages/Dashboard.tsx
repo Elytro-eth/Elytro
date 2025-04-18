@@ -10,6 +10,7 @@ import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import BetaNotice from '@/components/ui/BetaNotice';
 import PageLayout from '@/components/ui/PageLayout';
+import useSearchParams from '@/hooks/use-search-params';
 // import { Button } from '@/components/ui/button';
 // import { Plus } from 'lucide-react';
 
@@ -19,6 +20,10 @@ export default function Dashboard() {
   const handleReload = () => {
     reloadAccount(true);
   };
+
+  const searchParams = useSearchParams();
+  const defaultTabs =
+    searchParams.defaultTabs === 'activities' ? 'activities' : 'assets';
 
   return (
     <PageLayout className="w-full h-screen bg-gray-150">
@@ -30,7 +35,7 @@ export default function Dashboard() {
       <PageLayout.Body className="px-2">
         <div className=" rounded-xl bg-white h-full">
           <Tabs
-            defaultValue="assets"
+            defaultValue={defaultTabs}
             className=""
             style={{
               display: 'flex',

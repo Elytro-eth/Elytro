@@ -3,9 +3,12 @@ export const EVENT_TYPES = {
     ITEMS_UPDATED: 'historyItemsUpdated',
     ITEM_STATUS_UPDATED: 'historyItemStatusUpdated',
     NEW_RECEIVED_MESSAGE: 'newReceivedMessage',
+    TX_HASH_RECEIVED: 'txHashReceived',
   },
   APPROVAL: {
     REQUESTED: 'approvalRequested',
+    PENDING: 'approvalPending',
+    RESOLVED: 'approvalResolved',
   },
   CHAIN: {
     CHAIN_INITIALIZED: 'chainInitialized',

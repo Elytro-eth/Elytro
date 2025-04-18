@@ -19,7 +19,7 @@ function PageContainer({ children, className }: IPageContainerProps) {
         <div
           className={cn(
             // ! DO NOT REMOVE min-w-[360px], it's the minimum width of the side panel
-            'w-screen h-screen flex justify-center mx-auto max-w-screen-md min-w-[360px]',
+            'w-screen min-h-screen flex justify-center mx-auto max-w-screen-md min-w-[360px]',
             className
           )}
         >
