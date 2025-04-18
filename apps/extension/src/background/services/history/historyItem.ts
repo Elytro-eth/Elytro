@@ -128,8 +128,6 @@ class HistoryItem {
       this._retryCount = 0;
       this._backoffTime = INITIAL_BACKOFF;
 
-      console.log('test res', res);
-
       this._updateStatus(newStatus, res?.transactionHash);
     } catch (error) {
       this._handleError(error as Error);
