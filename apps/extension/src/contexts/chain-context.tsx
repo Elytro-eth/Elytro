@@ -77,17 +77,20 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
         chrome.tabs.create({
           url,
         });
+        return;
       } else if (opHash && currentChain?.opExplorer) {
         const url = `${currentChain.opExplorer}/${opHash}`;
 
         chrome.tabs.create({
           url,
         });
+        return;
       }
 
       toast({
         title: 'Failed to open explorer',
         description: 'No explorer url or hash',
+        variant: 'destructive',
       });
     },
     [currentChain]

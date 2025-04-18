@@ -110,14 +110,18 @@ class WalletController {
     return await elytroSDK.signUserOperation(deformatObjectWithBigInt(userOp));
   }
 
-  public async sendUserOperation(userOp: ElytroUserOperation, opHash: string) {
-    return await elytroSDK.sendUserOperation(
-      deformatObjectWithBigInt(userOp, [
-        'maxFeePerGas',
-        'maxPriorityFeePerGas',
-      ]),
-      opHash
-    );
+  public async sendUserOperation(userOp: ElytroUserOperation) {
+    // TODO: check this logic
+    if (!userOp?.paymaster) {
+      await elytroSDK.estimateGas(userOp!);
+    }
+
+    const { opHash } = await elytroSDK.signUserOperation(userOp!);
+    // userOp.signature = signature;
+
+    await elytroSDK.sendUserOperation(userOp);
+
+    return opHash;
   }
 
   public async signMessage(message: string) {
@@ -159,22 +163,25 @@ class WalletController {
     type,
     opHash,
     txHash,
-    userOp,
+    from,
     decodedDetail,
+    approvalId,
   }: {
     type: HistoricalActivityTypeEn;
     opHash: string;
     txHash?: string;
-    userOp: ElytroUserOperation;
+    from: string;
     decodedDetail: DecodeResult;
+    approvalId?: string;
   }) {
     historyManager.add({
       timestamp: Date.now(),
       type,
       opHash,
       txHash,
-      from: userOp.sender,
+      from,
       ...getTransferredTokenInfo(decodedDetail),
+      approvalId,
     });
   }
 
@@ -364,8 +371,10 @@ class WalletController {
   }
 
   public async getENSInfoByName(name: string) {
-    const address = await walletClient.getENSAddressByName(name);
-    const avatar = await walletClient.getENSAvatarByName(name);
+    const [address, avatar] = await Promise.all([
+      walletClient.getENSAddressByName(name),
+      walletClient.getENSAvatarByName(name),
+    ]);
     return {
       name,
       address,
@@ -431,12 +440,10 @@ class WalletController {
       );
     }
 
-    const infoRecordTx = await elytroSDK.generateRecoveryInfoRecordTx(
-      contacts,
-      threshold
-    );
-    const contactsSettingTx =
-      await elytroSDK.generateRecoveryContactsSettingTxInfo(newHash);
+    const [infoRecordTx, contactsSettingTx] = await Promise.all([
+      elytroSDK.generateRecoveryInfoRecordTx(contacts, threshold),
+      elytroSDK.generateRecoveryContactsSettingTxInfo(newHash),
+    ]);
 
     return [infoRecordTx, contactsSettingTx];
   }
