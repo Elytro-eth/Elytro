@@ -27,7 +27,7 @@
     "typedoc": "typedoc",
     "docs": "npx typedoc --tsconfig ./tsconfig.esm.json --plugin typedoc-plugin-markdown typedoc-plugin-missing-exports src/main.ts",
     "tsc": "tsc",
-    "build": "tsc --project ./tsconfig.esm.json;tsc --project ./tsconfig.cjs.json;node ./create-package-json.mjs",
+    "build": "mkdir -p lib.cjs lib.esm && tsc --project ./tsconfig.esm.json && tsc --project ./tsconfig.cjs.json && node ./create-package-json.mjs",
     "javascript-obfuscator": "javascript-obfuscator",
     "generateABI": "ts-node --project ./tsconfig.dev.json ./src/dev/generateABI.ts",
     "test": "jest"
