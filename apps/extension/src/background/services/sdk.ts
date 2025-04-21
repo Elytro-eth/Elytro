@@ -715,7 +715,7 @@ export class SDKService {
       return version;
     } catch (error) {
       console.error('Elytro: Failed to get contract version.', error);
-      return null;
+      return '0.0.0';
     }
   }
 

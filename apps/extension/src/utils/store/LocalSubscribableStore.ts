@@ -43,9 +43,8 @@ class LocalSubscribableStore<T extends object> extends SubscribableStore<T> {
           if (target[prop as keyof T] !== value) {
             target[prop as keyof T] = value;
             this._notifySubscribers();
-            return true;
           }
-          return false;
+          return true;
         },
       });
     };
