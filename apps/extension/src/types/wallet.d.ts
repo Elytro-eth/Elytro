@@ -12,6 +12,7 @@ type TAccountInfo = {
   chainId: number;
   isDeployed: boolean;
   balance?: Nullable<number>;
+  needUpgrade?: boolean;
 };
 
 type TTransactionInfo = {

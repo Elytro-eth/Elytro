@@ -6,6 +6,7 @@ import ActivateButton from './ActivateButton';
 import { useAccount } from '@/contexts/account-context';
 import AccountsDropdown from './AccountsDropdown';
 import Copy from '@/components/ui/Copy';
+import { RedDot } from '@/components/ui/RedDot';
 
 export default function BasicAccountInfo() {
   const { currentAccount } = useAccount();
@@ -35,6 +36,9 @@ export default function BasicAccountInfo() {
             className="elytro-clickable-icon"
             onClick={onClickMore}
           />
+          {currentAccount.needUpgrade && (
+            <RedDot size="normal" className="absolute right-2 top-4" />
+          )}
         </div>
       </div>
 

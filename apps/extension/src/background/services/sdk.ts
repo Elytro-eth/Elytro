@@ -43,6 +43,7 @@ import { ABI_SoulWallet, ABI_SocialRecoveryModule } from '@soulwallet/abi';
 import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 import { ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
+import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 
 export class SDKService {
   private readonly _REQUIRED_CHAIN_FIELDS: (keyof TChainItem)[] = [
@@ -207,47 +208,14 @@ export class SDKService {
     return code !== undefined && code !== '0x';
   }
 
-  public async sendUserOperation(
-    userOp: ElytroUserOperation,
-    opHash: string
-  ): Promise<{ txHash?: string; opHash: string }> {
+  public async sendUserOperation(userOp: ElytroUserOperation) {
     const res = await this._sdk.sendUserOperation(userOp);
+
     if (res.isErr()) {
       throw res.ERR;
+    } else {
+      return res.OK;
     }
-
-    const client = this._getClient();
-
-    return Promise.race([
-      new Promise<{ txHash?: string; opHash: string }>((resolve) => {
-        const unwatch = client.watchEvent({
-          address: this._config.onchainConfig.entryPoint as Address,
-          event: parseAbiItem(
-            'event UserOperationEvent(bytes32 indexed userOpHash, address indexed sender, address indexed paymaster, uint256 nonce, bool success, uint256 actualGasCost, uint256 actualGasUsed)'
-          ),
-          args: {
-            userOpHash: opHash as Hex,
-            sender: userOp.sender,
-          },
-          onLogs: (logs) => {
-            const targetLog = logs.find(
-              (log) => log.args?.userOpHash === opHash
-            );
-            if (targetLog) {
-              unwatch?.();
-              resolve({ txHash: targetLog.transactionHash, opHash });
-            }
-          },
-          onError: () => {
-            unwatch?.();
-            resolve({ opHash });
-          },
-        });
-      }),
-      new Promise<{ opHash: string }>(
-        (resolve) => setTimeout(() => resolve({ opHash }), 20_000) // 20s timeout. tune it later if needed.
-      ),
-    ]);
   }
 
   public async signUserOperation(userOp: ElytroUserOperation) {
@@ -730,6 +698,58 @@ export class SDKService {
     const latestRecoveryContacts = parseContactFromLog(logs[logs.length - 1]);
 
     return latestRecoveryContacts;
+  }
+
+  public async getContractVersion(walletAddress: string) {
+    const _client = this._getClient();
+
+    try {
+      const version = await _client.readContract({
+        address: walletAddress as Address,
+        abi: parseAbi([
+          'function VERSION() public view returns (string memory)',
+        ]),
+        functionName: 'VERSION',
+        args: [],
+      });
+      return version;
+    } catch (error) {
+      console.error('Elytro: Failed to get contract version.', error);
+      return '0.0.0';
+    }
+  }
+
+  public async getInstalledUpgradeModules(walletAddress: string) {
+    const _client = this._getClient();
+
+    try {
+      const modules = (await _client.readContract({
+        address: walletAddress as Address,
+        abi: ABI_SoulWallet,
+        functionName: 'listModule',
+      })) as string[][];
+
+      const upgradeModuleSet = new Set(
+        Object.values(
+          VERSION_MODULE_ADDRESS_MAP[this._config.id]?.versionModuleAddress ??
+            {}
+        )
+      );
+
+      const installedUpgradeModules: `0x${string}`[] = [];
+      for (const moduleGroup of modules) {
+        for (const module of moduleGroup) {
+          if (upgradeModuleSet.has(module as `0x${string}`)) {
+            installedUpgradeModules.push(module as `0x${string}`);
+          }
+        }
+      }
+
+      return installedUpgradeModules;
+    } catch (error) {
+      console.error('Elytro: Failed to get installed upgrade modules.', error);
+      return [];
+    }
   }
 
   // public async getPreFund(

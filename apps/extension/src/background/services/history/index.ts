@@ -26,18 +26,22 @@ class HistoryManager {
       this.switchAccount(account);
     });
 
-    eventBus.on(EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED, (opHash, status) => {
-      const historyItem = this.find(opHash);
-      if (historyItem) {
-        this._store.setState({
-          ...this._store.state,
-          [opHash]: {
-            ...this._store.state[opHash],
-            status,
-          },
-        });
+    eventBus.on(
+      EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED,
+      (opHash, status, txHash) => {
+        const historyItem = this.find(opHash);
+        if (historyItem) {
+          this._store.setState({
+            ...this._store.state,
+            [opHash]: {
+              ...this._store.state[opHash],
+              status,
+              txHash,
+            },
+          });
+        }
       }
-    });
+    );
   }
 
   private get _storageKey() {

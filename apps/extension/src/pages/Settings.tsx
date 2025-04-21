@@ -9,11 +9,13 @@ import {
   Settings2Icon,
   ShieldIcon,
   UserRoundIcon,
+  RefreshCcw,
 } from 'lucide-react';
 import { useWallet } from '@/contexts/wallet';
 import SettingItem from '@/components/ui/SettingItem';
 import AccountsDropdown from '@/components/biz/AccountsDropdown';
 import pkg from '../../package.json';
+import { useAccount } from '@/contexts/account-context';
 
 export default function Settings() {
   const { wallet } = useWallet();
@@ -22,6 +24,9 @@ export default function Settings() {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
   };
   const appVersion = pkg.version;
+  const {
+    currentAccount: { needUpgrade },
+  } = useAccount();
 
   return (
     <SecondaryPageWrapper title="Settings">
@@ -41,8 +46,17 @@ export default function Settings() {
             label="Connected apps"
             path={SIDE_PANEL_ROUTE_PATHS.Connection}
           />
+          {needUpgrade && (
+            <SettingItem
+              icon={RefreshCcw}
+              label="Upgrade contract"
+              path={SIDE_PANEL_ROUTE_PATHS.UpgradeContract}
+              showRedDot
+            />
+          )}
         </div>
       </div>
+
       <div className="mb-4">
         <h2 className="elytro-text-small-bold text-gray-600 my-4">
           Elytro settings

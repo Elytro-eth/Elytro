@@ -75,6 +75,7 @@ export default function ActivityItem({
   // logoURI,
 }: UserOperationHistory) {
   const { openExplorer } = useChain();
+
   const [latestStatus, setLatestStatus] = useState(status);
 
   const updateStatusFromMessage = (response: SafeObject) => {
@@ -100,7 +101,7 @@ export default function ActivityItem({
   return (
     <div
       className="flex items-center justify-between px-lg cursor-pointer py-md hover:bg-gray-150 "
-      onClick={() => openExplorer(txHash!)}
+      onClick={() => openExplorer({ txHash, opHash })}
     >
       <div className="flex items-center gap-3">
         <IconComponent className={`size-8 p-2 ${bg} rounded-full`} />

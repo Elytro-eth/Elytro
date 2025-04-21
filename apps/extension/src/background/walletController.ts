@@ -26,6 +26,8 @@ import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { TRecoveryStatus } from '@/constants/recovery';
 import { getTokenList, updateUserImportedTokens } from '@/utils/tokens';
 import { ABI_ERC20_BALANCE_OF } from '@/constants/abi';
+import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
+import { isOlderThan } from '@/utils/version';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -109,14 +111,18 @@ class WalletController {
     return await elytroSDK.signUserOperation(deformatObjectWithBigInt(userOp));
   }
 
-  public async sendUserOperation(userOp: ElytroUserOperation, opHash: string) {
-    return await elytroSDK.sendUserOperation(
-      deformatObjectWithBigInt(userOp, [
-        'maxFeePerGas',
-        'maxPriorityFeePerGas',
-      ]),
-      opHash
-    );
+  public async sendUserOperation(userOp: ElytroUserOperation) {
+    // TODO: check this logic
+    if (!userOp?.paymaster) {
+      await elytroSDK.estimateGas(userOp!);
+    }
+
+    const { opHash, signature } = await elytroSDK.signUserOperation(userOp!);
+    userOp.signature = signature;
+
+    await elytroSDK.sendUserOperation(userOp);
+
+    return opHash;
   }
 
   public async signMessage(message: string) {
@@ -158,22 +164,25 @@ class WalletController {
     type,
     opHash,
     txHash,
-    userOp,
+    from,
     decodedDetail,
+    approvalId,
   }: {
     type: HistoricalActivityTypeEn;
     opHash: string;
     txHash?: string;
-    userOp: ElytroUserOperation;
+    from: string;
     decodedDetail: DecodeResult;
+    approvalId?: string;
   }) {
     historyManager.add({
       timestamp: Date.now(),
       type,
       opHash,
       txHash,
-      from: userOp.sender,
+      from,
       ...getTransferredTokenInfo(decodedDetail),
+      approvalId,
     });
   }
 
@@ -243,26 +252,34 @@ class WalletController {
       return null;
     }
 
-    let isDeployed = basicInfo.isDeployed;
+    try {
+      const updatedInfo = { ...basicInfo };
 
-    // isDeployed maybe undefined when the account is just created, in this case, we need to check if the account is deployed
-    if (!isDeployed) {
-      isDeployed = await elytroSDK.isSmartAccountDeployed(basicInfo.address);
+      if (updatedInfo.isDeployed) {
+        const [balance, versionInfo] = await Promise.all([
+          walletClient.getBalance(basicInfo.address),
+          VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId]
+            ? elytroSDK.getContractVersion(basicInfo.address)
+            : Promise.resolve('0.0.0'),
+        ]);
 
-      accountManager.updateCurrentAccountInfo({
-        isDeployed,
-      });
+        updatedInfo.balance = Number(balance);
+        updatedInfo.needUpgrade = isOlderThan(
+          versionInfo,
+          VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId].latestVersion
+        );
+      } else {
+        updatedInfo.isDeployed = await elytroSDK.isSmartAccountDeployed(
+          basicInfo.address
+        );
+      }
+
+      accountManager.updateCurrentAccountInfo(updatedInfo);
+      return updatedInfo;
+    } catch (error) {
+      console.error('Elytro: getCurrentAccount error', error);
+      return basicInfo;
     }
-
-    const balance = await walletClient.getBalance(basicInfo.address);
-    accountManager.updateCurrentAccountInfo({
-      balance: Number(balance),
-    });
-
-    return {
-      ...basicInfo,
-      isDeployed,
-    };
   }
 
   public async createAccount(chainId: number) {
@@ -351,8 +368,10 @@ class WalletController {
   }
 
   public async getENSInfoByName(name: string) {
-    const address = await walletClient.getENSAddressByName(name);
-    const avatar = await walletClient.getENSAvatarByName(name);
+    const [address, avatar] = await Promise.all([
+      walletClient.getENSAddressByName(name),
+      walletClient.getENSAvatarByName(name),
+    ]);
     return {
       name,
       address,
@@ -418,12 +437,10 @@ class WalletController {
       );
     }
 
-    const infoRecordTx = await elytroSDK.generateRecoveryInfoRecordTx(
-      contacts,
-      threshold
-    );
-    const contactsSettingTx =
-      await elytroSDK.generateRecoveryContactsSettingTxInfo(newHash);
+    const [infoRecordTx, contactsSettingTx] = await Promise.all([
+      elytroSDK.generateRecoveryInfoRecordTx(contacts, threshold),
+      elytroSDK.generateRecoveryContactsSettingTxInfo(newHash),
+    ]);
 
     return [infoRecordTx, contactsSettingTx];
   }
@@ -544,6 +561,16 @@ class WalletController {
     await updateUserImportedTokens(
       accountManager.currentAccount.chainId,
       token
+    );
+  }
+
+  public async getInstalledUpgradeModules() {
+    if (!accountManager.currentAccount) {
+      return [];
+    }
+
+    return await elytroSDK.getInstalledUpgradeModules(
+      accountManager.currentAccount.address
     );
   }
 }

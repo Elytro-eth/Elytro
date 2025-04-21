@@ -55,4 +55,5 @@ export type UserOperationHistory = {
   status?: UserOperationStatusEn;
   type: Nullable<HistoricalActivityTypeEn>;
   txHash?: string;
+  approvalId?: string;
 };

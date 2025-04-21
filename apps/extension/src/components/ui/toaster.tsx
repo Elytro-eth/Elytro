@@ -1,7 +1,6 @@
 import { useToast } from '@/hooks/use-toast';
 import {
   Toast,
-  ToastClose,
   ToastDescription,
   ToastProvider,
   ToastTitle,
@@ -20,7 +19,7 @@ export function Toaster() {
   const { toasts } = useToast();
 
   return (
-    <ToastProvider swipeDirection="down" duration={1200}>
+    <ToastProvider swipeDirection="down" duration={1500}>
       {toasts.map(function ({
         id,
         title,
@@ -44,7 +43,6 @@ export function Toaster() {
               )}
             </div>
             {action}
-            <ToastClose />
           </Toast>
         );
       })}

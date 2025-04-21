@@ -39,8 +39,8 @@ export default function SecondaryPageWrapper({
   };
 
   return (
-    <div className={cn('w-full h-full bg-gray-150 p-sm', className)}>
-      <div className="flex flex-col flex-grow w-full h-full bg-white px-lg pb-lg rounded-sm">
+    <div className={cn('w-full min-h-full bg-gray-150 p-sm', className)}>
+      <div className="flex flex-col flex-grow w-full min-h-full bg-white p-lg rounded-sm">
         {/* Header: back button, title, close button */}
         <div className="flex flex-row items-center justify-center relative py-lg mb-sm">
           {showBack && (

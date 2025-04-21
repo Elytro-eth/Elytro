@@ -1,5 +1,6 @@
 import { EVENT_TYPES } from '@/constants/events';
 import { ApprovalTypeEn } from '@/constants/operations';
+import eventBus from '@/utils/eventBus';
 import { RuntimeMessage } from '@/utils/message';
 import { ethErrors } from 'eth-rpc-errors';
 import { v4 as UUIDv4 } from 'uuid';
@@ -36,6 +37,13 @@ class ApprovalService {
       // }, 60_000);
 
       RuntimeMessage.sendMessage(EVENT_TYPES.APPROVAL.REQUESTED);
+
+      eventBus.once(
+        `${EVENT_TYPES.HISTORY.TX_HASH_RECEIVED}_${id}`,
+        ({ txHash }: { txHash: string }) => {
+          this.resolveApproval(id, txHash);
+        }
+      );
     });
   }
 
