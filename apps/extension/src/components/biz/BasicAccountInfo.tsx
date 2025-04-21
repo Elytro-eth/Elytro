@@ -31,13 +31,13 @@ export default function BasicAccountInfo() {
           <AccountsDropdown />
           <Copy text={currentAccount.address} />
         </div>
-        <div className="flex flex-row gap-x-md">
+        <div className="flex flex-row gap-x-md relative">
           <Settings2Icon
             className="elytro-clickable-icon"
             onClick={onClickMore}
           />
           {currentAccount.needUpgrade && (
-            <RedDot size="normal" className="absolute right-2 top-4" />
+            <RedDot size="normal" className="absolute -right-1 -top-1" />
           )}
         </div>
       </div>
