@@ -27,6 +27,7 @@ import { TRecoveryStatus } from '@/constants/recovery';
 import { getTokenList, updateUserImportedTokens } from '@/utils/tokens';
 import { ABI_ERC20_BALANCE_OF } from '@/constants/abi';
 import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
+import { isOlderThan } from '@/utils/version';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -251,38 +252,34 @@ class WalletController {
       return null;
     }
 
-    let isDeployed = basicInfo.isDeployed;
+    try {
+      const updatedInfo = { ...basicInfo };
 
-    // isDeployed maybe undefined when the account is just created, in this case, we need to check if the account is deployed
-    if (!isDeployed) {
-      isDeployed = await elytroSDK.isSmartAccountDeployed(basicInfo.address);
+      if (updatedInfo.isDeployed) {
+        const [balance, versionInfo] = await Promise.all([
+          walletClient.getBalance(basicInfo.address),
+          VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId]
+            ? elytroSDK.getContractVersion(basicInfo.address)
+            : Promise.resolve('0.0.0'),
+        ]);
 
-      accountManager.updateCurrentAccountInfo({
-        isDeployed,
-      });
-    } else {
-      const versionInfo = VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId];
-      if (versionInfo) {
-        const currentVersion = await elytroSDK.getContractVersion(
+        updatedInfo.balance = Number(balance);
+        updatedInfo.needUpgrade = isOlderThan(
+          versionInfo,
+          VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId].latestVersion
+        );
+      } else {
+        updatedInfo.isDeployed = await elytroSDK.isSmartAccountDeployed(
           basicInfo.address
         );
-
-        // TODO: use `isLaterThan` to compare version after feat/version is merged
-        accountManager.updateCurrentAccountInfo({
-          needUpgrade: currentVersion !== versionInfo.latestVersion,
-        });
       }
+
+      accountManager.updateCurrentAccountInfo(updatedInfo);
+      return updatedInfo;
+    } catch (error) {
+      console.error('Elytro: getCurrentAccount error', error);
+      return basicInfo;
     }
-
-    const balance = await walletClient.getBalance(basicInfo.address);
-    accountManager.updateCurrentAccountInfo({
-      balance: Number(balance),
-    });
-
-    return {
-      ...basicInfo,
-      isDeployed,
-    };
   }
 
   public async createAccount(chainId: number) {

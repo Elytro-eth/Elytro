@@ -71,7 +71,7 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const openExplorer = useCallback(
-    ({ txHash, opHash }: { txHash: string; opHash: string }) => {
+    ({ txHash, opHash }: { txHash?: string; opHash: string }) => {
       if (txHash && currentChain?.blockExplorers?.default?.url) {
         const url = `${currentChain.blockExplorers.default.url}/tx/${txHash}`;
         chrome.tabs.create({

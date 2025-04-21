@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && cross-env VERSION_BUMP=false vite build",
+    "build:release": "tsc -b && cross-env VERSION_BUMP=true vite build",
+    "build:patch": "tsc -b && cross-env VERSION_BUMP=true VERSION_TYPE=patch vite build",
+    "build:minor": "tsc -b && cross-env VERSION_BUMP=true VERSION_TYPE=minor vite build",
+    "build:major": "tsc -b && cross-env VERSION_BUMP=true VERSION_TYPE=major vite build",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -73,6 +77,7 @@
     "@vitejs/plugin-react": "^4.3.1",
     "archiver": "^7.0.1",
     "babel-plugin-transform-remove-console": "^6.9.4",
+    "cross-env": "^7.0.3",
     "date-fns": "^4.1.0",
     "eslint": "^9.9.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
