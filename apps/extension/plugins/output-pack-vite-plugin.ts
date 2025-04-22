@@ -14,8 +14,9 @@ function formatFileSize(bytes: number): string {
 }
 
 function renameAndPackOutputPlugin(): Plugin {
+  console.log('🔄 Starting renameAndPackOutputPlugin ...');
   return {
-    name: 'rename-and-pack-output-plugin',
+    name: 'elytro-rename-and-pack-output-plugin',
     apply: 'build',
     enforce: 'post',
     closeBundle() {

@@ -48,7 +48,9 @@ class HistoryItem {
     }
   }
 
-  private _updateStatus(status: UserOperationStatusEn) {
+  private _updateStatus(status: UserOperationStatusEn, txHash?: string) {
+    this._broadcastTxHashReceived(txHash);
+
     if (this._status === status) {
       return;
     }
@@ -62,6 +64,17 @@ class HistoryItem {
 
     this._status = status;
     this._broadcastStatusChange();
+  }
+
+  private _broadcastTxHashReceived(txHash?: string) {
+    if (this._data.approvalId && txHash) {
+      eventBus.emit(
+        `${EVENT_TYPES.HISTORY.TX_HASH_RECEIVED}_${this._data.approvalId}`,
+        {
+          txHash,
+        }
+      );
+    }
   }
 
   private _broadcastStatusChange() {
@@ -115,7 +128,7 @@ class HistoryItem {
       this._retryCount = 0;
       this._backoffTime = INITIAL_BACKOFF;
 
-      this._updateStatus(newStatus);
+      this._updateStatus(newStatus, res?.transactionHash);
     } catch (error) {
       this._handleError(error as Error);
     } finally {

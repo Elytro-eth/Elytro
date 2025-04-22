@@ -71,23 +71,26 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const openExplorer = useCallback(
-    ({ txHash, opHash }: { txHash: string; opHash: string }) => {
+    ({ txHash, opHash }: { txHash?: string; opHash: string }) => {
       if (txHash && currentChain?.blockExplorers?.default?.url) {
         const url = `${currentChain.blockExplorers.default.url}/tx/${txHash}`;
         chrome.tabs.create({
           url,
         });
+        return;
       } else if (opHash && currentChain?.opExplorer) {
         const url = `${currentChain.opExplorer}/${opHash}`;
 
         chrome.tabs.create({
           url,
         });
+        return;
       }
 
       toast({
         title: 'Failed to open explorer',
         description: 'No explorer url or hash',
+        variant: 'destructive',
       });
     },
     [currentChain]

@@ -2,11 +2,13 @@ import { SUPPORTED_CHAINS, TChainItem } from '@/constants/chains';
 import { EVENT_TYPES } from '@/constants/events';
 import eventBus from '@/utils/eventBus';
 import LocalSubscribableStore from '@/utils/store/LocalSubscribableStore';
+import { isOlderThan, CURRENT_VERSION } from '@/utils/version';
 import { ethErrors } from 'eth-rpc-errors';
 
 type TChainsState = {
   chains: TChainItem[];
   currentChain: TChainItem | null;
+  version: string;
 };
 
 const CHAINS_STORAGE_KEY = 'elytroChains';
@@ -18,15 +20,25 @@ class ChainService {
     this._store = new LocalSubscribableStore<TChainsState>(
       CHAINS_STORAGE_KEY,
       (initState) => {
-        if (!initState?.chains?.length) {
+        const needReset =
+          !initState?.chains?.length ||
+          !initState?.version ||
+          isOlderThan(initState.version, CURRENT_VERSION);
+
+        let broadcastChain = initState?.currentChain;
+
+        if (needReset) {
           this._chains = [...SUPPORTED_CHAINS];
+          if (broadcastChain?.id) {
+            broadcastChain = SUPPORTED_CHAINS.find(
+              (n) => n.id === broadcastChain!.id
+            ) as TChainItem;
+          }
+          this._store.state.version = CURRENT_VERSION;
         }
 
-        if (initState?.currentChain) {
-          eventBus.emit(
-            EVENT_TYPES.CHAIN.CHAIN_INITIALIZED,
-            initState.currentChain
-          );
+        if (broadcastChain) {
+          eventBus.emit(EVENT_TYPES.CHAIN.CHAIN_INITIALIZED, broadcastChain);
         }
       }
     );
