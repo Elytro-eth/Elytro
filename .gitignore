@@ -137,3 +137,6 @@ build
 **/*.zip
 elytro-*
 **/package-lock.json
+packages/*/lib.*
+tsconfig.tsbuildinfo
+compiler_config.json
