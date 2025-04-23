@@ -158,7 +158,14 @@ export default function SendTx() {
       }
 
       const txParams: Transaction = { to };
-      const parsedAmount = parseUnits(amount || '0', token.decimals).toString();
+      const formattedMaxAmount = formatTokenAmount(
+        token.balance || 0,
+        token.decimals
+      );
+      const parsedAmount =
+        amount === formattedMaxAmount
+          ? token.balance?.toString() || '0'
+          : parseUnits(amount || '0', token.decimals).toString();
 
       if (token.address === zeroAddress) {
         txParams.value = parsedAmount;

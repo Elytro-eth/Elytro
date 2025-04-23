@@ -21,8 +21,6 @@ function TxConfirm() {
     errorMsg,
     hasSufficientBalance,
     userOp,
-    calcResult,
-    decodedDetail,
     onConfirm,
     onCancel,
     onRetry,
@@ -50,7 +48,7 @@ function TxConfirm() {
           {errorMsg || 'Please try again or contact support'}
         </div>
 
-        <Button onClick={onRetry} className="w-full">
+        <Button onClick={() => onRetry()} className="w-full">
           Retry
         </Button>
       </div>
@@ -61,13 +59,7 @@ function TxConfirm() {
     <>
       {/* Content */}
       <div className="flex flex-col gap-y-md">
-        <UserOpDetail
-          requestType={requestType}
-          calcResult={calcResult}
-          chainId={chainId!}
-          decodedUserOp={decodedDetail}
-          from={userOp?.sender}
-        />
+        <UserOpDetail chainId={chainId!} from={userOp?.sender} />
       </div>
 
       {/* Footer */}

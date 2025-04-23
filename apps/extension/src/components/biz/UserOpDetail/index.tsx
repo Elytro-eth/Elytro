@@ -1,4 +1,4 @@
-import { TxRequestTypeEn } from '@/contexts/tx-context';
+import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import InfoCard from '@/components/biz/InfoCard';
 import { formatEther } from 'viem';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';
@@ -7,7 +7,6 @@ import {
   formatDollarBalance,
   formatRawData,
 } from '@/utils/format';
-import { DecodeResult } from '@soulwallet/decoder';
 import { useMemo, useState } from 'react';
 import { cn } from '@/utils/shadcn/utils';
 import ActivateDetail from './ActivationDetail';
@@ -15,15 +14,14 @@ import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
+import { Tooltip, TooltipContent } from '@/components/ui/tooltip';
+import { TooltipTrigger } from '@/components/ui/tooltip';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
 interface IUserOpDetailProps {
   session?: TDAppInfo;
-  requestType: TxRequestTypeEn;
-  calcResult: Nullable<TUserOperationPreFundResult>;
   chainId: number;
-  decodedUserOp: Nullable<DecodeResult>;
   from?: string;
 }
 
@@ -35,17 +33,12 @@ const formatGasUsed = (gasUsed?: string) => {
     : '--';
 };
 
-export function UserOpDetail({
-  requestType,
-  calcResult,
-  chainId,
-  decodedUserOp,
-  from,
-}: IUserOpDetailProps) {
+export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   const [showRawData, setShowRawData] = useState(false);
   const {
     tokenInfo: { tokenPrices },
   } = useAccount();
+  const { requestType, calcResult, decodedDetail, onRetry } = useTx();
 
   const DetailContent = useMemo(() => {
     switch (requestType) {
@@ -53,14 +46,14 @@ export function UserOpDetail({
         return <ActivateDetail />;
 
       case TxRequestTypeEn.SendTransaction:
-        return <InnerSendingDetail decodedUserOp={decodedUserOp} />;
+        return <InnerSendingDetail decodedUserOp={decodedDetail} />;
 
       // case TxRequestTypeEn.ApproveTransaction:
       // TODO: add upgrade contract detail
       default:
-        return <ApprovalDetail decodedUserOp={decodedUserOp} />;
+        return <ApprovalDetail decodedUserOp={decodedDetail} />;
     }
-  }, [requestType, decodedUserOp]);
+  }, [requestType, decodedDetail]);
 
   const [gasInETH, gasInDollar] = useMemo(() => {
     if (!calcResult?.gasUsed) {
@@ -92,26 +85,49 @@ export function UserOpDetail({
         <InfoCardItem
           label="Network cost"
           content={
-            <span className="elytro-text-small-bold text-gray-600 truncate">
-              {calcResult?.hasSponsored && (
-                <span className="px-xs py-3xs bg-light-green elytro-text-tiny-body mr-sm rounded-xs">
-                  Sponsored
-                </span>
-              )}
-              <span
-                className={cn({
-                  'line-through font-bold text-sm text-gray-600 ':
-                    calcResult?.hasSponsored,
-                })}
-              >
-                {gasInETH} ETH
-                {gasInDollar && (
-                  <span className="elytro-text-small-body text-gray-600 ml-2xs">
-                    ({gasInDollar})
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <span
+                  className="elytro-text-small-bold text-gray-600 truncate"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRetry(calcResult?.hasSponsored);
+                  }}
+                >
+                  {calcResult?.hasSponsored && (
+                    <span
+                      className="px-xs py-3xs bg-light-green elytro-text-tiny-body mr-sm rounded-xs"
+                      onClick={() => {
+                        onRetry(true);
+                      }}
+                    >
+                      Sponsored
+                    </span>
+                  )}
+                  <span
+                    className={cn({
+                      'line-through font-bold text-sm text-gray-600 ':
+                        calcResult?.hasSponsored,
+                    })}
+                  >
+                    {gasInETH} ETH
+                    {gasInDollar && (
+                      <span className="elytro-text-small-body text-gray-600 ml-2xs">
+                        ({gasInDollar})
+                      </span>
+                    )}
                   </span>
-                )}
-              </span>
-            </span>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  Click to pay gas{' '}
+                  {calcResult?.hasSponsored
+                    ? 'by your own'
+                    : 'sponsored by Elytro'}
+                </p>
+              </TooltipContent>
+            </Tooltip>
           }
         />
       </InfoCardList>
@@ -135,7 +151,7 @@ export function UserOpDetail({
               `}
             style={{ userSelect: 'text' }}
           >
-            {formatRawData(decodedUserOp)}
+            {formatRawData(decodedDetail)}
           </pre>
         </div>
       )}

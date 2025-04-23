@@ -357,9 +357,17 @@ class WalletController {
     return formatObjectWithBigInt(await elytroSDK.estimateGas(userOp));
   }
 
-  public async packUserOp(userOp: ElytroUserOperation, amount: Hex) {
+  public async packUserOp(
+    userOp: ElytroUserOperation,
+    amount: Hex,
+    noSponsor = false
+  ) {
     const { userOp: userOpRes, calcResult } =
-      await elytroSDK.getRechargeAmountForUserOp(userOp, BigInt(amount));
+      await elytroSDK.getRechargeAmountForUserOp(
+        userOp,
+        BigInt(amount),
+        noSponsor
+      );
 
     return {
       userOp: formatObjectWithBigInt(userOpRes),
