@@ -1,8 +1,12 @@
 {
-  "name": "Elytro",
+  "name": "elytro-monorepo",
   "version": "0.0.1",
-  "description": "Elytro",
+  "description": "Elytro Monorepo - A collection of packages for Elytro, the Next-Generation Decentralized Ethereum Wallet",
   "main": "index.js",
+  "engines": {
+    "node": "22.15.x",
+    "pnpm": "9.15.x"
+  },
   "scripts": {
     "test": "lerna exec -- pnpm test",
     "prepare": "husky install",

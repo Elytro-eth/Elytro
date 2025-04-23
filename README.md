@@ -8,8 +8,8 @@ You can view the code repository of the wallet extension in the `apps/extension`
 
 Recommended environment:
 
-- Node: 19.6.0
-- Pnpm: 7.27.0
+- "node": "22.15.x",
+- "pnpm": "9.15.x"
 
 ## Development
 
