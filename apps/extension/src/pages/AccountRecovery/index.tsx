@@ -90,7 +90,13 @@ export default function AccountRecovery() {
 
   if (!isChainConfirmed) {
     return (
-      <SecondaryPageWrapper title="Recovery">
+      <SecondaryPageWrapper
+        title="Recovery"
+        onBack={() => {
+          setAddress('');
+          setSelectedChain(null);
+        }}
+      >
         <NetworkSelection
           selectedChain={selectedChain}
           handleSelectChain={handleSelectChain}

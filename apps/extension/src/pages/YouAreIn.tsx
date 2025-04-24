@@ -25,7 +25,11 @@ const YouAreIn: React.FC = () => {
       };
 
   return (
-    <FullPageWrapper showBack={false}>
+    <FullPageWrapper
+      onBack={() => {
+        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
+      }}
+    >
       <div className="flex justify-center">
         <img src={IconSuccess} alt="Passcode" width={164} />
       </div>

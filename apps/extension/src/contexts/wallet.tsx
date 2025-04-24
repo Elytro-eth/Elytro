@@ -6,10 +6,19 @@ import {
 import PortMessage from '@/utils/message/portMessage';
 import { toast } from '@/hooks/use-toast';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
-import { navigateTo } from '@/utils/navigation';
+import { navigateTo, SidePanelRoutePath } from '@/utils/navigation';
 import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';
-
 const portMessage = new PortMessage('elytro-ui');
+
+const INIT_PATHS = [
+  SIDE_PANEL_ROUTE_PATHS.Transfer,
+  SIDE_PANEL_ROUTE_PATHS.CreateAccount,
+  SIDE_PANEL_ROUTE_PATHS.CreatePasscode,
+  SIDE_PANEL_ROUTE_PATHS.YouAreIn,
+  SIDE_PANEL_ROUTE_PATHS.AccountRecovery,
+  SIDE_PANEL_ROUTE_PATHS.RetrieveContacts,
+  SIDE_PANEL_ROUTE_PATHS.Home,
+];
 
 const walletControllerProxy = new Proxy(
   {},
@@ -53,10 +62,37 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const res = await walletControllerProxy.getWalletStatus();
 
-      if (res === WalletStatusEn.HasAccountButLocked) {
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
+      if (res === status) {
+        return;
       }
+
+      let navigateToPath: SidePanelRoutePath | undefined;
+
+      switch (res) {
+        case WalletStatusEn.HasOwnerButLocked:
+          navigateToPath = SIDE_PANEL_ROUTE_PATHS.Unlock;
+          break;
+        case WalletStatusEn.Recovering:
+          navigateToPath = SIDE_PANEL_ROUTE_PATHS.AccountRecovery;
+          break;
+        case WalletStatusEn.NoAccount || WalletStatusEn.NoOwner:
+          if (!INIT_PATHS.includes(pathname as SidePanelRoutePath)) {
+            navigateToPath = SIDE_PANEL_ROUTE_PATHS.Home;
+          }
+          break;
+        case WalletStatusEn.HasAccountAndUnlocked:
+          if (INIT_PATHS.includes(pathname as SidePanelRoutePath)) {
+            navigateToPath = SIDE_PANEL_ROUTE_PATHS.Dashboard;
+          }
+          break;
+        default:
+          break;
+      }
+
       setStatus(res);
+      if (navigateToPath) {
+        navigateTo('side-panel', navigateToPath);
+      }
     } catch {
       toast({
         title: 'Failed to get wallet status',

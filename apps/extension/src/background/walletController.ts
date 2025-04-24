@@ -31,8 +31,8 @@ import { isOlderThan } from '@/utils/version';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
+  HasOwnerButLocked = 'HasOwnerButLocked',
   NoAccount = 'NoAccount',
-  HasAccountButLocked = 'HasAccountButLocked',
   HasAccountAndUnlocked = 'HasAccountAndUnlocked',
   Recovering = 'Recovering',
 }
@@ -63,13 +63,15 @@ class WalletController {
       return WalletStatusEn.NoOwner;
     }
 
+    if (keyring.locked) {
+      return WalletStatusEn.HasOwnerButLocked;
+    }
+
     if (accountManager.accounts.length === 0) {
       return WalletStatusEn.NoAccount;
     }
 
-    return keyring.locked
-      ? WalletStatusEn.HasAccountButLocked
-      : WalletStatusEn.HasAccountAndUnlocked;
+    return WalletStatusEn.HasAccountAndUnlocked;
   }
 
   public async lock() {
