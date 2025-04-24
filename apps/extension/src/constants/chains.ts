@@ -30,7 +30,7 @@ export type TChainItem = Chain & {
   onchainConfig: {
     chainId: number;
     entryPoint: string;
-    soulWalletLogic: string;
+    elytroWalletLogic: string;
   };
   opExplorer: string;
 };

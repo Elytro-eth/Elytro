@@ -1,6 +1,6 @@
 import TokenAmountItem from '../TokenAmountItem';
 import FragmentedAddress from '../FragmentedAddress';
-import { DecodeResult } from '@soulwallet/decoder';
+import { DecodeResult } from '@elytro/decoder';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { useAccount } from '@/contexts/account-context';
 

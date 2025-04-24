@@ -1,6 +1,6 @@
 import { toast } from '@/hooks/use-toast';
 import { getConfig } from '@/wagmi';
-import { GuardianSignature, SocialRecovery } from '@soulwallet/sdk';
+import { GuardianSignature, SocialRecovery } from '@elytro/sdk';
 import { Address, encodeFunctionData, Hex, isAddress } from 'viem';
 import { readContract } from 'wagmi/actions';
 

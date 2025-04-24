@@ -10,7 +10,7 @@ import {
   getUninstallModuleTx,
 } from '@/utils/contracts/upgrade';
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
-import type { Transaction } from '@soulwallet/sdk';
+import type { Transaction } from '@elytro/sdk';
 import { toast } from '@/hooks/use-toast';
 import { formatErrorMsg } from '@/utils/format';
 import { useWallet } from '@/contexts/wallet';

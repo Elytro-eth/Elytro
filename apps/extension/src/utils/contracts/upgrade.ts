@@ -1,4 +1,4 @@
-// import { ABI_SoulWallet, ABI_UpgradeModule} from '@soulwallet/abi';
+// import { ABI_SoulWallet, ABI_UpgradeModule} from '@eltyro/abi';
 import { Address, encodeFunctionData, parseAbi } from 'viem';
 
 export const getInstallModuleTx = (

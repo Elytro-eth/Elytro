@@ -1,8 +1,8 @@
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
 import { navigateTo } from '@/utils/navigation';
-import { DecodeResult } from '@soulwallet/decoder';
-import type { Transaction } from '@soulwallet/sdk';
+import { DecodeResult } from '@elytro/decoder';
+import type { Transaction } from '@elytro/sdk';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { toHex } from 'viem';
 import { SIDE_PANEL_ROUTE_PATHS } from '../routes';

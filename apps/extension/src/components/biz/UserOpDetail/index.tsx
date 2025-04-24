@@ -7,7 +7,7 @@ import {
   formatDollarBalance,
   formatRawData,
 } from '@/utils/format';
-import { DecodeResult } from '@soulwallet/decoder';
+import { DecodeResult } from '@elytro/decoder';
 import { useMemo, useState } from 'react';
 import { cn } from '@/utils/shadcn/utils';
 import ActivateDetail from './ActivationDetail';

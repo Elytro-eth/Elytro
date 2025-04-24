@@ -12,10 +12,10 @@ import {
   Bundler,
   SignkeyType,
   SocialRecovery,
-  SoulWallet,
+  ElytroWallet,
   Transaction,
-} from '@soulwallet/sdk';
-import { DecodeUserOp } from '@soulwallet/decoder';
+} from '@elytro/sdk';
+import { DecodeUserOp } from '@elytro/decoder';
 import { canUserOpGetSponsor } from '@/utils/ethRpc/sponsor';
 import keyring from './keyring';
 import { simulateSendUserOp } from '@/utils/ethRpc/simulate';
@@ -39,7 +39,7 @@ import {
 } from 'viem';
 import { createAccount } from '@/utils/ethRpc/create-account';
 import { ethErrors } from 'eth-rpc-errors';
-import { ABI_SoulWallet, ABI_SocialRecoveryModule } from '@soulwallet/abi';
+import { ABI_Elytro, ABI_SocialRecoveryModule } from '@elytro/abi';
 import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 import { ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
@@ -56,7 +56,7 @@ export class SDKService {
     'bundler',
   ];
 
-  private _sdk!: SoulWallet;
+  private _sdk!: ElytroWallet;
   private _bundler!: Bundler;
   private _config!: TChainItem;
   private _pimlicoRpc: Nullable<PublicClient> = null;
@@ -109,7 +109,7 @@ export class SDKService {
     const { endpoint, bundler, factory, fallback, recovery, onchainConfig } =
       config;
 
-    this._sdk = new SoulWallet(
+    this._sdk = new ElytroWallet(
       endpoint,
       bundler,
       factory,
@@ -278,7 +278,7 @@ export class SDKService {
 
     const magicValue = await _client.readContract({
       address,
-      abi: ABI_SoulWallet,
+      abi: ABI_Elytro,
       functionName: 'isValidSignature',
       args: [messageHash, signature],
     });
@@ -725,7 +725,7 @@ export class SDKService {
     try {
       const modules = (await _client.readContract({
         address: walletAddress as Address,
-        abi: ABI_SoulWallet,
+        abi: ABI_Elytro,
         functionName: 'listModule',
       })) as string[][];
 

@@ -1,4 +1,4 @@
-import { DecodeResult } from '@soulwallet/decoder';
+import { DecodeResult } from '@elytro/decoder';
 
 export const getTransferredTokenInfo = (decodeResult: DecodeResult) => {
   if (decodeResult.method?.name === 'transfer') {

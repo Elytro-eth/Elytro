@@ -1,4 +1,4 @@
-import { DecodeResult } from '@soulwallet/decoder';
+import { DecodeResult } from '@elytro/decoder';
 import SessionCard from '../SessionCard';
 import InfoCard from '../InfoCard';
 import TokenAmountItem from '../TokenAmountItem';

@@ -1,4 +1,4 @@
-import { Method } from '@soulwallet/decoder';
+import { Method } from '@elytro/decoder';
 
 export enum UserOperationStatusEn {
   pending = 'pending',

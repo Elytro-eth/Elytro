@@ -15,13 +15,13 @@ import { HistoricalActivityTypeEn } from '@/constants/operations';
 import { Abi, Address, Hex, isHex, toHex, zeroAddress } from 'viem';
 import chainService from './services/chain';
 import accountManager from './services/account';
-import type { Transaction } from '@soulwallet/sdk';
+import type { Transaction } from '@elytro/sdk';
 import { TChainItem } from '@/constants/chains';
 import {
   createRecoveryRecord,
   getRecoveryRecord,
 } from '@/utils/ethRpc/recovery';
-import { DecodeResult } from '@soulwallet/decoder';
+import { DecodeResult } from '@elytro/decoder';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { TRecoveryStatus } from '@/constants/recovery';
 import { getTokenList, updateUserImportedTokens } from '@/utils/tokens';
