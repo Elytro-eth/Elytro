@@ -521,46 +521,52 @@ class WalletController {
       return [];
     }
 
-    const erc20Tokens = await getTokenList(
-      accountManager.currentAccount.chainId
-    );
+    const { address, chainId } = accountManager.currentAccount;
 
-    const res = await walletClient.client?.multicall({
-      contracts: erc20Tokens.map((token) => ({
-        address: token.address,
-        abi: ABI_ERC20_BALANCE_OF as Abi,
-        functionName: 'balanceOf',
-        args: [accountManager.currentAccount?.address],
-      })),
-    });
+    const [erc20Tokens, ethBalance] = await Promise.all([
+      getTokenList(chainId),
+      walletClient.getBalance(address),
+    ]);
 
-    const processedRes = res.reduce((acc, item, index) => {
-      const currentToken = erc20Tokens[index];
-      if (
-        currentToken.importedByUser ||
-        (item.status === 'success' && (item.result as bigint) > BigInt(0))
-      ) {
+    const ethToken = {
+      name: 'Ether',
+      balance: Number(ethBalance),
+      decimals: 18,
+      symbol: 'ETH',
+      address: zeroAddress,
+      logoURI:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
+    };
+
+    if (erc20Tokens.length === 0) {
+      return [ethToken];
+    }
+
+    const balanceResults =
+      (await walletClient.client?.multicall({
+        contracts: erc20Tokens.map((token) => ({
+          address: token.address,
+          abi: ABI_ERC20_BALANCE_OF as Abi,
+          functionName: 'balanceOf',
+          args: [address],
+        })),
+      })) ?? [];
+
+    const processedTokens = balanceResults.reduce((acc, result, index) => {
+      const token = erc20Tokens[index];
+      const balance = result.status === 'success' ? Number(result.result) : 0;
+
+      if (token.importedByUser || balance > 0) {
         acc.push({
-          ...currentToken,
-          balance: Number(item.result),
+          ...token,
+          balance,
         });
       }
 
       return acc;
     }, [] as TTokenInfo[]);
 
-    return [
-      {
-        name: 'Ether',
-        balance: accountManager.currentAccount?.balance,
-        decimals: 18,
-        symbol: 'ETH',
-        address: zeroAddress,
-        logoURI:
-          'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
-      },
-      ...processedRes,
-    ];
+    return [ethToken, ...processedTokens];
   }
 
   public async importToken(token: TTokenInfo) {
