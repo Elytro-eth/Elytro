@@ -6,12 +6,11 @@
   "scripts": {
     "dev": "vite",
     "test": "echo jest",
-    "build": "pnpm build:dev",
-    "build:dev": "tsc -b && cross-env VERSION_BUMP=false NODE_ENV=development vite build",
-    "build:release": "tsc -b && cross-env VERSION_BUMP=true NODE_ENV=production vite build",
-    "build:patch": "tsc -b && cross-env VERSION_BUMP=true VERSION_TYPE=patch NODE_ENV=production vite build",
-    "build:minor": "tsc -b && cross-env VERSION_BUMP=true VERSION_TYPE=minor NODE_ENV=production vite build",
-    "build:major": "tsc -b && cross-env VERSION_BUMP=true VERSION_TYPE=major NODE_ENV=production vite build",
+    "build": "tsc -b && cross-env VERSION_BUMP=false vite build",
+    "build:release": "tsc -b && cross-env VERSION_BUMP=true vite build",
+    "build:patch": "tsc -b && cross-env VERSION_BUMP=true VERSION_TYPE=patch vite build",
+    "build:minor": "tsc -b && cross-env VERSION_BUMP=true VERSION_TYPE=minor vite build",
+    "build:major": "tsc -b && cross-env VERSION_BUMP=true VERSION_TYPE=major vite build",
     "lint": "eslint ."
   },
   "dependencies": {
