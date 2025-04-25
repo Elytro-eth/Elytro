@@ -19,12 +19,12 @@ import { getMessaging, onBackgroundMessage } from 'firebase/messaging/sw';
 import { getToken } from 'firebase/messaging';
 import { initializeApp } from 'firebase/app';
 import { localStorage } from '@/utils/storage/local';
-import CONFIG from '@/config';
+import { FIREBASE_CONFIG, FIREBASE_VAPID_KEY } from '@/constants/fcm';
 import { initializeSecurity } from '@/utils/security';
 
 initializeSecurity();
 
-const app = initializeApp(CONFIG.firebaseConfig);
+const app = initializeApp(FIREBASE_CONFIG);
 const messaging = getMessaging(app);
 
 onBackgroundMessage(messaging, async () => {
@@ -40,7 +40,7 @@ const getFcmToken = async (scope: SafeAny) => {
 
   getToken(messaging, {
     serviceWorkerRegistration: scope.registration,
-    vapidKey: CONFIG.firebaseVapidKey,
+    vapidKey: FIREBASE_VAPID_KEY,
   })
     .then(async (token) => {
       await localStorage.save({ fcmToken: token });

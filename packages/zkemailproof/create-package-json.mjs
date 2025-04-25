@@ -1,4 +1,3 @@
-import { createPackageJson } from '../../create-package-json.mjs';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
