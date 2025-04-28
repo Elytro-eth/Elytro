@@ -35,6 +35,7 @@ const CreateAccount: React.FC = () => {
       toast({
         title: 'Oops! Something went wrong. Try again later.',
         description: error?.toString(),
+        variant: 'destructive',
       });
     }
   };
