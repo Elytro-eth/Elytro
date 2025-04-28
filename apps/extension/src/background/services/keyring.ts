@@ -66,9 +66,9 @@ class KeyringService {
 
   public async createNewOwner(password: string) {
     // !TODO: maybe this check can be removed if we make sure user cannot turn back to create owner page
-    // if (this._owner) {
-    //   throw new Error('Cannot create new owner if owner is already set');
-    // }
+    if (this._owner) {
+      throw new Error('Cannot create new owner if owner is already set');
+    }
 
     try {
       const key = generatePrivateKey();

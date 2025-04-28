@@ -24,6 +24,7 @@ import ImportToken from './pages/ImportToken';
 import NetworkConfiguration from './pages/NetworkConfiguration';
 import UpgradeContract from './pages/UpgradeContract';
 import { ApprovalTypeEn } from './constants/operations';
+import Unlock from './pages/Unlock';
 
 export enum SIDE_PANEL_ROUTE_PATHS {
   Home = '/',
@@ -40,6 +41,7 @@ export enum SIDE_PANEL_ROUTE_PATHS {
   Sign = ApprovalTypeEn.Sign,
   TxConfirm = ApprovalTypeEn.TxConfirm,
   CreatePasscode = '/create-passcode',
+  Unlock = '/unlock',
   YouAreIn = '/you-are-in',
   CreateAccount = '/create-account',
   CreateNewAddress = '/create-new-address',
@@ -57,6 +59,10 @@ export const routes: TRoute[] = [
   {
     path: SIDE_PANEL_ROUTE_PATHS.Home,
     component: Launch,
+  },
+  {
+    path: SIDE_PANEL_ROUTE_PATHS.Unlock,
+    component: Unlock,
   },
   {
     path: SIDE_PANEL_ROUTE_PATHS.RecoverySetting,

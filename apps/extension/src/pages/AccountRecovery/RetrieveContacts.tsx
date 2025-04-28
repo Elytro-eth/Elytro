@@ -221,7 +221,7 @@ function PageContent() {
 
 export default function RetrieveContacts() {
   return (
-    <SecondaryPageWrapper title="Recovery">
+    <SecondaryPageWrapper title="Recovery" showBack={false}>
       <PageContent />
     </SecondaryPageWrapper>
   );
