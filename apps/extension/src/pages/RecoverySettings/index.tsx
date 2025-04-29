@@ -7,6 +7,7 @@ import ContactDetail from './ContactDetail';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
 import RecoverGuide from './ReocverGuide';
+import { toast } from '@/hooks/use-toast';
 
 enum ShowType {
   Guide = 'guide',
@@ -21,21 +22,19 @@ export default function RecoverySettings() {
   } = useAccount();
   const [loading, setLoading] = useState(false);
   const [contacts, setContacts] = useState<TRecoveryContact[]>([]);
-  const [threshold, setThreshold] = useState<number>(0);
+  const [threshold, setThreshold] = useState<string>('0');
   const [showType, setShowType] = useState<ShowType>(ShowType.List);
-  const [selectedContact, setSelectedContact] =
-    useState<TRecoveryContact | null>(null);
+  const [selectedContact, setSelectedContact] = useState<TRecoveryContact | null>(null);
 
   const getRecoveryContacts = async () => {
     try {
       setLoading(true);
 
-      const { guardians = [], threshold = 0 } =
-        (await wallet.queryRecoveryContactsByAddress(address)) || {};
+      const { guardians = [], threshold = 0 } = (await wallet.queryRecoveryContactsByAddress(address)) || {};
 
       setShowType(guardians.length <= 0 ? ShowType.Guide : ShowType.List);
       setContacts(guardians.map((c) => ({ address: c })));
-      setThreshold(threshold);
+      setThreshold(threshold.toString());
     } catch (error) {
       console.error(error);
     } finally {
@@ -47,28 +46,10 @@ export default function RecoverySettings() {
     getRecoveryContacts();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="relative h-full w-full bg-white flex flex-col items-center gap-y-sm p-4">
-        <ProcessingTip body="Getting recovery contacts" />
-        <Button
-          size="large"
-          variant="outline"
-          className="w-full mx-8"
-          onClick={() => {
-            history.back();
-          }}
-        >
-          Cancel
-        </Button>
-      </div>
-    );
-  }
-
   const handleAddContact = () => {
     setShowType(ShowType.Detail);
     setSelectedContact(null);
-    setThreshold(0);
+    // setThreshold(0);
   };
 
   const handleEditContact = (contact: TRecoveryContact) => {
@@ -80,7 +61,7 @@ export default function RecoverySettings() {
     // TODO: delete contact
     const newContacts = contacts.filter((c) => c.address !== contact.address);
     setContacts(newContacts);
-    setThreshold(0);
+    setThreshold('0');
   };
 
   const onClickGuide = () => {
@@ -88,12 +69,26 @@ export default function RecoverySettings() {
   };
 
   const handleSaveContact = (contact: TRecoveryContact) => {
-    if (contacts.find((c) => c.address === contact.address)) {
-      const newContacts = contacts.map((c) =>
-        c.address === contact.address ? contact : c
-      );
+    // Check if the address already exists in other contacts (excluding the current edited contact)
+    const isAddressExists = contacts.some(
+      (c) => c.address === contact.address && (!selectedContact || c.address !== selectedContact.address)
+    );
+
+    if (isAddressExists) {
+      toast({
+        title: 'Address already exists',
+        description: 'This address is already in your recovery contacts list.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (selectedContact) {
+      // Editing existing contact
+      const newContacts = contacts.map((c) => (c.address === selectedContact.address ? contact : c));
       setContacts(newContacts);
     } else {
+      // Adding new contact
       setContacts([...contacts, contact]);
     }
     setSelectedContact(null);
@@ -111,21 +106,36 @@ export default function RecoverySettings() {
         }
       }}
     >
-      {showType === ShowType.Guide && <RecoverGuide onClick={onClickGuide} />}
-      {showType === ShowType.List && (
-        <ContactList
-          contacts={contacts}
-          threshold={threshold}
-          onAddContact={handleAddContact}
-          onEditContact={handleEditContact}
-          onDeleteContact={handleDeleteContact}
-        />
-      )}
-      {showType === ShowType.Detail && (
-        <ContactDetail
-          onSaveContact={handleSaveContact}
-          contact={selectedContact}
-        />
+      {loading ? (
+        <>
+          <ProcessingTip body="Getting recovery contacts" />
+          <Button
+            size="large"
+            variant="outline"
+            onClick={() => {
+              history.back();
+            }}
+          >
+            Cancel
+          </Button>
+        </>
+      ) : (
+        <>
+          {showType === ShowType.Guide && <RecoverGuide onClick={onClickGuide} />}
+          {showType === ShowType.List && (
+            <ContactList
+              contacts={contacts}
+              threshold={threshold}
+              setThreshold={setThreshold}
+              onAddContact={handleAddContact}
+              onEditContact={handleEditContact}
+              onDeleteContact={handleDeleteContact}
+            />
+          )}
+          {showType === ShowType.Detail && (
+            <ContactDetail onSaveContact={handleSaveContact} contact={selectedContact} />
+          )}
+        </>
       )}
     </SecondaryPageWrapper>
   );
