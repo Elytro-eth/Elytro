@@ -141,7 +141,7 @@ function PageContent() {
       <div className="h-full flex flex-col justify-center items-center gap-y-xl text-center">
         <img src={WalletImg} alt="Wallet" className="size-36" />
         <div className="flex flex-col gap-y-sm">
-          <h1 className="elytro-text-title ">
+          <h1 className="elytro-text-title mb-sm">
             Recovery {recoveryRecord?.status === TRecoveryStatus.RECOVERY_COMPLETED ? 'completed' : 'canceled'}
           </h1>
           <Button onClick={handleNext}>Enter wallet</Button>
