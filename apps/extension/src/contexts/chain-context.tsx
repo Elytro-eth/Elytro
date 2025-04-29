@@ -8,6 +8,7 @@ import {
 import { useWallet } from '@/contexts/wallet';
 import { TChainItem } from '@/constants/chains';
 import { toast } from '@/hooks/use-toast';
+import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';
 
 type IChainContext = {
   chains: TChainItem[];
@@ -35,6 +36,7 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
   const [chains, setChains] = useState<TChainItem[]>([]);
   const [currentChain, setCurrentChain] = useState<TChainItem | null>(null);
+  const [pathname] = useEnhancedHashLocation();
 
   const getChains = async () => {
     try {
@@ -68,7 +70,7 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     getChains();
     getCurrentChain();
-  }, []);
+  }, [pathname]);
 
   const openExplorer = useCallback(
     ({ txHash, opHash }: { txHash?: string; opHash: string }) => {

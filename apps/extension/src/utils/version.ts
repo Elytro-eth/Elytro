@@ -26,5 +26,5 @@ export const isOlderThan = (v1: string, v2: string): boolean => {
     return v1Part < v2Part;
   }
 
-  return true;
+  return false;
 };

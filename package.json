@@ -1,13 +1,18 @@
 {
-  "name": "Elytro",
+  "name": "elytro-monorepo",
   "version": "0.0.1",
-  "description": "Elytro",
+  "description": "Elytro Monorepo - A collection of packages for Elytro, the Next-Generation Decentralized Ethereum Wallet",
   "main": "index.js",
+  "engines": {
+    "node": "22.15.x",
+    "pnpm": "9.15.x"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "lerna exec -- pnpm test",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
     "format": "prettier --write .",
+    "build": "lerna exec -- pnpm build",
     "commitlint": "commitlint --edit"
   },
   "keywords": [],
@@ -26,7 +31,37 @@
     "lerna": "^8.1.8",
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
-    "typescript-eslint": "^8.7.0"
+    "typescript-eslint": "^8.7.0",
+    "@babel/cli": "^7.23.4",
+    "@babel/core": "^7.23.7",
+    "@babel/plugin-syntax-flow": "^7.23.3",
+    "@babel/preset-env": "^7.23.7",
+    "@babel/preset-typescript": "^7.23.3",
+    "@changesets/cli": "^2.27.1",
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.7",
+    "@types/shelljs": "^0.8.12",
+    "@typescript-eslint/eslint-plugin": "^6.18.0",
+    "javascript-obfuscator": "^4.1.0",
+    "jest": "^29.7.0",
+    "jest-config": "^29.7.0",
+    "shelljs": "^0.8.5",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.2",
+    "typedoc": "^0.25.7",
+    "typedoc-plugin-markdown": "^3.17.1",
+    "typedoc-plugin-missing-exports": "^2.1.0",
+    "typescript": "^5.3.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "typescript": "^5.3.3",
+      "@types/node": "^20.10.7",
+      "@types/shelljs": "^0.8.12",
+      "shelljs": "^0.8.5",
+      "ethers": "^6.13.2"
+    }
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

@@ -489,10 +489,10 @@ export class SDKService {
 
   public async getRechargeAmountForUserOp(
     userOp: ElytroUserOperation,
-    transferValue: bigint
+    transferValue: bigint,
+    noSponsor = false
   ) {
-    const hasSponsored = await this.canGetSponsored(userOp);
-
+    const hasSponsored = noSponsor ? false : await this.canGetSponsored(userOp);
     if (!hasSponsored) {
       await this.estimateGas(userOp);
     }

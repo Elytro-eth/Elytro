@@ -1,0 +1,55 @@
+{
+  "name": "@elytro/zkemail-proof",
+  "version": "1.0.0",
+  "description": "A lib designed based on the philosophy of 'Errors are values'",
+  "author": "Jayden@elytro",
+  "homepage": "https://github.com/SoulWallet/elytro-wallet-lib#readme",
+  "license": "MIT",
+  "main": "./lib.cjs/main.js",
+  "module": "./lib.esm/main.js",
+  "types": "./lib.esm/main.d.ts",
+  "directories": {
+    "lib": "lib.cjs",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib.cjs",
+    "lib.esm"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoulWallet/elytro-wallet-lib.git"
+  },
+  "scripts": {
+    "typedoc": "typedoc",
+    "docs": "npx typedoc --tsconfig ./tsconfig.esm.json --plugin typedoc-plugin-markdown typedoc-plugin-missing-exports src/main.ts",
+    "tsc": "tsc",
+    "build": "tsc --project ./tsconfig.esm.json;tsc --project ./tsconfig.cjs.json;node ./create-package-json.mjs",
+    "javascript-obfuscator": "javascript-obfuscator",
+    "test": "jest"
+  },
+  "bugs": {
+    "url": "https://github.com/SoulWallet/elytro-wallet-lib/issues"
+  },
+  "dependencies": {
+    "@elytro/abi": "workspace:*",
+    "@elytro/result": "workspace:*",
+    "@zk-email/helpers": "^6.1.1",
+    "circomlibjs": "^0.1.7",
+    "ethers": "^6.13.2",
+    "snarkjs": "^0.7.4"
+  },
+  "devDependencies": {
+    "@types/circomlibjs": "^0.1.6",
+    "@types/snarkjs": "^0.7.8"
+  },
+  "exports": {
+    ".": {
+      "import": "./lib.esm/main.js",
+      "require": "./lib.cjs/main.js"
+    }
+  }
+}

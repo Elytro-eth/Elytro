@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test": "echo jest",
     "build": "tsc -b && cross-env VERSION_BUMP=false vite build",
     "build:release": "tsc -b && cross-env VERSION_BUMP=true vite build",
     "build:patch": "tsc -b && cross-env VERSION_BUMP=true VERSION_TYPE=patch vite build",

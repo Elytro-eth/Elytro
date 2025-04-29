@@ -1,0 +1,49 @@
+{
+  "name": "@elytro/abi",
+  "version": "1.0.0",
+  "description": "Elytro-contract ABI",
+  "author": "Jayden@elytro",
+  "homepage": "https://github.com/SoulWallet/elytro-wallet-lib#readme",
+  "license": "GPL-3.0",
+  "main": "./lib.cjs/main.js",
+  "module": "./lib.esm/main.js",
+  "types": "./lib.esm/main.d.ts",
+  "directories": {
+    "lib": "lib.cjs",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib.cjs",
+    "lib.esm"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoulWallet/elytro-wallet-lib.git"
+  },
+  "scripts": {
+    "typedoc": "typedoc",
+    "docs": "npx typedoc --tsconfig ./tsconfig.esm.json --plugin typedoc-plugin-markdown typedoc-plugin-missing-exports src/main.ts",
+    "tsc": "tsc",
+    "build": "mkdir -p lib.cjs lib.esm && tsc --project ./tsconfig.esm.json && tsc --project ./tsconfig.cjs.json && node ./create-package-json.mjs",
+    "javascript-obfuscator": "javascript-obfuscator",
+    "generateABI": "ts-node --project ./tsconfig.dev.json ./src/dev/generateABI.ts",
+    "test": "jest"
+  },
+  "bugs": {
+    "url": "https://github.com/SoulWallet/elytro-wallet-lib/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.7",
+    "@types/shelljs": "^0.8.12",
+    "shelljs": "^0.8.5"
+  },
+  "exports": {
+    ".": {
+      "import": "./lib.esm/main.js",
+      "require": "./lib.cjs/main.js"
+    }
+  }
+}

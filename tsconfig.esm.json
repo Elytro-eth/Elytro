@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "es2020",
+    "declaration": true,        
+    "declarationMap": false,      
+    "emitDeclarationOnly": false,       
+    "sourceMap": false
+  },
+}

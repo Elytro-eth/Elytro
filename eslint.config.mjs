@@ -36,4 +36,14 @@ export default [
       ],
     },
   },
+  {  
+    files: ['**/*.cjs.js', '**/*.cjs.ts', '**/*.cjs', '**/*.js'],
+    languageOptions: {
+      sourceType: 'script',
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+      },
+    },
+  },
 ];

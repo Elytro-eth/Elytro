@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PasswordSetter } from '@/components/ui/PasswordSetter';
 import IconPasscode from '@/assets/passcode.png';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
@@ -7,11 +7,19 @@ import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { toast } from '@/hooks/use-toast';
 import { useWallet } from '@/contexts/wallet';
 import useSearchParams from '@/hooks/use-search-params';
+import { WalletStatusEn } from '@/background/walletController';
 
 const Create: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const { wallet } = useWallet();
+  const { status, wallet } = useWallet();
   const params = useSearchParams();
+
+  useEffect(() => {
+    if (status === WalletStatusEn.NoAccount) {
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.YouAreIn, params);
+    }
+  }, [status, params]);
+
   const handleCreatePassword = async (pwd: string) => {
     try {
       setLoading(true);

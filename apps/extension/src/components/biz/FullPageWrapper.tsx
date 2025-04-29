@@ -16,8 +16,11 @@ export default function FullPageWrapper({
   className,
 }: ISecondaryPageWrapperProps) {
   const handleBack = () => {
-    onBack?.();
-    history.back();
+    if (onBack) {
+      onBack();
+    } else {
+      history.back();
+    }
   };
 
   return (

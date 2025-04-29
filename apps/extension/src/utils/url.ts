@@ -28,3 +28,36 @@ export const getCurrentSearchParams = (key?: string) => {
 
   return Object.fromEntries(urlObj.searchParams.entries());
 };
+
+const API_KEY_PARAMS = [
+  'key',
+  'apiKey',
+  'apikey',
+  'api_key',
+  'access_key',
+  'accessKey',
+];
+
+// export const urlHasApiKey = (url: string): boolean => {
+//   const urlObj = new URL(url);
+//   const params = new URLSearchParams(urlObj.search);
+//   return API_KEY_PARAMS.some((param) => params.has(param));
+// };
+
+export const maskApiKeyInUrl = (url: string): string => {
+  try {
+    const urlObj = new URL(url);
+    const params = new URLSearchParams(urlObj.search);
+
+    API_KEY_PARAMS.forEach((param) => {
+      if (params.has(param)) {
+        params.set(param, '******');
+      }
+    });
+
+    urlObj.search = params.toString();
+    return urlObj.toString();
+  } catch {
+    return url;
+  }
+};

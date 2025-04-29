@@ -1,5 +1,5 @@
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useWallet } from '@/contexts/wallet';
 import { ApprovalTypeEn } from '@/constants/operations';
 import { navigateTo } from '@/utils/navigation';
@@ -30,7 +30,6 @@ export const ApprovalProvider = ({
   const { wallet } = useWallet();
   const [approval, setApproval] = useState<Nullable<TApprovalInfo>>(null);
   const [pathname] = useHashLocation();
-  const isApprovalProcessing = useRef(false);
 
   const getCurrentApproval = async () => {
     try {
@@ -56,8 +55,6 @@ export const ApprovalProvider = ({
 
   const onApprovalChanged = async () => {
     if (!approval) {
-      isApprovalProcessing.current = false;
-
       // Only approval routes can be redirected based on need
       if (APPROVAL_ROUTES.includes(pathname as ApprovalTypeEn)) {
         if (pathname === SIDE_PANEL_ROUTE_PATHS.TxConfirm) {
@@ -65,9 +62,7 @@ export const ApprovalProvider = ({
         }
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
       }
-    } else if (!isApprovalProcessing.current && approval.type !== pathname) {
-      isApprovalProcessing.current = true;
-
+    } else if (approval.type !== pathname) {
       const currentAccount = await wallet.getCurrentAccount();
       if (
         !currentAccount?.isDeployed &&
