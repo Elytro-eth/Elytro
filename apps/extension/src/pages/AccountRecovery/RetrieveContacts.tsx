@@ -26,6 +26,8 @@ import WalletImg from '@/assets/wallet.png';
 import { TRecoveryStatus } from '@/constants/recovery';
 import { safeOpen } from '@/utils/safeOpen';
 import { useChain } from '@/contexts/chain-context';
+import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
+import { navigateTo } from '@/utils/navigation';
 
 type TShareInfo = {
   type: 'link' | 'email';
@@ -39,13 +41,9 @@ function PageContent() {
   const { address } = useSearchParams();
   const { currentChain } = useChain();
   const [loading, setLoading] = useState(false);
-  const [recoveryContacts, setRecoveryContacts] = useState<TRecoveryContact[]>(
-    []
-  );
+  const [recoveryContacts, setRecoveryContacts] = useState<TRecoveryContact[]>([]);
   const [shareInfo, setShareInfo] = useState<Nullable<TShareInfo>>(null);
-  const [recoveryRecord, setRecoveryRecord] = useState<IRecoveryRecord | null>(
-    null
-  );
+  const [recoveryRecord, setRecoveryRecord] = useState<IRecoveryRecord | null>(null);
 
   const getRecoveryRecord = async () => {
     try {
@@ -57,9 +55,7 @@ function PageContent() {
       setRecoveryContacts(
         (recoveryRecord?.guardianInfo?.guardians || []).map((c) => ({
           address: c,
-          confirmed: recoveryRecord?.guardianSignatures?.some(
-            (s) => s.guardian === c
-          ),
+          confirmed: recoveryRecord?.guardianSignatures?.some((s) => s.guardian === c),
         }))
       );
     } catch (err) {
@@ -81,6 +77,19 @@ function PageContent() {
       getRecoveryRecord();
     }
   }, [address, currentChain?.id]);
+
+  useEffect(() => {
+    if (
+      recoveryRecord?.status !== TRecoveryStatus.RECOVERY_COMPLETED &&
+      recoveryRecord?.status !== TRecoveryStatus.RECOVERY_CANCELED
+    ) {
+      const interval = setInterval(() => {
+        getRecoveryRecord();
+      }, 3_000);
+
+      return () => clearInterval(interval);
+    }
+  }, [recoveryRecord]);
 
   const handleShareContact = (contact: TRecoveryContact) => {
     if (!recoveryRecord || !recoveryRecord.recoveryRecordID) {
@@ -112,7 +121,7 @@ function PageContent() {
         {loading ? (
           <ProcessingTip body="Fetching" subBody="" className="flex-1" />
         ) : (
-          <ErrorTip title="Sorry we didn’t find any recovery contact" />
+          <ErrorTip title="Sorry we didn't find any recovery contact" />
         )}
         <Button className="w-full mt-8" onClick={() => history.back()}>
           Cancel
@@ -121,10 +130,22 @@ function PageContent() {
     );
   }
 
-  if (recoveryRecord?.status === TRecoveryStatus.RECOVERY_COMPLETED) {
+  if (
+    recoveryRecord?.status === TRecoveryStatus.RECOVERY_COMPLETED ||
+    recoveryRecord?.status === TRecoveryStatus.RECOVERY_CANCELED
+  ) {
+    const handleNext = () => {
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+    };
     return (
       <div className="h-full flex flex-col justify-center items-center gap-y-xl text-center">
         <img src={WalletImg} alt="Wallet" className="size-36" />
+        <div className="flex flex-col gap-y-sm">
+          <h1 className="elytro-text-title ">
+            Recovery {recoveryRecord?.status === TRecoveryStatus.RECOVERY_COMPLETED ? 'completed' : 'canceled'}
+          </h1>
+          <Button onClick={handleNext}>Enter wallet</Button>
+        </div>
       </div>
     );
   }
@@ -135,15 +156,11 @@ function PageContent() {
         <img src={WalletImg} alt="Wallet" className="size-36" />
         <div className="flex flex-col gap-y-sm">
           <h1 className="elytro-text-title ">Enough signatures collected</h1>
-          <p className="text-gray-600 elytro-text-smaller-body">
-            Begin your recovery in recovery app
-          </p>
+          <p className="text-gray-600 elytro-text-smaller-body">Begin your recovery in recovery app</p>
         </div>
         <Button
           onClick={() => {
-            safeOpen(
-              `${RECOVERY_APP_URL}start?id=${recoveryRecord?.recoveryRecordID}`
-            );
+            safeOpen(`${RECOVERY_APP_URL}start?id=${recoveryRecord?.recoveryRecordID}`);
           }}
         >
           Launch recovery app
@@ -172,16 +189,9 @@ function PageContent() {
             rightContent={
               // TODO: use confirm status to decide whether to show the copy button
               contact.confirmed ? (
-                <span className="elytro-text-tiny-body bg-light-green px-xs py-3xs rounded-xs">
-                  Confirmed
-                </span>
+                <span className="elytro-text-tiny-body bg-light-green px-xs py-3xs rounded-xs">Confirmed</span>
               ) : (
-                <Button
-                  variant="secondary"
-                  size="tiny"
-                  className="group"
-                  onClick={() => handleShareContact(contact)}
-                >
+                <Button variant="secondary" size="tiny" className="group" onClick={() => handleShareContact(contact)}>
                   <Copy className="size-md mr-xs group-hover:stroke-white" />
                   Copy {isAddress(contact.address) ? 'link' : 'email'}
                 </Button>
@@ -195,9 +205,7 @@ function PageContent() {
         <DialogContent showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>Recovery {shareInfo?.type || '--'} copied</DialogTitle>
-            <DialogDescription>
-              Send this link to your contact so they can confirm.
-            </DialogDescription>
+            <DialogDescription>Send this link to your contact so they can confirm.</DialogDescription>
           </DialogHeader>
 
           <pre

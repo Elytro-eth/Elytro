@@ -6,10 +6,7 @@ import { elytroSDK } from './services/sdk';
 import { hashEarlyTypedData, hashSignTypedData } from '@/utils/hash';
 import { ethErrors } from 'eth-rpc-errors';
 import sessionManager from './services/session';
-import {
-  deformatObjectWithBigInt,
-  formatObjectWithBigInt,
-} from '@/utils/format';
+import { deformatObjectWithBigInt, formatObjectWithBigInt } from '@/utils/format';
 import historyManager from './services/history';
 import { HistoricalActivityTypeEn } from '@/constants/operations';
 import { Abi, Address, Hex, isHex, toHex, zeroAddress } from 'viem';
@@ -17,10 +14,7 @@ import chainService from './services/chain';
 import accountManager from './services/account';
 import type { Transaction } from '@soulwallet/sdk';
 import { TChainItem } from '@/constants/chains';
-import {
-  createRecoveryRecord,
-  getRecoveryRecord,
-} from '@/utils/ethRpc/recovery';
+import { createRecoveryRecord, getRecoveryRecord } from '@/utils/ethRpc/recovery';
 import { DecodeResult } from '@soulwallet/decoder';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { TRecoveryStatus } from '@/constants/recovery';
@@ -55,6 +49,14 @@ class WalletController {
     return keyring.locked;
   }
   public async getWalletStatus() {
+    console.log(
+      'Elytro: accountManager.recoveryRecord',
+      accountManager.recoveryRecord,
+      keyring.hasOwner,
+      keyring.locked,
+      accountManager.currentAccount,
+      accountManager.accounts
+    );
     if (accountManager.recoveryRecord) {
       return WalletStatusEn.Recovering;
     }
@@ -67,7 +69,7 @@ class WalletController {
       return WalletStatusEn.HasOwnerButLocked;
     }
 
-    if (accountManager.accounts.length === 0) {
+    if (!accountManager.currentAccount) {
       return WalletStatusEn.NoAccount;
     }
 
@@ -137,10 +139,7 @@ class WalletController {
     }
 
     // todo: maybe more params check?
-    return await elytroSDK.signMessage(
-      message,
-      accountManager.currentAccount.address
-    );
+    return await elytroSDK.signMessage(message, accountManager.currentAccount.address);
   }
 
   public async signTypedData(typedData: string | TTypedDataItem[]) {
@@ -208,10 +207,7 @@ class WalletController {
     sessionManager.broadcastMessage('chainChanged', toHex(chainConfig.id));
   }
 
-  private _broadcastToConnectedSites(
-    event: ElytroEventMessage['event'],
-    data: ElytroEventMessage['data']
-  ) {
+  private _broadcastToConnectedSites(event: ElytroEventMessage['event'], data: ElytroEventMessage['data']) {
     connectionManager.connectedSites.forEach((site) => {
       if (site.origin && !site.origin.startsWith('chrome-extension://')) {
         sessionManager.broadcastMessageToDApp(site.origin, event, data);
@@ -266,14 +262,9 @@ class WalletController {
         ]);
 
         updatedInfo.balance = Number(balance);
-        updatedInfo.needUpgrade = isOlderThan(
-          versionInfo,
-          VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId].latestVersion
-        );
+        updatedInfo.needUpgrade = isOlderThan(versionInfo, VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId].latestVersion);
       } else {
-        updatedInfo.isDeployed = await elytroSDK.isSmartAccountDeployed(
-          basicInfo.address
-        );
+        updatedInfo.isDeployed = await elytroSDK.isSmartAccountDeployed(basicInfo.address);
       }
 
       accountManager.updateCurrentAccountInfo(updatedInfo);
@@ -310,9 +301,7 @@ class WalletController {
     await historyManager.switchAccount(accountManager.currentAccount);
     await connectionManager.switchAccount(accountManager.currentAccount);
 
-    this._broadcastToConnectedSites('accountsChanged', [
-      accountManager.currentAccount?.address as string,
-    ]);
+    this._broadcastToConnectedSites('accountsChanged', [accountManager.currentAccount?.address as string]);
   }
 
   public async switchAccountByChain(chainId: number) {
@@ -327,49 +316,33 @@ class WalletController {
       throw new Error('Elytro: No owner address. Try create owner first.');
     }
 
-    const deployUserOp = await elytroSDK.createUnsignedDeployWalletUserOp(
-      keyring.owner.address as string
-    );
+    const deployUserOp = await elytroSDK.createUnsignedDeployWalletUserOp(keyring.owner.address as string);
 
     // await elytroSDK.estimateGas(deployUserOp);
 
     return formatObjectWithBigInt(deployUserOp);
   }
 
-  public async createTxUserOp(
-    txs: Transaction[]
-  ): Promise<ElytroUserOperation> {
-    const userOp = await elytroSDK.createUserOpFromTxs(
-      accountManager.currentAccount?.address as string,
-      txs
-    );
+  public async createTxUserOp(txs: Transaction[]): Promise<ElytroUserOperation> {
+    const userOp = await elytroSDK.createUserOpFromTxs(accountManager.currentAccount?.address as string, txs);
 
     return formatObjectWithBigInt(userOp);
   }
 
   public async decodeUserOp(userOp: ElytroUserOperation) {
-    return formatObjectWithBigInt(
-      await elytroSDK.getDecodedUserOperation(userOp)
-    );
+    return formatObjectWithBigInt(await elytroSDK.getDecodedUserOperation(userOp));
   }
 
-  public async estimateGas(
-    userOp: ElytroUserOperation
-  ): Promise<ElytroUserOperation> {
+  public async estimateGas(userOp: ElytroUserOperation): Promise<ElytroUserOperation> {
     return formatObjectWithBigInt(await elytroSDK.estimateGas(userOp));
   }
 
-  public async packUserOp(
-    userOp: ElytroUserOperation,
-    amount: Hex,
-    noSponsor = false
-  ) {
-    const { userOp: userOpRes, calcResult } =
-      await elytroSDK.getRechargeAmountForUserOp(
-        userOp,
-        BigInt(amount),
-        noSponsor
-      );
+  public async packUserOp(userOp: ElytroUserOperation, amount: Hex, noSponsor = false) {
+    const { userOp: userOpRes, calcResult } = await elytroSDK.getRechargeAmountForUserOp(
+      userOp,
+      BigInt(amount),
+      noSponsor
+    );
 
     return {
       userOp: formatObjectWithBigInt(userOpRes),
@@ -398,9 +371,7 @@ class WalletController {
   }
 
   public async getRecoveryInfoOfCurrentAccount() {
-    return await elytroSDK.getRecoveryInfo(
-      accountManager.currentAccount?.address
-    );
+    return await elytroSDK.getRecoveryInfo(accountManager.currentAccount?.address);
   }
 
   public async queryRecoveryContactsByAddress(address: Address) {
@@ -420,31 +391,17 @@ class WalletController {
     };
   }
 
-  public async checkRecoveryContactsSettingChanged(
-    contacts: string[],
-    threshold: number
-  ): Promise<boolean> {
-    const { prevHash, newHash } = await this.getRecoveryContactsHash(
-      contacts,
-      threshold
-    );
+  public async checkRecoveryContactsSettingChanged(contacts: string[], threshold: number): Promise<boolean> {
+    const { prevHash, newHash } = await this.getRecoveryContactsHash(contacts, threshold);
 
     return prevHash !== newHash;
   }
 
-  public async generateRecoveryContactsSettingTxs(
-    contacts: string[],
-    threshold: number
-  ) {
-    const { prevHash, newHash } = await this.getRecoveryContactsHash(
-      contacts,
-      threshold
-    );
+  public async generateRecoveryContactsSettingTxs(contacts: string[], threshold: number) {
+    const { prevHash, newHash } = await this.getRecoveryContactsHash(contacts, threshold);
 
     if (prevHash === newHash) {
-      throw new Error(
-        'Elytro: New recovery contacts hash is the same as the previous.'
-      );
+      throw new Error('Elytro: New recovery contacts hash is the same as the previous.');
     }
 
     const [infoRecordTx, contactsSettingTx] = await Promise.all([
@@ -459,23 +416,25 @@ class WalletController {
     return accountManager.recoveryRecord?.address;
   }
 
+  public async cleanRecoveryRecord() {
+    accountManager.recoveryRecord = null;
+  }
+
   public async getRecoveryRecord(address?: Address) {
     if (accountManager.recoveryRecord) {
       const record = await getRecoveryRecord(accountManager.recoveryRecord.id);
 
       if (record?.status === TRecoveryStatus.RECOVERY_COMPLETED) {
-        accountManager.recoveryRecord = null;
+        this.cleanRecoveryRecord();
 
-        accountManager.updateCurrentAccountInfo({
+        accountManager.setCurrentAccount({
           address: record?.address,
           chainId: Number(record?.chainID),
           isDeployed: true,
         });
-
         this._onAccountChanged();
       } else if (record?.status === TRecoveryStatus.RECOVERY_CANCELED) {
-        accountManager.recoveryRecord = null;
-        await keyring.reset();
+        this.cleanRecoveryRecord();
       }
 
       return record;
@@ -523,10 +482,7 @@ class WalletController {
 
     const { address, chainId } = accountManager.currentAccount;
 
-    const [erc20Tokens, ethBalance] = await Promise.all([
-      getTokenList(chainId),
-      walletClient.getBalance(address),
-    ]);
+    const [erc20Tokens, ethBalance] = await Promise.all([getTokenList(chainId), walletClient.getBalance(address)]);
 
     const ethToken = {
       name: 'Ether',
@@ -574,10 +530,7 @@ class WalletController {
       throw new Error('No current wallet');
     }
 
-    await updateUserImportedTokens(
-      accountManager.currentAccount.chainId,
-      token
-    );
+    await updateUserImportedTokens(accountManager.currentAccount.chainId, token);
   }
 
   public async getInstalledUpgradeModules() {
@@ -585,9 +538,7 @@ class WalletController {
       return [];
     }
 
-    return await elytroSDK.getInstalledUpgradeModules(
-      accountManager.currentAccount.address
-    );
+    return await elytroSDK.getInstalledUpgradeModules(accountManager.currentAccount.address);
   }
 }
 

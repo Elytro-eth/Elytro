@@ -18,8 +18,6 @@ enum RecoveryStatusEn {
   Completed = 3, // Recovery completed
 }
 
-// const DELAY_TIME = 48 * 60 * 60 * 1_000; // 48 hours
-
 const TimeBlock = ({ time, unit }: { time: number; unit: string }) => {
   return (
     <div className="flex flex-col items-center gap-y-sm">
@@ -130,7 +128,16 @@ export default function Start() {
       trackTransaction(
         txHash,
         () => {
-          getRecoveryRecord();
+          // fetch recovery record until it's status is RecoveryStatusEn.READY
+          const interval = setInterval(() => {
+            getRecoveryRecord();
+
+            if (recoveryRecord?.status === RecoveryStatusEn.Ready) {
+              clearInterval(interval);
+            }
+          }, 2_000);
+
+          return () => clearInterval(interval);
         },
         () => {
           toast({
@@ -230,8 +237,6 @@ export default function Start() {
       }, 1000);
 
       return () => clearInterval(interval);
-    } else if (status === RecoveryStatusEn.Ready || status === RecoveryStatusEn.NonStarted) {
-      setLeftTime({ hours: 48, minutes: 0, seconds: 0 });
     }
   }, [status, recoveryRecord]);
 
@@ -243,11 +248,13 @@ export default function Start() {
       subtitle="You'll regain wallet access in 48 hours."
     >
       {/* Count down */}
-      <div className="flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg">
-        <TimeBlock time={leftTime.hours} unit="Hours" />
-        <TimeBlock time={leftTime.minutes} unit="Minutes" />
-        <TimeBlock time={leftTime.seconds} unit="Seconds" />
-      </div>
+      {status === RecoveryStatusEn.Waiting && (
+        <div className="flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg">
+          <TimeBlock time={leftTime.hours} unit="Hours" />
+          <TimeBlock time={leftTime.minutes} unit="Minutes" />
+          <TimeBlock time={leftTime.seconds} unit="Seconds" />
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-x-sm">
         <Button
