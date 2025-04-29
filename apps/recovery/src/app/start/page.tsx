@@ -57,7 +57,7 @@ export default function Start() {
     window.open(`${explorerUrl}/tx/${txHash}`, '_blank', 'noopener,noreferrer');
   };
 
-  const trackTransaction = (txHash: `0x${string}`) => {
+  const trackTransaction = (txHash: `0x${string}`, onSuccess?: () => void, onFailed?: () => void) => {
     setTxStatus('pending');
     toast({
       title: 'Transaction Processing',
@@ -87,7 +87,7 @@ export default function Start() {
               description: 'Your wallet recovery was successful!',
               variant: 'default',
             });
-            router.push('/finished');
+            onSuccess?.();
           } else {
             setTxStatus('failed');
             toast({
@@ -95,6 +95,7 @@ export default function Start() {
               description: 'Please try again or contact support.',
               variant: 'destructive',
             });
+            onFailed?.();
           }
         }
       } catch (error) {
@@ -116,7 +117,7 @@ export default function Start() {
 
     try {
       setIsLoading(true);
-      await sendTransaction(getConfig(), {
+      const txHash = await sendTransaction(getConfig(), {
         connector,
         ...getRecoveryStartTxData(
           recoveryRecord!.address,
@@ -125,6 +126,20 @@ export default function Start() {
           recoveryRecord!.guardianSignatures
         ),
       });
+
+      trackTransaction(
+        txHash,
+        () => {
+          getRecoveryRecord();
+        },
+        () => {
+          toast({
+            title: 'Failed to start recovery',
+            variant: 'destructive',
+            description: 'Please try again or contact support.',
+          });
+        }
+      );
     } catch (error) {
       toast({
         title: 'Failed to start recovery',
@@ -170,7 +185,19 @@ export default function Start() {
         ...getExecuteRecoveryTxData(recoveryRecord!.address, recoveryRecord!.newOwners),
       });
 
-      trackTransaction(txHash);
+      trackTransaction(
+        txHash,
+        () => {
+          router.push('/finished');
+        },
+        () => {
+          toast({
+            title: 'Failed to complete recovery',
+            variant: 'destructive',
+            description: 'Please try again or contact support.',
+          });
+        }
+      );
     } catch (error) {
       toast({
         title: 'Failed to complete recovery',
@@ -226,7 +253,7 @@ export default function Start() {
         <Button
           size="lg"
           variant={status === RecoveryStatusEn.NonStarted ? 'default' : 'outline'}
-          disabled={isLoading || status !== RecoveryStatusEn.NonStarted}
+          disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.NonStarted}
           onClick={startRecovery}
           className="w-full"
         >
@@ -240,7 +267,7 @@ export default function Start() {
           onClick={completeRecovery}
           className="w-full"
         >
-          {txStatus === 'pending' ? 'Processing...' : 'Complete Recovery'}
+          Complete Recovery
         </Button>
       </div>
     </ContentWrapper>
