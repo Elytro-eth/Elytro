@@ -2,20 +2,14 @@ import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import InfoCard from '@/components/biz/InfoCard';
 import { formatEther } from 'viem';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';
-import {
-  formatBalance,
-  formatDollarBalance,
-  formatRawData,
-} from '@/utils/format';
+import { formatBalance, formatDollarBalance, formatRawData } from '@/utils/format';
 import { useMemo, useState } from 'react';
-import { cn } from '@/utils/shadcn/utils';
 import ActivateDetail from './ActivationDetail';
 import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
-import { Tooltip, TooltipContent } from '@/components/ui/tooltip';
-import { TooltipTrigger } from '@/components/ui/tooltip';
+import { RadioGroup, RadioGroupIndicator, RadioGroupItem } from '@/components/ui/radiobox';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -35,6 +29,7 @@ const formatGasUsed = (gasUsed?: string) => {
 
 export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   const [showRawData, setShowRawData] = useState(false);
+  const [expandSponsorSelector, setExpandSponsorSelector] = useState(false);
   const {
     tokenInfo: { tokenPrices },
   } = useAccount();
@@ -76,65 +71,76 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
 
       {/* UserOp Pay Info */}
       <InfoCardList>
-        <InfoCardItem
-          label="From wallet"
-          content={<FragmentedAddress address={from} chainId={chainId} />}
-        />
+        <InfoCardItem label="From wallet" content={<FragmentedAddress address={from} chainId={chainId} />} />
 
         {/* Network cost: unit ETH */}
         <InfoCardItem
           label="Network cost"
           content={
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
-                <span
-                  className="elytro-text-small-bold text-gray-600 truncate"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRetry(calcResult?.hasSponsored);
-                  }}
-                >
-                  {calcResult?.hasSponsored && (
-                    <span
-                      className="px-xs py-3xs bg-light-green elytro-text-tiny-body mr-sm rounded-xs"
-                      onClick={() => {
-                        onRetry(true);
-                      }}
-                    >
-                      Sponsored
-                    </span>
-                  )}
-                  <span
-                    className={cn({
-                      'line-through font-bold text-sm text-gray-600 ':
-                        calcResult?.hasSponsored,
-                    })}
-                  >
-                    {gasInETH} ETH
-                    {gasInDollar && (
-                      <span className="elytro-text-small-body text-gray-600 ml-2xs">
-                        ({gasInDollar})
-                      </span>
-                    )}
-                  </span>
+            <span
+              className="flex items-center elytro-text-small truncate"
+              onClick={() => {
+                setExpandSponsorSelector((prev) => !prev);
+              }}
+            >
+              {calcResult?.hasSponsored ? (
+                <span className="px-xs py-3xs bg-light-green elytro-text-tiny-body rounded-xs">Sponsored</span>
+              ) : (
+                <span className="px-xs text-sm text-gray-750">
+                  {gasInETH} ETH
+                  {gasInDollar && <span className="elytro-text-small-body text-gray-600 ml-2xs">({gasInDollar})</span>}
                 </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  Click to pay gas{' '}
-                  {calcResult?.hasSponsored
-                    ? 'by your own'
-                    : 'sponsored by Elytro'}
-                </p>
-              </TooltipContent>
-            </Tooltip>
+              )}
+              {expandSponsorSelector ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </span>
           }
         />
+        {expandSponsorSelector && (
+          <div>
+            <RadioGroup>
+              <RadioGroupItem
+                className="flex items-center gap-x-2xs"
+                value="sponsor"
+                onClick={() => {
+                  onRetry(false);
+                }}
+                id="gas-fee-by-sponsor"
+              >
+                <RadioGroupIndicator />
+              </RadioGroupItem>
+              <label
+                htmlFor="gas-fee-by-sponsor"
+                className="flex items-center elytro-text-small-body text-gray-750 truncate"
+              >
+                Sponsored by Elytro
+              </label>
+
+              <RadioGroupItem
+                className="flex items-center gap-x-2xs"
+                value="self"
+                onClick={() => {
+                  onRetry(true);
+                }}
+                id="gas-fee-by-self"
+              >
+                <RadioGroupIndicator />
+              </RadioGroupItem>
+              <label
+                htmlFor="gas-fee-by-self"
+                className="flex items-center elytro-text-small-body text-gray-750 truncate"
+              >
+                <span>
+                  {gasInETH} ETH
+                  {gasInDollar && <span className="elytro-text-small-body text-gray-600 ml-2xs">({gasInDollar})</span>}
+                </span>
+              </label>
+            </RadioGroup>
+          </div>
+        )}
       </InfoCardList>
 
       {/* Transaction Raw Data: Only show for approve transaction */}
-      {(requestType === TxRequestTypeEn.ApproveTransaction ||
-        requestType === TxRequestTypeEn.UpgradeContract) && (
+      {(requestType === TxRequestTypeEn.ApproveTransaction || requestType === TxRequestTypeEn.UpgradeContract) && (
         <div>
           <button
             className="flex items-center justify-center gap-x-2xs elytro-text-tiny-body text-gray-750 mb-sm"
