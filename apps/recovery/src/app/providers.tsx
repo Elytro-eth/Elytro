@@ -9,10 +9,7 @@ import { ApolloProvider } from '@apollo/client';
 import { client } from '@/requests/client';
 import { RecoveryRecordProvider } from '@/contexts';
 
-export function Providers(props: {
-  children: ReactNode;
-  initialState?: State;
-}) {
+export function Providers(props: { children: ReactNode; initialState?: State }) {
   const [config] = useState(() => getConfig());
   const [queryClient] = useState(() => new QueryClient());
 

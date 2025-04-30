@@ -39,27 +39,16 @@ interface IStepBlockProps {
   isActive: boolean;
 }
 
-const StepBlock = ({
-  title,
-  index,
-  actionButton,
-  isActive,
-}: IStepBlockProps) => {
+const StepBlock = ({ title, index, actionButton, isActive }: IStepBlockProps) => {
   const styles = {
     container: `flex flex-col gap-y-md p-lg rounded-lg border-1 max-w-[248px] ${
       isActive ? 'bg-gray-150 border-gray-150' : 'bg-gray-0 border-gray-300'
     }`,
     index: `text-tiny-bold text-center size-5 border-[1.5px] rounded-full ${
-      isActive
-        ? 'border-gray-900 text-gray-900'
-        : 'border-gray-450 text-gray-450'
+      isActive ? 'border-gray-900 text-gray-900' : 'border-gray-450 text-gray-450'
     }`,
-    title: `text-small-bold text-nowrap ${
-      isActive ? 'text-gray-900' : 'text-gray-450'
-    }`,
-    description: `text-tiny whitespace-pre-wrap ${
-      isActive ? 'text-gray-450' : 'text-gray-300'
-    }`,
+    title: `text-small-bold text-nowrap ${isActive ? 'text-gray-900' : 'text-gray-450'}`,
+    description: `text-tiny whitespace-pre-wrap ${isActive ? 'text-gray-450' : 'text-gray-300'}`,
   };
 
   return (
@@ -85,11 +74,7 @@ export default function Home() {
     return (
       <div className="my-auto flex flex-col items-center justify-center gap-y-sm">
         <div className="bg-blue rounded-pill p-md">
-          <LoaderCircle
-            className="size-12 animate-spin"
-            stroke="#fff"
-            strokeOpacity={0.9}
-          />
+          <LoaderCircle className="size-12 animate-spin" stroke="#fff" strokeOpacity={0.9} />
         </div>
         <div className="text-bold-body">Fetching recovery details...</div>
       </div>
@@ -103,8 +88,7 @@ export default function Home() {
     redirect('/finished');
   }
 
-  const currentStatus =
-    recoveryRecord?.status ?? TRecoveryStatus.RECOVERY_CANCELED;
+  const currentStatus = recoveryRecord?.status ?? TRecoveryStatus.RECOVERY_CANCELED;
 
   return (
     <ContentWrapper title="Wallet recovery for">
@@ -117,7 +101,6 @@ export default function Home() {
 
         <div className="flex flex-row gap-x-2 justify-between">
           {RECOVERY_STEPS.map((step, index) => {
-            console.log(step.title, currentStatus, step.status);
             const isActive = currentStatus === step.status;
             return (
               <StepBlock
@@ -127,16 +110,10 @@ export default function Home() {
                 isActive={isActive}
                 actionButton={
                   <Button
-                    className={
-                      !isActive
-                        ? 'border-gray-450 border-1 text-gray-600 bg-gray-0 shadow-none'
-                        : ''
-                    }
+                    className={!isActive ? 'border-gray-450 border-1 text-gray-600 bg-gray-0 shadow-none' : ''}
                     disabled={!isActive}
                   >
-                    <LinkWithQuery href={step.href}>
-                      {step.buttonText}
-                    </LinkWithQuery>
+                    <LinkWithQuery href={step.href}>{step.buttonText}</LinkWithQuery>
                   </Button>
                 }
               />

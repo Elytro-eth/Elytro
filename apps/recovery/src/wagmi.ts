@@ -8,8 +8,7 @@ export const CONNECTOR_ICON_MAP = {
   metaMaskSDK: metamaskIcon,
   coinbaseWalletSDK:
     'https://gist.githubusercontent.com/taycaldwell/2291907115c0bb5589bc346661435007/raw/280eafdc84cb80ed0c60e36b4d0c563f6dca6b3e/cbw.svg',
-  walletConnect:
-    'https://logosarchive.com/wp-content/uploads/2022/02/WalletConnect-icon.svg',
+  walletConnect: 'https://logosarchive.com/wp-content/uploads/2022/02/WalletConnect-icon.svg',
 };
 
 export function getConfig() {
@@ -31,9 +30,7 @@ export function getConfig() {
       storage: cookieStorage,
     }),
     ssr: false,
-    transports: Object.fromEntries(
-      SUPPORTED_CHAINS.map((chain) => [chain.id, http()])
-    ),
+    transports: Object.fromEntries(SUPPORTED_CHAINS.map((chain) => [chain.id, http()])),
   });
 }
 

@@ -52,7 +52,6 @@ export default function ConnectControl() {
         if (connector.type === 'injected') {
           acc.injectedConnectors.push(connector);
         } else {
-          console.log(connector);
           acc.otherConnectors.push({
             ...connector,
             icon: CONNECTOR_ICON_MAP[connector.id as keyof typeof CONNECTOR_ICON_MAP],
@@ -112,9 +111,7 @@ export default function ConnectControl() {
   //   // }
   // }, [address]);
 
-  const isWrongChain = useMemo(() => {
-    return chain && Number(chain.id) !== Number(recoveryRecord?.chainID);
-  }, [chain, recoveryRecord]);
+  const isWrongChain = !chain || Number(chain.id) !== Number(recoveryRecord?.chainID);
 
   const switchChain = async () => {
     if (!recoveryRecord?.chainID) {

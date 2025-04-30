@@ -5,13 +5,7 @@ import { query } from '@/requests/client';
 import { QUERY_GET_RECOVERY_INFO } from '@/requests/gqls';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  useEffect,
-} from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface IRecoveryRecordContext {
   loading: boolean;
@@ -20,21 +14,14 @@ interface IRecoveryRecordContext {
   backToHome: () => void;
 }
 
-const RecoveryRecordContext = createContext<IRecoveryRecordContext | undefined>(
-  undefined
-);
+const RecoveryRecordContext = createContext<IRecoveryRecordContext | undefined>(undefined);
 
-export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [recoveryRecord, setRecoveryRecord] = useState<TRecoveryInfo | null>(
-    null
-  );
+  const [recoveryRecord, setRecoveryRecord] = useState<TRecoveryInfo | null>(null);
 
-  const recoveryRecordId =
-    useSearchParams().get('id') || recoveryRecord?.recoveryRecordID;
+  const recoveryRecordId = useSearchParams().get('id') || recoveryRecord?.recoveryRecordID;
 
   const backToHome = () => {
     router.replace(`/?id=${recoveryRecordId}`);
@@ -50,7 +37,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({
       const res = await query(QUERY_GET_RECOVERY_INFO, {
         recoveryRecordId,
       });
-      setRecoveryRecord((res as SafeAny)?.getRecoveryInfo as TRecoveryInfo);
+      setRecoveryRecord({ ...(res as SafeAny)?.getRecoveryInfo, chainID: '0x1' } as TRecoveryInfo);
       setLoading(false);
     } catch (error) {
       toast({
@@ -69,9 +56,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({
   }, [recoveryRecordId]);
 
   return (
-    <RecoveryRecordContext.Provider
-      value={{ recoveryRecord, getRecoveryRecord, loading, backToHome }}
-    >
+    <RecoveryRecordContext.Provider value={{ recoveryRecord, getRecoveryRecord, loading, backToHome }}>
       {children}
     </RecoveryRecordContext.Provider>
   );
@@ -80,9 +65,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({
 export const useRecoveryRecord = () => {
   const context = useContext(RecoveryRecordContext);
   if (context === undefined) {
-    throw new Error(
-      'useRecoveryRecord must be used within a RecoveryRecordProvider'
-    );
+    throw new Error('useRecoveryRecord must be used within a RecoveryRecordProvider');
   }
   return context;
 };

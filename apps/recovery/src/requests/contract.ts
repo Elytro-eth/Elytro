@@ -754,17 +754,11 @@ const generateGuardianSignatures = (
   threshold: number,
   guardians: string[]
 ) => {
-  const guardianSignatureMap = new Map(
-    guardianSignatures.map((sig) => [sig.guardian.toLowerCase(), sig])
-  );
+  const guardianSignatureMap = new Map(guardianSignatures.map((sig) => [sig.guardian.toLowerCase(), sig]));
 
   const result: GuardianSignature[] = [];
 
-  for (
-    let j = 0, collectedSign = 0;
-    j < guardians.length && collectedSign < threshold;
-    j++
-  ) {
+  for (let j = 0, collectedSign = 0; j < guardians.length && collectedSign < threshold; j++) {
     const guardianAddress = guardians[j].toLowerCase();
 
     if (collectedSign >= threshold) {
@@ -809,22 +803,13 @@ export const getRecoveryStartTxData = (
   );
 
   const packedGuardianSignature = SocialRecovery.packGuardianSignature(
-    generateGuardianSignatures(
-      guardianSignatures,
-      guardianInfo.threshold,
-      guardianInfo.guardians
-    )
+    generateGuardianSignatures(guardianSignatures, guardianInfo.threshold, guardianInfo.guardians)
   );
 
   const data = encodeFunctionData({
     abi: SocialRecoveryContractConfig.abi,
     functionName: 'scheduleRecovery',
-    args: [
-      walletAddress as Address,
-      newOwners as Address[],
-      rawGuardian as Hex,
-      packedGuardianSignature as Hex,
-    ],
+    args: [walletAddress as Address, newOwners as Address[], rawGuardian as Hex, packedGuardianSignature as Hex],
   });
 
   return {
@@ -833,10 +818,7 @@ export const getRecoveryStartTxData = (
   };
 };
 
-export const getExecuteRecoveryTxData = (
-  walletAddress: string,
-  newOwners: string[]
-) => {
+export const getExecuteRecoveryTxData = (walletAddress: string, newOwners: string[]) => {
   const data = encodeFunctionData({
     abi: SocialRecoveryContractConfig.abi,
     functionName: 'executeRecovery',
