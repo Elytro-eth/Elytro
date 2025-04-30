@@ -37,7 +37,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
       const res = await query(QUERY_GET_RECOVERY_INFO, {
         recoveryRecordId,
       });
-      setRecoveryRecord({ ...(res as SafeAny)?.getRecoveryInfo, chainID: '0x1' } as TRecoveryInfo);
+      setRecoveryRecord((res as SafeAny)?.getRecoveryInfo as TRecoveryInfo);
       setLoading(false);
     } catch (error) {
       toast({
