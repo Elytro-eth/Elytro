@@ -19,19 +19,14 @@ class AccountManager {
   private _store: LocalSubscribableStore<TAccountsState>;
 
   constructor() {
-    this._store = new LocalSubscribableStore<TAccountsState>(
-      ACCOUNTS_STORAGE_KEY,
-      (initState) => {
-        if (initState?.currentAccount) {
-          eventBus.emit(
-            EVENT_TYPES.ACCOUNT.ACCOUNT_INITIALIZED,
-            initState.currentAccount
-          );
-        }
+    this._store = new LocalSubscribableStore<TAccountsState>(ACCOUNTS_STORAGE_KEY, (initState) => {
+      if (initState?.currentAccount) {
+        eventBus.emit(EVENT_TYPES.ACCOUNT.ACCOUNT_INITIALIZED, initState.currentAccount);
       }
-    );
+    });
   }
 
+  // ! DO NOT USE Array.push() to add new account, use this._accounts = [...this._accounts, account] instead
   private get _accounts() {
     return this._store.state.accounts || [];
   }
@@ -66,28 +61,21 @@ class AccountManager {
   }
 
   public getAccountByChainId(chainId: number | string) {
-    return this._accounts.find(
-      (account) => account.chainId === Number(chainId)
-    );
+    return this._accounts.find((account) => account.chainId === Number(chainId));
   }
 
   public async createAccountAsCurrent(eoaAddress: string, chainId: number) {
     const account = this.getAccountByChainId(chainId);
 
     if (account) {
-      console.log(
-        'Elytro::AccountManager::createAccount: wallet already exists'
-      );
+      console.log('Elytro::AccountManager::createAccount: wallet already exists');
       // return account;
       return;
     }
 
     try {
       // creating address is not a sdk chain related request, so we don't rely on switch chain
-      const newAccountAddress = await elytroSDK.createWalletAddress(
-        eoaAddress,
-        chainId
-      );
+      const newAccountAddress = await elytroSDK.createWalletAddress(eoaAddress, chainId);
 
       const newAccount = {
         address: newAccountAddress,
@@ -107,9 +95,7 @@ class AccountManager {
     const account = this.getAccountByChainId(chainId);
 
     if (!account) {
-      throw new Error(
-        'Elytro::AccountManager::switchAccountByChainId: wallet not found'
-      );
+      throw new Error('Elytro::AccountManager::switchAccountByChainId: wallet not found');
     }
 
     this._currentAccount = account;
@@ -121,9 +107,16 @@ class AccountManager {
   }
 
   public async removeAccountByAddress(address: string) {
-    this._accounts = this._accounts.filter(
-      (account) => account.address !== address
-    );
+    this._accounts = this._accounts.filter((account) => account.address !== address);
+  }
+
+  // TODO: check this logic. is it really needed?
+  public async setCurrentAccount(account: TAccountInfo) {
+    this._currentAccount = account;
+
+    if (!this._accounts.find((acc) => acc.address === account.address)) {
+      this._accounts = [...this._accounts, account];
+    }
   }
 
   public async updateCurrentAccountInfo(account: Partial<TAccountInfo>) {
@@ -134,9 +127,7 @@ class AccountManager {
       ...account,
     };
 
-    this._accounts = this._accounts.map((acc) =>
-      acc.address === updatedAccount.address ? updatedAccount : acc
-    );
+    this._accounts = this._accounts.map((acc) => (acc.address === updatedAccount.address ? updatedAccount : acc));
 
     this._currentAccount = updatedAccount;
   }

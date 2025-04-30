@@ -18,8 +18,6 @@ enum RecoveryStatusEn {
   Completed = 3, // Recovery completed
 }
 
-// const DELAY_TIME = 48 * 60 * 60 * 1_000; // 48 hours
-
 const TimeBlock = ({ time, unit }: { time: number; unit: string }) => {
   return (
     <div className="flex flex-col items-center gap-y-sm">
@@ -57,7 +55,7 @@ export default function Start() {
     window.open(`${explorerUrl}/tx/${txHash}`, '_blank', 'noopener,noreferrer');
   };
 
-  const trackTransaction = (txHash: `0x${string}`) => {
+  const trackTransaction = (txHash: `0x${string}`, onSuccess?: () => void, onFailed?: () => void) => {
     setTxStatus('pending');
     toast({
       title: 'Transaction Processing',
@@ -87,7 +85,7 @@ export default function Start() {
               description: 'Your wallet recovery was successful!',
               variant: 'default',
             });
-            router.push('/finished');
+            onSuccess?.();
           } else {
             setTxStatus('failed');
             toast({
@@ -95,6 +93,7 @@ export default function Start() {
               description: 'Please try again or contact support.',
               variant: 'destructive',
             });
+            onFailed?.();
           }
         }
       } catch (error) {
@@ -116,7 +115,7 @@ export default function Start() {
 
     try {
       setIsLoading(true);
-      await sendTransaction(getConfig(), {
+      const txHash = await sendTransaction(getConfig(), {
         connector,
         ...getRecoveryStartTxData(
           recoveryRecord!.address,
@@ -125,6 +124,29 @@ export default function Start() {
           recoveryRecord!.guardianSignatures
         ),
       });
+
+      trackTransaction(
+        txHash,
+        () => {
+          // fetch recovery record until it's status is RecoveryStatusEn.READY
+          const interval = setInterval(() => {
+            getRecoveryRecord();
+
+            if (recoveryRecord?.status === RecoveryStatusEn.Ready) {
+              clearInterval(interval);
+            }
+          }, 2_000);
+
+          return () => clearInterval(interval);
+        },
+        () => {
+          toast({
+            title: 'Failed to start recovery',
+            variant: 'destructive',
+            description: 'Please try again or contact support.',
+          });
+        }
+      );
     } catch (error) {
       toast({
         title: 'Failed to start recovery',
@@ -170,7 +192,19 @@ export default function Start() {
         ...getExecuteRecoveryTxData(recoveryRecord!.address, recoveryRecord!.newOwners),
       });
 
-      trackTransaction(txHash);
+      trackTransaction(
+        txHash,
+        () => {
+          router.push('/finished');
+        },
+        () => {
+          toast({
+            title: 'Failed to complete recovery',
+            variant: 'destructive',
+            description: 'Please try again or contact support.',
+          });
+        }
+      );
     } catch (error) {
       toast({
         title: 'Failed to complete recovery',
@@ -203,8 +237,6 @@ export default function Start() {
       }, 1000);
 
       return () => clearInterval(interval);
-    } else if (status === RecoveryStatusEn.Ready || status === RecoveryStatusEn.NonStarted) {
-      setLeftTime({ hours: 48, minutes: 0, seconds: 0 });
     }
   }, [status, recoveryRecord]);
 
@@ -216,17 +248,19 @@ export default function Start() {
       subtitle="You'll regain wallet access in 48 hours."
     >
       {/* Count down */}
-      <div className="flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg">
-        <TimeBlock time={leftTime.hours} unit="Hours" />
-        <TimeBlock time={leftTime.minutes} unit="Minutes" />
-        <TimeBlock time={leftTime.seconds} unit="Seconds" />
-      </div>
+      {status === RecoveryStatusEn.Waiting && (
+        <div className="flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg">
+          <TimeBlock time={leftTime.hours} unit="Hours" />
+          <TimeBlock time={leftTime.minutes} unit="Minutes" />
+          <TimeBlock time={leftTime.seconds} unit="Seconds" />
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-x-sm">
         <Button
           size="lg"
           variant={status === RecoveryStatusEn.NonStarted ? 'default' : 'outline'}
-          disabled={isLoading || status !== RecoveryStatusEn.NonStarted}
+          disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.NonStarted}
           onClick={startRecovery}
           className="w-full"
         >
@@ -240,7 +274,7 @@ export default function Start() {
           onClick={completeRecovery}
           className="w-full"
         >
-          {txStatus === 'pending' ? 'Processing...' : 'Complete Recovery'}
+          Complete Recovery
         </Button>
       </div>
     </ContentWrapper>
