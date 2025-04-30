@@ -34,7 +34,7 @@ type TShareInfo = {
   content: string;
 };
 
-const RECOVERY_APP_URL = 'https://elytro.vercel.app/';
+const RECOVERY_APP_URL = 'https://recovery.elytro.com/';
 
 function PageContent() {
   const { wallet } = useWallet();
