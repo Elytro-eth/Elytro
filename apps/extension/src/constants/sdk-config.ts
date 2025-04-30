@@ -1,6 +1,6 @@
 import { keccak256, encodeAbiParameters, encodePacked, Hex, zeroHash, parseAbiParameters, toBytes } from 'viem';
 
-export const DEFAULT_GUARDIAN_SAFE_PERIOD = 10; // 48 * 60 * 60; // 48 hours in seconds
+export const DEFAULT_GUARDIAN_SAFE_PERIOD = 48 * 60 * 60; // 48 hours in seconds
 
 export const DEFAULT_GUARDIAN_HASH = zeroHash;
 
