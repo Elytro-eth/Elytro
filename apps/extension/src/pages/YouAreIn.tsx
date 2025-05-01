@@ -30,15 +30,13 @@ const YouAreIn: React.FC = () => {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
       }}
     >
-      <div className="flex justify-center">
+      <div className="flex justify-center pt-20">
         <img src={IconSuccess} alt="Passcode" width={164} />
       </div>
 
       <div className="flex flex-col gap-y-2xs">
         <h1 className="elytro-text-title text-center">{title}</h1>
-        <h2 className="elytro-text-smaller-body text-muted-foreground text-center">
-          {description}
-        </h2>
+        <h2 className="elytro-text-smaller-body text-muted-foreground text-center">{description}</h2>
       </div>
 
       <Button

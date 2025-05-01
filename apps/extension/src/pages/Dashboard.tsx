@@ -22,8 +22,7 @@ export default function Dashboard() {
   };
 
   const searchParams = useSearchParams();
-  const defaultTabs =
-    searchParams.defaultTabs === 'activities' ? 'activities' : 'assets';
+  const defaultTabs = searchParams.defaultTabs === 'activities' ? 'activities' : 'assets';
 
   return (
     <PageLayout className="w-full h-screen bg-gray-150">
@@ -44,15 +43,11 @@ export default function Dashboard() {
               boxSizing: 'border-box',
             }}
           >
-            <TabsList className="px-5 relative border-b-1">
+            <TabsList className="px-5 relative">
               <TabsTrigger value="assets">Tokens</TabsTrigger>
               <TabsTrigger value="activities">Activity</TabsTrigger>
               <div className="absolute right-4 mt-1">
-                <RefreshCcw
-                  className="elytro-clickable-icon"
-                  color="gray"
-                  onClick={handleReload}
-                />
+                <RefreshCcw className="elytro-clickable-icon" color="gray" onClick={handleReload} />
               </div>
             </TabsList>
             <div
@@ -88,10 +83,7 @@ export default function Dashboard() {
             Import token
           </Button>
         </div>
-        <BetaNotice
-          text="We're in beta. Please keep deposits small."
-          closeable
-        />
+        <BetaNotice text="We're in beta. Please keep deposits small." closeable />
       </PageLayout.Footer>
     </PageLayout>
   );

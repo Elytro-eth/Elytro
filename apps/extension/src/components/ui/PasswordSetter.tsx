@@ -3,14 +3,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useState } from 'react';
 import PasswordInput from '@/components/ui/PasswordInputer';
 
@@ -49,10 +42,7 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(handleSubmit)}
-        className="w-full space-y-3xl"
-      >
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full space-y-3xl">
         <div className="space-y-sm">
           <FormField
             control={form.control}
@@ -71,9 +61,7 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
                 {form.formState.errors.password ? (
                   <FormMessage />
                 ) : (
-                  <FormDescription>
-                    More than 6 characters and at least 1 capitalized letter.
-                  </FormDescription>
+                  <FormDescription>More than 6 characters with at least 1 capitalized letter.</FormDescription>
                 )}
               </FormItem>
             )}
@@ -100,12 +88,7 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
           />
         </div>
 
-        <Button
-          type="submit"
-          className="w-full rounded-full h-14"
-          disabled={loading}
-          size="large"
-        >
+        <Button type="submit" className="w-full rounded-full h-14" disabled={loading} size="large">
           {loading ? 'Creating...' : 'Continue'}
         </Button>
       </form>

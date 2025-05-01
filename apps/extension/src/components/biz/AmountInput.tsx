@@ -40,9 +40,7 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
     tokenInfo: { tokenPrices },
   } = useAccount();
 
-  const tokenPrice = token?.address
-    ? tokenPrices.find((p) => p.address === token.address)?.price || 0
-    : 0;
+  const tokenPrice = token?.address ? tokenPrices.find((p) => p.address === token.address)?.price || 0 : 0;
 
   useEffect(() => {
     if (isInternalUpdate.current) {
@@ -127,8 +125,7 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
     if (isDisabled || tokenPrice <= 0) return;
 
     setInputMode((prevMode) => {
-      const newMode =
-        prevMode === InputMode.TOKEN ? InputMode.DOLLAR : InputMode.TOKEN;
+      const newMode = prevMode === InputMode.TOKEN ? InputMode.DOLLAR : InputMode.TOKEN;
 
       if (field.value) {
         if (newMode === InputMode.DOLLAR && tokenPrice > 0) {
@@ -144,9 +141,7 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
   }, [isDisabled, tokenPrice, field.value]);
 
   useEffect(() => {
-    setEqMode(
-      inputMode === InputMode.TOKEN ? InputMode.DOLLAR : InputMode.TOKEN
-    );
+    setEqMode(inputMode === InputMode.TOKEN ? InputMode.DOLLAR : InputMode.TOKEN);
     if (tokenPrice > 0) {
       if (inputMode === InputMode.TOKEN) {
         const dollarValue = parseFloat(inputValue) * tokenPrice;
@@ -169,25 +164,17 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
     <div className="bg-white px-4 py-3 rounded-md flex flex-row items-center relative">
       <div className="relative flex-1">
         <div className="flex">
-          {inputPrefix && (
-            <div className={cn('flex-none', fontSize)}>{inputPrefix}</div>
-          )}
+          {inputPrefix && <div className={cn('flex-none font-bold', fontSize)}>{inputPrefix}</div>}
           <Input
             value={inputValue}
             onChange={handleChange}
-            className={cn(
-              'flex-1 border-none',
-              fontSize,
-              'font-bold pr-24 pl-px'
-            )}
+            className={cn('flex-1 border-none', fontSize, 'font-bold pr-24 pl-px')}
             placeholder="0"
             disabled={isDisabled}
             type="text"
             inputMode="decimal"
           />
-          {inputPostfix && (
-            <div className={cn('flex-none', fontSize)}>{inputPostfix}</div>
-          )}
+          {inputPostfix && <div className={cn('flex-none', fontSize)}>{inputPostfix}</div>}
         </div>
         {tokenPrice > 0 && eqValue && !isNaN(Number(eqValue)) && (
           <div>

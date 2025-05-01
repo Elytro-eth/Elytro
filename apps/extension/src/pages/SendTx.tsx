@@ -5,13 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleHelp, AlertCircle, Loader2 } from 'lucide-react';
 import { Transaction } from '@soulwallet/sdk';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useAccount } from '@/contexts/account-context';
 import TokenSelector from '@/components/biz/TokenSelector';
@@ -69,12 +63,7 @@ export default function SendTx() {
         }
 
         const maxAmount = token
-          ? Number(
-              formatTokenAmount(
-                form.getValues('token').balance,
-                form.getValues('token').decimals
-              )
-            )
+          ? Number(formatTokenAmount(form.getValues('token').balance, form.getValues('token').decimals))
           : 0;
 
         if (Number(data) > maxAmount) {
@@ -158,10 +147,7 @@ export default function SendTx() {
       }
 
       const txParams: Transaction = { to };
-      const formattedMaxAmount = formatTokenAmount(
-        token.balance || 0,
-        token.decimals
-      );
+      const formattedMaxAmount = formatTokenAmount(token.balance || 0, token.decimals);
       const parsedAmount =
         amount === formattedMaxAmount
           ? token.balance?.toString() || '0'
@@ -190,8 +176,7 @@ export default function SendTx() {
         toInfo: { ...token } as SafeAny,
       });
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to prepare transaction';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to prepare transaction';
       setError(errorMessage);
       toast({
         title: 'Transaction Error',
@@ -226,7 +211,7 @@ export default function SendTx() {
 
         <Form {...form}>
           <div className="bg-light-green rounded-sm pb-4 mb-4">
-            <h3 className="text-lg font-bold px-4 py-3">Sending</h3>
+            <h3 className="text-lg font-bold px-4 pt-3">Sending</h3>
             {/* Token selector */}
             <FormField
               control={form.control}
@@ -235,11 +220,7 @@ export default function SendTx() {
                 <div className="relative py-2">
                   <FormItem>
                     <FormControl>
-                      <TokenSelector
-                        className="h-16 px-4"
-                        tokens={filteredTokens}
-                        onTokenChange={handleTokenSelect}
-                      />
+                      <TokenSelector className="h-16 px-4" tokens={filteredTokens} onTokenChange={handleTokenSelect} />
                     </FormControl>
                     <FormMessage />
 
