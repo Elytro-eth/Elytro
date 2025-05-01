@@ -9,7 +9,8 @@ import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
-import { RadioGroup, RadioGroupIndicator, RadioGroupItem } from '@/components/ui/radiobox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -97,43 +98,36 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
         />
         {expandSponsorSelector && (
           <div>
-            <RadioGroup>
-              <RadioGroupItem
-                className="flex items-center gap-x-2xs"
-                value="sponsor"
-                onClick={() => {
-                  onRetry(false);
-                }}
-                id="gas-fee-by-sponsor"
-              >
-                <RadioGroupIndicator />
-              </RadioGroupItem>
-              <label
-                htmlFor="gas-fee-by-sponsor"
-                className="flex items-center elytro-text-small-body text-gray-750 truncate"
-              >
-                Sponsored by Elytro
-              </label>
-
-              <RadioGroupItem
-                className="flex items-center gap-x-2xs"
-                value="self"
-                onClick={() => {
-                  onRetry(true);
-                }}
-                id="gas-fee-by-self"
-              >
-                <RadioGroupIndicator />
-              </RadioGroupItem>
-              <label
-                htmlFor="gas-fee-by-self"
-                className="flex items-center elytro-text-small-body text-gray-750 truncate"
-              >
-                <span>
-                  {gasInETH} ETH
-                  {gasInDollar && <span className="elytro-text-small-body text-gray-600 ml-2xs">({gasInDollar})</span>}
-                </span>
-              </label>
+            <RadioGroup
+              value={calcResult?.hasSponsored ? 'sponsor' : 'self'}
+              onValueChange={(value: string) => {
+                onRetry(value !== 'sponsor');
+              }}
+              className="flex flex-col gap-y-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="sponsor" id="gas-fee-by-sponsor" />
+                <Label
+                  htmlFor="gas-fee-by-sponsor"
+                  className="flex items-center elytro-text-small-body text-gray-750 truncate"
+                >
+                  Sponsored by Elytro
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="self" id="gas-fee-by-self" />
+                <Label
+                  htmlFor="gas-fee-by-self"
+                  className="flex items-center elytro-text-small-body text-gray-750 truncate"
+                >
+                  <span className="text-gray-750">
+                    {gasInETH} ETH
+                    {gasInDollar && (
+                      <span className="elytro-text-small-body text-gray-600 ml-2xs">({gasInDollar})</span>
+                    )}
+                  </span>
+                </Label>
+              </div>
             </RadioGroup>
           </div>
         )}
