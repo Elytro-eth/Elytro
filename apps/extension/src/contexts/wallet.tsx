@@ -1,15 +1,21 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import {
-  WalletController,
-  WalletStatusEn,
-} from '@/background/walletController';
+import { WalletController, WalletStatusEn } from '@/background/walletController';
 import PortMessage from '@/utils/message/portMessage';
 import { toast } from '@/hooks/use-toast';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
-import { navigateTo } from '@/utils/navigation';
+import { navigateTo, SidePanelRoutePath } from '@/utils/navigation';
 import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';
-
 const portMessage = new PortMessage('elytro-ui');
+
+const INIT_PATHS = [
+  SIDE_PANEL_ROUTE_PATHS.Transfer,
+  SIDE_PANEL_ROUTE_PATHS.CreateAccount,
+  SIDE_PANEL_ROUTE_PATHS.CreatePasscode,
+  SIDE_PANEL_ROUTE_PATHS.YouAreIn,
+  SIDE_PANEL_ROUTE_PATHS.AccountRecovery,
+  SIDE_PANEL_ROUTE_PATHS.RetrieveContacts,
+  SIDE_PANEL_ROUTE_PATHS.Home,
+];
 
 const walletControllerProxy = new Proxy(
   {},
@@ -37,7 +43,7 @@ const walletControllerProxy = new Proxy(
 
 type IWalletContext = {
   wallet: WalletController;
-  status: WalletStatusEn;
+  status: WalletStatusEn | undefined;
 };
 
 const WalletContext = createContext<IWalletContext>({
@@ -46,17 +52,45 @@ const WalletContext = createContext<IWalletContext>({
 });
 
 export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
-  const [status, setStatus] = useState<WalletStatusEn>(WalletStatusEn.NoOwner);
+  const [status, setStatus] = useState<WalletStatusEn | undefined>();
   const [pathname] = useEnhancedHashLocation();
 
   const getWalletStatus = async () => {
     try {
       const res = await walletControllerProxy.getWalletStatus();
 
-      if (res === WalletStatusEn.HasAccountButLocked) {
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
+      // If the status is the same and the status is not in the list of statuses, do not navigate
+      if (res === status && ![WalletStatusEn.HasOwnerButLocked, WalletStatusEn.HasAccountAndUnlocked].includes(res)) {
+        return;
       }
+
+      let navigateToPath: SidePanelRoutePath | undefined;
+
+      switch (res) {
+        case WalletStatusEn.HasOwnerButLocked:
+          navigateToPath = SIDE_PANEL_ROUTE_PATHS.Unlock;
+          break;
+        case WalletStatusEn.Recovering:
+          navigateToPath = SIDE_PANEL_ROUTE_PATHS.AccountRecovery;
+          break;
+        case WalletStatusEn.NoAccount || WalletStatusEn.NoOwner:
+          if (!INIT_PATHS.includes(pathname as SidePanelRoutePath)) {
+            navigateToPath = SIDE_PANEL_ROUTE_PATHS.Home;
+          }
+          break;
+        case WalletStatusEn.HasAccountAndUnlocked:
+          if (INIT_PATHS.includes(pathname as SidePanelRoutePath)) {
+            navigateToPath = SIDE_PANEL_ROUTE_PATHS.Dashboard;
+          }
+          break;
+        default:
+          break;
+      }
+
       setStatus(res);
+      if (navigateToPath) {
+        navigateTo('side-panel', navigateToPath);
+      }
     } catch {
       toast({
         title: 'Failed to get wallet status',
@@ -71,11 +105,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
     getWalletStatus();
   }, [walletControllerProxy, pathname]);
 
-  return (
-    <WalletContext.Provider value={{ wallet: walletControllerProxy, status }}>
-      {children}
-    </WalletContext.Provider>
-  );
+  return <WalletContext.Provider value={{ wallet: walletControllerProxy, status }}>{children}</WalletContext.Provider>;
 };
 
 export const useWallet = () => {

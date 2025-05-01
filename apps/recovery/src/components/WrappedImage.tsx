@@ -6,9 +6,5 @@ export default function WrappedImage({ src, ...rest }: ImageProps) {
     return imgSrc.includes('base64') || imgSrc.startsWith('data:');
   };
 
-  return isBase64Image(src) ? (
-    <img src={src as string} {...rest} />
-  ) : (
-    <Image src={src} {...rest} />
-  );
+  return isBase64Image(src) ? <img src={src as string} {...rest} /> : <Image src={src} {...rest} />;
 }

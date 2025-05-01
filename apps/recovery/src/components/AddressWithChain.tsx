@@ -1,6 +1,6 @@
 'use client';
 
-import { CHAIN_LOGOS } from '@/constants/chains';
+import { CHAIN_LOGOS, SUPPORTED_CHAINS } from '@/constants/chains';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import React, { useState } from 'react';
@@ -12,23 +12,17 @@ interface IProps {
   rightExtra?: React.ReactNode;
 }
 
-export default function AddressWithChain({
-  address,
-  chainID = 0,
-  className,
-  rightExtra,
-}: IProps) {
+export default function AddressWithChain({ address, chainID = 0, className, rightExtra }: IProps) {
   const [showFullAddress, setShowFullAddress] = useState(false);
+
+  const isSupportedChain = SUPPORTED_CHAINS.some((chain) => chain.id === chainID);
 
   return (
     <div
-      className={cn(
-        'flex items-center justify-between  py-sm px-md rounded-sm bg-white fix:bg-gray-300',
-        className
-      )}
+      className={cn('flex items-center justify-between  py-sm px-md rounded-sm bg-white fix:bg-gray-300', className)}
     >
       <div className="flex items-center gap-2">
-        {chainID && (
+        {isSupportedChain && (
           <Image
             src={CHAIN_LOGOS[chainID]}
             alt={!Number.isNaN(chainID) ? chainID.toString() : ''}
@@ -48,9 +42,7 @@ export default function AddressWithChain({
             ) : (
               <>
                 {address?.slice(0, 6)}
-                <span className="text-gray-500 bg-gray-300 rounded-xs px-1">
-                  ...
-                </span>
+                <span className="text-gray-500 bg-gray-300 rounded-xs px-1">...</span>
                 {address?.slice(-4)}
               </>
             )}

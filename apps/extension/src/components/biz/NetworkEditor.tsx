@@ -14,7 +14,8 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { maskApiKeyInUrl } from '@/utils/url';
 
 type NetworkFormValues = Pick<TChainItem, 'name' | 'endpoint' | 'bundler'>;
 
@@ -89,6 +90,9 @@ export default function NetworkEditor({
 }) {
   const { toast } = useToast();
   const { wallet } = useWallet();
+  const [displayedBundlerUrl, setDisplayedBundlerUrl] = useState<string>(
+    maskApiKeyInUrl(chain.bundler)
+  );
 
   const form = useForm<NetworkFormValues>({
     resolver: zodResolver(createNetworkFormSchema(chain.id)),
@@ -99,6 +103,14 @@ export default function NetworkEditor({
     },
     mode: 'onChange',
   });
+
+  useEffect(() => {
+    form.reset({
+      name: chain.name,
+      endpoint: chain.endpoint,
+      bundler: chain.bundler,
+    });
+  }, [chain, form]);
 
   const formValues = form.watch();
   const formChanged =
@@ -133,14 +145,6 @@ export default function NetworkEditor({
       });
     }
   };
-
-  useEffect(() => {
-    form.reset({
-      name: chain.name,
-      endpoint: chain.endpoint,
-      bundler: chain.bundler,
-    });
-  }, [chain, form]);
 
   return (
     <div className="space-y-4">
@@ -184,6 +188,14 @@ export default function NetworkEditor({
                     label="Bundler"
                     placeholder="Input bundler URL"
                     {...field}
+                    value={displayedBundlerUrl}
+                    onChange={(e) => {
+                      setDisplayedBundlerUrl(e.target.value);
+                    }}
+                    onBlur={(e) => {
+                      field.onChange(e.target.value);
+                      setDisplayedBundlerUrl(maskApiKeyInUrl(e.target.value));
+                    }}
                   />
                 </FormControl>
                 <FormMessage />

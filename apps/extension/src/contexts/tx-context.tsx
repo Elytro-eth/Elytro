@@ -34,6 +34,7 @@ type ITxContext = {
   isSending: boolean;
   hasSufficientBalance: boolean;
   errorMsg: Nullable<string>;
+
   // UserOp/Tx info
   userOp: Nullable<ElytroUserOperation>;
   calcResult: Nullable<TUserOperationPreFundResult>;
@@ -47,7 +48,7 @@ type ITxContext = {
   ) => void;
   onConfirm: () => void;
   onCancel: () => void;
-  onRetry: () => void;
+  onRetry: (noSponsor?: boolean) => void;
 };
 
 const ConfirmSuccessMessageMap = {
@@ -116,7 +117,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     decodedDetail?: TMyDecodeResult
   ) => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm);
-    packUserOp(type, params, decodedDetail);
+    packUserOp(type, { params, decodedDetail });
   };
 
   const getTxType = (type: TxRequestTypeEn) => {
@@ -145,8 +146,15 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
 
   const packUserOp = async (
     type: TxRequestTypeEn,
-    params?: Transaction[],
-    decodedDetail?: TMyDecodeResult
+    {
+      params,
+      decodedDetail,
+      noSponsor = false,
+    }: {
+      params?: Transaction[];
+      decodedDetail?: TMyDecodeResult;
+      noSponsor?: boolean;
+    }
   ) => {
     try {
       setIsPacking(true);
@@ -176,7 +184,8 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
 
       const packedUserOp = await wallet.packUserOp(
         currentUserOp,
-        toHex(transferAmount)
+        toHex(transferAmount),
+        noSponsor
       );
 
       userOpRef.current = packedUserOp.userOp;
@@ -234,7 +243,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     handleBack(true);
   };
 
-  const onRetry = () => {
+  const onRetry = (noSponsor = false) => {
     if (!requestType) {
       toast({
         title: 'Failed to retry',
@@ -244,7 +253,10 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     setErrorMsg(null);
-    packUserOp(requestType!, txParamsRef.current as unknown as Transaction[]);
+    packUserOp(requestType!, {
+      params: txParamsRef.current as unknown as Transaction[],
+      noSponsor,
+    });
   };
 
   const onConfirm = async () => {
@@ -281,7 +293,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
           ? TxRequestTypeEn.SendTransaction
           : TxRequestTypeEn.ApproveTransaction;
 
-      packUserOp(type, txInfo);
+      packUserOp(type, { params: txInfo });
     }
   }, [approval]);
 

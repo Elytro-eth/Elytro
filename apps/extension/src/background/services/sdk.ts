@@ -8,13 +8,7 @@ import {
   GUARDIAN_INFO_KEY,
 } from '@/constants/sdk-config';
 import { formatHex, paddingZero } from '@/utils/format';
-import {
-  Bundler,
-  SignkeyType,
-  SocialRecovery,
-  SoulWallet,
-  Transaction,
-} from '@soulwallet/sdk';
+import { Bundler, SignkeyType, SocialRecovery, SoulWallet, Transaction } from '@soulwallet/sdk';
 import { DecodeUserOp } from '@soulwallet/decoder';
 import { canUserOpGetSponsor } from '@/utils/ethRpc/sponsor';
 import keyring from './keyring';
@@ -84,9 +78,7 @@ export class SDKService {
 
   public resetSDK(chainConfig: TChainItem) {
     if (!SUPPORTED_CHAIN_IDS.includes(chainConfig.id)) {
-      throw new Error(
-        `Elytro: chain ${chainConfig.id} is not supported for now.`
-      );
+      throw new Error(`Elytro: chain ${chainConfig.id} is not supported for now.`);
     }
 
     if (this._isConfigUnchanged(chainConfig)) {
@@ -100,23 +92,13 @@ export class SDKService {
   private _isConfigUnchanged(newConfig: TChainItem): boolean {
     if (!this._config) return false;
 
-    return this._REQUIRED_CHAIN_FIELDS.every(
-      (field) => newConfig[field] === this._config?.[field]
-    );
+    return this._REQUIRED_CHAIN_FIELDS.every((field) => newConfig[field] === this._config?.[field]);
   }
 
   private initializeSDK(config: TChainItem) {
-    const { endpoint, bundler, factory, fallback, recovery, onchainConfig } =
-      config;
+    const { endpoint, bundler, factory, fallback, recovery, onchainConfig } = config;
 
-    this._sdk = new SoulWallet(
-      endpoint,
-      bundler,
-      factory,
-      fallback,
-      recovery,
-      onchainConfig
-    );
+    this._sdk = new SoulWallet(endpoint, bundler, factory, fallback, recovery, onchainConfig);
 
     this._bundler = new Bundler(bundler);
     this._config = config;
@@ -157,14 +139,7 @@ export class SDKService {
       throw res.ERR;
     } else {
       // no need await for createAccount request. it's not a blocking request.
-      createAccount(
-        res.OK,
-        chainId,
-        this._index,
-        initialKeysStrArr,
-        initialGuardianHash,
-        initialGuardianSafePeriod
-      );
+      createAccount(res.OK, chainId, this._index, initialKeysStrArr, initialGuardianHash, initialGuardianSafePeriod);
       return res.OK as Address;
     }
   }
@@ -269,11 +244,7 @@ export class SDKService {
   //   }
   // }
 
-  private async _isSignatureValid(
-    address: Hex,
-    messageHash: Hex,
-    signature: Hex
-  ) {
+  private async _isSignatureValid(address: Hex, messageHash: Hex, signature: Hex) {
     const _client = this._getClient();
 
     const magicValue = await _client.readContract({
@@ -369,11 +340,7 @@ export class SDKService {
       return null;
     }
 
-    const res = await DecodeUserOp(
-      this._config.id,
-      this._config.onchainConfig.entryPoint,
-      userOp
-    );
+    const res = await DecodeUserOp(this._config.id, this._config.onchainConfig.entryPoint, userOp);
 
     if (res.isErr()) {
       throw res.ERR;
@@ -383,11 +350,7 @@ export class SDKService {
   }
 
   public async simulateUserOperation(userOp: ElytroUserOperation) {
-    return await simulateSendUserOp(
-      userOp,
-      this._config.onchainConfig.entryPoint,
-      this._config.id
-    );
+    return await simulateSendUserOp(userOp, this._config.onchainConfig.entryPoint, this._config.id);
   }
 
   private async _getFeeDataFromSDKProvider() {
@@ -428,10 +391,7 @@ export class SDKService {
     return gasPrice;
   }
 
-  public async estimateGas(
-    userOp: ElytroUserOperation,
-    useDefaultGasPrice = true
-  ) {
+  public async estimateGas(userOp: ElytroUserOperation, useDefaultGasPrice = true) {
     // looks like only deploy wallet will need this
     if (useDefaultGasPrice) {
       const gasPrice = await this._getFeeData();
@@ -478,21 +438,15 @@ export class SDKService {
         typeof paymasterVerificationGasLimit !== 'undefined'
       ) {
         userOp.paymasterPostOpGasLimit = BigInt(paymasterPostOpGasLimit);
-        userOp.paymasterVerificationGasLimit = BigInt(
-          paymasterVerificationGasLimit
-        );
+        userOp.paymasterVerificationGasLimit = BigInt(paymasterVerificationGasLimit);
       }
 
       return userOp;
     }
   }
 
-  public async getRechargeAmountForUserOp(
-    userOp: ElytroUserOperation,
-    transferValue: bigint
-  ) {
-    const hasSponsored = await this.canGetSponsored(userOp);
-
+  public async getRechargeAmountForUserOp(userOp: ElytroUserOperation, transferValue: bigint, noSponsor = false) {
+    const hasSponsored = noSponsor ? false : await this.canGetSponsored(userOp);
     if (!hasSponsored) {
       await this.estimateGas(userOp);
     }
@@ -529,10 +483,7 @@ export class SDKService {
   public async signMessage(message: Hex, saAddress: Address) {
     const hashedMessage = hashMessage({ raw: message });
     const encode1271MessageHash = getEncoded1271MessageHash(hashedMessage);
-    const domainSeparator = getDomainSeparator(
-      toHex(this._config.id),
-      saAddress
-    );
+    const domainSeparator = getDomainSeparator(toHex(this._config.id), saAddress);
     const messageHash = getEncodedSHA(domainSeparator, encode1271MessageHash);
 
     const signature = await this._getSignature({ messageHash }, true);
@@ -588,22 +539,18 @@ export class SDKService {
     }
   }
 
-  public async generateRecoveryInfoRecordTx(
-    guardians: string[],
-    threshold: number
-  ) {
+  public async generateRecoveryInfoRecordTx(guardians: string[], threshold: number) {
     if (!this._config.infoRecorder) {
-      throw new Error(
-        `Elytro: Info recorder on chain ${this._config.name} is not set.`
-      );
+      throw new Error(`Elytro: Info recorder on chain ${this._config.name} is not set.`);
     }
 
     // Encode the guardian data
     // Encode the guardian data
-    const guardianData = encodeAbiParameters(
-      parseAbiParameters(['address[]', 'uint256', 'bytes32']),
-      [guardians as Address[], BigInt(threshold), zeroHash]
-    );
+    const guardianData = encodeAbiParameters(parseAbiParameters(['address[]', 'uint256', 'bytes32']), [
+      guardians as Address[],
+      BigInt(threshold),
+      zeroHash,
+    ]);
 
     // Encode the function call data using viem
     const callData = encodeFunctionData({
@@ -652,9 +599,7 @@ export class SDKService {
 
   public async queryRecoveryContacts(address: Address) {
     if (!this._config.infoRecorder) {
-      throw new Error(
-        `Elytro: Info recorder on chain ${this._config.name} is not set.`
-      );
+      throw new Error(`Elytro: Info recorder on chain ${this._config.name} is not set.`);
     }
 
     const startBlock = await this._getInfoRecorderStartBlock(address);
@@ -668,11 +613,9 @@ export class SDKService {
 
     const logs = await _client.getLogs({
       address: this._config.infoRecorder as Address,
-      toBlock: startBlock,
+      toBlock: startBlock + 10n,
       fromBlock,
-      event: parseAbiItem(
-        'event DataRecorded(address indexed wallet, bytes32 indexed category, bytes data)'
-      ),
+      event: parseAbiItem('event DataRecorded(address indexed wallet, bytes32 indexed category, bytes data)'),
       args: {
         wallet: address,
         category: GUARDIAN_INFO_KEY,
@@ -706,9 +649,7 @@ export class SDKService {
     try {
       const version = await _client.readContract({
         address: walletAddress as Address,
-        abi: parseAbi([
-          'function VERSION() public view returns (string memory)',
-        ]),
+        abi: parseAbi(['function VERSION() public view returns (string memory)']),
         functionName: 'VERSION',
         args: [],
       });
@@ -730,10 +671,7 @@ export class SDKService {
       })) as string[][];
 
       const upgradeModuleSet = new Set(
-        Object.values(
-          VERSION_MODULE_ADDRESS_MAP[this._config.id]?.versionModuleAddress ??
-            {}
-        )
+        Object.values(VERSION_MODULE_ADDRESS_MAP[this._config.id]?.versionModuleAddress ?? {})
       );
 
       const installedUpgradeModules: `0x${string}`[] = [];

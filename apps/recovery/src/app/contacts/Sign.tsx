@@ -4,10 +4,7 @@ import { useAccount, useSwitchChain } from 'wagmi';
 import { useRecoveryRecord } from '@/contexts';
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  getSocialRecoveryTypedData,
-  getWalletNonce,
-} from '@/requests/contract';
+import { getSocialRecoveryTypedData, getWalletNonce } from '@/requests/contract';
 import { signTypedData } from 'wagmi/actions';
 import { Address } from 'viem';
 import { getConfig } from '@/wagmi';
@@ -20,9 +17,9 @@ export default function Sign() {
   const { switchChain } = useSwitchChain();
   const { recoveryRecord, backToHome } = useRecoveryRecord();
 
-  const isSigned = (
-    recoveryRecord?.guardianSignatures as TGuardianSignature[]
-  )?.some(({ guardian }) => guardian === address?.toLowerCase());
+  const isSigned = (recoveryRecord?.guardianSignatures as TGuardianSignature[])?.some(
+    ({ guardian }) => guardian === address?.toLowerCase()
+  );
 
   const sendSignatureRequest = async () => {
     try {
@@ -34,12 +31,16 @@ export default function Sign() {
         switchChain({ chainId: Number(recoveryRecord?.chainID) });
       }
 
-      const nonce = await getWalletNonce(
-        recoveryRecord?.address,
-        Number(recoveryRecord?.chainID)
-      );
+      const nonce = await getWalletNonce(recoveryRecord?.address, Number(recoveryRecord?.chainID));
 
-      if (nonce === null) return;
+      if (nonce === null) {
+        toast({
+          title: 'Failed to Get Signature Data',
+          description: 'Please check your wallet network connection or try switching RPC nodes',
+          variant: 'destructive',
+        });
+        return;
+      }
 
       const signature = await signTypedData(getConfig(), {
         ...(await getSocialRecoveryTypedData(

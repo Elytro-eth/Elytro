@@ -30,12 +30,8 @@ export default function Connect() {
   };
 
   return (
-    <div className="w-full h-full bg-white flex justify-center items-center min-h-screen p-4">
-      <ConnectionConfirmation
-        dApp={dApp}
-        onConfirm={handleConnect}
-        onCancel={handleReject}
-      />
+    <div className="w-full h-full bg-white flex justify-center min-h-screen p-4">
+      <ConnectionConfirmation dApp={dApp} onConfirm={handleConnect} onCancel={handleReject} />
     </div>
   );
 }

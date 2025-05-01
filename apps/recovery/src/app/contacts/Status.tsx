@@ -15,9 +15,7 @@ export default function Status() {
           chainID={Number(recoveryRecord?.chainID)}
           rightExtra={
             isContactSigned(recoveryRecord?.guardianSignatures, guardian) ? (
-              <div className="flex items-center text-tiny rounded-xs bg-light-green px-xs py-3xs">
-                Signed
-              </div>
+              <div className="flex items-center text-tiny rounded-xs bg-light-green px-xs py-3xs">Signed</div>
             ) : null
           }
         />

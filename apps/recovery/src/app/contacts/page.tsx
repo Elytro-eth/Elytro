@@ -12,13 +12,7 @@ export default function Contacts() {
   const { address } = useAccount();
 
   const { subtitle, content } = useMemo(() => {
-    const isGuardian =
-      address &&
-      isConnectedAccountAContact(
-        address,
-        recoveryRecord?.guardianInfo?.guardians
-      );
-
+    const isGuardian = address && isConnectedAccountAContact(address, recoveryRecord?.guardianInfo?.guardians);
     if (isGuardian) {
       return {
         subtitle: 'Please sign the recovery',
@@ -27,16 +21,16 @@ export default function Contacts() {
     }
 
     return {
-      subtitle: 'Select the wallet you will use to sign',
+      subtitle: address
+        ? 'The connected wallet is not a guardian. Please switch to a guardian wallet.'
+        : 'Please connect a guardian wallet (listed below) to sign the recovery request.',
       content: <Status />,
     };
-  }, [recoveryRecord, address]);
+  }, [address, recoveryRecord]);
 
   return (
     <ContentWrapper
-      title={
-        <div className="text-left mr-5xl">Sign your friend’s recovery</div>
-      }
+      title={<div className="text-left mr-5xl">Sign your friend&apos;s recovery</div>}
       // allSteps={3}
       // currentStep={1}
       subtitle={subtitle}

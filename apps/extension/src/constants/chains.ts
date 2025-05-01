@@ -1,5 +1,7 @@
 import {
+  arbitrum,
   Chain,
+  mainnet,
   optimism,
   optimismSepolia,
   // scrollSepolia,
@@ -37,6 +39,42 @@ export type TChainItem = Chain & {
 
 export const SUPPORTED_CHAINS: TChainItem[] = [
   {
+    ...mainnet,
+    icon: 'https://etherscan.io/images/svg/brands/ethereum-original.svg',
+    endpoint: 'https://eth.drpc.org',
+    bundler: `https://api.pimlico.io/v2/1/rpc?apikey=${import.meta.env.VITE_PIMLICO_API_KEY}`,
+    factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
+    fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
+    recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
+    validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
+    infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
+    opExplorer: 'https://etherscan.io/op/',
+    onchainConfig: {
+      chainId: mainnet.id,
+      entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+      soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
+    },
+  },
+  {
+    ...arbitrum,
+    icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png',
+    endpoint:
+      arbitrum.rpcUrls.default.http[0] ||
+      `https://arb-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
+    bundler: `https://api.pimlico.io/v2/42161/rpc?apikey=${import.meta.env.VITE_PIMLICO_API_KEY}`,
+    factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
+    fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
+    recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
+    validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
+    infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
+    onchainConfig: {
+      chainId: arbitrum.id,
+      entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+      soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
+    },
+    opExplorer: 'https://jiffyscan.xyz/userOpHash/',
+  },
+  {
     ...optimism,
     icon: 'https://raw.githubusercontent.com/blockscout/frontend-configs/main/configs/network-icons/optimism-mainnet-light.svg',
     endpoint:
@@ -55,6 +93,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
       soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
     },
   },
+
   {
     ...optimismSepolia,
     icon: 'https://raw.githubusercontent.com/blockscout/frontend-configs/main/configs/network-icons/optimism-mainnet-light.svg',
@@ -79,8 +118,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     ...sepolia,
     icon: 'https://etherscan.io/images/svg/brands/ethereum-original.svg',
     endpoint:
-      sepolia.rpcUrls.default.http[0] ||
-      `https://eth-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
+      sepolia.rpcUrls.default.http[0] || `https://eth-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
     bundler: `https://api.pimlico.io/v2/11155111/rpc?apikey=${import.meta.env.VITE_PIMLICO_API_KEY}`,
     factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
     fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
@@ -101,12 +139,13 @@ export const SUPPORTED_CHAIN_IDS = SUPPORTED_CHAINS.map((chain) => chain.id);
 export const getIconByChainId = (chainId: number | undefined) =>
   chainId ? SUPPORTED_CHAINS.find((chain) => chain.id === chainId)?.icon : '';
 
-export const getChainNameByChainId = (chainId: number) =>
-  SUPPORTED_CHAINS.find((chain) => chain.id === chainId)?.name;
+export const getChainNameByChainId = (chainId: number) => SUPPORTED_CHAINS.find((chain) => chain.id === chainId)?.name;
 
 // EIP-3770: get short chain name from :https://github.com/ethereum-lists/chains/tree/55e0b3bb7d8678f083d0549c0b2d16ec675c4378/_data/chains
 export const EIP3770_CHAIN_PREFIX_MAP: Record<number, string> = {
+  [mainnet.id]: 'eth',
   [optimism.id]: 'oeth',
+  [arbitrum.id]: 'arb1',
   [optimismSepolia.id]: 'opsep',
   [sepolia.id]: 'sep',
   // [scrollSepolia.id]: 'scrollsep',
