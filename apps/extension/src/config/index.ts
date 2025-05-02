@@ -1,15 +1,17 @@
-import devConfig from './index.dev';
-import testConfig from './index.test';
-import prodConfig from './index.prod';
+import secrets from './secrets';
+import testDefault from './default.test';
+import devDefault from './default.development';
+import prodDefault from './default.production';
 
-const env = process.env.APP_ENV || 'development';
+type Environment = 'development' | 'production' | 'test';
+const env = (process.env.APP_ENV || 'development') as Environment;
 
-let config = devConfig;
+const defaultConfig = env === 'test' ? testDefault : env === 'development' ? devDefault : prodDefault;
 
-if (env === 'production') {
-  config = prodConfig;
-} else if (env === 'test') {
-  config = testConfig;
-}
+const config = {
+  ...defaultConfig,
+  firebase: secrets.firebase,
+  rpc: secrets.rpc,
+};
 
 export default config;

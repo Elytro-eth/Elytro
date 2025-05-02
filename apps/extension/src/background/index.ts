@@ -24,7 +24,7 @@ import { initializeSecurity } from '@/utils/security';
 
 initializeSecurity();
 
-const app = initializeApp(CONFIG.firebaseConfig);
+const app = initializeApp(CONFIG.firebase.config);
 const messaging = getMessaging(app);
 
 onBackgroundMessage(messaging, async () => {
@@ -40,7 +40,7 @@ const getFcmToken = async (scope: SafeAny) => {
 
   getToken(messaging, {
     serviceWorkerRegistration: scope.registration,
-    vapidKey: CONFIG.firebaseVapidKey,
+    vapidKey: CONFIG.firebase.vapidKey,
   })
     .then(async (token) => {
       await localStorage.save({ fcmToken: token });
@@ -80,9 +80,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 });
 
 // allow side panel to open when clicking the extension icon
-chrome.sidePanel
-  .setPanelBehavior({ openPanelOnActionClick: true })
-  .catch((error) => console.error(error));
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch((error) => console.error(error));
 
 const initApp = async () => {
   // await keyring.restore();
@@ -146,9 +144,7 @@ const initContentScriptAndPageProviderMessage = (port: chrome.runtime.Port) => {
         sessionManager.broadcastMessageToDApp(
           origin,
           'accountsChanged',
-          accountManager?.currentAccount?.address
-            ? [accountManager.currentAccount.address]
-            : []
+          accountManager?.currentAccount?.address ? [accountManager.currentAccount.address] : []
         );
       }, 500);
     }
@@ -156,10 +152,7 @@ const initContentScriptAndPageProviderMessage = (port: chrome.runtime.Port) => {
 
   providerPortManager.onMessage(
     'CONTENT_SCRIPT_REQUEST',
-    async (
-      { uuid, payload }: { uuid: string; payload: RequestArguments },
-      port
-    ) => {
+    async ({ uuid, payload }: { uuid: string; payload: RequestArguments }, port) => {
       const { origin, tab } = port.sender || {};
 
       if (!origin || !tab?.id) {
@@ -240,9 +233,7 @@ const initUIMessage = (port: chrome.runtime.Port) => {
     const { method, params } = request;
 
     if (typeof walletController[method] === 'function') {
-      const res = await (
-        walletController[method] as (...args: unknown[]) => unknown
-      )(...params);
+      const res = await (walletController[method] as (...args: unknown[]) => unknown)(...params);
 
       uiReqCacheManager.set(method, params, res);
       return res;
@@ -273,11 +264,7 @@ const initUIMessage = (port: chrome.runtime.Port) => {
 
       UIPortManager.sendMessage(msgKey, { result }, port.sender?.origin);
     } catch (error) {
-      UIPortManager.sendMessage(
-        msgKey,
-        { error: (error as Error).message || 'Unknown error' },
-        port.sender?.origin
-      );
+      UIPortManager.sendMessage(msgKey, { error: (error as Error).message || 'Unknown error' }, port.sender?.origin);
     }
   });
 };
@@ -301,12 +288,9 @@ const initBackgroundMessage = () => {
   });
 
   eventBus.on(EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED, (userOpHash, status) => {
-    RuntimeMessage.sendMessage(
-      `${EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED}_${userOpHash}`,
-      {
-        status,
-      }
-    );
+    RuntimeMessage.sendMessage(`${EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED}_${userOpHash}`, {
+      status,
+    });
   });
 };
 
