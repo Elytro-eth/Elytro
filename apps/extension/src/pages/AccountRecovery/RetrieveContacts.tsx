@@ -201,7 +201,7 @@ function PageContent() {
               ) : (
                 <Button variant="secondary" size="tiny" className="group" onClick={() => handleShareContact(contact)}>
                   <Copy className="size-md mr-xs group-hover:stroke-white" />
-                  Copy {isAddress(contact.address) ? 'link' : 'email'}
+                  {isAddress(contact.address) ? 'Share link' : 'Copy email'}
                 </Button>
               )
             }
