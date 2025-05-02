@@ -49,14 +49,6 @@ class WalletController {
     return keyring.locked;
   }
   public async getWalletStatus() {
-    console.log(
-      'Elytro: accountManager.recoveryRecord',
-      accountManager.recoveryRecord,
-      keyring.hasOwner,
-      keyring.locked,
-      accountManager.currentAccount,
-      accountManager.accounts
-    );
     if (accountManager.recoveryRecord) {
       return WalletStatusEn.Recovering;
     }
