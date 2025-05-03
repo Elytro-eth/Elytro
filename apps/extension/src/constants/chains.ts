@@ -1,3 +1,4 @@
+import CONFIG from '@/config';
 import {
   arbitrum,
   Chain,
@@ -42,7 +43,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     ...mainnet,
     icon: 'https://etherscan.io/images/svg/brands/ethereum-original.svg',
     endpoint: 'https://eth.drpc.org',
-    bundler: `https://api.pimlico.io/v2/1/rpc?apikey=${import.meta.env.VITE_PIMLICO_API_KEY}`,
+    bundler: `https://api.pimlico.io/v2/1/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
     factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
     fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
     recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
@@ -58,10 +59,8 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
   {
     ...arbitrum,
     icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png',
-    endpoint:
-      arbitrum.rpcUrls.default.http[0] ||
-      `https://arb-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
-    bundler: `https://api.pimlico.io/v2/42161/rpc?apikey=${import.meta.env.VITE_PIMLICO_API_KEY}`,
+    endpoint: arbitrum.rpcUrls.default.http[0] || `https://arb-mainnet.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
+    bundler: `https://api.pimlico.io/v2/42161/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
     factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
     fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
     recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
@@ -98,9 +97,8 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     ...optimismSepolia,
     icon: 'https://raw.githubusercontent.com/blockscout/frontend-configs/main/configs/network-icons/optimism-mainnet-light.svg',
     endpoint:
-      optimismSepolia.rpcUrls.default.http[0] ||
-      `https://opt-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
-    bundler: `https://api.pimlico.io/v2/11155420/rpc?apikey=${import.meta.env.VITE_PIMLICO_API_KEY}`,
+      optimismSepolia.rpcUrls.default.http[0] || `https://opt-sepolia.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
+    bundler: `https://api.pimlico.io/v2/11155420/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
     factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
     fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
     recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
@@ -117,9 +115,8 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
   {
     ...sepolia,
     icon: 'https://etherscan.io/images/svg/brands/ethereum-original.svg',
-    endpoint:
-      sepolia.rpcUrls.default.http[0] || `https://eth-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
-    bundler: `https://api.pimlico.io/v2/11155111/rpc?apikey=${import.meta.env.VITE_PIMLICO_API_KEY}`,
+    endpoint: sepolia.rpcUrls.default.http[0] || `https://eth-sepolia.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
+    bundler: `https://api.pimlico.io/v2/11155111/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
     factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
     fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
     recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
