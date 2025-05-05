@@ -17,9 +17,7 @@ import { toast } from '@/hooks/use-toast';
 export default function AccountRecovery() {
   const [address, setAddress] = useState('');
   const { currentChain } = useChain();
-  const [selectedChain, setSelectedChain] = useState<TChainItem | null>(
-    currentChain
-  );
+  const [selectedChain, setSelectedChain] = useState<TChainItem | null>(currentChain);
   const { wallet } = useWallet();
   const [checked, setChecked] = useState(false);
   const [isChainConfirmed, setIsChainConfirmed] = useState(false);
@@ -43,7 +41,7 @@ export default function AccountRecovery() {
           navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
         }}
       >
-        <div className="flex flex-col items-center space-y-2xl mt-3xl">
+        <div className="flex flex-col items-center space-y-2xl mt-10">
           <img src={WalletImg} alt="Wallet" className="size-36" />
           <h1 className="elytro-text-title">How recovery works</h1>
           <div>
@@ -57,11 +55,7 @@ export default function AccountRecovery() {
               description="You need to collect enough recovery confirmations."
               Icon={Shield}
             />
-            <TipItem
-              title="3. Wait 48 hours until recovered "
-              description="This is for extra security."
-              Icon={Clock}
-            />
+            <TipItem title="3. Wait 48 hours until recovered " description="This is for extra security." Icon={Clock} />
           </div>
           <Button className="w-full" onClick={() => setChecked(true)}>
             Start recover
@@ -97,10 +91,7 @@ export default function AccountRecovery() {
           setSelectedChain(null);
         }}
       >
-        <NetworkSelection
-          selectedChain={selectedChain}
-          handleSelectChain={handleSelectChain}
-        />
+        <NetworkSelection selectedChain={selectedChain} handleSelectChain={handleSelectChain} />
         <div className="w-full grid grid-cols-2 gap-x-sm mt-10">
           <Button variant="outline" onClick={() => setChecked(false)}>
             Cancel
@@ -123,21 +114,11 @@ export default function AccountRecovery() {
     <SecondaryPageWrapper title="Recovery">
       <div className="flex flex-col gap-y-sm mb-md">
         <h1 className="elytro-text-bold-body">Wallet Address</h1>
-        <p className="elytro-text-smaller-body text-gray-600">
-          We need it to find your recovery contacts
-        </p>
+        <p className="elytro-text-smaller-body text-gray-600">We need it to find your recovery contacts</p>
       </div>
 
-      <AddressInputWithChainIcon
-        chainId={selectedChain!.id}
-        address={address}
-        onChange={setAddress}
-      />
-      <Button
-        className="w-full mt-10"
-        disabled={!isAddress(address)}
-        onClick={handleRetrieveContacts}
-      >
+      <AddressInputWithChainIcon chainId={selectedChain!.id} address={address} onChange={setAddress} />
+      <Button className="w-full mt-10" disabled={!isAddress(address)} onClick={handleRetrieveContacts}>
         <Box className="size-4 mr-sm" color="#cce1ea" />
         Retrieve my contacts
       </Button>

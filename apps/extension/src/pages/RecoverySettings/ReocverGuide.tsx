@@ -5,7 +5,7 @@ import { Clock, Mail, Shield } from 'lucide-react';
 
 export default function RecoverGuide({ onClick }: { onClick: () => void }) {
   return (
-    <div className="flex flex-col gap-y-xl items-center">
+    <div className="flex flex-col gap-y-xl items-center mt-10">
       <img src={ContactsImg} className="size-36" />
       <div className="elytro-text-subtitle text-center">
         How recovery
@@ -18,11 +18,7 @@ export default function RecoverGuide({ onClick }: { onClick: () => void }) {
           description="Add recovery contacts for each wallet."
           Icon={Mail}
         />
-        <TipItem
-          title="2. Add by address or email"
-          description="Contact can be stored in either ways."
-          Icon={Shield}
-        />
+        <TipItem title="2. Add by address or email" description="Contact can be stored in either ways." Icon={Shield} />
         <TipItem
           title="3. Contacts help you recover"
           description="Recovery contacts need to confirm the recovery."
