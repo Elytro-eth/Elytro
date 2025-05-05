@@ -30,11 +30,9 @@ const Welcome = () => (
       Open Extensions and pin <br />
       Elytro for easy access
     </div>
-    <main className="rounded-sm p-4xl bg-white w-[480px]">
+    <main className="rounded-sm p-4xl bg-white w-[30rem]">
       <h1 className="elytro-text-headline mb-lg ">Welcome to Elytro</h1>
-      <p className="elytro-text-body text-gray-600">
-        Your first decentralised smart wallet for Ethereum
-      </p>
+      <p className="elytro-text-body text-gray-600">Your first decentralised smart wallet for Ethereum</p>
 
       <Button
         className="w-full mt-2xl"

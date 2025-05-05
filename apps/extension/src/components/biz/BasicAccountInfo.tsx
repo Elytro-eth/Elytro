@@ -32,13 +32,8 @@ export default function BasicAccountInfo() {
           <Copy text={currentAccount.address} />
         </div>
         <div className="flex flex-row gap-x-md relative">
-          <Settings2Icon
-            className="elytro-clickable-icon"
-            onClick={onClickMore}
-          />
-          {currentAccount.needUpgrade && (
-            <RedDot size="normal" className="absolute -right-1 -top-1" />
-          )}
+          <Settings2Icon className="elytro-clickable-icon" onClick={onClickMore} />
+          {currentAccount.needUpgrade && <RedDot size="normal" className="absolute -right-1 -top-1" />}
         </div>
       </div>
 
@@ -50,31 +45,25 @@ export default function BasicAccountInfo() {
       </div> */}
 
       {/* Actions */}
-      <div>
-        <div className="flex flex-row gap-md my-sm">
-          {currentAccount.isDeployed ? (
-            <>
-              <ActionButton
-                className="bg-light-green hover:bg-green hover:stroke-white"
-                icon={
-                  <ArrowDownLeft className="w-5 h-5 mr-1 duration-100 transition-all group-hover:stroke-white" />
-                }
-                label="Receive"
-                onClick={onClickReceive}
-              />
-              <ActionButton
-                className="hover:stroke-white"
-                icon={
-                  <ArrowUpRight className="w-5 h-5 mr-1 duration-100 transition-all group-hover:stroke-white" />
-                }
-                label="Send"
-                onClick={onClickSend}
-              />
-            </>
-          ) : (
-            <ActivateButton />
-          )}
-        </div>
+      <div className="flex flex-row gap-md my-sm">
+        {currentAccount.isDeployed ? (
+          <>
+            <ActionButton
+              className="bg-light-green hover:bg-green hover:stroke-white"
+              icon={<ArrowDownLeft className="size-5 mr-1 duration-100 transition-all group-hover:stroke-white" />}
+              label="Receive"
+              onClick={onClickReceive}
+            />
+            <ActionButton
+              className="hover:stroke-white"
+              icon={<ArrowUpRight className="size-5 mr-1 duration-100 transition-all group-hover:stroke-white" />}
+              label="Send"
+              onClick={onClickSend}
+            />
+          </>
+        ) : (
+          <ActivateButton />
+        )}
       </div>
     </div>
   );
