@@ -40,7 +40,7 @@ export default function SecondaryPageWrapper({
 
   return (
     <div className={cn('w-full min-h-full bg-gray-150 p-sm', className)}>
-      <div className="flex flex-col flex-grow w-full min-h-full bg-white p-lg pt-0 rounded-sm">
+      <div className="flex flex-col flex-grow w-full min-h-full bg-white p-lg rounded-sm">
         {/* Header: back button, title, close button */}
         <div className="flex flex-row items-center justify-center relative pb-lg mb-sm">
           {showBack && <ArrowLeft className="elytro-clickable-icon absolute left-0" onClick={handleBack} />}
