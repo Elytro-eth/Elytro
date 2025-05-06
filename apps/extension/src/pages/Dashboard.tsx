@@ -33,16 +33,7 @@ export default function Dashboard() {
       </PageLayout.Header>
       <PageLayout.Body className="px-2">
         <div className=" rounded-xl bg-white h-full">
-          <Tabs
-            defaultValue={defaultTabs}
-            className=""
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
-              boxSizing: 'border-box',
-            }}
-          >
+          <Tabs defaultValue={defaultTabs} className="flex flex-col flex-1 h-full box-border">
             <TabsList className="px-5 relative">
               <TabsTrigger value="assets">Tokens</TabsTrigger>
               <TabsTrigger value="activities">Activity</TabsTrigger>
@@ -50,15 +41,7 @@ export default function Dashboard() {
                 <RefreshCcw className="elytro-clickable-icon" color="gray" onClick={handleReload} />
               </div>
             </TabsList>
-            <div
-              className="flex flex-col"
-              style={{
-                flex: '1',
-                height: '100%',
-                overflow: 'auto',
-                boxSizing: 'border-box',
-              }}
-            >
+            <div className="flex flex-col flex-1 h-full overflow-auto box-border scrollbar-thin">
               <TabsContent value="assets">
                 <Assets />
               </TabsContent>

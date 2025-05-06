@@ -25,27 +25,19 @@ export default function Settings() {
   };
   const appVersion = pkg.version;
   const {
-    currentAccount: { needUpgrade },
+    currentAccount: { needUpgrade, isDeployed },
   } = useAccount();
 
   return (
     <SecondaryPageWrapper title="Settings">
       <div className="bg-gray-150 p-lg rounded-sm space-y-2">
-        <h2 className="elytro-text-small-bold text-gray-600 pd-md">
-          Wallet settings
-        </h2>
+        <h2 className="elytro-text-small-bold text-gray-600 pd-md">Wallet settings</h2>
         <div className="space-y-2">
           <AccountsDropdown />
-          <SettingItem
-            icon={ShieldIcon}
-            label="Social Recovery"
-            path={SIDE_PANEL_ROUTE_PATHS.RecoverySetting}
-          />
-          <SettingItem
-            icon={LayoutGridIcon}
-            label="Connected apps"
-            path={SIDE_PANEL_ROUTE_PATHS.Connection}
-          />
+          {isDeployed && (
+            <SettingItem icon={ShieldIcon} label="Social Recovery" path={SIDE_PANEL_ROUTE_PATHS.RecoverySetting} />
+          )}
+          <SettingItem icon={LayoutGridIcon} label="Connected apps" path={SIDE_PANEL_ROUTE_PATHS.Connection} />
           {needUpgrade && (
             <SettingItem
               icon={RefreshCcw}
@@ -58,15 +50,9 @@ export default function Settings() {
       </div>
 
       <div className="mb-4">
-        <h2 className="elytro-text-small-bold text-gray-600 my-4">
-          Elytro settings
-        </h2>
+        <h2 className="elytro-text-small-bold text-gray-600 my-4">Elytro settings</h2>
         <div className="space-y-2">
-          <SettingItem
-            icon={UserRoundIcon}
-            label="Device profile"
-            path={SIDE_PANEL_ROUTE_PATHS.LocalProfile}
-          />
+          <SettingItem icon={UserRoundIcon} label="Device profile" path={SIDE_PANEL_ROUTE_PATHS.LocalProfile} />
           <SettingItem
             icon={Settings2Icon}
             label="Network configuration"
@@ -86,11 +72,7 @@ export default function Settings() {
 
           <div className="text-center text-gray-750">
             <p>
-              <a
-                href="https://t.me/+l9coqJq9QHgyYjI1"
-                target="_blank"
-                rel="noreferrer"
-              >
+              <a href="https://t.me/+l9coqJq9QHgyYjI1" target="_blank" rel="noreferrer">
                 Join Telegram group
               </a>
             </p>
