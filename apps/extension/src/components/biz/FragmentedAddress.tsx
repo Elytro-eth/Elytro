@@ -1,8 +1,4 @@
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { SUPPORTED_CHAINS } from '@/constants/chains';
 import { cn } from '@/utils/shadcn/utils';
 import { ReactNode } from 'react';
@@ -16,6 +12,7 @@ interface IProps {
   dotColor?: string;
   showChainIcon?: boolean;
   extra?: ReactNode;
+  extraLayout?: 'row' | 'column';
 }
 
 const SIZE_MAP = {
@@ -41,6 +38,7 @@ export default function FragmentedAddress({
   dotColor,
   showChainIcon = true,
   extra,
+  extraLayout = 'column',
 }: IProps) {
   if (!address || !isAddress(address)) {
     return '--';
@@ -53,18 +51,13 @@ export default function FragmentedAddress({
 
   return (
     <div className={cn('flex items-center gap-sm', className)}>
-      {showChainIcon && chain && (
-        <img src={chain.icon} alt={chain.name} className={icon} />
-      )}
-      <div className="flex-column">
+      {showChainIcon && chain && <img src={chain.icon} alt={chain.name} className={icon} />}
+      <div className={cn('flex', extraLayout === 'row' ? 'flex-row items-center' : 'flex-col')}>
         <div className={cn('flex items-center gap-sm', text)}>
           <span>{prefix}</span>
           <Tooltip delayDuration={0}>
             <TooltipTrigger>
-              <span
-                className="px-1 bg-gray-300 rounded-xs"
-                style={{ backgroundColor: dotColor }}
-              >
+              <span className="px-1 bg-gray-300 rounded-xs" style={{ backgroundColor: dotColor }}>
                 …
               </span>
             </TooltipTrigger>
@@ -78,7 +71,7 @@ export default function FragmentedAddress({
           </Tooltip>
           <span>{suffix}</span>
         </div>
-        {extra && <div>{extra}</div>}
+        {extra && <div className={cn(extraLayout === 'row' ? 'ml-sm' : 'mt-xs')}>{extra}</div>}
       </div>
     </div>
   );

@@ -35,7 +35,7 @@ type ITxContext = {
   // UserOp/Tx info
   userOp: Nullable<ElytroUserOperation>;
   calcResult: Nullable<TUserOperationPreFundResult>;
-  decodedDetail: Nullable<DecodeResult>;
+  decodedDetail: Nullable<DecodeResult[]>;
 
   // Actions
   handleTxRequest: (requestType: TxRequestTypeEn, params?: Transaction[], innerDecodedDetail?: TMyDecodeResult) => void;
@@ -69,7 +69,7 @@ const TxContext = createContext<ITxContext>({
 
 export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
-  const { approval, reject } = useApproval();
+  const { approval, reject, resolve } = useApproval();
 
   const userOpRef = useRef<Nullable<ElytroUserOperation>>();
   const txTypeRef = useRef<Nullable<HistoricalActivityTypeEn>>(null);
@@ -80,7 +80,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const [isSending, setIsSending] = useState(false);
   const [errorMsg, setErrorMsg] = useState<Nullable<string>>(null);
 
-  const [decodedDetail, setDecodedDetail] = useState<Nullable<DecodeResult>>(null);
+  const [decodedDetail, setDecodedDetail] = useState<Nullable<DecodeResult[]>>(null);
   const [hasSufficientBalance, setHasSufficientBalance] = useState(false);
   const [calcResult, setCalcResult] = useState<Nullable<TUserOperationPreFundResult>>(null);
 
@@ -156,14 +156,20 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         currentUserOp = await generateDeployUserOp();
       } else {
         currentUserOp = await generateTxUserOp();
-        let decodeRes = (await wallet.decodeUserOp(currentUserOp))?.[0];
-        if (!decodeRes) {
+        let decodeRes = await wallet.decodeUserOp(currentUserOp);
+        if (!decodeRes || decodeRes.length === 0) {
           throw new Error('Failed to decode user operation');
         }
-        transferAmount = BigInt(decodeRes.value); // hex to bigint
+
+        transferAmount = decodeRes.reduce((acc: bigint, curr: DecodeResult) => acc + BigInt(curr.value), 0n);
 
         if (type === TxRequestTypeEn.SendTransaction && decodedDetail) {
-          decodeRes = { ...decodeRes, ...decodedDetail };
+          decodeRes = [
+            {
+              ...decodeRes[0],
+              ...decodedDetail,
+            },
+          ];
         }
 
         setDecodedDetail(decodeRes);
@@ -252,6 +258,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         decodedDetail: decodedDetail!,
         approvalId: approval?.id,
       });
+      resolve();
       handleBack();
     } catch (error) {
       const msg = formatErrorMsg(error);

@@ -17,9 +17,8 @@ export default function Activities() {
   const historiesByMonth = history.reduce(
     (acc, item) => {
       const date = new Date(item.timestamp);
-      const year = date.getFullYear().toString(); // 确保是 YYYY 格式
-      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 确保是 MM 格式（补零）
-
+      const year = date.getFullYear().toString();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
       const key = `${year}/${month}`;
       acc[key] = acc[key] || [];
       acc[key].push(item);
@@ -28,7 +27,7 @@ export default function Activities() {
     {} as Record<string, UserOperationHistory[]>
   );
   return (
-    <div className="flex flex-col overflow-auto gap-y-lg">
+    <div className="flex flex-col gap-y-lg">
       {Object.entries(historiesByMonth).map(([month, items]) => (
         <ActivityGroup key={month} date={month} items={items} />
       ))}
