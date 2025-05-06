@@ -60,7 +60,7 @@ export default function UpgradeContract() {
           <FragmentedAddress address={address} chainId={chainId} className="p-xs rounded-2xs bg-gray-150" />
         </div>
         <div>
-          <img src={WalletImg} alt="Wallet" className="size-[144px] mt-3xl mx-auto" />
+          <img src={WalletImg} alt="Wallet" className="size-[9rem] mt-3xl mx-auto" />
         </div>
         <div className="elytro-text-bold-body text-center">Update contract</div>
         <div className="bg-gray-150 p-lg rounded-sm space-y-2">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import RequestProvider from './RequestProvider';
 import '@/index.css';
 import { Toaster } from './toaster';
@@ -13,15 +13,30 @@ interface IPageContainerProps {
 }
 
 function PageContainer({ children, className }: IPageContainerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Update the min-width based on the zoom and root font size. This is a workaround for browser zoom. Not always working but better than nothing.
+  useEffect(() => {
+    // ! DO NOT REMOVE this, it's the minimum width of the side panel
+    function updateMinWidth() {
+      const zoom = window.outerWidth / window.innerWidth;
+      const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const minWidth = 360 / (zoom * rootFontSize);
+      if (containerRef.current) {
+        containerRef.current.style.minWidth = `${minWidth}px`;
+      }
+    }
+    updateMinWidth();
+    window.addEventListener('resize', updateMinWidth);
+    return () => window.removeEventListener('resize', updateMinWidth);
+  }, []);
+
   return (
     <>
       <ErrorBoundary>
         <div
-          className={cn(
-            // ! DO NOT REMOVE min-w-[360px], it's the minimum width of the side panel
-            'w-screen min-h-screen flex justify-center mx-auto max-w-screen-md min-w-[360px]',
-            className
-          )}
+          ref={containerRef}
+          className={cn('w-screen min-h-screen flex justify-center mx-auto max-w-screen-md', className)}
         >
           <WalletProvider>
             <ChainProvider>
