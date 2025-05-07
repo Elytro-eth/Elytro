@@ -80,9 +80,9 @@ class WalletController {
     return approvalService.currentApproval;
   }
 
-  // public async resolveApproval(id: string, data: unknown) {
-  //   return approvalService.resolveApproval(id, data);
-  // }
+  public async resolveApproval(id: string, data: unknown) {
+    return approvalService.resolveApproval(id, data);
+  }
 
   public async rejectApproval(id: string, e?: Error) {
     return approvalService.rejectApproval(id, e);
