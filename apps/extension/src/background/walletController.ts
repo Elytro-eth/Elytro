@@ -298,8 +298,8 @@ class WalletController {
   }
 
   public async switchAccountByChain(chainId: number) {
+    await accountManager.switchAccountByChainId(chainId);
     this.switchChain(chainId);
-    accountManager.switchAccountByChainId(chainId);
     this._broadcastToConnectedSites('accountsChanged', []);
     this._onAccountChanged();
   }
