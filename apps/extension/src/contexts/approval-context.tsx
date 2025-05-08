@@ -51,6 +51,9 @@ export const ApprovalProvider = ({ children }: { children: React.ReactNode }) =>
       isProcessingApproval.current = false;
 
       if (APPROVAL_ROUTES.includes(pathname as ApprovalTypeEn)) {
+        if (pathname === SIDE_PANEL_ROUTE_PATHS.TxConfirm) {
+          return;
+        }
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
       }
     } else if (approval.type !== pathname && !isProcessingApproval.current) {
@@ -90,13 +93,23 @@ export const ApprovalProvider = ({ children }: { children: React.ReactNode }) =>
     };
   }, []);
 
-  const resolve = async () => {
+  const resolve = async (data?: unknown) => {
     if (!approval) {
       return;
     }
 
-    // resolve approval is processed by service automatically, only need to set the approval to null
-    isProcessingApproval.current = true;
+    if (approval.type === SIDE_PANEL_ROUTE_PATHS.TxConfirm) {
+      // resolve approval is processed by service automatically, only need to set the approval to null
+      isProcessingApproval.current = true;
+      return;
+    }
+
+    try {
+      await wallet.resolveApproval(approval.id, data);
+      setApproval(null);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const reject = async (e?: Error) => {
