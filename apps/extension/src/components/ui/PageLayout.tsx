@@ -7,19 +7,11 @@ interface IPageLayoutProps {
 }
 
 function PageLayout({ children, className }: IPageLayoutProps) {
-  return (
-    <div className={cn('flex flex-col h-screen box-border', className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('flex flex-col h-screen box-border ', className)}>{children}</div>;
 }
 
 function PageLayoutBody({ children, className }: IPageLayoutProps) {
-  return (
-    <div className={cn('flex-1 box-border overflow-auto', className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('flex-1 box-border overflow-auto', className)}>{children}</div>;
 }
 
 function PageLayoutHeader({ children, className }: IPageLayoutProps) {

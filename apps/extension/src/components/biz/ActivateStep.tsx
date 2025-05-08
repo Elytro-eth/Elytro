@@ -38,23 +38,9 @@ export default function ActivateStep({
         >
           {isFinished ? '✓' : stepIndex}
         </span>
-        <span
-          className={cn(
-            'text-lg',
-            isFinished ? 'text-[#D4F4C1]' : 'text-gray-900'
-          )}
-        >
-          {title}
-        </span>
+        <span className={cn('text-lg', isFinished ? 'text-[#D4F4C1]' : 'text-gray-900')}>{title}</span>
       </div>
-      <div
-        className={cn(
-          'text-sm my-4',
-          isFinished ? 'text-[#D4F4C1]' : 'text-gray-500'
-        )}
-      >
-        {description}
-      </div>
+      <div className={cn('text-sm my-4', isFinished ? 'text-[#D4F4C1]' : 'text-gray-500')}>{description}</div>
       {status === ActivateStepStatus.Ready && (
         <Button className="rounded-full" onClick={onClick}>
           {buttonText}

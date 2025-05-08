@@ -3,15 +3,10 @@
 @tailwind utilities;
 
 :root {
-
-  background: radial-gradient(
-    93.78% 93.78% at 83.78% 16.41%,
-    #fffaf5 0%,
-    #e5f2f3 100%
-  );
+  background: radial-gradient(93.78% 93.78% at 83.78% 16.41%, #fffaf5 0%, #e5f2f3 100%);
   background-blend-mode: overlay;
 
-  color:#161F36;
+  color: #161f36;
   color-scheme: light dark;
   font-synthesis: none;
   font-weight: 400;
@@ -22,6 +17,9 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
 }
 
 ::-webkit-scrollbar {
@@ -29,7 +27,6 @@
 }
 
 @layer base {
-
   * {
     @apply border-border;
     @apply text-black-blue hover:text-dark-blue;
@@ -37,14 +34,16 @@
 
   @font-face {
     font-family: 'ElytroSoehne';
-    src:  url('../assets/fonts/soehne-buch.woff2') format('woff2'),
-          url('../assets/fonts/soehne-buch.woff') format('woff');
+    src:
+      url('../assets/fonts/soehne-buch.woff2') format('woff2'),
+      url('../assets/fonts/soehne-buch.woff') format('woff');
     font-weight: 400;
   }
   @font-face {
     font-family: 'ElytroSoehne';
-    src:  url('../assets/fonts/soehne-kraftig.woff2') format('woff2'),
-          url('../assets/fonts/soehne-kraftig.woff') format('woff');
+    src:
+      url('../assets/fonts/soehne-kraftig.woff2') format('woff2'),
+      url('../assets/fonts/soehne-kraftig.woff') format('woff');
     font-weight: 700;
   }
 
@@ -56,12 +55,7 @@
 
   :root {
     --background: 0 0% 100%;
-    --elytro-btn-bg: linear-gradient(
-      to right,
-      #f0eee6 0%,
-      #f5edeb 36%,
-      #bad5f5 80%
-    );
+    --elytro-btn-bg: linear-gradient(to right, #f0eee6 0%, #f5edeb 36%, #bad5f5 80%);
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -143,15 +137,11 @@
   }
 
   .text-tiny-bold {
-    @apply text-tiny font-bold ;
+    @apply text-tiny font-bold;
   }
 }
 
 .screen-bg {
-  background: radial-gradient(
-    93.78% 93.78% at 83.78% 16.41%,
-    #fffaf5 0%,
-    #e5f2f3 100%
-  );
+  background: radial-gradient(93.78% 93.78% at 83.78% 16.41%, #fffaf5 0%, #e5f2f3 100%);
   background-blend-mode: overlay;
 }
