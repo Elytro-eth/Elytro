@@ -86,19 +86,21 @@ export default function ActivityItem({
 
   return (
     <div
-      className="flex items-center justify-between px-lg cursor-pointer py-md hover:bg-gray-150 "
+      className="flex items-center w-full justify-between px-lg cursor-pointer py-md hover:bg-gray-150 gap-x-sm min-w-0"
       onClick={() => openExplorer({ txHash, opHash })}
     >
-      <div className="flex items-center gap-3">
-        <IconComponent className={`size-8 p-2 ${bg} rounded-full`} />
+      <div className="flex items-center gap-3 min-w-0 flex-1">
+        <IconComponent className={`size-8 p-2 ${bg} rounded-full flex-shrink-0`} />
 
-        <div className="flex flex-col">
-          <span className="font-bold text-base flex items-end">
-            {name}
-            <span className={`elytro-text-tiny-body px-2 py-1 rounded-[6px] ml-sm text-white ${style} `}>{label}</span>
-          </span>
+        <div className="flex flex-col min-w-0 flex-1">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="font-bold text-base truncate">{name}</span>
+            <span className={`elytro-text-tiny-body px-xs py-2xs rounded-xs text-white ${style} flex-shrink-0`}>
+              {label}
+            </span>
+          </div>
 
-          <span className="elytro-text-tiny-body text-gray-600">
+          <span className="elytro-text-tiny-body text-gray-600 truncate">
             {type === HistoricalActivityTypeEn.Receive
               ? `from ${formatAddressToShort(from)}`
               : `to ${formatAddressToShort(to)}`}
@@ -106,7 +108,13 @@ export default function ActivityItem({
         </div>
       </div>
 
-      <TokenBalanceItem amount={Number(value)} decimals={decimals} symbol={symbol} address={from as `0x${string}`} />
+      <TokenBalanceItem
+        amount={Number(value)}
+        decimals={decimals}
+        symbol={symbol}
+        address={from as `0x${string}`}
+        className="flex-shrink-0"
+      />
     </div>
   );
 }

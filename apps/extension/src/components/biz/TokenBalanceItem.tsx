@@ -7,14 +7,10 @@ interface ITokenBalanceItemProps {
   decimals: number;
   symbol: string;
   address: `0x${string}`;
+  className?: string;
 }
 
-export default function TokenBalanceItem({
-  amount,
-  decimals,
-  symbol,
-  address,
-}: ITokenBalanceItemProps) {
+export default function TokenBalanceItem({ amount, decimals, symbol, address, className }: ITokenBalanceItemProps) {
   const {
     tokenInfo: { tokenPrices },
   } = useAccount();
@@ -31,15 +27,11 @@ export default function TokenBalanceItem({
   }, [amount, decimals, address, symbol, tokenPrices]);
 
   return (
-    <div className="flex flex-col items-end gap-x-sm">
+    <div className={`flex flex-col  items-end gap-x-sm w-fit whitespace-nowrap ${className}`}>
       <p className="text-base font-bold text-gray-900">
         {tokenAmount} {symbol}
       </p>
-      {displayPrice && (
-        <p className="text-sm font-medium text-gray-600 -mt-[.2rem]">
-          {displayPrice}
-        </p>
-      )}
+      {displayPrice && <p className="text-sm font-medium text-gray-600 -mt-[.2rem]">{displayPrice}</p>}
     </div>
   );
 }

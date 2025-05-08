@@ -6,11 +6,7 @@ interface ActionButtonProps extends ButtonProps {
   label: string;
 }
 
-export default function ActionButton({
-  icon,
-  label,
-  ...props
-}: ActionButtonProps) {
+export default function ActionButton({ icon, label, ...props }: ActionButtonProps) {
   return (
     <Button key={label} {...props} variant="secondary" size="large">
       {icon}
