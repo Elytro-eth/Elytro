@@ -41,7 +41,7 @@ interface IStepBlockProps {
 
 const StepBlock = ({ title, index, actionButton, isActive }: IStepBlockProps) => {
   const styles = {
-    container: `flex flex-col gap-y-md p-lg rounded-lg border-1 max-w-[248px] ${
+    container: `flex flex-col gap-y-md p-lg rounded-lg border-1 min-w-[200px] ${
       isActive ? 'bg-gray-150 border-gray-150' : 'bg-gray-0 border-gray-300'
     }`,
     index: `text-tiny-bold text-center size-5 border-[1.5px] rounded-full ${

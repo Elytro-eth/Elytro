@@ -11,7 +11,7 @@ import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: 'Elytro Recovery',
-  description: "Help you recover your or your friend's Elytro accounts",
+  description: 'Help you recover your or your friend’s Elytro accounts',
 };
 
 export default async function RootLayout({

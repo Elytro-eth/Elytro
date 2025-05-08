@@ -161,10 +161,10 @@ function PageContent() {
   if (recoveryRecord?.status === TRecoveryStatus.SIGNATURE_COMPLETED) {
     return (
       <div className="h-full flex flex-col items-center gap-y-xl text-center">
-        <img src={WalletImg} alt="Wallet" className="size-36" />
+        <img src={WalletImg} alt="Wallet" className="size-36 mt-10" />
         <div className="flex flex-col gap-y-sm">
-          <h1 className="elytro-text-title ">Enough signatures collected</h1>
-          <p className="text-gray-600 elytro-text-smaller-body">Begin your recovery in recovery app</p>
+          <h1 className="elytro-text-title">Enough signatures collected</h1>
+          <p className="text-gray-600 elytro-text-smaller-body">Complete your recovery in recovery app</p>
         </div>
         <Button
           onClick={() => {
@@ -213,7 +213,7 @@ function PageContent() {
         <DialogContent showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>Recovery {shareInfo?.type || '--'} copied</DialogTitle>
-            <DialogDescription>Send this link to your contact so they can confirm.</DialogDescription>
+            <DialogDescription>Send this link to your contact so they can sign your recovery.</DialogDescription>
           </DialogHeader>
 
           <pre

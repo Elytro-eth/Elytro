@@ -22,15 +22,15 @@ export default function Contacts() {
 
     return {
       subtitle: address
-        ? 'The connected wallet is not a guardian. Please switch to a guardian wallet.'
-        : 'Please connect a guardian wallet (listed below) to sign the recovery request.',
+        ? 'The connected wallet is not a recovery contact. Please switch to a recovery contact wallet.'
+        : 'Please connect a recovery contact wallet (listed below) to sign the recovery request.',
       content: <Status />,
     };
   }, [address, recoveryRecord]);
 
   return (
     <ContentWrapper
-      title={<div className="text-left mr-5xl">Sign your friend&apos;s recovery</div>}
+      title={<div className="text-left mr-5xl">Sign your friend’s recovery</div>}
       // allSteps={3}
       // currentStep={1}
       subtitle={subtitle}

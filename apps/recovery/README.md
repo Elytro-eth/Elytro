@@ -1,4 +1,4 @@
-This is the Recovery App for Elytro users to help them recover their accounts. Recovery contacts of an Elytro wallet can connect to this dapp and help the user recover their wallet.
+This is the Recovery App for Elytro users to help them recover their wallets. Recovery contacts of an Elytro wallet can connect to this dapp and help the user recover their wallet.
 
 ## Getting Started
 
