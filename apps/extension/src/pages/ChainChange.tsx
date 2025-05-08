@@ -1,21 +1,12 @@
 import { useApproval } from '@/contexts/approval-context';
 import Spin from '@/components/ui/Spin';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ethErrors } from 'eth-rpc-errors';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
-import {
-  SUPPORTED_CHAINS,
-  ChainOperationEn,
-  TChainItem,
-} from '@/constants/chains';
+import { SUPPORTED_CHAINS, ChainOperationEn, TChainItem } from '@/constants/chains';
 import { getChainNameByChainId } from '@/constants/chains';
 
 function URLSection({ title, items }: { title: string; items: string[] }) {
@@ -54,14 +45,7 @@ export default function ChainChange() {
     data: { dApp, chain },
   } = approval;
 
-  const {
-    method,
-    chainName,
-    chainId: targetChainId,
-    nativeCurrency,
-    rpcUrls,
-    blockExplorerUrls,
-  } = chain || {};
+  const { method, chainName, chainId: targetChainId, nativeCurrency, rpcUrls, blockExplorerUrls } = chain || {};
 
   const handleCancel = () => {
     reject(ethErrors.provider.userRejectedRequest());
@@ -94,12 +78,13 @@ export default function ChainChange() {
       }
       resolve();
     } catch (e) {
+      console.error(e);
       reject(e as Error);
     }
   };
 
   return (
-    <Card className="w-full h-full flex flex-col ">
+    <Card className="w-full min-h-screen h-full flex flex-col ">
       <CardHeader className="text-center ">
         <Avatar className="size-10 relative z-0 rounded-full mx-auto mb-4 transition-transform transform hover:scale-105">
           <AvatarImage src={dApp.icon} alt={`${dApp.name} icon`} />
@@ -115,16 +100,10 @@ export default function ChainChange() {
         {method === ChainOperationEn.Switch && (
           <div className="text-base text-gray-700">
             <p>
-              Current chain is{' '}
+              Current chain is <span className="font-bold">{getChainNameByChainId(chainId)}</span>. Do you want to
+              switch to{' '}
               <span className="font-bold">
-                {getChainNameByChainId(chainId)}
-              </span>
-              . Do you want to switch to{' '}
-              <span className="font-bold">
-                {chainName ||
-                  SUPPORTED_CHAINS.find(
-                    (chain) => chain.id === Number(targetChainId)
-                  )?.name}
+                {chainName || SUPPORTED_CHAINS.find((chain) => chain.id === Number(targetChainId))?.name}
               </span>
               ?
             </p>
@@ -134,8 +113,7 @@ export default function ChainChange() {
         {method === ChainOperationEn.Update && (
           <div className="text-base text-gray-700 space-y-4">
             <p>
-              Chain <span className="font-bold">{chainName}</span> (
-              {targetChainId}) will be{' '}
+              Chain <span className="font-bold">{chainName}</span> ({targetChainId}) will be{' '}
               <span className="font-bold">updated</span> in your wallet.
             </p>
             <div className="border-t pt-4">
@@ -143,10 +121,7 @@ export default function ChainChange() {
               <p>{nativeCurrency?.name || '--'}</p>
             </div>
             <URLSection title="RPC URLs" items={rpcUrls || []} />
-            <URLSection
-              title="Block Explorers"
-              items={blockExplorerUrls || []}
-            />
+            <URLSection title="Block Explorers" items={blockExplorerUrls || []} />
           </div>
         )}
       </CardContent>

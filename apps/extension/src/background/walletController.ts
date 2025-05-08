@@ -49,14 +49,6 @@ class WalletController {
     return keyring.locked;
   }
   public async getWalletStatus() {
-    console.log(
-      'Elytro: accountManager.recoveryRecord',
-      accountManager.recoveryRecord,
-      keyring.hasOwner,
-      keyring.locked,
-      accountManager.currentAccount,
-      accountManager.accounts
-    );
     if (accountManager.recoveryRecord) {
       return WalletStatusEn.Recovering;
     }
@@ -173,7 +165,7 @@ class WalletController {
     opHash: string;
     txHash?: string;
     from: string;
-    decodedDetail: DecodeResult;
+    decodedDetail: DecodeResult[];
     approvalId?: string;
   }) {
     historyManager.add({
@@ -182,7 +174,8 @@ class WalletController {
       opHash,
       txHash,
       from,
-      ...getTransferredTokenInfo(decodedDetail),
+      // TODO: get all transferred token info
+      ...getTransferredTokenInfo(decodedDetail[0]),
       approvalId,
     });
   }
@@ -305,8 +298,8 @@ class WalletController {
   }
 
   public async switchAccountByChain(chainId: number) {
+    await accountManager.switchAccountByChainId(chainId);
     this.switchChain(chainId);
-    accountManager.switchAccountByChainId(chainId);
     this._broadcastToConnectedSites('accountsChanged', []);
     this._onAccountChanged();
   }

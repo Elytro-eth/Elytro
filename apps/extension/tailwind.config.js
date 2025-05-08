@@ -6,30 +6,30 @@ module.exports = {
   theme: {
     extend: {
       spacing: {
-        '4xs': '1px',
-        '3xs': '2px',
-        '2xs': '4px',
-        xs: '6px',
-        sm: '8px',
-        md: '12px',
-        lg: '16px',
-        xl: '20px',
-        '2xl': '24px',
-        '3xl': '32px',
-        '4xl': '40px',
-        '5xl': '64px',
+        '4xs': '0.0625rem', // 1px
+        '3xs': '0.125rem', // 2px
+        '2xs': '0.25rem', // 4px
+        xs: '0.375rem', // 6px
+        sm: '0.5rem', // 8px
+        md: '0.75rem', // 12px
+        lg: '1rem', // 16px
+        xl: '1.25rem', // 20px
+        '2xl': '1.5rem', // 24px
+        '3xl': '2rem', // 32px
+        '4xl': '2.5rem', // 40px
+        '5xl': '4rem', // 64px
       },
       borderRadius: {
         pill: '9999px',
-        lg: '24px',
-        md: '16px',
-        sm: '12px',
-        xs: '4px',
-        '2xs': '8px',
+        lg: '1.5rem', // 24px
+        md: '1rem', // 16px
+        sm: '0.75rem', // 12px
+        xs: '0.25rem', // 4px
+        '2xs': '0.5rem', // 8px
       },
       borderWidth: {
-        1: '1px',
-        2: '2px',
+        1: '0.0625rem', // 1px
+        2: '0.125rem', // 2px
       },
       fontSize: {
         xs: '0.75rem' /* 'tiny', 12px */,
@@ -130,13 +130,9 @@ module.exports = {
         },
       },
       boxShadow: {
-        lg: '0px 12px 24px 0px rgba(0, 0, 0, 0.16)',
+        lg: '0 0.75rem 1.5rem 0 rgba(0, 0, 0, 0.16)',
       },
     },
   },
-  plugins: [
-    require('tailwindcss-animate'),
-    require('tailwindcss'),
-    require('autoprefixer'),
-  ],
+  plugins: [require('tailwindcss-animate'), require('tailwindcss'), require('autoprefixer')],
 };

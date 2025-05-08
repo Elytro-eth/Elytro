@@ -28,6 +28,7 @@ import { safeOpen } from '@/utils/safeOpen';
 import { useChain } from '@/contexts/chain-context';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
+import { formatErrorMsg } from '@/utils/format';
 
 type TShareInfo = {
   type: 'link' | 'email';
@@ -63,7 +64,7 @@ function PageContent() {
       setRecoveryContacts([]);
       setRecoveryRecord(null);
       toast({
-        title: 'Failed to retrieve recovery contacts',
+        title: formatErrorMsg(err),
         description: 'Please try again later',
         variant: 'destructive',
       });
@@ -80,12 +81,13 @@ function PageContent() {
 
   useEffect(() => {
     if (
+      recoveryRecord &&
       recoveryRecord?.status !== TRecoveryStatus.RECOVERY_COMPLETED &&
       recoveryRecord?.status !== TRecoveryStatus.RECOVERY_CANCELED
     ) {
       const interval = setInterval(() => {
         getRecoveryRecord();
-      }, 3_000);
+      }, 5_000);
 
       return () => clearInterval(interval);
     }
@@ -121,11 +123,17 @@ function PageContent() {
         {loading ? (
           <ProcessingTip body="Fetching" subBody="" className="flex-1" />
         ) : (
-          <ErrorTip title="Sorry we didn't find any recovery contact" />
+          <ErrorTip title="Sorry we didn't find any recovery contact or failed to initiate recovery" />
         )}
-        <Button className="w-full mt-8" onClick={() => history.back()}>
-          Cancel
-        </Button>
+
+        <div className="flex flex-row w-full mt-md gap-x-sm">
+          <Button variant="secondary" onClick={() => history.back()} className="flex-1">
+            Cancel
+          </Button>
+          <Button onClick={() => getRecoveryRecord()} className="flex-1">
+            Retry
+          </Button>
+        </div>
       </div>
     );
   }
@@ -193,7 +201,7 @@ function PageContent() {
               ) : (
                 <Button variant="secondary" size="tiny" className="group" onClick={() => handleShareContact(contact)}>
                   <Copy className="size-md mr-xs group-hover:stroke-white" />
-                  Copy {isAddress(contact.address) ? 'link' : 'email'}
+                  {isAddress(contact.address) ? 'Share link' : 'Copy email'}
                 </Button>
               )
             }

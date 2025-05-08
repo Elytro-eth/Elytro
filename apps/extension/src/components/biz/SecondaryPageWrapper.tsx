@@ -42,20 +42,10 @@ export default function SecondaryPageWrapper({
     <div className={cn('w-full min-h-full bg-gray-150 p-sm', className)}>
       <div className="flex flex-col flex-grow w-full min-h-full bg-white p-lg rounded-sm">
         {/* Header: back button, title, close button */}
-        <div className="flex flex-row items-center justify-center relative py-lg mb-sm">
-          {showBack && (
-            <ArrowLeft
-              className="elytro-clickable-icon absolute left-0"
-              onClick={handleBack}
-            />
-          )}
+        <div className="flex flex-row items-center justify-center relative pb-lg mb-sm">
+          {showBack && <ArrowLeft className="elytro-clickable-icon absolute left-0" onClick={handleBack} />}
           <h3 className="elytro-text-bold-body">{title}</h3>
-          {closeable && (
-            <X
-              className="elytro-clickable-icon absolute right-0"
-              onClick={handleClose}
-            />
-          )}
+          {closeable && <X className="elytro-clickable-icon absolute right-0" onClick={handleClose} />}
         </div>
 
         {children}

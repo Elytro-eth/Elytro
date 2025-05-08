@@ -4,11 +4,7 @@ import { useAccount } from '@/contexts/account-context';
 import WalletImg from '@/assets/wallet.png';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';
 import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
-import {
-  getInstallModuleTx,
-  getUpgradeModuleTx,
-  getUninstallModuleTx,
-} from '@/utils/contracts/upgrade';
+import { getInstallModuleTx, getUpgradeModuleTx, getUninstallModuleTx } from '@/utils/contracts/upgrade';
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import type { Transaction } from '@soulwallet/sdk';
 import { toast } from '@/hooks/use-toast';
@@ -28,14 +24,12 @@ export default function UpgradeContract() {
         throw new Error('Version info not found for current chain');
       }
 
-      const latestVersionContractAddress =
-        versionInfo.versionModuleAddress[versionInfo.latestVersion];
+      const latestVersionContractAddress = versionInfo.versionModuleAddress[versionInfo.latestVersion];
       if (!latestVersionContractAddress) {
         throw new Error('Latest version contract address not found');
       }
 
-      const installedUpgradeModuleAddresses =
-        await wallet.getInstalledUpgradeModules();
+      const installedUpgradeModuleAddresses = await wallet.getInstalledUpgradeModules();
 
       const txs: Partial<Transaction>[] = [
         getInstallModuleTx(address, latestVersionContractAddress),
@@ -63,14 +57,10 @@ export default function UpgradeContract() {
       <div className="flex flex-col gap-y-md">
         <h1 className="elytro-text-bold-body">You are updating</h1>
         <div className="flex flex-row justify-between">
-          <FragmentedAddress
-            address={address}
-            chainId={chainId}
-            className="p-xs rounded-2xs bg-gray-150"
-          />
+          <FragmentedAddress address={address} chainId={chainId} className="p-xs rounded-2xs bg-gray-150" />
         </div>
         <div>
-          <img src={WalletImg} alt="Wallet" className="size-[144px] mx-auto" />
+          <img src={WalletImg} alt="Wallet" className="size-[9rem] mt-3xl mx-auto" />
         </div>
         <div className="elytro-text-bold-body text-center">Update contract</div>
         <div className="bg-gray-150 p-lg rounded-sm space-y-2">
@@ -80,12 +70,7 @@ export default function UpgradeContract() {
           You may not be able to access funds until the update is successful.
         </div>
 
-        <Button
-          variant="secondary"
-          size="large"
-          className="w-full gap-xl"
-          onClick={handleStartUpgrade}
-        >
+        <Button variant="secondary" size="large" className="w-full gap-xl" onClick={handleStartUpgrade}>
           Start update
         </Button>
       </div>

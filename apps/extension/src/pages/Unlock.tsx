@@ -30,8 +30,7 @@ const Unlock = () => {
     } catch (error) {
       toast({
         title: 'Failed to unlock wallet',
-        description:
-          error instanceof Error ? error.message : 'Please try again',
+        description: error instanceof Error ? error.message : 'Please try again',
         variant: 'destructive',
       });
       reject();
@@ -53,20 +52,12 @@ const Unlock = () => {
 
   return (
     <div className="elytro-gradient-bg flex flex-1 flex-col items-center px-xl min-h-screen gap-y-3xl pt-10">
-      <img src={LaunchImg} alt="Launch" className="size-[128px] mt-10" />
+      <img src={LaunchImg} alt="Launch" className="size-[8rem] mt-10" />
       <h1 className="elytro-text-headline text-center">Welcome back</h1>
       <div className="flex flex-col w-full">
         <div className="flex flex-col gap-y-3xl">
-          <PasswordInput
-            onValueChange={setPassword}
-            placeholder="Enter your passcode"
-            disabled={isLoading}
-            autoFocus
-          />
-          <Button
-            onClick={handleUnlock}
-            disabled={!password || password.length < 7 || isLoading}
-          >
+          <PasswordInput onValueChange={setPassword} placeholder="Enter your passcode" disabled={isLoading} autoFocus />
+          <Button onClick={handleUnlock} disabled={!password || password.length < 7 || isLoading}>
             {isLoading ? 'Unlocking...' : 'Unlock'}
           </Button>
         </div>

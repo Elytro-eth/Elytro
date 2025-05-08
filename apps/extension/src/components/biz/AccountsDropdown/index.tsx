@@ -1,8 +1,4 @@
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import AccountOption from './AccountOption';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -102,7 +98,7 @@ export default function AccountsDropdown() {
             </Avatar>
           </DropdownMenuTrigger>
 
-          <span>
+          <span className="text-ellipsis overflow-hidden whitespace-nowrap">
             {currentAccount?.address ? (
               formatAddressToShort(currentAccount.address)
             ) : (
@@ -121,15 +117,8 @@ export default function AccountsDropdown() {
         className="w-[330px] max-w-fit bg-white rounded-md shadow-lg py-lg px-0"
       >
         <div className="flex items-center justify-between  gap-x-3xl px-lg pb-sm">
-          <span className="elytro-text-small-bold text-gray-900">
-            Switch wallet
-          </span>
-          <Button
-            variant="outline"
-            size="tiny"
-            className="elytro-text-tiny-body"
-            onClick={handleAddAccount}
-          >
+          <span className="elytro-text-small-bold text-gray-900">Switch wallet</span>
+          <Button variant="outline" size="tiny" className="elytro-text-tiny-body" onClick={handleAddAccount}>
             Add new wallet
           </Button>
         </div>

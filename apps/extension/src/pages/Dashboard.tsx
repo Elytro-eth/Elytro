@@ -22,8 +22,7 @@ export default function Dashboard() {
   };
 
   const searchParams = useSearchParams();
-  const defaultTabs =
-    searchParams.defaultTabs === 'activities' ? 'activities' : 'assets';
+  const defaultTabs = searchParams.defaultTabs === 'activities' ? 'activities' : 'assets';
 
   return (
     <PageLayout className="w-full h-screen bg-gray-150">
@@ -34,36 +33,15 @@ export default function Dashboard() {
       </PageLayout.Header>
       <PageLayout.Body className="px-2">
         <div className=" rounded-xl bg-white h-full">
-          <Tabs
-            defaultValue={defaultTabs}
-            className=""
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
-              boxSizing: 'border-box',
-            }}
-          >
-            <TabsList className="px-5 relative border-b-1">
+          <Tabs defaultValue={defaultTabs} className="flex flex-col flex-1 h-full box-border">
+            <TabsList className="px-5 relative">
               <TabsTrigger value="assets">Tokens</TabsTrigger>
               <TabsTrigger value="activities">Activity</TabsTrigger>
               <div className="absolute right-4 mt-1">
-                <RefreshCcw
-                  className="elytro-clickable-icon"
-                  color="gray"
-                  onClick={handleReload}
-                />
+                <RefreshCcw className="elytro-clickable-icon" color="gray" onClick={handleReload} />
               </div>
             </TabsList>
-            <div
-              className="flex flex-col"
-              style={{
-                flex: '1',
-                height: '100%',
-                overflow: 'auto',
-                boxSizing: 'border-box',
-              }}
-            >
+            <div className="flex flex-col flex-1 h-full overflow-auto box-border scrollbar-thin">
               <TabsContent value="assets">
                 <Assets />
               </TabsContent>
@@ -88,10 +66,7 @@ export default function Dashboard() {
             Import token
           </Button>
         </div>
-        <BetaNotice
-          text="We're in beta. Please keep deposits small."
-          closeable
-        />
+        <BetaNotice text="We're in beta. Please keep deposits small." closeable />
       </PageLayout.Footer>
     </PageLayout>
   );

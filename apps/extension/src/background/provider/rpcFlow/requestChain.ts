@@ -1,19 +1,12 @@
-import {
-  approvalService,
-  ApprovalTypeEn,
-} from '@/background/services/approval';
+import accountManager from '@/background/services/account';
+import { approvalService, ApprovalTypeEn } from '@/background/services/approval';
 import { ChainOperationEn, SUPPORTED_CHAIN_IDS } from '@/constants/chains';
 import type { TFlowMiddleWareFn } from '@/utils/asyncTaskFlow';
 import { ethErrors } from 'eth-rpc-errors';
 
-const RELATED_METHODS: ProviderMethodType[] = [
-  'wallet_switchEthereumChain',
-  'wallet_addEthereumChain',
-];
+const RELATED_METHODS: ProviderMethodType[] = ['wallet_switchEthereumChain', 'wallet_addEthereumChain'];
 
-const CHAIN_OPERATION_MAP: Partial<
-  Record<ProviderMethodType, ChainOperationEn>
-> = {
+const CHAIN_OPERATION_MAP: Partial<Record<ProviderMethodType, ChainOperationEn>> = {
   wallet_switchEthereumChain: ChainOperationEn.Switch,
   wallet_addEthereumChain: ChainOperationEn.Update,
 };
@@ -46,6 +39,20 @@ export const requestChain: TFlowMiddleWareFn = async (ctx, next) => {
       options: {
         name: method,
         reason: `You are trying to ${operation} an unsupported chain.`,
+      },
+    });
+  }
+
+  if (accountManager.currentAccount?.chainId === Number(chainId)) {
+    return;
+  }
+
+  if (!accountManager.accounts.find((account) => account.chainId === Number(chainId))) {
+    return await approvalService.request(ApprovalTypeEn.Alert, {
+      dApp,
+      options: {
+        name: method,
+        reason: `You are trying to switch to a chain that you don't have any account on.`,
       },
     });
   }

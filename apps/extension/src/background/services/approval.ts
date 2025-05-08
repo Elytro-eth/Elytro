@@ -38,12 +38,9 @@ class ApprovalService {
 
       RuntimeMessage.sendMessage(EVENT_TYPES.APPROVAL.REQUESTED);
 
-      eventBus.once(
-        `${EVENT_TYPES.HISTORY.TX_HASH_RECEIVED}_${id}`,
-        ({ txHash }: { txHash: string }) => {
-          this.resolveApproval(id, txHash);
-        }
-      );
+      eventBus.once(`${EVENT_TYPES.HISTORY.TX_HASH_RECEIVED}_${id}`, ({ txHash }: { txHash: string }) => {
+        this.resolveApproval(id, txHash);
+      });
     });
   }
 

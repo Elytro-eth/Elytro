@@ -7,10 +7,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { toHex } from 'viem';
 import { SIDE_PANEL_ROUTE_PATHS } from '../routes';
 import { useApproval } from './approval-context';
-import {
-  HistoricalActivityTypeEn,
-  UserOperationStatusEn,
-} from '@/constants/operations';
+import { HistoricalActivityTypeEn, UserOperationStatusEn } from '@/constants/operations';
 import { formatErrorMsg } from '@/utils/format';
 import { RuntimeMessage } from '@/utils/message';
 import { EVENT_TYPES } from '@/constants/events';
@@ -38,14 +35,10 @@ type ITxContext = {
   // UserOp/Tx info
   userOp: Nullable<ElytroUserOperation>;
   calcResult: Nullable<TUserOperationPreFundResult>;
-  decodedDetail: Nullable<DecodeResult>;
+  decodedDetail: Nullable<DecodeResult[]>;
 
   // Actions
-  handleTxRequest: (
-    requestType: TxRequestTypeEn,
-    params?: Transaction[],
-    innerDecodedDetail?: TMyDecodeResult
-  ) => void;
+  handleTxRequest: (requestType: TxRequestTypeEn, params?: Transaction[], innerDecodedDetail?: TMyDecodeResult) => void;
   onConfirm: () => void;
   onCancel: () => void;
   onRetry: (noSponsor?: boolean) => void;
@@ -76,23 +69,20 @@ const TxContext = createContext<ITxContext>({
 
 export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
-  const { approval, reject } = useApproval();
+  const { approval, reject, resolve } = useApproval();
 
   const userOpRef = useRef<Nullable<ElytroUserOperation>>();
   const txTypeRef = useRef<Nullable<HistoricalActivityTypeEn>>(null);
   const txParamsRef = useRef<Nullable<Transaction[]>>(null);
 
-  const [requestType, setRequestType] =
-    useState<Nullable<TxRequestTypeEn>>(null);
+  const [requestType, setRequestType] = useState<Nullable<TxRequestTypeEn>>(null);
   const [isPacking, setIsPacking] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [errorMsg, setErrorMsg] = useState<Nullable<string>>(null);
 
-  const [decodedDetail, setDecodedDetail] =
-    useState<Nullable<DecodeResult>>(null);
+  const [decodedDetail, setDecodedDetail] = useState<Nullable<DecodeResult[]>>(null);
   const [hasSufficientBalance, setHasSufficientBalance] = useState(false);
-  const [calcResult, setCalcResult] =
-    useState<Nullable<TUserOperationPreFundResult>>(null);
+  const [calcResult, setCalcResult] = useState<Nullable<TUserOperationPreFundResult>>(null);
 
   const registerOpStatusListener = (opHash: string) => {
     const eventKey = `${EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED}_${opHash}`;
@@ -100,6 +90,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       if (message?.status === UserOperationStatusEn.confirmedSuccess) {
         toast({
           title: ConfirmSuccessMessageMap[requestType!],
+          variant: 'constructive',
         });
       } else {
         toast({
@@ -111,11 +102,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const handleTxRequest = async (
-    type: TxRequestTypeEn,
-    params?: Transaction[],
-    decodedDetail?: TMyDecodeResult
-  ) => {
+  const handleTxRequest = async (type: TxRequestTypeEn, params?: Transaction[], decodedDetail?: TMyDecodeResult) => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm);
     packUserOp(type, { params, decodedDetail });
   };
@@ -169,24 +156,26 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         currentUserOp = await generateDeployUserOp();
       } else {
         currentUserOp = await generateTxUserOp();
-        let decodeRes = (await wallet.decodeUserOp(currentUserOp))?.[0];
-        if (!decodeRes) {
+        let decodeRes = await wallet.decodeUserOp(currentUserOp);
+        if (!decodeRes || decodeRes.length === 0) {
           throw new Error('Failed to decode user operation');
         }
-        transferAmount = BigInt(decodeRes.value); // hex to bigint
+
+        transferAmount = decodeRes.reduce((acc: bigint, curr: DecodeResult) => acc + BigInt(curr.value), 0n);
 
         if (type === TxRequestTypeEn.SendTransaction && decodedDetail) {
-          decodeRes = { ...decodeRes, ...decodedDetail };
+          decodeRes = [
+            {
+              ...decodeRes[0],
+              ...decodedDetail,
+            },
+          ];
         }
 
         setDecodedDetail(decodeRes);
       }
 
-      const packedUserOp = await wallet.packUserOp(
-        currentUserOp,
-        toHex(transferAmount),
-        noSponsor
-      );
+      const packedUserOp = await wallet.packUserOp(currentUserOp, toHex(transferAmount), noSponsor);
 
       userOpRef.current = packedUserOp.userOp;
       setCalcResult(packedUserOp.calcResult);
@@ -222,10 +211,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
 
     let params;
     if (!isCancel) {
-      if (
-        prevType === TxRequestTypeEn.DeployWallet ||
-        prevType === TxRequestTypeEn.UpgradeContract
-      ) {
+      if (prevType === TxRequestTypeEn.DeployWallet || prevType === TxRequestTypeEn.UpgradeContract) {
         params = { activating: '1' };
       } else {
         params = { defaultTabs: 'activities' };
@@ -248,6 +234,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       toast({
         title: 'Failed to retry',
         description: 'Invalid request type or transaction parameters',
+        variant: 'destructive',
       });
       return;
     }
@@ -271,6 +258,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         decodedDetail: decodedDetail!,
         approvalId: approval?.id,
       });
+      resolve();
       handleBack();
     } catch (error) {
       const msg = formatErrorMsg(error);

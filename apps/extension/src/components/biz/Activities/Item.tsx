@@ -1,20 +1,11 @@
 import { useEffect } from 'react';
-import {
-  HistoricalActivityTypeEn,
-  UserOperationHistory,
-} from '@/constants/operations';
+import { HistoricalActivityTypeEn, UserOperationHistory } from '@/constants/operations';
 import { UserOperationStatusEn } from '@/constants/operations';
 import { useState } from 'react';
 import { EVENT_TYPES } from '@/constants/events';
 import RuntimeMessage from '@/utils/message/runtimeMessage';
 import { formatAddressToShort } from '@/utils/format';
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  ChevronsLeftRight,
-  Check,
-  ShieldQuestion,
-} from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, ChevronsLeftRight, Check, ShieldQuestion } from 'lucide-react';
 import { useChain } from '@/contexts/chain-context';
 import TokenBalanceItem from '../TokenBalanceItem';
 
@@ -83,19 +74,14 @@ export default function ActivityItem({
   };
 
   useEffect(() => {
-    RuntimeMessage.onMessage(
-      `${EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED}_${opHash}`,
-      updateStatusFromMessage
-    );
+    RuntimeMessage.onMessage(`${EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED}_${opHash}`, updateStatusFromMessage);
 
     return () => {
       RuntimeMessage.offMessage(updateStatusFromMessage);
     };
   }, [opHash]);
 
-  const { name, IconComponent, bg } = type
-    ? ActivityTypeMap[type]
-    : UnknownActivity;
+  const { name, IconComponent, bg } = type ? ActivityTypeMap[type] : UnknownActivity;
   const { label, style } = ActivityStatusMap[latestStatus];
 
   return (
@@ -107,13 +93,9 @@ export default function ActivityItem({
         <IconComponent className={`size-8 p-2 ${bg} rounded-full`} />
 
         <div className="flex flex-col">
-          <span className="font-bold text-base">
+          <span className="font-bold text-base flex items-end">
             {name}
-            <span
-              className={`elytro-text-tiny-body px-1 rounded-sm ml-sm text-white ${style} `}
-            >
-              {label}
-            </span>
+            <span className={`elytro-text-tiny-body px-2 py-1 rounded-[6px] ml-sm text-white ${style} `}>{label}</span>
           </span>
 
           <span className="elytro-text-tiny-body text-gray-600">
@@ -124,12 +106,7 @@ export default function ActivityItem({
         </div>
       </div>
 
-      <TokenBalanceItem
-        amount={Number(value)}
-        decimals={decimals}
-        symbol={symbol}
-        address={from as `0x${string}`}
-      />
+      <TokenBalanceItem amount={Number(value)} decimals={decimals} symbol={symbol} address={from as `0x${string}`} />
     </div>
   );
 }
