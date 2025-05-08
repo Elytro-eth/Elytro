@@ -165,7 +165,7 @@ export default function Start() {
 
     if (targetTime === 0) {
       status = RecoveryStatusEn.NonStarted;
-    } else if (targetTime === 1) {
+    } else if (targetTime === 1000) {
       status = RecoveryStatusEn.Completed;
     } else if (targetTime > Date.now()) {
       status = RecoveryStatusEn.Waiting;
