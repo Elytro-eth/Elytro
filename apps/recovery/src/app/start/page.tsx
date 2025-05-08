@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAccount, usePublicClient } from 'wagmi';
 import { sendTransaction } from 'wagmi/actions';
+import { ExternalLink } from 'lucide-react';
 
 enum RecoveryStatusEn {
   NonStarted = 0, // Not started yet
@@ -61,7 +62,11 @@ export default function Start() {
       title: 'Transaction Processing',
       description: 'Please wait while we process your transaction...',
       variant: 'default',
-      action: <Button onClick={() => openExplorer(txHash)}>Go to Explorer</Button>,
+      action: (
+        <a className="text-xs flex cursor-pointer" onClick={() => openExplorer(txHash)}>
+          View transaction <ExternalLink className="size-4 stroke-gray-450 ml-2" />
+        </a>
+      ),
     });
 
     const pollInterval = setInterval(async () => {
