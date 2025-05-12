@@ -18,18 +18,20 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 
-  scrollbar-width: none;
-  scrollbar-color: transparent transparent;
+  scrollbar-width: none !important;
+  scrollbar-color: transparent transparent !important;
 }
 
 ::-webkit-scrollbar {
-  display: none;
+  display: none !important;
 }
 
 @layer base {
   * {
     @apply border-border;
     @apply text-black-blue hover:text-dark-blue;
+    scrollbar-width: none !important;
+    scrollbar-color: transparent transparent !important;
   }
 
   @font-face {
