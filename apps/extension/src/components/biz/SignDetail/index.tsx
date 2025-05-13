@@ -6,6 +6,7 @@ import { SignTypeEn, getProcessingFromSignType } from './utils';
 import DomainDetail from './DomainDetail';
 import { WalletController } from '@/background/walletController';
 import { cn } from '@/utils/shadcn/utils';
+import { formatErrorMsg } from '@/utils/format';
 
 interface ISendTxProps {
   signData: TSignData;
@@ -23,23 +24,20 @@ export default function SignDetail({ onConfirm, onCancel, dapp, chainId, signDat
 
   const handleConfirm = async () => {
     try {
-      let signature;
-
-      if (signMethod && params[messageIdx]) {
-        signature = await (wallet[signMethod] as WalletController['signMessage'] | WalletController['signTypedData'])(
-          params[messageIdx]
-        );
-      }
+      const signature = await (
+        wallet[signMethod] as WalletController['signMessage'] | WalletController['signTypedData']
+      )(params[messageIdx]);
 
       if (signature) {
         onConfirm(signature);
       } else {
         throw new Error('Sign failed');
       }
-    } catch {
+    } catch (error) {
       toast({
         title: 'Sign failed',
-        description: 'Please try again',
+        description: formatErrorMsg(error),
+        variant: 'destructive',
       });
     }
   };

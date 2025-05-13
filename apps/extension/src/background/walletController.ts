@@ -144,7 +144,7 @@ class WalletController {
       }
 
       if (hash) {
-        return await this.signMessage(hash);
+        return formatObjectWithBigInt(await this.signMessage(hash));
       }
 
       throw new Error('Elytro: Cannot generate hash for typed data');

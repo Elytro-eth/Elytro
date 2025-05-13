@@ -1,20 +1,13 @@
-import {
-  approvalService,
-  ApprovalTypeEn,
-} from '@/background/services/approval';
+import { approvalService, ApprovalTypeEn } from '@/background/services/approval';
 import connectionManager from '@/background/services/connection';
 import type { TFlowMiddleWareFn } from '@/utils/asyncTaskFlow';
 import { ethErrors } from 'eth-rpc-errors';
 
-const CONNECT_METHODS: ProviderMethodType[] = ['eth_requestAccounts'];
+const CONNECT_METHODS: ProviderMethodType[] = ['eth_requestAccounts', 'eth_accounts'];
 
-const CONNECT_METHODS_WITH_PERMISSIONS: ProviderMethodType[] = [
-  'wallet_requestPermissions',
-];
+const CONNECT_METHODS_WITH_PERMISSIONS: ProviderMethodType[] = ['wallet_requestPermissions'];
 
-const GET_CONNECTION_INFO_METHODS: ProviderMethodType[] = [
-  'wallet_getPermissions',
-];
+const GET_CONNECTION_INFO_METHODS: ProviderMethodType[] = ['wallet_getPermissions'];
 
 const DISCONNECT_METHODS: ProviderMethodType[] = ['wallet_revokePermissions'];
 
@@ -31,28 +24,18 @@ export const requestConnect: TFlowMiddleWareFn = async (ctx, next) => {
     return connectionManager.getPermissions(dApp.origin);
   }
 
-  if (
-    ctx.request.needConnection &&
-    connectionManager.isConnected(dApp.origin)
-  ) {
+  if (ctx.request.needConnection && connectionManager.isConnected(dApp.origin)) {
     return next();
   }
 
   // if the method is to connect, request connection
-  if (
-    CONNECT_METHODS.includes(method) ||
-    CONNECT_METHODS_WITH_PERMISSIONS.includes(method)
-  ) {
+  if (CONNECT_METHODS.includes(method) || CONNECT_METHODS_WITH_PERMISSIONS.includes(method)) {
     if (connectingSites.has(dApp.origin)) {
-      throw ethErrors.rpc.resourceNotFound(
-        'Elytro:Multiple connect requests are not allowed. Please wait.'
-      );
+      throw ethErrors.rpc.resourceNotFound('Elytro:Multiple connect requests are not allowed. Please wait.');
     }
 
     if (connectionManager.isConnected(dApp.origin)) {
-      return CONNECT_METHODS_WITH_PERMISSIONS.includes(method)
-        ? connectionManager.getPermissions(dApp.origin)
-        : next();
+      return CONNECT_METHODS_WITH_PERMISSIONS.includes(method) ? connectionManager.getPermissions(dApp.origin) : next();
     }
 
     try {

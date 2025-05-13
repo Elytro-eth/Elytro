@@ -48,9 +48,7 @@ class BuiltinProvider extends SafeEventEmitter {
         return await walletClient.getBlockNumber();
       case 'eth_accounts':
       case 'eth_requestAccounts':
-        return accountManager.currentAccount?.address
-          ? [accountManager.currentAccount?.address]
-          : [];
+        return accountManager.currentAccount?.address ? [accountManager.currentAccount?.address] : [];
       case 'eth_getBlockByNumber':
         return await walletClient.getBlockByNumber({
           blockTag: (params as [BlockTag])?.[0] ?? 'latest',
@@ -61,14 +59,10 @@ class BuiltinProvider extends SafeEventEmitter {
       case 'eth_getCode':
         this._validateArrayParams(params);
 
-        return await walletClient.getCode(
-          ...(params as [Address, BlockTag | bigint])
-        );
+        return await walletClient.getCode(...(params as [Address, BlockTag | bigint]));
       case 'eth_estimateGas':
         this._validateArrayParams(params);
-        return await walletClient.estimateGas(
-          ...(params as [SafeAny, BlockTag | bigint])
-        );
+        return await walletClient.estimateGas(...(params as [SafeAny, BlockTag | bigint]));
       // case 'eth_getTransactionByHash':
       //   this._validateArrayParams(params);
       //   // return await walletClient.getTransactionReceipt((params as [Hex])[0]);
