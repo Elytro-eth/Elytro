@@ -147,10 +147,10 @@ function PageContent() {
     };
     return (
       <div className="h-full flex flex-col justify-center items-center gap-y-xl text-center">
-        <img src={WalletImg} alt="Wallet" className="size-36" />
+        <img src={WalletImg} alt="Wallet" className="size-36 mt-10" />
         <div className="flex flex-col gap-y-sm">
           <h1 className="elytro-text-title mb-sm">
-            Recovery {recoveryRecord?.status === TRecoveryStatus.RECOVERY_COMPLETED ? 'completed' : 'canceled'}
+            Recovery {recoveryRecord?.status === TRecoveryStatus.RECOVERY_COMPLETED ? 'completed' : 'cancelled'}
           </h1>
           <Button onClick={handleNext}>Enter wallet</Button>
         </div>
@@ -182,8 +182,8 @@ function PageContent() {
       <h1 className="elytro-text-bold-body ">Wallet recovery</h1>
 
       <HelperText
-        title={`${recoveryRecord?.guardianInfo?.threshold} confirmations required`}
-        description="This minimum requirement was set up by you"
+        title={`${recoveryRecord?.guardianInfo?.threshold} signatures required`}
+        description="This requirement was set up by you"
         className="bg-light-green text-gray-750"
       />
 
@@ -197,7 +197,7 @@ function PageContent() {
             rightContent={
               // TODO: use confirm status to decide whether to show the copy button
               contact.confirmed ? (
-                <span className="elytro-text-tiny-body bg-light-green px-xs py-3xs rounded-xs">Confirmed</span>
+                <span className="elytro-text-tiny-body bg-light-green px-xs py-3xs rounded-xs">Signed</span>
               ) : (
                 <Button variant="secondary" size="tiny" className="group" onClick={() => handleShareContact(contact)}>
                   <Copy className="size-md mr-xs group-hover:stroke-white" />

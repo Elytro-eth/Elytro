@@ -72,7 +72,7 @@ module.exports = {
         'dark-green': '#97B59C',
         green: '#209D7F',
         'light-green': '#D4F4C1',
-        'dark-red': '#61203F',
+        'dark-red': '#BE4862',
         red: '#FF7066',
         'light-red': '#FCE9EA',
         purple: '#ECE6F7',
