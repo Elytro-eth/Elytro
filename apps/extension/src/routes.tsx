@@ -2,18 +2,18 @@ import { TRoute } from '@/types/route';
 import Dashboard from './pages/Dashboard';
 import Receive from './pages/Receive';
 import Settings from './pages/Settings';
-import Connect from './pages/Connect';
-import SendTx from './pages/SendTx';
-import Alert from './pages/Alert';
-import Sign from './pages/Sign';
-import TxConfirm from './pages/TxConfirm';
+// import Connect from './pages/Connect';
+// import SendTx from './pages/SendTx';
+// import Alert from './pages/Alert';
+// import Sign from './pages/Sign';
+// import TxConfirm from './pages/TxConfirm';
 import Create from './pages/CreatePasscode';
 import CreateAccount from './pages/CreateAccount';
 import YouAreIn from './pages/YouAreIn';
 import CreateNewAddress from './pages/CreateNewAddress';
 import LocalProfile from './pages/LocalProfile';
 import Connection from './pages/Connection';
-import ChainChange from './pages/ChainChange';
+// import ChainChange from './pages/ChainChange';
 import Launch from './pages/Launch';
 import RecoverySetting from './pages/RecoverySettings/index';
 import Transfer from './pages/Transfer';
@@ -97,26 +97,30 @@ export const routes: TRoute[] = [
     path: SIDE_PANEL_ROUTE_PATHS.Receive,
     component: Receive,
   },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.Connect,
-    component: Connect,
-  },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.SendTx,
-    component: SendTx,
-  },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.Alert,
-    component: Alert,
-  },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.Sign,
-    component: Sign,
-  },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.TxConfirm,
-    component: TxConfirm,
-  },
+  // {
+  //   path: SIDE_PANEL_ROUTE_PATHS.Connect,
+  //   component: Connect,
+  // },
+  // {
+  //   path: SIDE_PANEL_ROUTE_PATHS.SendTx,
+  //   component: SendTx,
+  // },
+  // {
+  //   path: SIDE_PANEL_ROUTE_PATHS.Alert,
+  //   component: Alert,
+  // },
+  // {
+  //   path: SIDE_PANEL_ROUTE_PATHS.Sign,
+  //   component: Sign,
+  // },
+  // {
+  //   path: SIDE_PANEL_ROUTE_PATHS.TxConfirm,
+  //   component: TxConfirm,
+  // },
+  // {
+  //   path: SIDE_PANEL_ROUTE_PATHS.ChainChange,
+  //   component: ChainChange,
+  // },
   {
     path: SIDE_PANEL_ROUTE_PATHS.CreatePasscode,
     component: Create,
@@ -145,10 +149,7 @@ export const routes: TRoute[] = [
     path: SIDE_PANEL_ROUTE_PATHS.Connection,
     component: Connection,
   },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.ChainChange,
-    component: ChainChange,
-  },
+
   {
     path: SIDE_PANEL_ROUTE_PATHS.Transfer,
     component: Transfer,

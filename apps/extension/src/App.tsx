@@ -12,6 +12,7 @@ import { client } from '@/requests';
 import { TxProvider } from '@/contexts/tx-context';
 import { AlerterProvider } from '@/components/ui/alerter';
 import { initializeSecurity } from '@/utils/security';
+import ApprovalDialog from './components/biz/ApprovalDialog';
 
 initializeSecurity({ isUI: true });
 
@@ -26,6 +27,7 @@ const main = () => {
               <TooltipProvider>
                 <AlerterProvider>
                   <HashRouter routes={routes} />
+                  <ApprovalDialog />
                 </AlerterProvider>
                 {/* <UserOpConfirmDialog /> */}
               </TooltipProvider>

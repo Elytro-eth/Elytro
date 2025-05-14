@@ -70,10 +70,10 @@ export const ApprovalProvider = ({ children }: { children: React.ReactNode }) =>
             },
           } as TApprovalData,
         });
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Alert);
+        // navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Alert);
         return;
       }
-      navigateTo('side-panel', approval.type);
+      // navigateTo('side-panel', approval.type);
       return;
     }
   };
