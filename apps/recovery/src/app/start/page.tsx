@@ -59,12 +59,12 @@ export default function Start() {
   const trackTransaction = (txHash: `0x${string}`, onSuccess?: () => void, onFailed?: () => void) => {
     setTxStatus('pending');
     toast({
-      title: 'Transaction Processing',
-      description: 'Please wait while we process your transaction...',
+      title: 'Transaction processing',
+      //description: 'Please wait while we process your transaction...',
       variant: 'default',
       action: (
-        <a className="text-xs flex cursor-pointer" onClick={() => openExplorer(txHash)}>
-          View transaction <ExternalLink className="size-4 stroke-gray-450 ml-2" />
+        <a className="mr-3 text-sm text-light-green flex cursor-pointer items-center" onClick={() => openExplorer(txHash)}>
+          View <ExternalLink className="size-4 stroke-light-green ml-1" />
         </a>
       ),
     });
@@ -86,16 +86,16 @@ export default function Start() {
           if (receipt.status === 'success') {
             setTxStatus('success');
             toast({
-              title: 'Recovery Completed',
-              description: 'Your wallet recovery was successful!',
+              title: 'Recovery completed',
+              //description: 'Your wallet recovery was successful!',
               variant: 'default',
             });
             onSuccess?.();
           } else {
             setTxStatus('failed');
             toast({
-              title: 'Transaction Failed',
-              description: 'Please try again or contact support.',
+              title: 'Transaction failed, try again or contact us',
+              //description: 'Please try again or contact support.',
               variant: 'destructive',
             });
             onFailed?.();

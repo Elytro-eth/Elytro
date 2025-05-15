@@ -17,7 +17,7 @@ export default function ContentWrapper({
   // currentStep,
 }: IProps) {
   return (
-    <section className="mt-[15%] bg-white rounded-lg min-w-fit min-h-fit px-4xl py-3xl inline-block">
+    <section className="max-w-lg mt-[15%] bg-white rounded-lg min-h-fit px-4xl py-3xl inline-block">
       {title && (
         <h1 className="text-title text-center mb-xl">
           {/* {allSteps && currentStep && (

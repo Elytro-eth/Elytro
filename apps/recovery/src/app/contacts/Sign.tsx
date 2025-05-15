@@ -25,8 +25,8 @@ export default function Sign() {
     try {
       if (chainId !== Number(recoveryRecord?.chainID)) {
         toast({
-          title: 'Switch to the correct chain',
-          description: 'Please approve the chain switch in your wallet',
+          title: 'Switch to the correct network',
+          //description: 'Please approve the network switch in your wallet',
         });
         switchChain({ chainId: Number(recoveryRecord?.chainID) });
       }
@@ -35,8 +35,8 @@ export default function Sign() {
 
       if (nonce === null) {
         toast({
-          title: 'Failed to Get Signature Data',
-          description: 'Please check your wallet network connection or try switching RPC nodes',
+          title: 'Failed to get signature data, check network or RPC',
+          //description: 'Please check your wallet network connection or try switching RPC nodes',
           variant: 'destructive',
         });
         return;
@@ -63,15 +63,16 @@ export default function Sign() {
       }
 
       toast({
-        title: 'Success',
-        description: 'Signature sent successfully',
+        title: 'Signed successlly',
+        //description: 'Signature sent successfully',
       });
 
       backToHome();
     } catch (error) {
       toast({
-        title: 'Failed to sign',
-        description: (error as SafeAny)?.details || 'Please try again',
+        title: 'Signing failed',
+        //description: (error as SafeAny)?.details || 'Please try again',
+        variant: 'destructive',
       });
     }
   };

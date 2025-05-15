@@ -65,7 +65,7 @@ export default function NetworkSelection({
   return (
     <div>
       <div className="space-y-4">
-        <h1 className="elytro-text-bold-body">Select a network</h1>
+        <h1 className="elytro-text-bold-body">Select network</h1>
         <div className="flex flex-col space-y-4 pt-4">
           {renderChains(mainnetChains, 'Mainnet')}
           {renderChains(testnetChains, 'Testnet')}

@@ -34,7 +34,7 @@ export default function ContactDetail({
 
         <HelperText
           title="Name of contact is saved locally"
-          description="They will not be deployed on chain for privacy reasons."
+          description="They will not be deployed on chain for privacy."
         />
 
         {/* If Wallet Address: input address and name(optional) */}

@@ -99,10 +99,10 @@ export default function ContactList({
           )}
         </div>
 
-        <HelperText
+        {/* <HelperText
           title="How does it work?"
           description="Add 2–3 recovery social contacts via email or wallet address, so they can help you regain access later."
-        />
+        /> */}
 
         {contacts?.length ? (
           <div className="flex flex-col gap-y-sm">

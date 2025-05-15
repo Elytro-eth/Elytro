@@ -120,12 +120,12 @@ export default function ConnectControl() {
     try {
       await switchChainAsync({ chainId: Number(recoveryRecord.chainID) });
       toast({
-        title: 'Switched chain successfully',
+        title: 'Switched network successfully',
       });
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Failed to switch chain',
+        title: 'Failed to switch network',
         variant: 'destructive',
       });
     }
@@ -135,23 +135,28 @@ export default function ConnectControl() {
     <Dialog open={showDialog} onOpenChange={onDialogOpenChange}>
       <DialogTrigger asChild>
         {isConnected ? (
-          <div className="flex items-center gap-2 py-sm px-md rounded-sm bg-white">
+          <div className="flex items-center gap-2">
             {isWrongChain ? (
-              <span className="cursor-pointer text-red underline" onClick={switchChain}>
+              <Button
+                className="rounded-full font-bold shadow-none duration-0 bg-transparent hover:bg-light-blue hover:text-dark-blue text-light-blue bg-dark-blue hover:border-light-blue"
+                onClick={switchChain}
+              >
                 Switch to {CHAIN_ID_TO_NAME_MAP[Number(recoveryRecord?.chainID)]}
-              </span>
+              </Button>
             ) : null}
-            <AddressWithChain
-              address={address}
-              chainID={chain?.id}
-              className={cn('!p-0', isWrongChain && '!text-red !border-red')}
-            />
-            <div className="h-4 w-[1px] bg-gray-300" />
-            <X onClick={handleDisconnect} color="gray" className="cursor-pointer hover:shadow-md" />
+            <div className="flex items-center gap-2 py-sm px-md rounded-sm bg-white">
+              <AddressWithChain
+                address={address}
+                chainID={chain?.id}
+                className={cn('!p-0', isWrongChain && '!text-red !border-red')}
+              />
+              <div className="h-4 w-[1px] bg-gray-300" />
+              <X onClick={handleDisconnect} color="gray" className="cursor-pointer hover:stroke-black" />
+            </div>
           </div>
         ) : (
           <Button
-            className="rounded-full font-normal shadow-none duration-0 bg-transparent hover:bg-light-blue text-dark-blue border border-gray-450 hover:border-light-blue"
+            className="rounded-full font-bold shadow-none duration-0 bg-transparent hover:bg-light-blue hover:text-dark-blue text-light-blue bg-dark-blue hover:border-light-blue"
             onClick={() => setShowDialog(true)}
           >
             Connect Wallet

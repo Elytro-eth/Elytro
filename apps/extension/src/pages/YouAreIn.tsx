@@ -14,7 +14,7 @@ const YouAreIn: React.FC = () => {
     ? {
         title: 'You are ready to recover',
         description: 'You will need the passcode to see recovery status',
-        action: 'Start recover',
+        action: 'Start recovery',
         actionPath: SIDE_PANEL_ROUTE_PATHS.AccountRecovery,
       }
     : {

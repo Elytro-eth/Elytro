@@ -43,22 +43,22 @@ export default function AccountRecovery() {
       >
         <div className="flex flex-col items-center space-y-2xl mt-10">
           <img src={WalletImg} alt="Wallet" className="size-36" />
-          <h1 className="elytro-text-title">How recovery works</h1>
+          <h1 className="elytro-text-title">How to recover</h1>
           <div>
             <TipItem
               title="1. Enter your wallet details"
-              description="You need  the network & address of your wallet"
+              description="You need the network & address of your wallet."
               Icon={Search}
             />
             <TipItem
-              title="2. Ask your contacts to recover"
-              description="You need to collect enough recovery confirmations."
+              title="2. Ask your contacts to sign"
+              description="You need to collect enough signatures."
               Icon={Shield}
             />
-            <TipItem title="3. Wait 48 hours until recovered " description="This is for extra security." Icon={Clock} />
+            <TipItem title="3. Wait 48 hrs until recovered " description="This is for extra security." Icon={Clock} />
           </div>
           <Button className="w-full" onClick={() => setChecked(true)}>
-            Start recover
+            Start recovery
           </Button>
         </div>
       </SecondaryPageWrapper>
