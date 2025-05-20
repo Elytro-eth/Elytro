@@ -15,6 +15,20 @@ enum ShowType {
   Detail = 'detail',
 }
 
+// 本地联系人name存储
+function getLocalContacts(address: string): TRecoveryContact[] {
+  try {
+    const raw = localStorage.getItem(`recovery_contacts_${address}`);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+function setLocalContacts(address: string, contacts: TRecoveryContact[]) {
+  localStorage.setItem(`recovery_contacts_${address}`, JSON.stringify(contacts));
+}
+
 export default function RecoverySettings() {
   const { wallet } = useWallet();
   const {
@@ -29,11 +43,15 @@ export default function RecoverySettings() {
   const getRecoveryContacts = async () => {
     try {
       setLoading(true);
-
       const { guardians = [], threshold = 0 } = (await wallet.queryRecoveryContactsByAddress(address)) || {};
-
+      const localContacts = getLocalContacts(address);
       setShowType(guardians.length <= 0 ? ShowType.Guide : ShowType.List);
-      setContacts(guardians.map((c) => ({ address: c })));
+      setContacts(
+        guardians.map((c) => {
+          const local = localContacts.find((lc) => lc.address === c);
+          return { address: c, name: local?.name || '' };
+        })
+      );
       setThreshold(threshold.toString());
     } catch (error) {
       console.error(error);
@@ -49,7 +67,6 @@ export default function RecoverySettings() {
   const handleAddContact = () => {
     setShowType(ShowType.Detail);
     setSelectedContact(null);
-    // setThreshold(0);
   };
 
   const handleEditContact = (contact: TRecoveryContact) => {
@@ -58,10 +75,10 @@ export default function RecoverySettings() {
   };
 
   const handleDeleteContact = (contact: TRecoveryContact) => {
-    // TODO: delete contact
     const newContacts = contacts.filter((c) => c.address !== contact.address);
     setContacts(newContacts);
     setThreshold('0');
+    setLocalContacts(address, newContacts);
   };
 
   const onClickGuide = () => {
@@ -69,11 +86,9 @@ export default function RecoverySettings() {
   };
 
   const handleSaveContact = (contact: TRecoveryContact) => {
-    // Check if the address already exists in other contacts (excluding the current edited contact)
     const isAddressExists = contacts.some(
       (c) => c.address === contact.address && (!selectedContact || c.address !== selectedContact.address)
     );
-
     if (isAddressExists) {
       toast({
         title: 'Address already exists',
@@ -82,15 +97,15 @@ export default function RecoverySettings() {
       });
       return;
     }
-
+    let newContacts: TRecoveryContact[];
     if (selectedContact) {
-      // Editing existing contact
-      const newContacts = contacts.map((c) => (c.address === selectedContact.address ? contact : c));
+      newContacts = contacts.map((c) => (c.address === selectedContact.address ? contact : c));
       setContacts(newContacts);
     } else {
-      // Adding new contact
-      setContacts([...contacts, contact]);
+      newContacts = [...contacts, contact];
+      setContacts(newContacts);
     }
+    setLocalContacts(address, newContacts);
     setSelectedContact(null);
     setShowType(ShowType.List);
   };

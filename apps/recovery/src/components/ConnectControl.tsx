@@ -13,6 +13,8 @@ import WrappedImage from './WrappedImage';
 import { CONNECTOR_ICON_MAP } from '@/wagmi';
 import { cn } from '@/lib/utils';
 import { CHAIN_ID_TO_NAME_MAP } from '@/constants/chains';
+import { useCurrentChain } from '@/hooks/use-current-chain';
+
 const ConnectorItem = ({
   connector,
   handleConnect,
@@ -39,7 +41,8 @@ const ConnectorItem = ({
 
 export default function ConnectControl() {
   const [showDialog, setShowDialog] = useState(false);
-  const { address, isConnected, chain } = useAccount();
+  const { address, isConnected } = useAccount();
+  const { chainId, isWrongChain } = useCurrentChain();
   const { connectors, connect } = useConnect();
   const { switchChainAsync } = useSwitchChain();
   const { recoveryRecord } = useRecoveryRecord();
@@ -111,8 +114,6 @@ export default function ConnectControl() {
   //   // }
   // }, [address]);
 
-  const isWrongChain = !chain || Number(chain.id) !== Number(recoveryRecord?.chainID);
-
   const switchChain = async () => {
     if (!recoveryRecord?.chainID) {
       return;
@@ -143,7 +144,7 @@ export default function ConnectControl() {
             ) : null}
             <AddressWithChain
               address={address}
-              chainID={chain?.id}
+              chainID={chainId}
               className={cn('!p-0', isWrongChain && '!text-red !border-red')}
             />
             <div className="h-4 w-[1px] bg-gray-300" />

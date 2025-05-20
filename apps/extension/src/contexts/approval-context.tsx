@@ -54,7 +54,7 @@ export const ApprovalProvider = ({ children }: { children: React.ReactNode }) =>
         if (pathname === SIDE_PANEL_ROUTE_PATHS.TxConfirm) {
           return;
         }
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
       }
     } else if (approval.type !== pathname && !isProcessingApproval.current) {
       const currentAccount = await wallet.getCurrentAccount();

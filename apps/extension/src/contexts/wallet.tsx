@@ -59,8 +59,12 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const res = await walletControllerProxy.getWalletStatus();
 
-      // If the status is the same and the status is not in the list of statuses, do not navigate
-      if (res === status && ![WalletStatusEn.HasOwnerButLocked, WalletStatusEn.HasAccountAndUnlocked].includes(res)) {
+      // We should NOT navigate if user already in the home/dashboard page and the status is the same and the status is not in the list of statuses
+      if (
+        ![SIDE_PANEL_ROUTE_PATHS.Home, SIDE_PANEL_ROUTE_PATHS.Dashboard].includes(pathname as SidePanelRoutePath) &&
+        res === status &&
+        ![WalletStatusEn.HasOwnerButLocked, WalletStatusEn.HasAccountAndUnlocked].includes(res)
+      ) {
         return;
       }
 

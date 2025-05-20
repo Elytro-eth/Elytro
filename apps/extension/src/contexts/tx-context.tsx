@@ -3,7 +3,7 @@ import { toast } from '@/hooks/use-toast';
 import { navigateTo } from '@/utils/navigation';
 import { DecodeResult } from '@soulwallet/decoder';
 import type { Transaction } from '@soulwallet/sdk';
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { toHex } from 'viem';
 import { SIDE_PANEL_ROUTE_PATHS } from '../routes';
 import { useApproval } from './approval-context';
@@ -84,23 +84,32 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const [hasSufficientBalance, setHasSufficientBalance] = useState(false);
   const [calcResult, setCalcResult] = useState<Nullable<TUserOperationPreFundResult>>(null);
 
-  const registerOpStatusListener = (opHash: string) => {
-    const eventKey = `${EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED}_${opHash}`;
-    RuntimeMessage.onMessage(eventKey, (message) => {
-      if (message?.status === UserOperationStatusEn.confirmedSuccess) {
-        toast({
-          title: ConfirmSuccessMessageMap[requestType!],
-          variant: 'constructive',
-        });
-      } else {
-        toast({
-          title: 'Transaction failed',
-          description: 'Please try again',
-          variant: 'destructive',
-        });
-      }
-    });
-  };
+  const registerOpStatusListener = useCallback(
+    (opHash: string) => {
+      const eventKey = `${EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED}_${opHash}`;
+      const listener = (message: SafeAny) => {
+        if (message?.status === UserOperationStatusEn.confirmedSuccess) {
+          toast({
+            title: ConfirmSuccessMessageMap[requestType!],
+            variant: 'constructive',
+          });
+        } else {
+          toast({
+            title: 'Transaction failed',
+            description: 'Please try again',
+            variant: 'destructive',
+          });
+        }
+      };
+
+      RuntimeMessage.onMessage(eventKey, listener);
+
+      return () => {
+        RuntimeMessage.offMessage(listener);
+      };
+    },
+    [requestType]
+  );
 
   const handleTxRequest = async (type: TxRequestTypeEn, params?: Transaction[], decodedDetail?: TMyDecodeResult) => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm);

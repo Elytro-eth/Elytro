@@ -225,23 +225,32 @@ export default function Start() {
   useEffect(() => {
     if (status === RecoveryStatusEn.Waiting) {
       const targetTime = recoveryRecord!.validTime * 1000;
+      let animationFrameId: number;
 
-      const interval = setInterval(() => {
-        const lastTime = targetTime - Date.now();
+      const updateTimer = () => {
+        const currentTime = Date.now();
+        const lastTime = targetTime - currentTime;
+
         if (lastTime > 0) {
-          setLeftTime({
-            hours: Math.floor(lastTime / (1000 * 60 * 60)),
-            minutes: Math.floor((lastTime % (1000 * 60 * 60)) / (1000 * 60)),
-            seconds: Math.floor((lastTime % (1000 * 60)) / 1000),
-          });
+          const hours = Math.floor(lastTime / (1000 * 60 * 60));
+          const minutes = Math.floor((lastTime % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((lastTime % (1000 * 60)) / 1000);
+
+          setLeftTime({ hours, minutes, seconds });
+          animationFrameId = requestAnimationFrame(updateTimer);
         } else {
-          clearInterval(interval);
           setLeftTime({ hours: 0, minutes: 0, seconds: 0 });
           getRecoveryRecord();
         }
-      }, 1000);
+      };
 
-      return () => clearInterval(interval);
+      animationFrameId = requestAnimationFrame(updateTimer);
+
+      return () => {
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+        }
+      };
     }
   }, [status, recoveryRecord]);
 

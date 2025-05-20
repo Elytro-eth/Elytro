@@ -5,12 +5,12 @@ import { useRecoveryRecord } from '@/contexts';
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { getSocialRecoveryTypedData, getWalletNonce } from '@/requests/contract';
-import { signTypedData } from 'wagmi/actions';
 import { Address } from 'viem';
 import { getConfig } from '@/wagmi';
 import { mutate } from '@/requests/client';
 import { MUTATION_ADD_CONTACT_SIGNATURE } from '@/requests/gqls';
 import { toast } from '@/hooks/use-toast';
+import { signTypedData } from 'wagmi/actions';
 
 export default function Sign() {
   const { address, isConnected, connector, chainId } = useAccount();
@@ -23,15 +23,35 @@ export default function Sign() {
 
   const sendSignatureRequest = async () => {
     try {
-      if (chainId !== Number(recoveryRecord?.chainID)) {
+      if (!recoveryRecord?.address || !recoveryRecord?.chainID || !recoveryRecord?.newOwners) {
+        toast({
+          title: 'Invalid Recovery Record',
+          description: 'Missing required recovery information',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (chainId !== Number(recoveryRecord.chainID)) {
         toast({
           title: 'Switch to the correct chain',
           description: 'Please approve the chain switch in your wallet',
         });
-        switchChain({ chainId: Number(recoveryRecord?.chainID) });
+        try {
+          switchChain({ chainId: Number(recoveryRecord.chainID) });
+          // Add a small delay to ensure chain switch is complete
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        } catch {
+          toast({
+            title: 'Failed to switch chain',
+            description: 'Please manually switch to the correct network in your wallet',
+            variant: 'destructive',
+          });
+          return;
+        }
       }
 
-      const nonce = await getWalletNonce(recoveryRecord?.address, Number(recoveryRecord?.chainID));
+      const nonce = await getWalletNonce(recoveryRecord.address, Number(recoveryRecord.chainID));
 
       if (nonce === null) {
         toast({
@@ -42,25 +62,28 @@ export default function Sign() {
         return;
       }
 
-      const signature = await signTypedData(getConfig(), {
-        ...(await getSocialRecoveryTypedData(
-          recoveryRecord?.address as Address,
-          Number(recoveryRecord?.chainID),
-          nonce,
-          recoveryRecord?.newOwners as []
-        )),
-        connector,
-      } as SafeAny);
+      const typedData = await getSocialRecoveryTypedData(
+        recoveryRecord.address as Address,
+        Number(recoveryRecord.chainID),
+        nonce,
+        recoveryRecord.newOwners as Address[]
+      );
 
-      if (signature) {
-        await mutate(MUTATION_ADD_CONTACT_SIGNATURE, {
-          input: {
-            recoveryRecordID: recoveryRecord?.recoveryRecordID,
-            guardian: address?.toLowerCase(),
-            guardianSignature: signature,
-          },
-        });
-      }
+      const signature = await signTypedData(getConfig(), {
+        domain: typedData.domain,
+        types: typedData.types,
+        primaryType: 'SocialRecovery' as const,
+        message: typedData.message,
+        connector,
+      });
+
+      await mutate(MUTATION_ADD_CONTACT_SIGNATURE, {
+        input: {
+          recoveryRecordID: recoveryRecord.recoveryRecordID,
+          guardian: address?.toLowerCase(),
+          guardianSignature: signature,
+        },
+      });
 
       toast({
         title: 'Success',
@@ -69,9 +92,11 @@ export default function Sign() {
 
       backToHome();
     } catch (error) {
+      console.error('Signature error:', error);
       toast({
         title: 'Failed to sign',
-        description: (error as SafeAny)?.details || 'Please try again',
+        description: error instanceof Error ? error.message : 'Please try again',
+        variant: 'destructive',
       });
     }
   };

@@ -1,7 +1,4 @@
-import {
-  UserOperationHistory,
-  UserOperationStatusEn,
-} from '@/constants/operations';
+import { UserOperationHistory, UserOperationStatusEn } from '@/constants/operations';
 import { elytroSDK } from '../sdk';
 import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
@@ -68,23 +65,15 @@ class HistoryItem {
 
   private _broadcastTxHashReceived(txHash?: string) {
     if (this._data.approvalId && txHash) {
-      eventBus.emit(
-        `${EVENT_TYPES.HISTORY.TX_HASH_RECEIVED}_${this._data.approvalId}`,
-        {
-          txHash,
-        }
-      );
+      eventBus.emit(`${EVENT_TYPES.HISTORY.TX_HASH_RECEIVED}_${this._data.approvalId}`, {
+        txHash,
+      });
     }
   }
 
   private _broadcastStatusChange() {
-    eventBus.emit(
-      EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED,
-      this._data.opHash,
-      this.status
-    );
+    eventBus.emit(EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED, this._data.opHash, this.status);
   }
-
   private _initWatcher() {
     if (!this._watcher && this._status === UserOperationStatusEn.pending) {
       this._watcher = setInterval(() => this.fetchStatus(), FETCH_INTERVAL);
@@ -120,9 +109,7 @@ class HistoryItem {
 
       // status is 0x1 means has confirm result
       if (res && (res as SafeAny)?.status === '0x1') {
-        newStatus = res.success
-          ? UserOperationStatusEn.confirmedSuccess
-          : UserOperationStatusEn.confirmedFailed;
+        newStatus = res.success ? UserOperationStatusEn.confirmedSuccess : UserOperationStatusEn.confirmedFailed;
       }
       // Reset retry state on success
       this._retryCount = 0;
