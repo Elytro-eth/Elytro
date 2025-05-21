@@ -59,12 +59,15 @@ export default function Start() {
   const trackTransaction = (txHash: `0x${string}`, onSuccess?: () => void, onFailed?: () => void) => {
     setTxStatus('pending');
     toast({
-      title: 'Transaction Processing',
-      description: 'Please wait while we process your transaction...',
+      title: 'Transaction processing',
+      //description: 'Please wait while we process your transaction...',
       variant: 'default',
       action: (
-        <a className="text-xs flex cursor-pointer" onClick={() => openExplorer(txHash)}>
-          View transaction <ExternalLink className="size-4 stroke-gray-450 ml-2" />
+        <a
+          className="mr-3 text-sm text-light-green flex cursor-pointer items-center"
+          onClick={() => openExplorer(txHash)}
+        >
+          View <ExternalLink className="size-4 stroke-light-green ml-1" />
         </a>
       ),
     });
@@ -86,16 +89,16 @@ export default function Start() {
           if (receipt.status === 'success') {
             setTxStatus('success');
             toast({
-              title: 'Recovery Completed',
-              description: 'Your wallet recovery was successful!',
+              title: 'Recovery completed',
+              //description: 'Your wallet recovery was successful!',
               variant: 'default',
             });
             onSuccess?.();
           } else {
             setTxStatus('failed');
             toast({
-              title: 'Transaction Failed',
-              description: 'Please try again or contact support.',
+              title: 'Transaction failed, try again or contact us',
+              //description: 'Please try again or contact support.',
               variant: 'destructive',
             });
             onFailed?.();
@@ -225,23 +228,32 @@ export default function Start() {
   useEffect(() => {
     if (status === RecoveryStatusEn.Waiting) {
       const targetTime = recoveryRecord!.validTime * 1000;
+      let animationFrameId: number;
 
-      const interval = setInterval(() => {
-        const lastTime = targetTime - Date.now();
+      const updateTimer = () => {
+        const currentTime = Date.now();
+        const lastTime = targetTime - currentTime;
+
         if (lastTime > 0) {
-          setLeftTime({
-            hours: Math.floor(lastTime / (1000 * 60 * 60)),
-            minutes: Math.floor((lastTime % (1000 * 60 * 60)) / (1000 * 60)),
-            seconds: Math.floor((lastTime % (1000 * 60)) / 1000),
-          });
+          const hours = Math.floor(lastTime / (1000 * 60 * 60));
+          const minutes = Math.floor((lastTime % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((lastTime % (1000 * 60)) / 1000);
+
+          setLeftTime({ hours, minutes, seconds });
+          animationFrameId = requestAnimationFrame(updateTimer);
         } else {
-          clearInterval(interval);
           setLeftTime({ hours: 0, minutes: 0, seconds: 0 });
           getRecoveryRecord();
         }
-      }, 1000);
+      };
 
-      return () => clearInterval(interval);
+      animationFrameId = requestAnimationFrame(updateTimer);
+
+      return () => {
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+        }
+      };
     }
   }, [status, recoveryRecord]);
 

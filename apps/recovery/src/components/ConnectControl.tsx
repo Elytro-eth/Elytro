@@ -13,6 +13,8 @@ import WrappedImage from './WrappedImage';
 import { CONNECTOR_ICON_MAP } from '@/wagmi';
 import { cn } from '@/lib/utils';
 import { CHAIN_ID_TO_NAME_MAP } from '@/constants/chains';
+import { useCurrentChain } from '@/hooks/use-current-chain';
+
 const ConnectorItem = ({
   connector,
   handleConnect,
@@ -39,7 +41,8 @@ const ConnectorItem = ({
 
 export default function ConnectControl() {
   const [showDialog, setShowDialog] = useState(false);
-  const { address, isConnected, chain } = useAccount();
+  const { address, isConnected } = useAccount();
+  const { chainId, isWrongChain } = useCurrentChain();
   const { connectors, connect } = useConnect();
   const { switchChainAsync } = useSwitchChain();
   const { recoveryRecord } = useRecoveryRecord();
@@ -111,8 +114,6 @@ export default function ConnectControl() {
   //   // }
   // }, [address]);
 
-  const isWrongChain = !chain || Number(chain.id) !== Number(recoveryRecord?.chainID);
-
   const switchChain = async () => {
     if (!recoveryRecord?.chainID) {
       return;
@@ -120,12 +121,12 @@ export default function ConnectControl() {
     try {
       await switchChainAsync({ chainId: Number(recoveryRecord.chainID) });
       toast({
-        title: 'Switched chain successfully',
+        title: 'Switched network successfully',
       });
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Failed to switch chain',
+        title: 'Failed to switch network',
         variant: 'destructive',
       });
     }
@@ -135,23 +136,28 @@ export default function ConnectControl() {
     <Dialog open={showDialog} onOpenChange={onDialogOpenChange}>
       <DialogTrigger asChild>
         {isConnected ? (
-          <div className="flex items-center gap-2 py-sm px-md rounded-sm bg-white">
+          <div className="flex items-center gap-2">
             {isWrongChain ? (
-              <span className="cursor-pointer text-red underline" onClick={switchChain}>
+              <Button
+                className="rounded-full font-bold shadow-none duration-0 bg-transparent hover:bg-light-blue hover:text-dark-blue text-light-blue bg-dark-blue hover:border-light-blue"
+                onClick={switchChain}
+              >
                 Switch to {CHAIN_ID_TO_NAME_MAP[Number(recoveryRecord?.chainID)]}
-              </span>
+              </Button>
             ) : null}
-            <AddressWithChain
-              address={address}
-              chainID={chain?.id}
-              className={cn('!p-0', isWrongChain && '!text-red !border-red')}
-            />
-            <div className="h-4 w-[1px] bg-gray-300" />
-            <X onClick={handleDisconnect} color="gray" className="cursor-pointer hover:shadow-md" />
+            <div className="flex items-center gap-2 py-sm px-md rounded-sm bg-white">
+              <AddressWithChain
+                address={address}
+                chainID={chainId}
+                className={cn('!p-0', isWrongChain && '!text-red !border-red')}
+              />
+              <div className="h-4 w-[1px] bg-gray-300" />
+              <X onClick={handleDisconnect} color="gray" className="cursor-pointer hover:stroke-black" />
+            </div>
           </div>
         ) : (
           <Button
-            className="rounded-full font-normal shadow-none duration-0 bg-transparent hover:bg-light-blue text-dark-blue border border-gray-450 hover:border-light-blue"
+            className="rounded-full font-bold shadow-none duration-0 bg-transparent hover:bg-light-blue hover:text-dark-blue text-light-blue bg-dark-blue hover:border-light-blue"
             onClick={() => setShowDialog(true)}
           >
             Connect Wallet

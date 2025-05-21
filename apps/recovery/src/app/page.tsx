@@ -19,13 +19,13 @@ interface StepConfig {
 
 const RECOVERY_STEPS: StepConfig[] = [
   {
-    title: 'For Recovery Contacts',
+    title: 'Signature collection',
     status: TRecoveryStatus.WAITING_FOR_SIGNATURE,
     href: '/contacts',
     buttonText: 'Sign recovery',
   },
   {
-    title: 'For Wallet Owner',
+    title: 'Wallet recovery',
     status: TRecoveryStatus.SIGNATURE_COMPLETED,
     href: '/start',
     buttonText: 'Start recovery',

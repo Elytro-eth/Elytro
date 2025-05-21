@@ -6,6 +6,7 @@ import { SIDE_PANEL_ROUTE_PATHS } from '../routes';
 import { navigateTo } from '@/utils/navigation';
 import SignDetail from '@/components/biz/SignDetail';
 import { useAccount } from '@/contexts/account-context';
+import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 
 export default function Sign() {
   const {
@@ -43,18 +44,16 @@ export default function Sign() {
   };
 
   return (
-    <div className="w-full h-full bg-white flex justify-center items-center">
-      <div className="max-w-screen-sm h-full flex py-4">
-        <SignDetail
-          onConfirm={handleConfirm}
-          onCancel={handleCancel}
-          dapp={approval.data.dApp}
-          chainId={chainId}
-          signData={approval.data.sign}
-        />
+    <SecondaryPageWrapper title="Sign" onBack={handleCancel} className="p-0">
+      <SignDetail
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        dapp={approval.data.dApp}
+        chainId={chainId}
+        signData={approval.data.sign}
+      />
 
-        <Spin isLoading={loading} />
-      </div>
-    </div>
+      <Spin isLoading={loading} />
+    </SecondaryPageWrapper>
   );
 }

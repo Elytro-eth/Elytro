@@ -21,9 +21,14 @@ export default function Contacts() {
     }
 
     return {
-      subtitle: address
-        ? 'The connected wallet is not a recovery contact. Please switch to a recovery contact wallet.'
-        : 'Please connect a recovery contact wallet (listed below) to sign the recovery request.',
+      subtitle: address ? (
+        <span>
+          The connected wallet is <span className="text-red font-bold">NOT</span> a recovery contact. Please switch to a
+          recovery contact wallet.
+        </span>
+      ) : (
+        <span>Please connect a wallet that matches one of the recovery contacts below.</span>
+      ),
       content: <Status />,
     };
   }, [address, recoveryRecord]);

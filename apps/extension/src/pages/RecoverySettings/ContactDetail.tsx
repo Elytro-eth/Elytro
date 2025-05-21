@@ -11,10 +11,7 @@ interface IContactDetailProps {
   onSaveContact: (contact: TRecoveryContact) => void;
 }
 
-export default function ContactDetail({
-  contact,
-  onSaveContact,
-}: IContactDetailProps) {
+export default function ContactDetail({ contact, onSaveContact }: IContactDetailProps) {
   const { currentAccount: currentAccount } = useAccount();
   const [address, setAddress] = useState<string>(contact?.address || '');
   const [name, setName] = useState<string>(contact?.name || '');
@@ -26,23 +23,17 @@ export default function ContactDetail({
   return (
     <div className="flex flex-col justify-between ">
       <div className=" flex flex-col gap-y-md">
-        <h1 className="elytro-text-bold-body my-1">
-          {contact ? 'Edit' : 'Add'} a recovery contact
-        </h1>
+        <h1 className="elytro-text-bold-body my-1">{contact ? 'Edit' : 'Add'} a recovery contact</h1>
 
         {/* TODO: Missing Tab: Which type of contact? Email or Wallet Address */}
 
         <HelperText
           title="Name of contact is saved locally"
-          description="They will not be deployed on chain for privacy reasons."
+          description="They will not be deployed on chain for privacy."
         />
 
         {/* If Wallet Address: input address and name(optional) */}
-        <AddressInputWithChainIcon
-          chainId={currentAccount.chainId}
-          address={address}
-          onChange={setAddress}
-        />
+        <AddressInputWithChainIcon chainId={currentAccount.chainId} address={address} onChange={setAddress} />
 
         <Input
           placeholder="Name of contact (optional)"
@@ -52,11 +43,7 @@ export default function ContactDetail({
         />
       </div>
 
-      <Button
-        className="mt-4"
-        disabled={!isAddress(address)}
-        onClick={() => onSaveContact({ address, name })}
-      >
+      <Button className="mt-4" disabled={!isAddress(address)} onClick={() => onSaveContact({ address, name })}>
         Continue
       </Button>
     </div>

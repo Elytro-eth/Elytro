@@ -1,6 +1,5 @@
 import ContactItem from '@/components/biz/ContactItem';
 import { Button } from '@/components/ui/button';
-import HelperText from '@/components/ui/HelperText';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAccount } from '@/contexts/account-context';
 import { useTx } from '@/contexts/tx-context';
@@ -8,7 +7,7 @@ import { TxRequestTypeEn } from '@/contexts/tx-context';
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
 import { PencilLine, Plus, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ContactsImg from '@/assets/contacts.png';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { cn } from '@/utils/shadcn/utils';
@@ -37,19 +36,89 @@ export default function ContactList({
 
   const isEmptyContacts = contacts.length === 0;
 
+  const [isRecoverContactChanged, setIsRecoverContactChanged] = useState(false);
+  const [isAddressChanged, setIsAddressChanged] = useState(false);
+
+  // 本地联系人name存储
+  function getLocalContacts(address: string): TRecoveryContact[] {
+    try {
+      const raw = localStorage.getItem(`recovery_contacts_${address}`);
+      if (!raw) return [];
+      return JSON.parse(raw);
+    } catch {
+      return [];
+    }
+  }
+
+  const initialNamesRef = useRef<{ [address: string]: string }>({});
+  useEffect(() => {
+    const localContacts = getLocalContacts(currentAccount.address);
+    const map: { [address: string]: string } = {};
+    localContacts.forEach((c) => {
+      map[c.address] = c.name || '';
+    });
+    initialNamesRef.current = map;
+  }, [currentAccount.address]);
+
+  useEffect(() => {
+    let active = true;
+    async function check() {
+      if (!active) return;
+      const addressChanged = await wallet.checkRecoveryContactsSettingChanged(
+        contacts.map((contact) => contact.address),
+        Number(threshold)
+      );
+      const nameChanged = contacts.some((contact) => {
+        const initialName = initialNamesRef.current[contact.address] || '';
+        return (contact.name || '') !== initialName;
+      });
+
+      if (!active) return;
+      setIsAddressChanged(addressChanged);
+      setIsRecoverContactChanged(addressChanged || nameChanged);
+    }
+    check();
+    return () => {
+      active = false;
+    };
+  }, [contacts, threshold, wallet, currentAccount.address]);
+
   const handleConfirmContacts = async () => {
     try {
       setLoading(true);
 
-      const txs = await wallet.generateRecoveryContactsSettingTxs(
-        contacts.map((contact) => contact.address),
-        Number(threshold)
-      );
-
-      handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs);
+      if (isAddressChanged) {
+        const txs = await wallet.generateRecoveryContactsSettingTxs(
+          contacts.map((contact) => contact.address),
+          Number(threshold)
+        );
+        handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs);
+      } else {
+        const localContacts = getLocalContacts(currentAccount.address);
+        const updatedContacts = contacts.map((contact) => {
+          const local = localContacts.find((lc) => lc.address === contact.address);
+          return {
+            address: contact.address,
+            name: contact.name || local?.name || '',
+          };
+        });
+        localStorage.setItem(`recovery_contacts_${currentAccount.address}`, JSON.stringify(updatedContacts));
+        // 更新初始name映射
+        const map: { [address: string]: string } = {};
+        updatedContacts.forEach((c) => {
+          map[c.address] = c.name || '';
+        });
+        initialNamesRef.current = map;
+        setIsRecoverContactChanged(false);
+        toast({
+          title: 'Success',
+          description: 'Contact names updated successfully',
+          variant: 'default',
+        });
+      }
     } catch (error) {
       toast({
-        title: 'Confirm contacts failed',
+        title: 'Failed',
         description: String(error),
         variant: 'destructive',
       });
@@ -57,30 +126,6 @@ export default function ContactList({
       setLoading(false);
     }
   };
-
-  const [isRecoverContactChanged, setIsRecoverContactChanged] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    async function check() {
-      if (!active) {
-        return;
-      }
-      const changed = await wallet.checkRecoveryContactsSettingChanged(
-        contacts.map((contact) => contact.address),
-        Number(threshold)
-      );
-      if (!active) {
-        return;
-      }
-      setIsRecoverContactChanged(changed);
-    }
-    check();
-
-    return () => {
-      active = false;
-    };
-  }, [contacts, threshold]);
 
   return (
     <div className="flex flex-col justify-between">
@@ -99,10 +144,10 @@ export default function ContactList({
           )}
         </div>
 
-        <HelperText
+        {/* <HelperText
           title="How does it work?"
           description="Add 2–3 recovery social contacts via email or wallet address, so they can help you regain access later."
-        />
+        /> */}
 
         {contacts?.length ? (
           <div className="flex flex-col gap-y-sm">
