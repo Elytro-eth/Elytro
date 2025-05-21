@@ -1,6 +1,5 @@
 import ContactItem from '@/components/biz/ContactItem';
 import { Button } from '@/components/ui/button';
-import HelperText from '@/components/ui/HelperText';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAccount } from '@/contexts/account-context';
 import { useTx } from '@/contexts/tx-context';
@@ -145,10 +144,10 @@ export default function ContactList({
           )}
         </div>
 
-        <HelperText
+        {/* <HelperText
           title="How does it work?"
           description="Add 2–3 recovery social contacts via email or wallet address, so they can help you regain access later."
-        />
+        /> */}
 
         {contacts?.length ? (
           <div className="flex flex-col gap-y-sm">
