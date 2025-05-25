@@ -4,9 +4,10 @@ import { CHAIN_LOGOS, SUPPORTED_CHAINS } from '@/constants/chains';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import React, { useState } from 'react';
+import { Address } from 'viem';
 
 interface IProps {
-  address?: string;
+  address?: Address;
   chainID?: number;
   className?: string;
   rightExtra?: React.ReactNode;

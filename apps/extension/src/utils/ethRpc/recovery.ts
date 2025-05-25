@@ -8,7 +8,7 @@ interface ICreateRecoveryRecordInput {
   newOwner: string;
   chainID: number;
   address: string;
-  guardianInfo: TGuardianInfo;
+  guardianInfo: TRecoveryContactsInfo;
 }
 
 export interface IRecoveryRecord {
@@ -19,7 +19,7 @@ export interface IRecoveryRecord {
   createTimestamp: string;
   nonce: string;
   newOwners: string[];
-  guardianInfo: TGuardianInfo;
+  guardianInfo: TRecoveryContactsInfo;
   status: number;
   guardianSignatures?: {
     recoveryRecordID: string;

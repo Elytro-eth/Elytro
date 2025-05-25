@@ -30,6 +30,8 @@ import {
   decodeAbiParameters,
   parseAbiItem,
   parseAbi,
+  hashTypedData,
+  keccak256,
 } from 'viem';
 import { createAccount } from '@/utils/ethRpc/create-account';
 import { ethErrors } from 'eth-rpc-errors';
@@ -38,6 +40,7 @@ import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 import { ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
 import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
+import { RecoveryStatusEn } from '@/constants/recovery';
 
 export class SDKService {
   private readonly _REQUIRED_CHAIN_FIELDS: (keyof TChainItem)[] = [
@@ -539,15 +542,14 @@ export class SDKService {
     }
   }
 
-  public async generateRecoveryInfoRecordTx(guardians: string[], threshold: number) {
+  public async generateRecoveryInfoRecordTx(contacts: string[], threshold: number) {
     if (!this._config.infoRecorder) {
       throw new Error(`Elytro: Info recorder on chain ${this._config.name} is not set.`);
     }
 
     // Encode the guardian data
-    // Encode the guardian data
     const guardianData = encodeAbiParameters(parseAbiParameters(['address[]', 'uint256', 'bytes32']), [
-      guardians as Address[],
+      contacts as Address[],
       BigInt(threshold),
       zeroHash,
     ]);
@@ -632,15 +634,96 @@ export class SDKService {
         (log.args as SafeAny).data
       );
       return {
-        guardians: parsedLog[0],
+        contacts: parsedLog[0],
         threshold: Number(parsedLog[1]),
         salt: parsedLog[2],
-      } as TGuardianInfo;
+      } as TRecoveryContactsInfo;
     };
 
     const latestRecoveryContacts = parseContactFromLog(logs[logs.length - 1]);
-
     return latestRecoveryContacts;
+  }
+
+  public async getRecoveryNonce(address: Address) {
+    const _client = this._getClient();
+    const nonce = await _client.readContract({
+      address: this._config.recovery as Address,
+      abi: ABI_SocialRecoveryModule,
+      functionName: 'walletNonce',
+      args: [address],
+    });
+
+    return Number(nonce);
+  }
+
+  public async getRecoveryOnchainID(address: Address, nonce: number, newOwners: string[]) {
+    const ownersData = encodeAbiParameters(parseAbiParameters(['bytes32[]']), [
+      newOwners.map((owner) => paddingZero(owner, 32) as `0x${string}`),
+    ]);
+
+    const onChainID = keccak256(
+      encodeAbiParameters(parseAbiParameters(['address', 'uint256', 'bytes', 'address', 'uint256']), [
+        address,
+        BigInt(nonce),
+        ownersData,
+        this._config.recovery as Address,
+        BigInt(this._config.id),
+      ])
+    );
+
+    return onChainID;
+  }
+
+  public async generateRecoveryApproveHash(address: Address, nonce: number, newOwners: string[]) {
+    const typedData = SocialRecovery.getSocialRecoveryTypedData(
+      this._config.id,
+      this._config.recovery as Address,
+      address,
+      nonce,
+      newOwners
+    );
+
+    const domain = {
+      chainId: Number(typedData.domain.chainId),
+      ...(typedData.domain.name && { name: typedData.domain.name }),
+      verifyingContract: typedData.domain.verifyingContract as `0x${string}`,
+      ...(typedData.domain.version && { version: typedData.domain.version }),
+    };
+
+    const sigHash = hashTypedData({
+      domain,
+      types: typedData.types,
+      primaryType: typedData.primaryType,
+      message: typedData.message,
+    });
+
+    return sigHash.toLowerCase();
+  }
+
+  public async checkIsGuardianSigned(hash: `0x${string}`, guardian: Address, fromBlock: bigint) {
+    const _client = this._getClient();
+
+    const logs = await _client.getLogs({
+      address: this._config.recovery as Address,
+      fromBlock,
+      event: parseAbiItem('event ApproveHash(address indexed guardian, bytes32 indexed hash)'),
+      args: { guardian, hash },
+    });
+
+    return logs.length > 0;
+  }
+
+  public async checkOnchainRecoveryStatus(wallet: Address, id: string) {
+    const _client = this._getClient();
+
+    const operationState = await _client.readContract({
+      address: this._config.recovery as Address,
+      abi: ABI_SocialRecoveryModule,
+      functionName: 'getOperationState',
+      args: [wallet, id],
+    });
+
+    return operationState as RecoveryStatusEn;
   }
 
   public async getContractVersion(walletAddress: string) {

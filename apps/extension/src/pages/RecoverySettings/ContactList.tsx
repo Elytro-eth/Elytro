@@ -37,9 +37,8 @@ export default function ContactList({
   const isEmptyContacts = contacts.length === 0;
 
   const [isRecoverContactChanged, setIsRecoverContactChanged] = useState(false);
-  const [isAddressChanged, setIsAddressChanged] = useState(false);
+  const isAddressChanged = useRef(false);
 
-  // 本地联系人name存储
   function getLocalContacts(address: string): TRecoveryContact[] {
     try {
       const raw = localStorage.getItem(`recovery_contacts_${address}`);
@@ -64,7 +63,7 @@ export default function ContactList({
     let active = true;
     async function check() {
       if (!active) return;
-      const addressChanged = await wallet.checkRecoveryContactsSettingChanged(
+      isAddressChanged.current = await wallet.checkRecoveryContactsSettingChanged(
         contacts.map((contact) => contact.address),
         Number(threshold)
       );
@@ -74,20 +73,20 @@ export default function ContactList({
       });
 
       if (!active) return;
-      setIsAddressChanged(addressChanged);
-      setIsRecoverContactChanged(addressChanged || nameChanged);
+      setIsRecoverContactChanged(isAddressChanged.current || nameChanged);
     }
+
     check();
     return () => {
       active = false;
     };
-  }, [contacts, threshold, wallet, currentAccount.address]);
+  }, [contacts, threshold, wallet, currentAccount.address, isAddressChanged]);
 
   const handleConfirmContacts = async () => {
     try {
       setLoading(true);
 
-      if (isAddressChanged) {
+      if (isAddressChanged.current) {
         const txs = await wallet.generateRecoveryContactsSettingTxs(
           contacts.map((contact) => contact.address),
           Number(threshold)
@@ -103,7 +102,6 @@ export default function ContactList({
           };
         });
         localStorage.setItem(`recovery_contacts_${currentAccount.address}`, JSON.stringify(updatedContacts));
-        // 更新初始name映射
         const map: { [address: string]: string } = {};
         updatedContacts.forEach((c) => {
           map[c.address] = c.name || '';

@@ -4,20 +4,13 @@ import ContentWrapper from '@/components/ContentWrapper';
 import { Button } from '@/components/ui/button';
 import { useRecoveryRecord } from '@/contexts';
 import { toast } from '@/hooks/use-toast';
-import { getExecuteRecoveryTxData, getRecoveryStartTxData } from '@/requests/contract';
 import { getConfig } from '@/wagmi';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAccount, usePublicClient } from 'wagmi';
 import { sendTransaction } from 'wagmi/actions';
 import { ExternalLink } from 'lucide-react';
-
-enum RecoveryStatusEn {
-  NonStarted = 0, // Not started yet
-  Waiting = 1, // Waiting for ok to start the recovery
-  Ready = 2, // Ready to start the recovery
-  Completed = 3, // Recovery completed
-}
+import { RecoveryStatusEn } from '@/constants/enums';
 
 const TimeBlock = ({ time, unit }: { time: number; unit: string }) => {
   return (
@@ -34,7 +27,16 @@ export default function Start() {
   const { isConnected, connector, chain } = useAccount();
   const publicClient = usePublicClient();
   const router = useRouter();
-  const { recoveryRecord, getRecoveryRecord } = useRecoveryRecord();
+  const {
+    status,
+    updateContactsSignStatus,
+    address,
+    chainId,
+    hash,
+    generateStartRecoveryTxData,
+    generateExecuteRecoveryTxData,
+    validTime,
+  } = useRecoveryRecord();
   const [leftTime, setLeftTime] = useState({
     hours: 0,
     minutes: 0,
@@ -42,6 +44,11 @@ export default function Start() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [txStatus, setTxStatus] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle');
+
+  if (!address || !chainId || !hash) {
+    router.push('/not-found');
+    return;
+  }
 
   const openExplorer = (txHash: string) => {
     const explorerUrl = chain?.blockExplorers?.default.url;
@@ -125,12 +132,7 @@ export default function Start() {
       setIsLoading(true);
       const txHash = await sendTransaction(getConfig(), {
         connector,
-        ...getRecoveryStartTxData(
-          recoveryRecord!.address,
-          recoveryRecord!.newOwners,
-          recoveryRecord!.guardianInfo,
-          recoveryRecord!.guardianSignatures
-        ),
+        ...generateStartRecoveryTxData(),
       });
 
       trackTransaction(
@@ -138,9 +140,9 @@ export default function Start() {
         () => {
           // fetch recovery record until it's status is RecoveryStatusEn.READY
           const interval = setInterval(() => {
-            getRecoveryRecord();
+            updateContactsSignStatus();
 
-            if (recoveryRecord?.status === RecoveryStatusEn.Ready) {
+            if (status && status === RecoveryStatusEn.RECOVERY_READY) {
               clearInterval(interval);
             }
           }, 2_000);
@@ -163,26 +165,26 @@ export default function Start() {
       });
     } finally {
       setIsLoading(false);
-      getRecoveryRecord();
+      updateContactsSignStatus();
     }
   };
 
-  const { status } = useMemo(() => {
-    const targetTime = (recoveryRecord?.validTime || 0) * 1000;
-    let status = RecoveryStatusEn.NonStarted;
+  // const { status } = useMemo(() => {
+  //   const targetTime = (recoveryRecord?.validTime || 0) * 1000;
+  //   let status = RecoveryStatusEn.NonStarted;
 
-    if (targetTime === 0) {
-      status = RecoveryStatusEn.NonStarted;
-    } else if (targetTime === 1000) {
-      status = RecoveryStatusEn.Completed;
-    } else if (targetTime > Date.now()) {
-      status = RecoveryStatusEn.Waiting;
-    } else {
-      status = RecoveryStatusEn.Ready;
-    }
+  //   if (targetTime === 0) {
+  //     status = RecoveryStatusEn.NonStarted;
+  //   } else if (targetTime === 1000) {
+  //     status = RecoveryStatusEn.Completed;
+  //   } else if (targetTime > Date.now()) {
+  //     status = RecoveryStatusEn.Waiting;
+  //   } else {
+  //     status = RecoveryStatusEn.Ready;
+  //   }
 
-    return { status };
-  }, [recoveryRecord]);
+  //   return { status };
+  // }, [recoveryRecord]);
 
   const completeRecovery = async () => {
     try {
@@ -197,7 +199,7 @@ export default function Start() {
 
       const txHash = await sendTransaction(getConfig(), {
         connector,
-        ...getExecuteRecoveryTxData(recoveryRecord!.address, recoveryRecord!.newOwners),
+        ...generateExecuteRecoveryTxData(),
       });
 
       trackTransaction(
@@ -221,13 +223,13 @@ export default function Start() {
       });
     } finally {
       setIsLoading(false);
-      getRecoveryRecord();
+      updateContactsSignStatus();
     }
   };
 
   useEffect(() => {
-    if (status === RecoveryStatusEn.Waiting) {
-      const targetTime = recoveryRecord!.validTime * 1000;
+    if (status === RecoveryStatusEn.RECOVERY_STARTED && validTime) {
+      const targetTime = validTime * 1000;
       let animationFrameId: number;
 
       const updateTimer = () => {
@@ -243,7 +245,7 @@ export default function Start() {
           animationFrameId = requestAnimationFrame(updateTimer);
         } else {
           setLeftTime({ hours: 0, minutes: 0, seconds: 0 });
-          getRecoveryRecord();
+          updateContactsSignStatus();
         }
       };
 
@@ -255,7 +257,7 @@ export default function Start() {
         }
       };
     }
-  }, [status, recoveryRecord]);
+  }, [status, validTime]);
 
   return (
     <ContentWrapper
@@ -265,7 +267,7 @@ export default function Start() {
       subtitle="You'll regain wallet access in 48 hours."
     >
       {/* Count down */}
-      {status === RecoveryStatusEn.Waiting && (
+      {status === RecoveryStatusEn.RECOVERY_STARTED && (
         <div className="flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg">
           <TimeBlock time={leftTime.hours} unit="Hours" />
           <TimeBlock time={leftTime.minutes} unit="Minutes" />
@@ -276,8 +278,8 @@ export default function Start() {
       <div className="grid grid-cols-2 gap-x-sm">
         <Button
           size="lg"
-          variant={status === RecoveryStatusEn.NonStarted ? 'default' : 'outline'}
-          disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.NonStarted}
+          variant={status === RecoveryStatusEn.SIGNATURE_COMPLETED ? 'default' : 'outline'}
+          disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.SIGNATURE_COMPLETED}
           onClick={startRecovery}
           className="w-full"
         >
@@ -286,8 +288,8 @@ export default function Start() {
 
         <Button
           size="lg"
-          variant={status === RecoveryStatusEn.Ready ? 'default' : 'outline'}
-          disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.Ready}
+          variant={status === RecoveryStatusEn.RECOVERY_READY ? 'default' : 'outline'}
+          disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.RECOVERY_READY}
           onClick={completeRecovery}
           className="w-full"
         >

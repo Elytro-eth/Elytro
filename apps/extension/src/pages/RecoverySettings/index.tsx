@@ -43,11 +43,11 @@ export default function RecoverySettings() {
   const getRecoveryContacts = async () => {
     try {
       setLoading(true);
-      const { guardians = [], threshold = 0 } = (await wallet.queryRecoveryContactsByAddress(address)) || {};
+      const { contacts = [], threshold = 0 } = (await wallet.queryRecoveryContactsByAddress(address)) || {};
       const localContacts = getLocalContacts(address);
-      setShowType(guardians.length <= 0 ? ShowType.Guide : ShowType.List);
+      setShowType(contacts.length <= 0 ? ShowType.Guide : ShowType.List);
       setContacts(
-        guardians.map((c) => {
+        contacts.map((c) => {
           const local = localContacts.find((lc) => lc.address === c);
           return { address: c, name: local?.name || '' };
         })

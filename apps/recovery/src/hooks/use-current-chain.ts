@@ -1,16 +1,16 @@
-import { useChainId } from 'wagmi';
+import { useAccount } from 'wagmi';
 import { useRecoveryRecord } from '@/contexts';
 import { useEffect, useState } from 'react';
 export function useCurrentChain() {
-  const chainId = useChainId();
-  const { recoveryRecord } = useRecoveryRecord();
+  const { chainId } = useAccount();
+  const { chainId: recoveryChainId } = useRecoveryRecord();
   const [isWrongChain, setIsWrongChain] = useState(true);
 
   useEffect(() => {
-    if (chainId && recoveryRecord?.chainID) {
-      setIsWrongChain(chainId !== Number(recoveryRecord?.chainID));
+    if (chainId && recoveryChainId) {
+      setIsWrongChain(chainId !== recoveryChainId);
     }
-  }, [chainId, recoveryRecord?.chainID]);
+  }, [chainId, recoveryChainId]);
 
   return { chainId, isWrongChain };
 }

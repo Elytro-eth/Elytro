@@ -14,14 +14,13 @@ import chainService from './services/chain';
 import accountManager from './services/account';
 import type { Transaction } from '@soulwallet/sdk';
 import { TChainItem } from '@/constants/chains';
-import { createRecoveryRecord, getRecoveryRecord } from '@/utils/ethRpc/recovery';
 import { DecodeResult } from '@soulwallet/decoder';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
-import { TRecoveryStatus } from '@/constants/recovery';
 import { getTokenList, updateUserImportedTokens } from '@/utils/tokens';
 import { ABI_ERC20_BALANCE_OF } from '@/constants/abi';
 import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 import { isOlderThan } from '@/utils/version';
+import { RecoveryStatusEn } from '@/constants/recovery';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -49,7 +48,7 @@ class WalletController {
     return keyring.locked;
   }
   public async getWalletStatus() {
-    if (accountManager.recoveryRecord) {
+    if (await accountManager.getRecoveryRecord()) {
       return WalletStatusEn.Recovering;
     }
 
@@ -363,15 +362,11 @@ class WalletController {
     return await keyring.changePassword(oldPassword, newPassword);
   }
 
-  public async getRecoveryInfoOfCurrentAccount() {
-    return await elytroSDK.getRecoveryInfo(accountManager.currentAccount?.address);
-  }
-
   public async queryRecoveryContactsByAddress(address: Address) {
     return await elytroSDK.queryRecoveryContacts(address);
   }
 
-  private async getRecoveryContactsHash(contacts: string[], threshold: number) {
+  private async _getRecoveryContactsHash(contacts: string[], threshold: number) {
     const [newHash, prevInfo] = await Promise.all([
       elytroSDK.calculateRecoveryContactsHash(contacts, threshold),
       elytroSDK.getRecoveryInfo(accountManager.currentAccount?.address),
@@ -385,13 +380,13 @@ class WalletController {
   }
 
   public async checkRecoveryContactsSettingChanged(contacts: string[], threshold: number): Promise<boolean> {
-    const { prevHash, newHash } = await this.getRecoveryContactsHash(contacts, threshold);
+    const { prevHash, newHash } = await this._getRecoveryContactsHash(contacts, threshold);
 
     return prevHash !== newHash;
   }
 
   public async generateRecoveryContactsSettingTxs(contacts: string[], threshold: number) {
-    const { prevHash, newHash } = await this.getRecoveryContactsHash(contacts, threshold);
+    const { prevHash, newHash } = await this._getRecoveryContactsHash(contacts, threshold);
 
     if (prevHash === newHash) {
       throw new Error('Elytro: New recovery contacts hash is the same as the previous.');
@@ -403,69 +398,6 @@ class WalletController {
     ]);
 
     return [infoRecordTx, contactsSettingTx];
-  }
-
-  public async localRecoveryAddress() {
-    return accountManager.recoveryRecord?.address;
-  }
-
-  public async cleanRecoveryRecord() {
-    accountManager.recoveryRecord = null;
-  }
-
-  public async getRecoveryRecord(address?: Address) {
-    if (accountManager.recoveryRecord) {
-      const record = await getRecoveryRecord(accountManager.recoveryRecord.id);
-
-      if (record?.status === TRecoveryStatus.RECOVERY_COMPLETED) {
-        this.cleanRecoveryRecord();
-
-        accountManager.setCurrentAccount({
-          address: record?.address,
-          chainId: Number(record?.chainID),
-          isDeployed: true,
-        });
-        this._onAccountChanged();
-      } else if (record?.status === TRecoveryStatus.RECOVERY_CANCELED) {
-        this.cleanRecoveryRecord();
-      }
-
-      return record;
-    }
-
-    if (!address) {
-      throw new Error('Elytro: No address provided');
-    }
-
-    const newOwner = keyring.owner?.address;
-    const chainId = chainService.currentChain?.id;
-    if (!newOwner || !chainId) {
-      throw new Error('Elytro: No new owner or chain id found');
-    }
-
-    const guardianInfo = await this.queryRecoveryContactsByAddress(address);
-
-    if (!guardianInfo) {
-      throw new Error('Elytro: No guardian info found');
-    }
-
-    const recoveryRecord = await createRecoveryRecord({
-      newOwner,
-      chainID: chainId,
-      address: address,
-      guardianInfo,
-    });
-
-    if (!recoveryRecord) {
-      throw new Error('Elytro: failed to create recovery record');
-    }
-
-    accountManager.recoveryRecord = {
-      address,
-      id: recoveryRecord.recoveryRecordID,
-    };
-
-    return recoveryRecord;
   }
 
   public async getCurrentAccountTokens() {
@@ -532,6 +464,116 @@ class WalletController {
     }
 
     return await elytroSDK.getInstalledUpgradeModules(accountManager.currentAccount.address);
+  }
+
+  public async updateRecoveryStatus() {
+    let recoveryRecord = (await accountManager.getRecoveryRecord()) as TRecoveryRecord | null;
+    if (!recoveryRecord) {
+      return;
+    }
+
+    if (recoveryRecord.status === RecoveryStatusEn.WAITING_FOR_SIGNATURE) {
+      // if the recovery record is waiting for signature, check if the contacts have signed
+      const { contacts, threshold } = recoveryRecord;
+      const signedContacts = contacts.filter((contact) => contact.confirmed);
+
+      if (signedContacts.length >= threshold) {
+        recoveryRecord.status = RecoveryStatusEn.SIGNATURE_COMPLETED;
+      } else {
+        const waitingContacts = contacts.filter((contact) => !contact.confirmed);
+
+        for (const contact of waitingContacts) {
+          const isSigned = await elytroSDK.checkIsGuardianSigned(
+            recoveryRecord.approveHash as `0x${string}`,
+            contact.address as Address,
+            BigInt(recoveryRecord.fromBlock)
+          );
+
+          if (isSigned) {
+            recoveryRecord.contacts = recoveryRecord.contacts.map((contact) =>
+              contact.address === contact.address ? { ...contact, confirmed: true } : contact
+            );
+            if (signedContacts.length >= threshold) {
+              recoveryRecord.status = RecoveryStatusEn.SIGNATURE_COMPLETED;
+              break;
+            }
+          }
+        }
+      }
+    } else if (recoveryRecord.status === RecoveryStatusEn.RECOVERY_COMPLETED) {
+      // TODO: check this logic
+      console.log('Elytro: Recovery record is completed or canceled');
+      accountManager.setCurrentAccount({
+        address: recoveryRecord?.address,
+        chainId: Number(recoveryRecord?.chainId),
+        isDeployed: true,
+      });
+      this._onAccountChanged();
+      recoveryRecord = null;
+    } else {
+      const onChainStatus = await elytroSDK.checkOnchainRecoveryStatus(
+        recoveryRecord.address,
+        recoveryRecord.recoveryID
+      );
+      recoveryRecord.status = onChainStatus;
+    }
+
+    accountManager.updateRecoveryRecord(recoveryRecord);
+  }
+
+  public async hasRecoveryRecord() {
+    return (await accountManager.getRecoveryRecord()) !== null;
+  }
+
+  public async getRecoveryRecord() {
+    await this.updateRecoveryStatus();
+    return (await accountManager.getRecoveryRecord()) as TRecoveryRecord;
+  }
+
+  public async createRecoveryRecord(address: Address) {
+    try {
+      const contactsInfo = await elytroSDK.queryRecoveryContacts(address);
+      const owner = keyring.owner?.address;
+      const chainId = chainService.currentChain?.id;
+
+      if (!contactsInfo) {
+        throw new Error('Elytro: Wallet cannot be recovered because no recovery contacts found');
+      }
+
+      if (!owner || !chainId) {
+        throw new Error('Elytro: No owner address or chainId. Try create owner and switch chain first.');
+      }
+
+      const nonce = await elytroSDK.getRecoveryNonce(address);
+
+      const [approveHash, fromBlock, recoveryID] = await Promise.all([
+        elytroSDK.generateRecoveryApproveHash(address, nonce, [owner]),
+        walletClient.getBlockNumber(),
+        elytroSDK.getRecoveryOnchainID(address, nonce, [owner]),
+      ]);
+
+      await accountManager.updateRecoveryRecord({
+        address,
+        chainId,
+        ...contactsInfo,
+        contacts: contactsInfo.contacts.map(
+          (contact) =>
+            ({
+              address: contact,
+              confirmed: false,
+            }) as TRecoveryContact
+        ),
+        approveHash,
+        recoveryID,
+        status: RecoveryStatusEn.WAITING_FOR_SIGNATURE,
+        signedGuardians: [],
+        fromBlock: fromBlock.toString(),
+        owner,
+      });
+    } catch (error) {
+      console.error('Elytro: createRecoveryRecord error', error);
+      throw error;
+    }
   }
 }
 

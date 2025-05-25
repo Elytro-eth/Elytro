@@ -6,7 +6,7 @@ import { useChain } from '@/contexts/chain-context';
 import { navigateTo } from '@/utils/navigation';
 import { Box, Clock, Search, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { isAddress } from 'viem';
+import { Address, isAddress } from 'viem';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import WalletImg from '@/assets/wallet.png';
 import TipItem from '@/components/biz/TipItem';
@@ -22,15 +22,19 @@ export default function AccountRecovery() {
   const [checked, setChecked] = useState(false);
   const [isChainConfirmed, setIsChainConfirmed] = useState(false);
 
-  // TODO: check this logic
   useEffect(() => {
-    wallet.localRecoveryAddress().then((address) => {
-      if (address) {
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RetrieveContacts, {
-          address,
-        });
+    const checkRecoveryRecord = async () => {
+      try {
+        const hasRecoveryRecord = await wallet.hasRecoveryRecord();
+        if (hasRecoveryRecord) {
+          navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RetrieveContacts);
+        }
+      } catch {
+        // do nothing
       }
-    });
+    };
+
+    checkRecoveryRecord();
   }, [wallet]);
 
   if (!checked) {
@@ -104,10 +108,20 @@ export default function AccountRecovery() {
     );
   }
 
-  const handleRetrieveContacts = () => {
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RetrieveContacts, {
-      address,
-    });
+  const handleStartRecovery = async () => {
+    // navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RetrieveContacts, {
+    //   address,
+    // });
+    try {
+      await wallet.createRecoveryRecord(address as Address);
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RetrieveContacts);
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: 'Failed to create recovery record',
+        description: 'Please try again',
+      });
+    }
   };
 
   return (
@@ -118,7 +132,7 @@ export default function AccountRecovery() {
       </div>
 
       <AddressInputWithChainIcon chainId={selectedChain!.id} address={address} onChange={setAddress} />
-      <Button className="w-full mt-10" disabled={!isAddress(address)} onClick={handleRetrieveContacts}>
+      <Button className="w-full mt-10" disabled={!isAddress(address)} onClick={handleStartRecovery}>
         <Box className="size-4 mr-sm" color="#cce1ea" />
         Retrieve my contacts
       </Button>

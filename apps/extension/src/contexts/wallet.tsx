@@ -75,7 +75,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
           navigateToPath = SIDE_PANEL_ROUTE_PATHS.Unlock;
           break;
         case WalletStatusEn.Recovering:
-          navigateToPath = SIDE_PANEL_ROUTE_PATHS.AccountRecovery;
+          navigateToPath = SIDE_PANEL_ROUTE_PATHS.RetrieveContacts;
           break;
         case WalletStatusEn.NoAccount || WalletStatusEn.NoOwner:
           if (!INIT_PATHS.includes(pathname as SidePanelRoutePath)) {

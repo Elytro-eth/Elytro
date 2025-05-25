@@ -8,11 +8,18 @@ import Sign from './Sign';
 import Status from './Status';
 import { isConnectedAccountAContact } from '@/lib/contact';
 export default function Contacts() {
-  const { recoveryRecord } = useRecoveryRecord();
+  const { contacts, loading } = useRecoveryRecord();
   const { address } = useAccount();
 
   const { subtitle, content } = useMemo(() => {
-    const isGuardian = address && isConnectedAccountAContact(address, recoveryRecord?.guardianInfo?.guardians);
+    if (loading) {
+      return {
+        subtitle: '',
+        content: <div className="mt-lg animate-spin rounded-full size-10 border-y-2 border-primary mx-auto"></div>,
+      };
+    }
+    const isGuardian = address && contacts && isConnectedAccountAContact(address, contacts);
+
     if (isGuardian) {
       return {
         subtitle: 'Please sign the recovery',
@@ -31,7 +38,7 @@ export default function Contacts() {
       ),
       content: <Status />,
     };
-  }, [address, recoveryRecord]);
+  }, [address, contacts, loading]);
 
   return (
     <ContentWrapper
