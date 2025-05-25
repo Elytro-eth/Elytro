@@ -15,6 +15,7 @@ import {
   parseAbi,
   parseAbiItem,
   parseAbiParameters,
+  zeroHash,
 } from 'viem';
 import { readContract } from 'wagmi/actions';
 
@@ -162,13 +163,15 @@ const convertAddressToBytes32 = (address: string) => {
   return `0x${address.slice(2).padStart(64, '0')}` as `0x${string}`;
 };
 
+const RECOVERY_SALT = zeroHash;
+
 export const getRecoveryStartTxData = (
   walletAddress: string,
   newOwners: string[],
-  guardianInfo: TRecoveryContactsInfo
+  contacts: Address[],
+  threshold: number
 ) => {
-  const contacts = guardianInfo.contacts.map((contact) => contact.address);
-  const rawGuardian = SocialRecovery.getGuardianBytes(contacts, guardianInfo.threshold, guardianInfo.salt);
+  const rawGuardian = SocialRecovery.getGuardianBytes(contacts, threshold, RECOVERY_SALT);
 
   const packedGuardianSignature = SocialRecovery.packGuardianSignature(getGuardianSignatures(contacts));
 
@@ -248,7 +251,7 @@ export const queryRecoveryContacts = async (address: Address, chainId: number) =
     return {
       contacts: parsedLog[0],
       threshold: Number(parsedLog[1]),
-      salt: parsedLog[2],
+      salt: parsedLog[2] || RECOVERY_SALT,
     } as TRecoveryContactsInfo;
   };
 

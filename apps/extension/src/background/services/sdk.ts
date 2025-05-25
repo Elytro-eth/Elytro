@@ -633,6 +633,7 @@ export class SDKService {
         parseAbiParameters(['address[]', 'uint256', 'bytes32']),
         (log.args as SafeAny).data
       );
+
       return {
         contacts: parsedLog[0],
         threshold: Number(parsedLog[1]),

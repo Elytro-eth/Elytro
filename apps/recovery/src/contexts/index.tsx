@@ -32,12 +32,6 @@ interface IRecoveryRecordContext {
 
 const RecoveryRecordContext = createContext<IRecoveryRecordContext | undefined>(undefined);
 
-// /?id=0x16c8d383580cf86db99e2ec27e5adc06b4e558a5de12fd649a06e112e15146be
-// &address=0x9261229B5a58891B7cCe9744cF94D5b6869946a5
-// &chainId=11155111
-// &approveHash=0x4deb94be66fb4a041f05a0d9116b68de53bfdc34c0c2277269f898234c32f4a2
-// &from=8405819
-// &owner=0xf937057d2cf299D60e2066740f5508B78a3048eb
 export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -45,11 +39,9 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
   const recoveryRecordId = params.get('id');
   const address = params.get('address') as Address;
   const chainId = Number(params.get('chainId'));
-  const hash = params.get('approveHash') as `0x${string}`;
+  const hash = params.get('hash') as `0x${string}`;
   const from = params.get('from');
   const newOwner = params.get('owner');
-
-  const saltRef = useRef<string | null>(null);
 
   const [contacts, setContacts] = useState<TContact[] | null>(null);
   const [threshold, setThreshold] = useState<number | null>(null);
@@ -57,7 +49,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
   const [validTime, setValidTime] = useState<number | null>(null);
 
   const generateStartRecoveryTxData = () => {
-    if (!address || !newOwner || !contacts || !threshold || !saltRef.current) {
+    if (!address || !newOwner || !contacts || !threshold) {
       toast({
         title: 'Invalid Recovery Record',
         description: 'Please check the url',
@@ -66,11 +58,12 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
       return;
     }
 
-    return getRecoveryStartTxData(address, [newOwner as Address], {
-      contacts,
-      threshold,
-      salt: saltRef.current,
-    });
+    return getRecoveryStartTxData(
+      address,
+      [newOwner as Address],
+      contacts?.map((contact) => contact.address),
+      threshold
+    );
   };
 
   const generateExecuteRecoveryTxData = () => {
@@ -91,7 +84,6 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
       setLoading(true);
       const res = await queryRecoveryContacts(address as Address, chainId);
       if (res) {
-        saltRef.current = res.salt;
         await updateContactsSignStatus(res.contacts, res.threshold);
       } else {
         throw new Error('No contacts found');
@@ -102,7 +94,6 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
         description: (error as Error)?.message || 'Please try again later',
         variant: 'destructive',
       });
-      saltRef.current = null;
       router.replace('/not-found');
     } finally {
       setLoading(false);
@@ -147,7 +138,6 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
         const confirmed = isPrevSigned
           ? true
           : await checkIsContactSigned({
-              hash: hash as `0x${string}`,
               guardian: address as Address,
               fromBlock: BigInt(from || '0'),
               chainId: Number(chainId),
@@ -172,7 +162,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
   };
 
   useEffect(() => {
-    if (address && isAddress(address) && Number(chainId) && hash) {
+    if (address && isAddress(address) && Number(chainId)) {
       getRecoveryContacts();
     } else {
       toast({

@@ -77,12 +77,12 @@ function PageContent() {
   }, [recoveryRecord, wallet]);
 
   const generateShareLink = () => {
-    const { recoveryID, address, chainId, approveHash, fromBlock, owner } = recoveryRecord!;
+    const { recoveryID, address, chainId, approveHash: hash, fromBlock, owner } = recoveryRecord!;
     const params = new URLSearchParams({
       id: recoveryID,
       address,
       chainId: chainId.toString(),
-      approveHash,
+      hash,
       from: fromBlock,
       owner,
     });
