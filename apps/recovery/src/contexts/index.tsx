@@ -11,7 +11,7 @@ import {
 } from '@/requests/contract';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Address, isAddress } from 'viem';
 
 interface IRecoveryRecordContext {
@@ -26,6 +26,7 @@ interface IRecoveryRecordContext {
   setStatus: (status: RecoveryStatusEn) => void;
   backToHome: () => void;
   updateContactsSignStatus: (contactAddresses?: Address[], _threshold?: number) => void;
+  updateRecoveryStatus: () => void;
   generateStartRecoveryTxData: () => SafeAny;
   generateExecuteRecoveryTxData: () => SafeAny;
 }
@@ -58,12 +59,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
       return;
     }
 
-    return getRecoveryStartTxData(
-      address,
-      [newOwner as Address],
-      contacts?.map((contact) => contact.address),
-      threshold
-    );
+    return getRecoveryStartTxData(address, [newOwner as Address], contacts, threshold);
   };
 
   const generateExecuteRecoveryTxData = () => {
@@ -196,6 +192,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
         contacts,
         loading,
         updateContactsSignStatus,
+        updateRecoveryStatus,
         backToHome,
         threshold,
         status,

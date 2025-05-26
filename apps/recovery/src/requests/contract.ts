@@ -150,11 +150,11 @@ export const getSocialRecoveryTypedData = async (
 //   return result;
 // };
 
-const getGuardianSignatures = (contacts: Address[]) => {
+const getGuardianSignatures = (contacts: TContact[]) => {
   return contacts.map((contact) => {
     return {
-      address: contact,
-      signatureType: 1 as const, // approved onchain before
+      address: contact.address,
+      signatureType: contact.confirmed ? 1 : 3,
     };
   });
 };
@@ -168,10 +168,14 @@ const RECOVERY_SALT = zeroHash;
 export const getRecoveryStartTxData = (
   walletAddress: string,
   newOwners: string[],
-  contacts: Address[],
+  contacts: TContact[],
   threshold: number
 ) => {
-  const rawGuardian = SocialRecovery.getGuardianBytes(contacts, threshold, RECOVERY_SALT);
+  const rawGuardian = SocialRecovery.getGuardianBytes(
+    contacts.map((contact) => contact.address),
+    threshold,
+    RECOVERY_SALT
+  );
 
   const packedGuardianSignature = SocialRecovery.packGuardianSignature(getGuardianSignatures(contacts));
 

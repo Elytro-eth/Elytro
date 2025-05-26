@@ -30,6 +30,7 @@ export default function Start() {
   const {
     status,
     updateContactsSignStatus,
+    updateRecoveryStatus,
     address,
     chainId,
     hash,
@@ -141,7 +142,7 @@ export default function Start() {
           // fetch recovery record until it's status is RecoveryStatusEn.READY
           const interval = setInterval(() => {
             updateContactsSignStatus();
-
+            updateRecoveryStatus();
             if (status && status === RecoveryStatusEn.RECOVERY_READY) {
               clearInterval(interval);
             }
