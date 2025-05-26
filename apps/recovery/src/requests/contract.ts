@@ -154,7 +154,7 @@ const getGuardianSignatures = (contacts: TContact[]) => {
   return contacts.map((contact) => {
     return {
       address: contact.address,
-      signatureType: contact.confirmed ? 1 : 3,
+      signatureType: (contact.confirmed ? 1 : 3) as 0 | 1 | 2 | 3,
     };
   });
 };
