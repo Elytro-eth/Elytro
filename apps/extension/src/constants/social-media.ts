@@ -1,7 +1,6 @@
 import twitter from '@/assets/icons/twitter.svg';
 import github from '@/assets/icons/github.svg';
 import telegram from '@/assets/icons/telegram.svg';
-import linkedin from '@/assets/icons/linkedin.svg';
 
 export const SOCIAL_MEDIA_LINKS = [
   {
