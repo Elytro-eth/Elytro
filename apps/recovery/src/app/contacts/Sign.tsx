@@ -57,10 +57,6 @@ export default function Sign() {
       // call `approveHash` method in SocialRecovery contract
       const _txHash = await sendTransactionAsync(getApproveHashTxData(hash));
       setTxHash(_txHash);
-      toast({
-        title: 'Signed successfully',
-        //description: 'Signature sent successfully',
-      });
 
       // backToHome();
     } catch (error) {
@@ -70,8 +66,6 @@ export default function Sign() {
         description: error instanceof Error ? error.message : 'Failed to send transaction',
         variant: 'destructive',
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -80,6 +74,7 @@ export default function Sign() {
       toast({
         title: 'You have signed the recovery successfully.',
       });
+      setLoading(false);
       updateContactsSignStatus();
     } else if (error) {
       toast({
@@ -87,6 +82,7 @@ export default function Sign() {
         description: error instanceof Error ? error.message : 'Failed to send transaction',
         variant: 'destructive',
       });
+      setLoading(false);
     }
   }, [receiptStatus, error]);
 

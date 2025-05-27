@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { useAccount, usePublicClient } from 'wagmi';
 import { sendTransaction } from 'wagmi/actions';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Loader2 } from 'lucide-react';
 import { RecoveryStatusEn } from '@/constants/enums';
 
 const TimeBlock = ({ time, unit }: { time: number; unit: string }) => {
@@ -272,6 +272,14 @@ export default function Start() {
           <TimeBlock time={leftTime.hours} unit="Hours" />
           <TimeBlock time={leftTime.minutes} unit="Minutes" />
           <TimeBlock time={leftTime.seconds} unit="Seconds" />
+        </div>
+      )}
+
+      {txStatus === 'pending' && (
+        // Loading: waiting for transaction to be confirmed
+        <div className="flex flex-col my-2xl w-full justify-center items-center gap-y-sm flex-nowrap mb-lg text-gray-300">
+          <Loader2 className="size-8 animate-spin" />
+          <div className="text-tiny flex flex-row items-center">Waiting for transaction to be confirmed...</div>
         </div>
       )}
 
