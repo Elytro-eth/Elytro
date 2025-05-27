@@ -41,6 +41,7 @@ import { EVENT_TYPES } from '@/constants/events';
 import { ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
 import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 import { RecoveryStatusEn } from '@/constants/recovery';
+import { getLogsOnchain } from '@/utils/getLogsOnchain';
 
 export class SDKService {
   private readonly _REQUIRED_CHAIN_FIELDS: (keyof TChainItem)[] = [
@@ -701,14 +702,14 @@ export class SDKService {
     return sigHash.toLowerCase();
   }
 
-  public async checkIsGuardianSigned(hash: `0x${string}`, guardian: Address, fromBlock: bigint) {
+  public async checkIsGuardianSigned(guardian: Address, fromBlock: bigint) {
     const _client = this._getClient();
 
-    const logs = await _client.getLogs({
+    const logs = await getLogsOnchain(_client, {
       address: this._config.recovery as Address,
       fromBlock,
-      event: parseAbiItem('event ApproveHash(address indexed guardian, bytes32 indexed hash)'),
-      args: { guardian, hash },
+      event: parseAbiItem('event ApproveHash(address indexed guardian, bytes32 hash)'),
+      args: { guardian },
     });
 
     return logs.length > 0;
@@ -717,14 +718,14 @@ export class SDKService {
   public async checkOnchainRecoveryStatus(wallet: Address, id: string) {
     const _client = this._getClient();
 
-    const operationState = await _client.readContract({
+    const status = await _client.readContract({
       address: this._config.recovery as Address,
       abi: ABI_SocialRecoveryModule,
       functionName: 'getOperationState',
       args: [wallet, id],
     });
 
-    return operationState as RecoveryStatusEn;
+    return status as RecoveryStatusEn;
   }
 
   public async getContractVersion(walletAddress: string) {

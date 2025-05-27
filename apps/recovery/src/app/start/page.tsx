@@ -29,7 +29,6 @@ export default function Start() {
   const router = useRouter();
   const {
     status,
-    updateContactsSignStatus,
     updateRecoveryStatus,
     address,
     chainId,
@@ -141,7 +140,6 @@ export default function Start() {
         () => {
           // fetch recovery record until it's status is RecoveryStatusEn.READY
           const interval = setInterval(() => {
-            updateContactsSignStatus();
             updateRecoveryStatus();
             if (status && status === RecoveryStatusEn.RECOVERY_READY) {
               clearInterval(interval);
@@ -166,7 +164,7 @@ export default function Start() {
       });
     } finally {
       setIsLoading(false);
-      updateContactsSignStatus();
+      updateRecoveryStatus();
     }
   };
 
@@ -206,6 +204,7 @@ export default function Start() {
       trackTransaction(
         txHash,
         () => {
+          updateRecoveryStatus();
           router.push('/finished');
         },
         () => {
@@ -224,7 +223,7 @@ export default function Start() {
       });
     } finally {
       setIsLoading(false);
-      updateContactsSignStatus();
+      updateRecoveryStatus();
     }
   };
 
@@ -246,7 +245,7 @@ export default function Start() {
           animationFrameId = requestAnimationFrame(updateTimer);
         } else {
           setLeftTime({ hours: 0, minutes: 0, seconds: 0 });
-          updateContactsSignStatus();
+          updateRecoveryStatus();
         }
       };
 

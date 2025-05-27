@@ -85,6 +85,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
         throw new Error('No contacts found');
       }
     } catch (error) {
+      console.error(error);
       toast({
         title: 'Get Recovery Record Failed',
         description: (error as Error)?.message || 'Please try again later',
@@ -97,6 +98,10 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
   };
 
   const updateRecoveryStatus = async () => {
+    if (status === RecoveryStatusEn.RECOVERY_COMPLETED) {
+      return;
+    }
+
     if (!address || !chainId || !recoveryRecordId) {
       toast({
         title: 'Invalid Recovery Record',
@@ -158,6 +163,10 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
   };
 
   useEffect(() => {
+    if (status === RecoveryStatusEn.RECOVERY_COMPLETED) {
+      return;
+    }
+
     if (address && isAddress(address) && Number(chainId)) {
       getRecoveryContacts();
     } else {
@@ -168,7 +177,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
       });
       router.replace('/not-found');
     }
-  }, [address, chainId]);
+  }, [address, chainId, status]);
 
   const backToHome = () => {
     router.replace(`/?${params.toString()}`);

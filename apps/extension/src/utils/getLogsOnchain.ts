@@ -1,10 +1,4 @@
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
 import { BlockTag, GetLogsParameters, GetLogsReturnType, PublicClient } from 'viem';
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 const MIN_STEP = 100n;
 const MAX_RETRIES = 3;

@@ -66,6 +66,7 @@ function PageContent() {
 
     const interval = setInterval(async () => {
       const newRecoveryRecord = await wallet.getRecoveryRecord();
+      console.log('newRecoveryRecord', newRecoveryRecord?.status);
       setRecoveryRecord((prev) => {
         if (prev?.status !== newRecoveryRecord?.status) {
           return newRecoveryRecord;

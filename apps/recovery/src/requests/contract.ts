@@ -2,6 +2,7 @@ import { SUPPORTED_CHAINS } from '@/constants/chains';
 import { SocialRecoveryContractConfig, SocialRecoveryInfoRecorderContractConfig } from '@/constants/contracts';
 import { RecoveryStatusEn } from '@/constants/enums';
 import { toast } from '@/hooks/use-toast';
+import { getLogsOnchain } from '@/lib/utils';
 import { getConfig } from '@/wagmi';
 import { SocialRecovery } from '@soulwallet/sdk';
 import {
@@ -319,10 +320,9 @@ export const checkIsContactSigned = async ({
     transport: http(),
   });
 
-  const logs = await client.getLogs({
+  const logs = await getLogsOnchain(client, {
     address: SocialRecoveryContractConfig.address,
     fromBlock,
-    toBlock: 'latest',
     // TODO: why hash is not indexed?
     event: parseAbiItem('event ApproveHash(address indexed guardian, bytes32 hash)'),
     args: { guardian },

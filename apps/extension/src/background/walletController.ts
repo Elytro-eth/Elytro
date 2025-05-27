@@ -476,25 +476,29 @@ class WalletController {
       // if the recovery record is waiting for signature, check if the contacts have signed
       const { contacts, threshold } = recoveryRecord;
       const signedContacts = contacts.filter((contact) => contact.confirmed);
+      let leftSignsNeeded = threshold - signedContacts.length;
 
-      if (signedContacts.length >= threshold) {
+      if (leftSignsNeeded <= 0) {
         recoveryRecord.status = RecoveryStatusEn.SIGNATURE_COMPLETED;
       } else {
         const waitingContacts = contacts.filter((contact) => !contact.confirmed);
 
         for (const contact of waitingContacts) {
           const isSigned = await elytroSDK.checkIsGuardianSigned(
-            recoveryRecord.approveHash as `0x${string}`,
             contact.address as Address,
             BigInt(recoveryRecord.fromBlock)
           );
 
           if (isSigned) {
+            leftSignsNeeded--;
             recoveryRecord.contacts = recoveryRecord.contacts.map((contact) =>
               contact.address === contact.address ? { ...contact, confirmed: true } : contact
             );
-            if (signedContacts.length >= threshold) {
-              recoveryRecord.status = RecoveryStatusEn.SIGNATURE_COMPLETED;
+            if (leftSignsNeeded <= 0) {
+              recoveryRecord.status = await elytroSDK.checkOnchainRecoveryStatus(
+                recoveryRecord.address,
+                recoveryRecord.recoveryID
+              );
               break;
             }
           }
