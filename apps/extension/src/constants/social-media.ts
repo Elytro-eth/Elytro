@@ -20,10 +20,10 @@ export const SOCIAL_MEDIA_LINKS = [
     url: 'https://github.com/Elytro-eth',
     icon: github,
   },
-  {
-    name: 'Linkedin',
-    // TODO: replace this to real link
-    url: 'https://www.linkedin.com/company/elytro/',
-    icon: linkedin,
-  },
+  // {
+  //   name: 'Linkedin',
+  //   // TODO: replace this to real link
+  //   url: 'https://www.linkedin.com/company/elytro/',
+  //   icon: linkedin,
+  // },
 ];

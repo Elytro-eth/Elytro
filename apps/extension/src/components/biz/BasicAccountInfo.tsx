@@ -48,13 +48,13 @@ const ActionButtons = () => {
     <>
       <ActionButton
         className="bg-light-green hover:bg-green hover:stroke-white"
-        icon={<ArrowDownLeft className="size-5 mr-1 duration-100 transition-all group-hover:stroke-white" />}
+        icon={<ArrowDownLeft className="size-5 mr-1 stroke-dark-blue duration-100 transition-all group-hover:stroke-white" />}
         label="Receive"
         onClick={handleClickReceive}
       />
       <ActionButton
         className="hover:stroke-white"
-        icon={<ArrowUpRight className="size-5 mr-1 duration-100 transition-all group-hover:stroke-white" />}
+        icon={<ArrowUpRight className="size-5 mr-1 stroke-dark-blue duration-100 transition-all group-hover:stroke-white" />}
         label="Send"
         onClick={handleClickSend}
       />

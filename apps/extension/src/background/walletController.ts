@@ -410,7 +410,7 @@ class WalletController {
     const [erc20Tokens, ethBalance] = await Promise.all([getTokenList(chainId), walletClient.getBalance(address)]);
 
     const ethToken = {
-      name: 'Ether',
+      name: 'ETH',
       balance: Number(ethBalance),
       decimals: 18,
       symbol: 'ETH',

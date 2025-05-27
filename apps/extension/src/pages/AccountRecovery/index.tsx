@@ -55,11 +55,15 @@ export default function AccountRecovery() {
               Icon={Search}
             />
             <TipItem
-              title="2. Ask your contacts to sign"
-              description="You need to collect enough signatures."
+              title="2. Ask your contacts to confirm"
+              description="You need to collect enough confirmations."
               Icon={Shield}
             />
-            <TipItem title="3. Wait 48 hrs until recovered " description="This is for extra security." Icon={Clock} />
+            <TipItem 
+              title="3. Wait 48 hrs until recovered" 
+              description="This is for extra security." 
+              Icon={Clock} 
+            />
           </div>
           <Button className="w-full" onClick={() => setChecked(true)}>
             Start recovery
