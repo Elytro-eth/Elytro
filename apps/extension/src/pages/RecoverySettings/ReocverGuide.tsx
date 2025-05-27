@@ -20,12 +20,12 @@ export default function RecoverGuide({ onClick }: { onClick: () => void }) {
         />
         <TipItem
           title="2. Add contact by address"
-          description="Contact addresses will be stored on chain."
+          description="Contact will be stored on chain."
           Icon={Shield}
         />
         <TipItem
           title="3. Contacts help you recover"
-          description="Regain access once enough contacts signed."
+          description="Regain access once contacts confirmed."
           Icon={Clock}
         />
       </div>

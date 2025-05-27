@@ -178,7 +178,7 @@ export default function ImportToken() {
           onChange={(e) =>
             setToken((prev) => ({ ...prev, name: e.target.value }))
           }
-          placeholder="Ether"
+          placeholder="ETH"
         />
 
         <Button

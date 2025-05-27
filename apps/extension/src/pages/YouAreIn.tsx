@@ -34,7 +34,7 @@ const YouAreIn: React.FC = () => {
         <img src={IconSuccess} alt="Passcode" width={164} />
       </div>
 
-      <div className="flex flex-col gap-y-2xs">
+      <div className="flex flex-col gap-y-sm">
         <h1 className="elytro-text-title text-center">{title}</h1>
         <h2 className="elytro-text-smaller-body text-muted-foreground text-center">{description}</h2>
       </div>

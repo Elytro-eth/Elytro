@@ -28,8 +28,8 @@ export default function ContactDetail({ contact, onSaveContact }: IContactDetail
         {/* TODO: Missing Tab: Which type of contact? Email or Wallet Address */}
 
         <HelperText
-          title="Name of contact is saved locally"
-          description="They will not be deployed on chain for privacy."
+          title="Addresses will be visible on chain"
+          description="Names will not be deployed for privacy reasons."
         />
 
         {/* If Wallet Address: input address and name(optional) */}
