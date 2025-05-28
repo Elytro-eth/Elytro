@@ -28,9 +28,7 @@ export default function TokenBalanceItem({ amount, decimals, symbol, address, cl
 
   return (
     <div className={`flex flex-col  items-end gap-x-sm w-fit whitespace-nowrap ${className}`}>
-      <p className="text-base font-bold text-gray-900">
-        {tokenAmount} {symbol}
-      </p>
+      <p className="text-base font-bold text-gray-900">{tokenAmount}</p>
       {displayPrice && <p className="text-sm font-medium text-gray-600 -mt-[.2rem]">{displayPrice}</p>}
     </div>
   );

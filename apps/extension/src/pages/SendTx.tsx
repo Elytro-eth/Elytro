@@ -55,7 +55,7 @@ export default function SendTx() {
       .superRefine((data, ctx) => {
         const token = form.getValues('token');
 
-        if (data === '' || isNaN(Number(data)) || Number(data) <= 0) {
+        if (data && (data === '' || isNaN(Number(data)) || Number(data) <= 0)) {
           ctx.addIssue({
             code: 'custom',
             message: 'Please input a valid amount',

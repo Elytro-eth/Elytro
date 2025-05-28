@@ -66,14 +66,7 @@ function ApprovalDetailItem({ decodedResult, useExpanded = false }: IApprovalDet
           <>
             <InfoCardItem label="Sending" content={<TokenAmountItem {...transferredTokenInfo} size="sm" />} />
 
-            <InfoCardItem
-              label="Function"
-              content={
-                decodedResult?.method?.text || (
-                  <span className="elytro-text-tiny-body bg-white px-xs py-3xs rounded-xs text-gray-750">Unknown</span>
-                )
-              }
-            />
+            {decodedResult?.method?.text && <InfoCardItem label="Function" content={decodedResult?.method?.text} />}
 
             <InfoCardItem label="Data" content={decodedResult?.method?.bytes4} />
           </>
