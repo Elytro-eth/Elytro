@@ -22,22 +22,10 @@ const TokenConfigItem = ({
 }) => {
   return (
     <div className="flex items-center gap-x-sm">
-      <img
-        src={token.logoURI}
-        alt={token.symbol}
-        className="size-8 rounded-full flex-shrink-0 "
-      />
+      <img src={token.logoURI} alt={token.symbol} className="size-8 rounded-full flex-shrink-0 " />
       <div className="flex flex-col">
-        <HighlightText
-          className="elytro-text-smaller-body"
-          text={token.symbol}
-          highlight={searchValue}
-        />
-        <HighlightText
-          className="elytro-text-tiny-body"
-          text={token.address}
-          highlight={searchValue}
-        />
+        <HighlightText className="elytro-text-smaller-body" text={token.symbol} highlight={searchValue} />
+        <HighlightText className="elytro-text-tiny-body" text={token.address} highlight={searchValue} />
       </div>
     </div>
   );
@@ -74,9 +62,7 @@ export default function ImportToken() {
       symbol: value,
     }));
 
-    return tokens.filter((token) =>
-      token.symbol.toLowerCase().includes(value.toLowerCase())
-    );
+    return tokens.filter((token) => token.symbol.toLowerCase().includes(value.toLowerCase()));
   };
 
   const handleAddressInputChange = (value: string) => {
@@ -85,9 +71,7 @@ export default function ImportToken() {
       address: value as `0x${string}`,
     }));
 
-    return tokens.filter((token) =>
-      token.address.toLowerCase().includes(value.toLowerCase())
-    );
+    return tokens.filter((token) => token.address.toLowerCase().includes(value.toLowerCase()));
   };
 
   const handleSelectToken = (token: TTokenInfo) => {
@@ -109,6 +93,12 @@ export default function ImportToken() {
     try {
       await wallet.importToken({ ...token, name: token?.name || token.symbol });
       updateTokens();
+
+      toast({
+        title: 'Token imported successfully',
+        variant: 'constructive',
+      });
+
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
     } catch (error) {
       console.error('Elytro: Import token failed', error);
@@ -129,13 +119,7 @@ export default function ImportToken() {
           input={token.symbol}
           onSearch={handleSymbolInputChange}
           onSelect={handleSelectToken}
-          renderItem={(token) => (
-            <TokenConfigItem
-              token={token}
-              searchType="symbol"
-              searchValue={token.symbol}
-            />
-          )}
+          renderItem={(token) => <TokenConfigItem token={token} searchType="symbol" searchValue={token.symbol} />}
           placeholder="ETH"
         />
 
@@ -145,18 +129,10 @@ export default function ImportToken() {
             input={token.address}
             onSearch={handleAddressInputChange}
             onSelect={handleSelectToken}
-            renderItem={(token) => (
-              <TokenConfigItem
-                token={token}
-                searchType="address"
-                searchValue={token.address}
-              />
-            )}
+            renderItem={(token) => <TokenConfigItem token={token} searchType="address" searchValue={token.address} />}
             placeholder="0x"
           />
-          {hasAddressError && (
-            <p className="elytro-text-tiny-body text-red">Invalid address</p>
-          )}
+          {hasAddressError && <p className="elytro-text-tiny-body text-red">Invalid address</p>}
         </div>
 
         <LabelInput
@@ -175,21 +151,14 @@ export default function ImportToken() {
         <LabelInput
           label="Token name"
           value={token.name}
-          onChange={(e) =>
-            setToken((prev) => ({ ...prev, name: e.target.value }))
-          }
+          onChange={(e) => setToken((prev) => ({ ...prev, name: e.target.value }))}
           placeholder="ETH"
         />
 
         <Button
           className="mt-3xl"
           onClick={handleImportToken}
-          disabled={
-            !token.address ||
-            !token.symbol ||
-            !token.decimals ||
-            hasAddressError
-          }
+          disabled={!token.address || !token.symbol || !token.decimals || hasAddressError}
         >
           Continue
         </Button>

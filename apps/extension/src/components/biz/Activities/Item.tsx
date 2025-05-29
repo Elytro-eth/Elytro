@@ -108,13 +108,16 @@ export default function ActivityItem({
         </div>
       </div>
 
-      <TokenBalanceItem
-        amount={Number(value)}
-        decimals={decimals}
-        symbol={symbol}
-        address={from as `0x${string}`}
-        className="flex-shrink-0"
-      />
+      {/* Hide token if it's a contract interaction and the value is 0 */}
+      {(type !== HistoricalActivityTypeEn.ContractInteraction || Number(value) > 0) && (
+        <TokenBalanceItem
+          amount={Number(value)}
+          decimals={decimals}
+          symbol={symbol}
+          address={from as `0x${string}`}
+          className="flex-shrink-0"
+        />
+      )}
     </div>
   );
 }
