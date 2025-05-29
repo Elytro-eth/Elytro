@@ -52,7 +52,7 @@ export default function AccountOption({
       <div className="flex items-center gap-sm">
         <Avatar>
           <AvatarImage
-            className="size-8"
+            className="size-8 rounded-full"
             src={getIconByChainId(account.chainId)}
           />
           <AvatarFallback>{account.chainId}</AvatarFallback>
@@ -63,7 +63,7 @@ export default function AccountOption({
         </span>
       </div>
 
-      <div className="elytro-text-small text-gray-600 flex flex-row items-center">
+      <div className="text-sm text-gray-600 flex flex-row items-center">
         <span className="text-gray-600">
           {formatTokenAmount(account?.balance, 18, 'ETH')}
         </span>

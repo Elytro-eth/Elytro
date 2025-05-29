@@ -33,7 +33,7 @@ export default function ConnectionConfirmation({
         </Avatar>
       </div>
 
-      <div className="text-center mb-8">
+      <div className="text-center my-8">
         <h2 className="elytro-text-bold-body">Connect to {dApp.name}</h2>
         <p className="elytro-text-small mt-sm text-gray-600">{dApp.origin}</p>
       </div>

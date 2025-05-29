@@ -6,7 +6,7 @@ import ContactList from './ContactList';
 import ContactDetail from './ContactDetail';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
-import RecoverGuide from './ReocverGuide';
+import RecoverGuide from './RecoverGuide';
 import { toast } from '@/hooks/use-toast';
 import LabelDialog, { ILabelDialogRef } from './LabelDialog';
 

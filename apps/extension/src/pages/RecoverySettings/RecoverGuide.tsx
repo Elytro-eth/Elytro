@@ -1,30 +1,28 @@
 import ContactsImg from '@/assets/contacts.png';
 import TipItem from '@/components/biz/TipItem';
 import { Button } from '@/components/ui/button';
-import { Clock, Mail, Shield } from 'lucide-react';
+import { Clock, WalletCards, Shield } from 'lucide-react';
 
 export default function RecoverGuide({ onClick }: { onClick: () => void }) {
   return (
-    <div className="flex flex-col gap-y-xl items-center mt-10">
+    <div className="flex flex-col gap-y-xl items-center mt-10 ">
       <img src={ContactsImg} className="size-36" />
-      <div className="elytro-text-subtitle text-center">
-        How recovery
-        <br />
-        contact works
+      <div className="elytro-text-subtitle text-center text-dark-blue">
+        How Recovery works
       </div>
       <div>
         <TipItem
-          title="1. Each wallet has own contacts"
+          title="Each wallet has own contacts"
           description="Add recovery contacts for each wallet."
-          Icon={Mail}
+          Icon={WalletCards}
         />
         <TipItem
-          title="2. Add contact by address"
+          title="Add contact by address"
           description="Contact will be stored on chain."
           Icon={Shield}
         />
         <TipItem
-          title="3. Contacts help you recover"
+          title="Contacts help you recover"
           description="Regain access once contacts confirmed."
           Icon={Clock}
         />

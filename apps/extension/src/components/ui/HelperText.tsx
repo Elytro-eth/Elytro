@@ -1,13 +1,13 @@
 import { cn } from '@/utils/shadcn/utils';
 
 interface IHelperTextProps {
-  title: string;
+  // title: string;
   description: string;
   className?: string;
 }
 
 export default function HelperText({
-  title,
+  // title,
   description,
   className,
 }: IHelperTextProps) {
@@ -18,8 +18,8 @@ export default function HelperText({
         className
       )}
     >
-      <h2 className="elytro-text-small-bold text-purple">{title}</h2>
-      <p className="elytro-text-tiny-body mt-2xs text-purple">
+      {/* <h2 className="elytro-text-small-bold text-purple">{title}</h2> */}
+      <p className="elytro-text-tiny-body text-purple">
         {description}
       </p>
     </div>

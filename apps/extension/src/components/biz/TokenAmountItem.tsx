@@ -42,14 +42,14 @@ export default function TokenAmountItem({
   return (
     <span
       className={cn(
-        'flex items-center gap-x-sm elytro-text-bold-body',
-        size === 'sm' && 'elytro-text-small-bold',
+        'flex items-center gap-x-sm elytro-text-smaller-body',
+        size === 'sm' && 'elytro-text-smaller-bold',
         className
       )}
     >
       <img
         className={cn(
-          'size-8 rounded-full ring-1 ring-gray-150 bg-white p-1',
+          'size-8 rounded-full ring-1 ring-gray-150 bg-white p-[2px]',
           size === 'sm' && 'size-4'
         )}
         src={logoURI || DefaultTokenIcon}

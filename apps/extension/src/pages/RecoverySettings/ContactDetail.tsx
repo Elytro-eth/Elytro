@@ -30,18 +30,17 @@ export default function ContactDetail({ onAddContact }: IContactDetailProps) {
         {!isAddressValid && (
           <div className="flex items-center gap-x-2xs">
             <CircleAlert className="size-3  stroke-red" />
-            <p className="elytro-text-tiny-body text-red">Recovery requires valid Ethereum-compatible addresses</p>
+            <p className="elytro-text-tiny-body text-red">Recovery requires Ethereum-compatible addresses</p>
           </div>
         )}
 
         <HelperText
-          title="Addresses will be visible on chain"
-          description="Names will not be deployed for privacy reasons."
+          description="Addresses will be visible on chain"
         />
       </div>
 
       <Button className="mt-4" disabled={!isAddress(address)} onClick={() => onAddContact({ address })}>
-        Save wallet contact
+        Save contact
       </Button>
     </div>
   );

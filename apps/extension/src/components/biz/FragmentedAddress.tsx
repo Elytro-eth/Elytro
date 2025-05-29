@@ -17,15 +17,15 @@ interface IProps {
 
 const SIZE_MAP = {
   sm: {
-    icon: 'size-4',
+    icon: 'size-4 rounded-full',
     text: 'elytro-text-smaller-body',
   },
   md: {
-    icon: 'size-6',
+    icon: 'size-6 rounded-full',
     text: 'elytro-text-bold-body',
   },
   lg: {
-    icon: 'size-8',
+    icon: 'size-8 rounded-full',
     text: 'elytro-text-bold-body',
   },
 };

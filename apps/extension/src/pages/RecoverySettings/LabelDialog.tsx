@@ -52,13 +52,13 @@ const LabelDialog = forwardRef<ILabelDialogRef, ILabelDialogProps>(({ onSave }, 
         <DialogHeader>
           <DialogTitle>Add a label</DialogTitle>
         </DialogHeader>
-        <DialogDescription className="text-sm text-muted-foreground">
+        <DialogDescription className="text-sm text-gray-600">
           Labels are saved locally and not on chain
         </DialogDescription>
 
         <Input
-          placeholder="Label (optional)"
-          className="bg-gray-150"
+          placeholder="Label"
+          className="bg-gray-150 mt-2"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
         />

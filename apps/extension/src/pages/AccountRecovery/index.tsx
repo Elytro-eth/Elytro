@@ -50,17 +50,17 @@ export default function AccountRecovery() {
           <h1 className="elytro-text-title">How to recover</h1>
           <div>
             <TipItem
-              title="1. Enter your wallet details"
+              title="Enter your wallet details"
               description="You need the network & address of your wallet."
               Icon={Search}
             />
             <TipItem
-              title="2. Ask your contacts to confirm"
+              title="Ask your contacts to confirm"
               description="You need to collect enough confirmations."
               Icon={Shield}
             />
             <TipItem 
-              title="3. Wait 48 hrs until recovered" 
+              title="Wait 48 hrs until recovered" 
               description="This is for extra security." 
               Icon={Clock} 
             />

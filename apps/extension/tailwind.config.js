@@ -76,7 +76,8 @@ module.exports = {
         red: '#FF7066',
         'light-red': '#FCE9EA',
         purple: '#7755B5',
-        'light-purple': '#F9F5FF',
+        'light-purple': '#ECE6F7',
+        'overlay': 'rgba(22, 42, 54, 0.26)',
 
         // Start of Selection
         background: 'var(--background)',
