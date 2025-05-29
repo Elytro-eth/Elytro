@@ -93,7 +93,7 @@ type TApprovalInfo = {
 };
 
 type TRecoveryContact = {
-  name?: string;
+  label?: string;
   address: string;
   confirmed?: boolean;
 };

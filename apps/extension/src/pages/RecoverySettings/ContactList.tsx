@@ -39,26 +39,6 @@ export default function ContactList({
   const [isRecoverContactChanged, setIsRecoverContactChanged] = useState(false);
   const isAddressChanged = useRef(false);
 
-  function getLocalContacts(address: string): TRecoveryContact[] {
-    try {
-      const raw = localStorage.getItem(`recovery_contacts_${address}`);
-      if (!raw) return [];
-      return JSON.parse(raw);
-    } catch {
-      return [];
-    }
-  }
-
-  const initialNamesRef = useRef<{ [address: string]: string }>({});
-  useEffect(() => {
-    const localContacts = getLocalContacts(currentAccount.address);
-    const map: { [address: string]: string } = {};
-    localContacts.forEach((c) => {
-      map[c.address] = c.name || '';
-    });
-    initialNamesRef.current = map;
-  }, [currentAccount.address]);
-
   useEffect(() => {
     let active = true;
     async function check() {
@@ -67,53 +47,26 @@ export default function ContactList({
         contacts.map((contact) => contact.address),
         Number(threshold)
       );
-      const nameChanged = contacts.some((contact) => {
-        const initialName = initialNamesRef.current[contact.address] || '';
-        return (contact.name || '') !== initialName;
-      });
 
       if (!active) return;
-      setIsRecoverContactChanged(isAddressChanged.current || nameChanged);
+      setIsRecoverContactChanged(isAddressChanged.current);
     }
 
     check();
     return () => {
       active = false;
     };
-  }, [contacts, threshold, wallet, currentAccount.address, isAddressChanged]);
+  }, [contacts, threshold, wallet, isAddressChanged]);
 
   const handleConfirmContacts = async () => {
     try {
       setLoading(true);
 
-      if (isAddressChanged.current) {
-        const txs = await wallet.generateRecoveryContactsSettingTxs(
-          contacts.map((contact) => contact.address),
-          Number(threshold)
-        );
-        handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs);
-      } else {
-        const localContacts = getLocalContacts(currentAccount.address);
-        const updatedContacts = contacts.map((contact) => {
-          const local = localContacts.find((lc) => lc.address === contact.address);
-          return {
-            address: contact.address,
-            name: contact.name || local?.name || '',
-          };
-        });
-        localStorage.setItem(`recovery_contacts_${currentAccount.address}`, JSON.stringify(updatedContacts));
-        const map: { [address: string]: string } = {};
-        updatedContacts.forEach((c) => {
-          map[c.address] = c.name || '';
-        });
-        initialNamesRef.current = map;
-        setIsRecoverContactChanged(false);
-        toast({
-          title: 'Success',
-          description: 'Contact names updated successfully',
-          variant: 'default',
-        });
-      }
+      const txs = await wallet.generateRecoveryContactsSettingTxs(
+        contacts.map((contact) => contact.address),
+        Number(threshold)
+      );
+      handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs);
     } catch (error) {
       toast({
         title: 'Failed',

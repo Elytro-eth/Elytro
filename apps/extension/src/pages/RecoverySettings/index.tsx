@@ -1,13 +1,14 @@
 import ProcessingTip from '@/components/ui/ProcessingTip';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ContactList from './ContactList';
 import ContactDetail from './ContactDetail';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
 import RecoverGuide from './ReocverGuide';
 import { toast } from '@/hooks/use-toast';
+import LabelDialog, { ILabelDialogRef } from './LabelDialog';
 
 enum ShowType {
   Guide = 'guide',
@@ -15,7 +16,6 @@ enum ShowType {
   Detail = 'detail',
 }
 
-// 本地联系人name存储
 function getLocalContacts(address: string): TRecoveryContact[] {
   try {
     const raw = localStorage.getItem(`recovery_contacts_${address}`);
@@ -38,7 +38,7 @@ export default function RecoverySettings() {
   const [contacts, setContacts] = useState<TRecoveryContact[]>([]);
   const [threshold, setThreshold] = useState<string>('0');
   const [showType, setShowType] = useState<ShowType>(ShowType.List);
-  const [selectedContact, setSelectedContact] = useState<TRecoveryContact | null>(null);
+  const labelDialogRef = useRef<ILabelDialogRef>(null);
 
   const getRecoveryContacts = async () => {
     try {
@@ -49,7 +49,7 @@ export default function RecoverySettings() {
       setContacts(
         contacts.map((c) => {
           const local = localContacts.find((lc) => lc.address === c);
-          return { address: c, name: local?.name || '' };
+          return { address: c, label: local?.label || '' };
         })
       );
       setThreshold(threshold.toString());
@@ -66,29 +66,29 @@ export default function RecoverySettings() {
 
   const handleAddContact = () => {
     setShowType(ShowType.Detail);
-    setSelectedContact(null);
   };
 
   const handleEditContact = (contact: TRecoveryContact) => {
-    setShowType(ShowType.Detail);
-    setSelectedContact(contact);
+    labelDialogRef.current?.open(contact);
+  };
+
+  const saveContacts = (newContacts: TRecoveryContact[]) => {
+    setContacts(newContacts);
+    setLocalContacts(address, newContacts);
   };
 
   const handleDeleteContact = (contact: TRecoveryContact) => {
     const newContacts = contacts.filter((c) => c.address !== contact.address);
-    setContacts(newContacts);
+    saveContacts(newContacts);
     setThreshold('0');
-    setLocalContacts(address, newContacts);
   };
 
   const onClickGuide = () => {
     setShowType(ShowType.List);
   };
 
-  const handleSaveContact = (contact: TRecoveryContact) => {
-    const isAddressExists = contacts.some(
-      (c) => c.address === contact.address && (!selectedContact || c.address !== selectedContact.address)
-    );
+  const handleSaveAddedContact = (contact: TRecoveryContact) => {
+    const isAddressExists = contacts.some((c) => c.address === contact.address);
     if (isAddressExists) {
       toast({
         title: 'Address already exists',
@@ -97,17 +97,13 @@ export default function RecoverySettings() {
       });
       return;
     }
-    let newContacts: TRecoveryContact[];
-    if (selectedContact) {
-      newContacts = contacts.map((c) => (c.address === selectedContact.address ? contact : c));
-      setContacts(newContacts);
-    } else {
-      newContacts = [...contacts, contact];
-      setContacts(newContacts);
-    }
-    setLocalContacts(address, newContacts);
-    setSelectedContact(null);
+    saveContacts([...contacts, contact]);
     setShowType(ShowType.List);
+  };
+
+  const handleSaveContactLabel = (contact: TRecoveryContact) => {
+    const newContacts = contacts.map((c) => (c.address === contact.address ? contact : c));
+    saveContacts(newContacts);
   };
 
   return (
@@ -147,11 +143,10 @@ export default function RecoverySettings() {
               onDeleteContact={handleDeleteContact}
             />
           )}
-          {showType === ShowType.Detail && (
-            <ContactDetail onSaveContact={handleSaveContact} contact={selectedContact} />
-          )}
+          {showType === ShowType.Detail && <ContactDetail onAddContact={handleSaveAddedContact} />}
         </>
       )}
+      <LabelDialog ref={labelDialogRef} onSave={handleSaveContactLabel} />
     </SecondaryPageWrapper>
   );
 }

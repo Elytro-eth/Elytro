@@ -14,13 +14,10 @@ export function RedDot(props: RedDotProps) {
   return (
     <div
       className={cn(
-        'inline-flex items-center rounded-full border px-1 py-1 text-xs font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+        'inline-flex items-center rounded-full border px-1 py-1 text-xs bg-red font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
         SIZE[size],
         className
       )}
-      style={{
-        backgroundColor: '#FF7066',
-      }}
     ></div>
   );
 }
