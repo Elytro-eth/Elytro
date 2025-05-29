@@ -13,12 +13,7 @@ interface IAccountOptionProps {
   onSelect: () => void;
 }
 
-export default function AccountOption({
-  account,
-  isSelected,
-  onDelete,
-  onSelect,
-}: IAccountOptionProps) {
+export default function AccountOption({ account, isSelected, onDelete, onSelect }: IAccountOptionProps) {
   const { elytroAlert } = useAlert();
 
   const handleDelete = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -51,27 +46,17 @@ export default function AccountOption({
     >
       <div className="flex items-center gap-sm">
         <Avatar>
-          <AvatarImage
-            className="size-8"
-            src={getIconByChainId(account.chainId)}
-          />
+          <AvatarImage className="size-8 rounded-full" src={getIconByChainId(account.chainId)} />
           <AvatarFallback>{account.chainId}</AvatarFallback>
         </Avatar>
 
-        <span className="font-bold text-sm">
-          {formatAddressToShort(account.address)}
-        </span>
+        <span className="font-bold text-sm">{formatAddressToShort(account.address)}</span>
       </div>
 
-      <div className="elytro-text-small text-gray-600 flex flex-row items-center">
-        <span className="text-gray-600">
-          {formatTokenAmount(account?.balance, 18, 'ETH')}
-        </span>
+      <div className="text-sm text-gray-600 flex flex-row items-center">
+        <span className="text-gray-600">{formatTokenAmount(account?.balance, 18, 'ETH')}</span>
         {!isSelected ? (
-          <Trash2
-            className="size-4 stroke-gray-600 hover:stroke-gray-900 ml-sm"
-            onClick={handleDelete}
-          />
+          <Trash2 className="size-4 stroke-gray-600 hover:stroke-gray-900 ml-sm" onClick={handleDelete} />
         ) : (
           <span></span>
         )}

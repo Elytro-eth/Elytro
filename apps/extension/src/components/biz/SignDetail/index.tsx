@@ -48,20 +48,20 @@ export default function SignDetail({ onConfirm, onCancel, dapp, chainId, signDat
 
   return (
     <div className="w-full mx-auto">
-      <div className="mb-2 border-b">
+      <div className="mb-6">
         <DAppDetail dapp={dapp} chainId={chainId} />
       </div>
 
-      <div className="space-4">
-        <div className="rounded-2xl p-4">
+      <div className="space-2">
+        <div className="rounded-2xl">
           {/* TODO: 区分 */}
-          <div className="text-lg font-bold mb-3">{title}</div>
+          <div className="text-sm font-bold mb-3">{title}</div>
 
           {showDetail && <DomainDetail message={params[messageIdx]} />}
 
           <pre
             className={cn(
-              'w-full whitespace-normal bg-gray-150 rounded-2xl p-4 text-sm text-gray-500 min-h-40 max-h-[calc(100vh-400px)] !overflow-auto ',
+              'w-full whitespace-normal bg-gray-150 rounded-2xl p-4 text-xs text-gray-500 min-h-40 max-h-[calc(100vh-400px)] !overflow-auto ',
               signMethod === 'signMessage' ? '[word-break:break-word]' : ''
             )}
             style={{
@@ -75,11 +75,11 @@ export default function SignDetail({ onConfirm, onCancel, dapp, chainId, signDat
 
       <div className="flex flex-col gap-y-4">
         <div className="text-xs text-gray-300 my-4 border-gray-200">
-          <div className="px-4">
+          <div className="">
             By confirming, you will allow the smart contract to access your fund and make transactions.
           </div>
         </div>
-        <div className="flex w-full justify-between gap-x-2 px-4">
+        <div className="flex w-full justify-between gap-x-2">
           <Button variant="ghost" onClick={handleCancel} className="flex-1 rounded-md border border-gray-200">
             Cancel
           </Button>

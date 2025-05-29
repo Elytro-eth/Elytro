@@ -95,7 +95,7 @@ export default function ActivityItem({
         <div className="flex flex-col min-w-0 flex-1">
           <div className="flex items-center gap-2 min-w-0">
             <span className="font-bold text-base truncate">{name}</span>
-            <span className={`elytro-text-tiny-body px-xs py-2xs rounded-xs text-white ${style} flex-shrink-0`}>
+            <span className={`elytro-text-tiny-body px-xs py-3xs rounded-xs text-white ${style} flex-shrink-0`}>
               {label}
             </span>
           </div>

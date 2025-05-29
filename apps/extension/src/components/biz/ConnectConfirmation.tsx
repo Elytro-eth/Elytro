@@ -10,15 +10,8 @@ interface IProps {
   onConfirm: () => void;
 }
 
-export default function ConnectionConfirmation({
-  dApp,
-  onConfirm,
-  onCancel,
-}: IProps) {
-  const tips = [
-    'Access to your balance and activities',
-    'Send you requests for transactions',
-  ];
+export default function ConnectionConfirmation({ dApp, onConfirm, onCancel }: IProps) {
+  const tips = ['Access to your balance and activities', 'Send you requests for transactions'];
 
   return (
     <Card className="w-full h-full p-6 flex flex-col border-none rounded-none shadow-none">
@@ -33,15 +26,13 @@ export default function ConnectionConfirmation({
         </Avatar>
       </div>
 
-      <div className="text-center mb-8">
+      <div className="text-center my-8">
         <h2 className="elytro-text-bold-body">Connect to {dApp.name}</h2>
         <p className="elytro-text-small mt-sm text-gray-600">{dApp.origin}</p>
       </div>
 
       <div className="mb-8">
-        <p className="text-gray-700 mb-sm font-medium">
-          This site will be able to:
-        </p>
+        <p className="text-gray-700 mb-sm font-medium">This site will be able to:</p>
         <ul className="space-y-2xs">
           {tips.map((tip) => (
             <li className="flex items-start text-sm  align-center" key={tip}>

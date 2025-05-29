@@ -2,7 +2,7 @@ import { encodeFunctionData, isAddress, parseUnits, zeroAddress } from 'viem';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CircleHelp, AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { Transaction } from '@soulwallet/sdk';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
@@ -275,7 +275,7 @@ export default function SendTx() {
 
             {/* Warning message */}
             <div className="flex text-gray-750">
-              <CircleHelp className="w-4 h-4 text-gray-750 mr-2" />
+              <AlertCircle className="w-4 h-4 stroke-gray-750 mr-2" />
               Tokens will be lost if sent to a different network.
             </div>
           </div>
