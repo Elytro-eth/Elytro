@@ -17,11 +17,7 @@ const SelectedToken = memo(({ token }: { token?: TTokenInfo }) => {
 
   return (
     <div className="flex items-center w-full">
-      <img
-        className="h-10 w-10"
-        src={token.logoURI || DefaultTokenIcon}
-        alt={token.name || 'Token'}
-      />
+      <img className="h-10 w-10" src={token.logoURI || DefaultTokenIcon} alt={token.name || 'Token'} />
       <div className="text-left ml-2">
         <div className="flex items-center">
           <div className="text-lg font-bold">{token.name || token.symbol}</div>
@@ -51,13 +47,7 @@ export default function TokenSelector({
   const [open, setOpen] = useState(false);
 
   const defaultToken = useCallback(() => {
-    return (
-      tokens.find(
-        (token) => token.balance !== undefined && token.balance > 0
-      ) ||
-      tokens[0] ||
-      null
-    );
+    return tokens.find((token) => token.balance !== undefined && token.balance > 0) || tokens[0] || null;
   }, [tokens]);
 
   const [selectedToken, setSelectedToken] = useState<TTokenInfo | null>();
@@ -102,11 +92,7 @@ export default function TokenSelector({
 
   return (
     <Select open={open} onOpenChange={setOpen}>
-      <SelectTrigger
-        needDropdown={false}
-        onClick={toggleDropdown}
-        className={cn('border-0', className)}
-      >
+      <SelectTrigger needDropdown={false} onClick={toggleDropdown} className={cn('border-0', className)}>
         <SelectedToken token={selectedToken as TTokenInfo} />
       </SelectTrigger>
       <SelectContent
@@ -115,9 +101,7 @@ export default function TokenSelector({
         onEscapeKeyDown={handleClose}
       >
         {tokens.length === 0 ? (
-          <div className="p-4 text-center text-gray-500">
-            No tokens available
-          </div>
+          <div className="p-4 text-center text-gray-500">No tokens available</div>
         ) : (
           tokens.map((item) => (
             <div
@@ -125,7 +109,7 @@ export default function TokenSelector({
               className="cursor-pointer hover:bg-gray-200"
               key={`${item.symbol}-${item.address || 'native'}`}
             >
-              <TokenItem token={item} />
+              <TokenItem token={item} showSymbol={false} />
             </div>
           ))
         )}
