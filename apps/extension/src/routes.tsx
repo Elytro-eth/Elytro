@@ -8,7 +8,7 @@ import Alert from './pages/Alert';
 import Sign from './pages/Sign';
 import TxConfirm from './pages/TxConfirm';
 import Create from './pages/CreatePasscode';
-import CreateAccount from './pages/CreateAccount';
+// import CreateAccount from './pages/CreateAccount';
 import YouAreIn from './pages/YouAreIn';
 import CreateNewAddress from './pages/CreateNewAddress';
 import LocalProfile from './pages/LocalProfile';
@@ -43,7 +43,7 @@ export enum SIDE_PANEL_ROUTE_PATHS {
   CreatePasscode = '/create-passcode',
   Unlock = '/unlock',
   YouAreIn = '/you-are-in',
-  CreateAccount = '/create-account',
+  // CreateAccount = '/create-account',
   CreateNewAddress = '/create-new-address',
   LocalProfile = '/local-profile',
   Connection = '/connection',
@@ -124,10 +124,6 @@ export const routes: TRoute[] = [
   {
     path: SIDE_PANEL_ROUTE_PATHS.YouAreIn,
     component: YouAreIn,
-  },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.CreateAccount,
-    component: CreateAccount,
   },
   {
     path: SIDE_PANEL_ROUTE_PATHS.CreateNewAddress,

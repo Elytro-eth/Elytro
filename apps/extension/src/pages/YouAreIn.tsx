@@ -5,12 +5,14 @@ import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { Button } from '@/components/ui/button';
 import useSearchParams from '@/hooks/use-search-params';
 import { navigateTo } from '@/utils/navigation';
+import { useWallet } from '@/contexts/wallet';
 
 const YouAreIn: React.FC = () => {
   const params = useSearchParams();
   const isFromRecover = params.from === 'recover';
+  const { wallet } = useWallet();
 
-  const { title, description, action, actionPath } = isFromRecover
+  const { title, description, action, actionPath, beforeAction } = isFromRecover
     ? {
         title: 'You are ready to recover',
         description: 'You will need the passcode to see recovery status',
@@ -19,9 +21,12 @@ const YouAreIn: React.FC = () => {
       }
     : {
         title: 'Welcome!',
-        description: 'Let’s create your first smart contract wallet',
-        action: 'Create wallet',
-        actionPath: SIDE_PANEL_ROUTE_PATHS.CreateAccount,
+        description: "Let's get you started",
+        action: 'Go to dashboard',
+        actionPath: SIDE_PANEL_ROUTE_PATHS.Dashboard,
+        beforeAction: async () => {
+          await wallet.createAccount(1); // create ethereum mainnet account as default
+        },
       };
 
   return (
@@ -42,7 +47,8 @@ const YouAreIn: React.FC = () => {
       <Button
         className="w-full rounded-full h-14"
         size="large"
-        onClick={() => {
+        onClick={async () => {
+          await beforeAction?.();
           navigateTo('side-panel', actionPath);
         }}
       >
