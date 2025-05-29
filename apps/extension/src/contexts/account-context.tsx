@@ -1,28 +1,13 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useWallet } from '@/contexts/wallet';
 import { useHashLocation } from 'wouter/use-hash-location';
 import useSearchParams from '@/hooks/use-search-params';
 import { Address, toHex } from 'viem';
-import {
-  UserOperationStatusEn,
-  HistoricalActivityTypeEn,
-  UserOperationHistory,
-} from '@/constants/operations';
+import { UserOperationStatusEn, HistoricalActivityTypeEn, UserOperationHistory } from '@/constants/operations';
 import RuntimeMessage from '@/utils/message/runtimeMessage';
 import { EVENT_TYPES } from '@/constants/events';
 import { removeSearchParamsOfCurrentWindow } from '@/utils/url';
-import {
-  query,
-  query_receive_activities,
-  query_token_price,
-} from '@/requests/query';
+import { query, query_receive_activities, query_token_price } from '@/requests/query';
 import { debounce, DebouncedFunc } from 'lodash';
 import { toast } from '@/hooks/use-toast';
 
@@ -64,14 +49,9 @@ const AccountContext = createContext<IAccountContext>({
   reloadAccount: debounce(async () => {}, 1_000),
 });
 
-export const AccountProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const AccountProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
-  const [currentAccount, setCurrentAccount] =
-    useState<TAccountInfo>(DEFAULT_ACCOUNT_INFO);
+  const [currentAccount, setCurrentAccount] = useState<TAccountInfo>(DEFAULT_ACCOUNT_INFO);
   const [loading, setLoading] = useState(false);
   const [pathname] = useHashLocation();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -132,9 +112,7 @@ export const AccountProvider = ({
         contractAddresses: lastTokens.map((token) => token.address),
       })) as SafeAny;
 
-      const priceMap = new Map(
-        res.tokenPrices.map((item: TTokenPrice) => [item.address, item])
-      );
+      const priceMap = new Map(res.tokenPrices.map((item: TTokenPrice) => [item.address, item]));
 
       const formattedTokenPrices = lastTokens.map((token) => {
         const price = priceMap.get(token.address) || {};
@@ -201,14 +179,9 @@ export const AccountProvider = ({
       return;
     }
 
-    const [localHistory, receives] = await Promise.all([
-      wallet.getLatestHistories(),
-      getReceiveActivities(),
-    ]);
+    const [localHistory, receives] = await Promise.all([wallet.getLatestHistories(), getReceiveActivities()]);
 
-    const res = [...localHistory, ...receives].sort(
-      (a, b) => b.timestamp - a.timestamp
-    );
+    const res = [...localHistory, ...receives].sort((a, b) => b.timestamp - a.timestamp);
 
     setHistory(res);
   };
@@ -229,10 +202,7 @@ export const AccountProvider = ({
       updateHistory();
       updateTokens();
 
-      RuntimeMessage.onMessage(
-        EVENT_TYPES.HISTORY.ITEMS_UPDATED,
-        onHistoryUpdated
-      );
+      RuntimeMessage.onMessage(EVENT_TYPES.HISTORY.ITEMS_UPDATED, onHistoryUpdated);
 
       return () => {
         RuntimeMessage.offMessage(onHistoryUpdated);
@@ -270,22 +240,10 @@ export const AccountProvider = ({
       getAccounts,
       reloadAccount,
     }),
-    [
-      currentAccount,
-      tokens,
-      isTokensLoading,
-      history,
-      loading,
-      accounts,
-      tokenPrices,
-    ]
+    [currentAccount, tokens, isTokensLoading, history, loading, accounts, tokenPrices]
   );
 
-  return (
-    <AccountContext.Provider value={contextValue}>
-      {children}
-    </AccountContext.Provider>
-  );
+  return <AccountContext.Provider value={contextValue}>{children}</AccountContext.Provider>;
 };
 
 export const useAccount = () => {

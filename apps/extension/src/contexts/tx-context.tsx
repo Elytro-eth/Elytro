@@ -11,6 +11,7 @@ import { HistoricalActivityTypeEn, UserOperationStatusEn } from '@/constants/ope
 import { formatErrorMsg } from '@/utils/format';
 import { RuntimeMessage } from '@/utils/message';
 import { EVENT_TYPES } from '@/constants/events';
+import { useAccount } from './account-context';
 
 export enum TxRequestTypeEn {
   DeployWallet = 1,
@@ -70,6 +71,7 @@ const TxContext = createContext<ITxContext>({
 export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
   const { approval, reject, resolve } = useApproval();
+  const { reloadAccount } = useAccount();
 
   const userOpRef = useRef<Nullable<ElytroUserOperation>>();
   const txTypeRef = useRef<Nullable<HistoricalActivityTypeEn>>(null);
@@ -89,6 +91,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       const eventKey = `${EVENT_TYPES.HISTORY.ITEM_STATUS_UPDATED}_${opHash}`;
       const listener = (message: SafeAny) => {
         if (message?.status === UserOperationStatusEn.confirmedSuccess) {
+          reloadAccount(true);
           toast({
             title: ConfirmSuccessMessageMap[requestType!],
             variant: 'constructive',

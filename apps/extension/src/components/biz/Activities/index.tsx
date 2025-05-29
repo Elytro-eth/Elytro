@@ -13,7 +13,6 @@ export default function Activities() {
       </div>
     );
 
-  // split histories into YYYY/MM
   const historiesByMonth = history.reduce(
     (acc, item) => {
       const date = new Date(item.timestamp);
@@ -26,9 +25,16 @@ export default function Activities() {
     },
     {} as Record<string, UserOperationHistory[]>
   );
+
+  Object.values(historiesByMonth).forEach((items) => {
+    items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  });
+
+  const sortedMonths = Object.entries(historiesByMonth).sort(([a], [b]) => b.localeCompare(a));
+
   return (
     <div className="flex flex-col gap-y-lg">
-      {Object.entries(historiesByMonth).map(([month, items]) => (
+      {sortedMonths.map(([month, items]) => (
         <ActivityGroup key={month} date={month} items={items} />
       ))}
     </div>
