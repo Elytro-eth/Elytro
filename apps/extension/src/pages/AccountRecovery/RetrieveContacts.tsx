@@ -164,8 +164,8 @@ function PageContent() {
 
       <HelperText
         // title={`${recoveryRecord?.threshold} signatures required`}
-        description="This requirement was set up by you"
-        className="bg-light-green text-gray-750"
+        description={`${recoveryRecord?.threshold} confirmations required`}
+        className="bg-light-green text-green"
       />
 
       <ShortedAddress address={recoveryRecord?.address} chainId={currentChain?.id} />

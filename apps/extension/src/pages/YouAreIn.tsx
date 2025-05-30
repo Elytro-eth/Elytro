@@ -22,7 +22,7 @@ const YouAreIn: React.FC = () => {
     : {
         title: 'Welcome!',
         description: "Let's get you started",
-        action: 'Go to dashboard',
+        action: 'Start',
         actionPath: SIDE_PANEL_ROUTE_PATHS.Dashboard,
         beforeAction: async () => {
           await wallet.createAccount(1); // create ethereum mainnet account as default

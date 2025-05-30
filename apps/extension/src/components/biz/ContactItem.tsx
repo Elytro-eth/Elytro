@@ -17,7 +17,7 @@ export default function ContactItem({ contact, rightContent }: IContactItemProps
             {formatAddressToShort(contact.address)}
           </p>
           <p className="elytro-text-tiny-body text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap">
-            {contact.label || '—'}
+            {contact.label || 'No label'}
           </p>
         </div>
       </div>

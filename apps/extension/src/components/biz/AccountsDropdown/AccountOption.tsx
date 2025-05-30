@@ -31,7 +31,7 @@ export default function AccountOption({ account, isSelected, onDelete, onSelect 
     elytroAlert({
       title: 'Delete from this device',
       description:
-        'The wallet is still functional but is no longer accessible from this device. You can add it back any time.',
+        'The wallet can be recovered later.',
       onConfirm: onDelete,
     });
   };

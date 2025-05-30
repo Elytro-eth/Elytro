@@ -59,7 +59,7 @@ export default function Receive() {
         <ReceiveAddressBadge address={address!} chainId={chainId} />
 
         <div className="flex flex-row items-center gap-2 w-full text-left">
-          <CircleAlert className="elytro-clickable-icon size-3" />
+          <CircleAlert className="elytro-icon stroke-gray-600 size-3" />
           <div className="elytro-text-tiny-body text-gray-600">Copy and share this address to receive tokens.</div>
         </div>
 
@@ -67,12 +67,12 @@ export default function Receive() {
         <Button variant="secondary" size="large" className="w-full group hover:stroke-white" onClick={onCopy}>
           {isCopied ? (
             <>
-              <Check className="elytro-clickable-icon mr-2xs group-hover:stroke-white" />
+              <Check className="elytro-icon mr-2xs stroke-dark-blue group-hover:stroke-white" />
               Address copied
             </>
           ) : (
             <>
-              <Copy className="elytro-clickable-icon mr-2xs group-hover:stroke-white" />
+              <Copy className="elytro-icon mr-2xs stroke-dark-blue group-hover:stroke-white" />
               Copy address
             </>
           )}

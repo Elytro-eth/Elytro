@@ -51,7 +51,7 @@ export default function AccountRecovery() {
           <div>
             <TipItem
               title="Enter your wallet details"
-              description="You need the network & address of your wallet."
+              description="You need the network & address."
               Icon={Search}
             />
             <TipItem
