@@ -163,7 +163,7 @@ function PageContent() {
       <h1 className="elytro-text-bold-body ">Wallet recovery</h1>
 
       <HelperText
-        title={`${recoveryRecord?.threshold} signatures required`}
+        // title={`${recoveryRecord?.threshold} signatures required`}
         description="This requirement was set up by you"
         className="bg-light-green text-gray-750"
       />
