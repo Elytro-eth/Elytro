@@ -9,7 +9,7 @@ import sessionManager from './services/session';
 import { deformatObjectWithBigInt, formatObjectWithBigInt } from '@/utils/format';
 import historyManager from './services/history';
 import { HistoricalActivityTypeEn } from '@/constants/operations';
-import { Abi, Address, Hex, isHex, toHex, zeroAddress } from 'viem';
+import { Abi, Address, Hex, isHex, toHex } from 'viem';
 import chainService from './services/chain';
 import accountManager from './services/account';
 import type { Transaction } from '@soulwallet/sdk';
@@ -21,6 +21,7 @@ import { ABI_ERC20_BALANCE_OF } from '@/constants/abi';
 import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 import { isOlderThan } from '@/utils/version';
 import { RecoveryStatusEn } from '@/constants/recovery';
+import { ETH_TOKEN_INFO } from '@/constants/token';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -167,14 +168,22 @@ class WalletController {
     decodedDetail: DecodeResult[];
     approvalId?: string;
   }) {
+    const tokenInfo =
+      decodedDetail?.length > 0
+        ? getTransferredTokenInfo(decodedDetail[0])
+        : {
+            value: '0',
+            ...ETH_TOKEN_INFO,
+            to: ETH_TOKEN_INFO.address,
+          };
+
     historyManager.add({
       timestamp: Date.now(),
       type,
       opHash,
       txHash,
       from,
-      // TODO: get all transferred token info
-      ...getTransferredTokenInfo(decodedDetail[0]),
+      ...tokenInfo,
       approvalId,
     });
   }
@@ -410,13 +419,8 @@ class WalletController {
     const [erc20Tokens, ethBalance] = await Promise.all([getTokenList(chainId), walletClient.getBalance(address)]);
 
     const ethToken = {
-      name: 'ETH',
       balance: Number(ethBalance),
-      decimals: 18,
-      symbol: 'ETH',
-      address: zeroAddress,
-      logoURI:
-        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
+      ...ETH_TOKEN_INFO,
     };
 
     if (erc20Tokens.length === 0) {

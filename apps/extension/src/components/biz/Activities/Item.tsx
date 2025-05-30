@@ -108,8 +108,8 @@ export default function ActivityItem({
         </div>
       </div>
 
-      {/* Hide token if it's a contract interaction and the value is 0 */}
-      {(type !== HistoricalActivityTypeEn.ContractInteraction || Number(value) > 0) && (
+      {/* TODO: Check this logic */}
+      {(type === HistoricalActivityTypeEn.Send || type === HistoricalActivityTypeEn.Receive || Number(value) > 0) && (
         <TokenBalanceItem
           amount={Number(value)}
           decimals={decimals}
