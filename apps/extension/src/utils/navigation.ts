@@ -6,25 +6,16 @@ import { navigate } from 'wouter/use-hash-location';
 // for now, we only support tab and side-panel
 // const getCurrentType = () => location.pathname.split('/')[3];
 
-export type SidePanelRoutePath =
-  (typeof SIDE_PANEL_ROUTE_PATHS)[keyof typeof SIDE_PANEL_ROUTE_PATHS];
+export type SidePanelRoutePath = (typeof SIDE_PANEL_ROUTE_PATHS)[keyof typeof SIDE_PANEL_ROUTE_PATHS];
 // type TabRoutePath = (typeof TAB_ROUTE_PATHS)[keyof typeof TAB_ROUTE_PATHS];
 
-export function navigateTo(
-  target: 'popup',
-  path: SidePanelRoutePath,
-  params?: Record<string, string>
-): void;
+export function navigateTo(target: 'popup', path: SidePanelRoutePath, params?: Record<string, string>): void;
 // export function navigateTo(
 //   target: 'tab',
 //   path: TabRoutePath,
 //   params?: Record<string, string>
 // ): void;
-export function navigateTo(
-  target: 'side-panel',
-  path: SidePanelRoutePath,
-  params?: Record<string, string>
-): void;
+export function navigateTo(target: 'side-panel', path: SidePanelRoutePath, params?: Record<string, string>): void;
 
 export function navigateTo(
   target: 'popup' | 'tab' | 'side-panel', //| 'options' | 'notification',

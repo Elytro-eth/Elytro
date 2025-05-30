@@ -1,41 +1,47 @@
 import aave from '@/assets/icons/aave.svg';
-import uniswap from '@/assets/icons/uniswap.svg';
 import lido from '@/assets/icons/lido.svg';
-import originEther from '@/assets/icons/ether.svg';
-import tenderizeV2 from '@/assets/icons/tenderize.svg';
-import makerDAO from '@/assets/icons/makerdao.svg';
 import logo from '@/assets/logo.svg';
+import ens from '@/assets/icons/ens.svg';
+import opensea from '@/assets/icons/opensea.svg';
+import cowswap from '@/assets/icons/cowswap.svg';
+import relay from '@/assets/icons/relay.svg';
 
 export const ENCOURAGE_DAPPS = [
   {
+    name: 'ENS',
+    label: 'Names',
+    url: 'https://app.ens.domains/',
+    icon: ens,
+  },
+  {
     name: 'AAVE',
-    url: 'https://aave.com/',
+    label: 'Lend',
+    url: 'https://app.aave.com/',
     icon: aave,
   },
   {
-    name: 'Uniswap',
-    url: 'https://uniswap.org/',
-    icon: uniswap,
-  },
-  {
     name: 'Lido',
-    url: 'https://lido.fi/',
+    label: 'Stake',
+    url: 'https://stake.lido.fi/',
     icon: lido,
   },
   {
-    name: 'Origin Ether',
-    url: 'https://www.origintrail.io/',
-    icon: originEther,
+    name: 'OpenSea',
+    label: 'NFT',
+    url: 'https://opensea.io/',
+    icon: opensea,
   },
   {
-    name: 'Tenderize V2',
-    url: 'https://tenderize.finance/',
-    icon: tenderizeV2,
+    name: 'CowSwap',
+    label: 'Swap',
+    url: 'https://swap.cow.fi/',
+    icon: cowswap,
   },
   {
-    name: 'Maker DAO',
-    url: 'https://makerdao.com/',
-    icon: makerDAO,
+    name: 'Relay',
+    label: 'Bridge',
+    url: 'https://www.relay.link/bridge',
+    icon: relay,
   },
 ];
 

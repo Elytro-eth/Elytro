@@ -12,6 +12,7 @@ import { formatErrorMsg } from '@/utils/format';
 import { RuntimeMessage } from '@/utils/message';
 import { EVENT_TYPES } from '@/constants/events';
 import { useAccount } from './account-context';
+import { TABS_KEYS } from '@/components/biz/DashboardTabs';
 
 export enum TxRequestTypeEn {
   DeployWallet = 1,
@@ -226,7 +227,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       if (prevType === TxRequestTypeEn.DeployWallet || prevType === TxRequestTypeEn.UpgradeContract) {
         params = { activating: '1' };
       } else {
-        params = { defaultTabs: 'activities' };
+        params = { tab: TABS_KEYS.ACTIVITIES };
       }
     }
 
