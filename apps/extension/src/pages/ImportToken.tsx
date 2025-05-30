@@ -43,9 +43,10 @@ export default function ImportToken() {
   const [tokens, setTokens] = useState<TTokenInfo[]>([]);
 
   const [hasAddressError, setHasAddressError] = useState(false);
+  const [hasDecimalsError, setHasDecimalsError] = useState(false);
 
   const loadTokens = async () => {
-    const fetchedTokens = await fetchTokens(chainId, 100);
+    const fetchedTokens = await fetchTokens(chainId);
     setTokens(fetchedTokens);
   };
 
@@ -62,7 +63,7 @@ export default function ImportToken() {
       symbol: value,
     }));
 
-    return tokens.filter((token) => token.symbol.toLowerCase().includes(value.toLowerCase()));
+    return tokens.filter((t) => t.symbol.toLowerCase().includes(value.toLowerCase()));
   };
 
   const handleAddressInputChange = (value: string) => {
@@ -71,7 +72,7 @@ export default function ImportToken() {
       address: value as `0x${string}`,
     }));
 
-    return tokens.filter((token) => token.address.toLowerCase().includes(value.toLowerCase()));
+    return tokens.filter((t) => t.address.toLowerCase().includes(value.toLowerCase()));
   };
 
   const handleSelectToken = (token: TTokenInfo) => {
@@ -111,6 +112,12 @@ export default function ImportToken() {
     }
   }, [token.address]);
 
+  useEffect(() => {
+    if (token.decimals !== undefined) {
+      setHasDecimalsError(!token.decimals || token.decimals === 0);
+    }
+  }, [token.decimals]);
+
   return (
     <SecondaryPageWrapper title="Import token">
       <div className="flex flex-col gap-y-md ">
@@ -135,18 +142,21 @@ export default function ImportToken() {
           {hasAddressError && <p className="elytro-text-tiny-body text-red">Invalid address</p>}
         </div>
 
-        <LabelInput
-          label="Decimals"
-          type="number"
-          value={token.decimals}
-          onChange={(e) =>
-            setToken((prev) => ({
-              ...prev,
-              decimals: Number(e.target.value),
-            }))
-          }
-          placeholder="18"
-        />
+        <div className="flex flex-col gap-y-2xs">
+          <LabelInput
+            label="Decimals"
+            type="number"
+            value={token.decimals > 0 ? token.decimals : ''}
+            onChange={(e) =>
+              setToken((prev) => ({
+                ...prev,
+                decimals: Number(e.target.value),
+              }))
+            }
+            placeholder="18"
+          />
+          {hasDecimalsError && <p className="elytro-text-tiny-body text-red">Decimals cannot be empty or 0</p>}
+        </div>
 
         <LabelInput
           label="Token name"
@@ -158,7 +168,7 @@ export default function ImportToken() {
         <Button
           className="mt-3xl"
           onClick={handleImportToken}
-          disabled={!token.address || !token.symbol || !token.decimals || hasAddressError}
+          disabled={!token.address || !token.symbol || !token.decimals || hasAddressError || hasDecimalsError}
         >
           Continue
         </Button>

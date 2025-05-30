@@ -10,7 +10,12 @@ export function LabelInput({ label, ...rest }: LabelInputProps) {
     <div className="flex flex-col gap-y-2xs text-gray-600">
       <label className="font-small text-gray-600">{label}</label>
       <Input
-        className={cn('rounded-md py-md px-lg h-auto', rest?.className)}
+        className={cn(
+          'rounded-md py-md px-lg h-auto',
+          'placeholder:text-gray-400 placeholder:font-normal',
+          'text-gray-900 font-medium',
+          rest?.className
+        )}
         {...rest}
       />
     </div>
