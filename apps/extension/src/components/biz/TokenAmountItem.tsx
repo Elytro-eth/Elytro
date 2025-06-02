@@ -51,7 +51,7 @@ export default function TokenAmountItem({
         src={logoURI || DefaultTokenIcon}
         alt={symbol}
       />
-      <span>
+      <span className="elytro-text-bold-body">
         {tokenAmount} {symbol}
       </span>
       {displayPrice && <span className=" text-gray-600">({displayPrice})</span>}

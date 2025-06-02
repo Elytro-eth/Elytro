@@ -65,8 +65,8 @@ export const ApprovalProvider = ({ children }: { children: React.ReactNode }) =>
           data: {
             ...approval?.data,
             options: {
-              name: 'wallet rpc',
-              reason: 'Please activate your wallet first.',
+              name: 'Wallet RPC',
+              reason: 'please activate your wallet first.',
             },
           } as TApprovalData,
         });

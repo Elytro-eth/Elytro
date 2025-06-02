@@ -23,7 +23,7 @@ export default function BlockedAlert() {
   return (
     <div className="flex flex-col gap-6 min-h-screen p-5xl bg-white text-center">
       {/* DApp Info */}
-      <div className="flex items-center gap-4">
+      {/* <div className="flex items-center gap-4">
         <Avatar className="size-12">
           <AvatarImage src={dApp.icon} alt={`${dApp.name} icon`} />
           <AvatarFallback>{dApp.name}</AvatarFallback>
@@ -34,19 +34,12 @@ export default function BlockedAlert() {
             {dApp.origin}
           </div>
         </div>
-      </div>
+      </div> */}
 
       <img src={ErrorIcon} alt="error" className="size-16 self-center" />
 
       <div className="elytro-text-small">
-        The Dapp called
-        <span className="font-bold  px-xs">
-          {(options as UnsupportedMethod).name}
-        </span>
-        failed, the reason is
-        <span className=" font-bold  px-xs">
-          {(options as UnsupportedMethod).reason}
-        </span>
+          {(options as UnsupportedMethod).name} failed, {(options as UnsupportedMethod).reason}
       </div>
 
       <Button className="w-full " onClick={handleReject}>

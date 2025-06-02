@@ -13,7 +13,7 @@ export default function TipItem({ title, description, Icon, index }: ITipItemPro
       <Icon className="size-5 mt-1 flex-shrink-0 stroke-dark-blue" />
 
       <div className="flex flex-col gap-y-3xs leading-none ml-md">
-        <span className="elytro-text-bold-body text-dark-blue">
+        <span className="elytro-text-small-bold text-dark-blue">
           {index ? index : ''} {title}
         </span>
         <span className="elytro-text-tiny-body text-gray-600">{description}</span>

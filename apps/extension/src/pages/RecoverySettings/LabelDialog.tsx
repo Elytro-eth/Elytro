@@ -64,10 +64,10 @@ const LabelDialog = forwardRef<ILabelDialogRef, ILabelDialogProps>(({ onSave }, 
         />
 
         <div className="mt-4 flex w-full justify-between gap-2">
-          <Button variant="outline" className="w-full" onClick={handleClose}>
+          <Button variant="outline" size="small" className="w-full" onClick={handleClose}>
             Cancel
           </Button>
-          <Button className="w-full" onClick={handleSave}>
+          <Button className="w-full" size="small" onClick={handleSave}>
             Add
           </Button>
         </div>

@@ -14,7 +14,7 @@ export const ENCOURAGE_DAPPS = [
     icon: ens,
   },
   {
-    name: 'AAVE',
+    name: 'Aave',
     label: 'Lend',
     url: 'https://app.aave.com/',
     icon: aave,
@@ -32,7 +32,7 @@ export const ENCOURAGE_DAPPS = [
     icon: opensea,
   },
   {
-    name: 'CowSwap',
+    name: 'CoW Swap',
     label: 'Swap',
     url: 'https://swap.cow.fi/',
     icon: cowswap,

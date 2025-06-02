@@ -122,10 +122,10 @@ export default function ContactList({
             ))}
 
             <div className="mt-xl">
-              <h1 className="elytro-text-bold-body mb-2xs">Signatures required</h1>
+              <h1 className="elytro-text-bold-body mb-2xs">Confirmations required</h1>
 
               <p className="elytro-text-smaller-body text-gray-600 mb-md">
-                Number of confirmations needed for recovery
+                Minimum needed for recovery
               </p>
 
               <div className="flex flex-row gap-x-md items-center">

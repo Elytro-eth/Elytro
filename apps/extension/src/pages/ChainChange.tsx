@@ -86,27 +86,25 @@ export default function ChainChange() {
   return (
     <Card className="w-full min-h-screen h-full flex flex-col ">
       <CardHeader className="text-center ">
-        <Avatar className="size-10 relative z-0 rounded-full mx-auto mb-4 transition-transform transform hover:scale-105">
+        <Avatar className="size-16 mt-10 relative z-0 rounded-full mx-auto mb-4 transition-transform transform hover:scale-105">
           <AvatarImage src={dApp.icon} alt={`${dApp.name} icon`} />
           <AvatarFallback>{dApp.name}</AvatarFallback>
         </Avatar>
         <div className="elytro-text-body">
-          {dApp.name} wants to <span className="font-bold">{method}</span> chain
+          <span className="font-bold">Please {method} network</span>
         </div>
       </CardHeader>
 
-      <CardContent className="flex flex-col h-full p-6 space-y-6 border-1 border-gray-200 rounded-lg mx-lg my-md">
+      <CardContent className="flex flex-col h-full p-3 text-sm space-y-6 mx-lg my-md">
         {/* Description of the chain change */}
         {method === ChainOperationEn.Switch && (
-          <div className="text-base text-gray-700">
-            <p>
-              Current chain is <span className="font-bold">{getChainNameByChainId(chainId)}</span>. Do you want to
+          <div className="text-gray-900">
+              Current network is <span className="font-bold text-gray-900">{getChainNameByChainId(chainId)}</span>. Do you want to
               switch to{' '}
-              <span className="font-bold">
+              <span className="font-bold text-gray-900">
                 {chainName || SUPPORTED_CHAINS.find((chain) => chain.id === Number(targetChainId))?.name}
               </span>
               ?
-            </p>
           </div>
         )}
 
