@@ -47,11 +47,11 @@ export default function TokenAmountItem({
       )}
     >
       <img
-        className={cn('size-8 rounded-full ring-1 ring-gray-150 bg-white', size === 'sm' && 'size-4')}
+        className={cn('size-8 rounded-full ring-1 ring-gray-150 bg-white', size === 'sm' && 'p-1 size-5')}
         src={logoURI || DefaultTokenIcon}
         alt={symbol}
       />
-      <span className="elytro-text-bold-body">
+      <span className={cn(size === 'md' && 'elytro-text-bold-body')}>
         {tokenAmount} {symbol}
       </span>
       {displayPrice && <span className=" text-gray-600">({displayPrice})</span>}

@@ -92,7 +92,6 @@ export default function RecoverySettings() {
     if (isAddressExists) {
       toast({
         title: 'Address already exists',
-        description: 'This address is already in your recovery contacts list.',
         variant: 'destructive',
       });
       return;

@@ -38,7 +38,7 @@ export default function ContactDetail({ onAddContact }: IContactDetailProps) {
       </div>
 
       <Button className="mt-4" disabled={!isAddress(address)} onClick={() => onAddContact({ address })}>
-        Save contact
+        Next
       </Button>
     </div>
   );
