@@ -9,7 +9,7 @@ const portMessage = new PortMessage('elytro-ui');
 
 const INIT_PATHS = [
   SIDE_PANEL_ROUTE_PATHS.Transfer,
-  SIDE_PANEL_ROUTE_PATHS.CreateAccount,
+  // SIDE_PANEL_ROUTE_PATHS.CreateAccount,
   SIDE_PANEL_ROUTE_PATHS.CreatePasscode,
   SIDE_PANEL_ROUTE_PATHS.YouAreIn,
   SIDE_PANEL_ROUTE_PATHS.AccountRecovery,
@@ -75,7 +75,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
           navigateToPath = SIDE_PANEL_ROUTE_PATHS.Unlock;
           break;
         case WalletStatusEn.Recovering:
-          navigateToPath = SIDE_PANEL_ROUTE_PATHS.AccountRecovery;
+          navigateToPath = SIDE_PANEL_ROUTE_PATHS.RetrieveContacts;
           break;
         case WalletStatusEn.NoAccount || WalletStatusEn.NoOwner:
           if (!INIT_PATHS.includes(pathname as SidePanelRoutePath)) {

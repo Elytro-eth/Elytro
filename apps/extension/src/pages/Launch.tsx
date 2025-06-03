@@ -12,11 +12,11 @@ export default function Launch() {
   return (
     <div className="elytro-gradient-bg flex flex-1 flex-col items-center px-xl min-h-screen gap-y-3xl pt-10">
       <img src={LaunchImg} alt="Launch" className="size-[8rem] mt-20" />
-      <h1 className="elytro-text-headline text-center">Your permanent Ethereum client</h1>
+      <h1 className="elytro-text-headline text-center">Your permanent Ethereum wallet</h1>
       <div className="flex flex-col w-full">
         <div className="flex flex-col gap-y-3">
           <Button size="large" onClick={() => navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreatePasscode)}>
-            Get Started
+            Get started
           </Button>
           <Button
             size="large"

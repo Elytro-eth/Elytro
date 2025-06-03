@@ -11,6 +11,7 @@ import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import HelperText from '@/components/ui/HelperText';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -33,6 +34,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   const [expandSponsorSelector, setExpandSponsorSelector] = useState(false);
   const {
     tokenInfo: { tokenPrices },
+    currentAccount: { isDeployed },
   } = useAccount();
   const { requestType, calcResult, decodedDetail, onRetry } = useTx();
 
@@ -132,6 +134,10 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
           </div>
         )}
       </InfoCardList>
+
+      {!isDeployed && requestType !== TxRequestTypeEn.DeployWallet && (
+        <HelperText description="Wallet activation included with a one-time network cost" />
+      )}
 
       {/* Transaction Raw Data: Only show for approve transaction */}
       {(requestType === TxRequestTypeEn.ApproveTransaction || requestType === TxRequestTypeEn.UpgradeContract) && (

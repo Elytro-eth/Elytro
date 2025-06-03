@@ -73,15 +73,20 @@ export const AlerterProvider = ({
               <AlertDialogTitle>{title}</AlertDialogTitle>
               <AlertDialogDescription>{description}</AlertDialogDescription>
             </AlertDialogHeader>
-            <div className="flex gap-2 justify-between">
+            <div className="flex gap-2 justify-between mt-2">
               <Button
                 className="flex-1"
+                size="small"
                 variant="outline"
                 onClick={handleCancel}
               >
                 Cancel
               </Button>
-              <Button className="flex-1" onClick={handleConfirm}>
+              <Button 
+                className="flex-1" 
+                size="small"
+                onClick={handleConfirm}
+              >
                 Confirm
               </Button>
             </div>

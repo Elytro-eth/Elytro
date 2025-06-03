@@ -1,28 +1,12 @@
 type SafeAny = any;
-type TRecoveryInfo = {
-  recoveryRecordID: string;
-  status: number;
-  newOwners: string[];
-  guardianInfo: TGuardianInfo;
-  validTime: number;
-  chainID: string;
-  address: string;
-  nonce: number;
-  onchainID: string;
-  createTimestamp: number;
-  guardianSignatures: TGuardianSignature[];
+
+type TContact = {
+  address: Address;
+  confirmed: boolean;
 };
 
-type TGuardianSignature = {
-  guardian: string;
-  guardianSignature: string;
-  recoveryRecordID: string;
-  signatureType: 0 | 1 | 2 | 3;
-  updateTimestamp: string;
-};
-
-type TGuardianInfo = {
-  threshold: number;
+type TRecoveryContactsInfo = {
   salt: string;
-  guardians: string[];
+  threshold: number;
+  contacts: Address[];
 };

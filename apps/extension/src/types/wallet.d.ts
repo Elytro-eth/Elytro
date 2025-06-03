@@ -93,15 +93,27 @@ type TApprovalInfo = {
 };
 
 type TRecoveryContact = {
-  name?: string;
+  label?: string;
   address: string;
   confirmed?: boolean;
 };
 
-type TGuardianInfo = {
+type TRecoveryContactsInfo = {
   salt: string;
   threshold: number;
-  guardians: string[];
+  contacts: string[];
+};
+
+type TRecoveryRecord = Omit<TRecoveryContactsInfo, 'contacts'> & {
+  address: Address;
+  chainId: number;
+  approveHash: string; // contact approve hash
+  recoveryID: string; // on chain id
+  signedGuardians: string[];
+  status: TRecoveryStatus;
+  fromBlock: string;
+  contacts: TRecoveryContact[];
+  owner: Address;
 };
 
 type TTokenInfo = {

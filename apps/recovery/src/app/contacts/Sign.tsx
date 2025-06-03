@@ -1,44 +1,45 @@
 'use client';
 import AddressWithChain from '@/components/AddressWithChain';
-import { useAccount, useSwitchChain } from 'wagmi';
+import { useAccount, useSendTransaction, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 import { useRecoveryRecord } from '@/contexts';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { getSocialRecoveryTypedData, getWalletNonce } from '@/requests/contract';
-import { Address } from 'viem';
-import { getConfig } from '@/wagmi';
-import { mutate } from '@/requests/client';
-import { MUTATION_ADD_CONTACT_SIGNATURE } from '@/requests/gqls';
+import { getApproveHashTxData } from '@/requests/contract';
 import { toast } from '@/hooks/use-toast';
-import { signTypedData } from 'wagmi/actions';
+import { Box } from 'lucide-react';
 
 export default function Sign() {
-  const { address, isConnected, connector, chainId } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
   const { switchChain } = useSwitchChain();
-  const { recoveryRecord, backToHome } = useRecoveryRecord();
+  const {
+    contacts,
+    address: recoveryAddress,
+    chainId: recoveryChainId,
+    hash,
+    updateContactsSignStatus,
+  } = useRecoveryRecord();
+  const [loading, setLoading] = useState(false);
 
-  const isSigned = (recoveryRecord?.guardianSignatures as TGuardianSignature[])?.some(
-    ({ guardian }) => guardian === address?.toLowerCase()
-  );
+  const { sendTransactionAsync } = useSendTransaction();
+  const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
+  const { status: receiptStatus, error } = useWaitForTransactionReceipt({ hash: txHash ?? undefined });
+
+  if (!recoveryAddress || !recoveryChainId || !hash) {
+    return null;
+  }
+
+  const isSigned = contacts?.find((contact) => contact.address.toLowerCase() === address?.toLowerCase())?.confirmed;
 
   const sendSignatureRequest = async () => {
     try {
-      if (!recoveryRecord?.address || !recoveryRecord?.chainID || !recoveryRecord?.newOwners) {
-        toast({
-          title: 'Invalid Recovery Record',
-          description: 'Missing required recovery information',
-          variant: 'destructive',
-        });
-        return;
-      }
+      setLoading(true);
 
-      if (chainId !== Number(recoveryRecord.chainID)) {
+      if (chainId !== recoveryChainId) {
         toast({
           title: 'Switch to the correct network',
-          //description: 'Please approve the network switch in your wallet',
         });
         try {
-          switchChain({ chainId: Number(recoveryRecord.chainID) });
+          switchChain({ chainId: recoveryChainId });
           // Add a small delay to ensure chain switch is complete
           await new Promise((resolve) => setTimeout(resolve, 1000));
         } catch {
@@ -51,72 +52,57 @@ export default function Sign() {
         }
       }
 
-      const nonce = await getWalletNonce(recoveryRecord.address, Number(recoveryRecord.chainID));
+      console.log('target chainId', recoveryChainId);
+      console.log('current chainId', chainId);
 
-      if (nonce === null) {
-        toast({
-          title: 'Failed to get signature data, check network or RPC',
-          //description: 'Please check your wallet network connection or try switching RPC nodes',
-          variant: 'destructive',
-        });
-        return;
-      }
+      // call `approveHash` method in SocialRecovery contract
+      const _txHash = await sendTransactionAsync(getApproveHashTxData(hash));
+      setTxHash(_txHash);
 
-      const typedData = await getSocialRecoveryTypedData(
-        recoveryRecord.address as Address,
-        Number(recoveryRecord.chainID),
-        nonce,
-        recoveryRecord.newOwners as Address[]
-      );
-
-      const signature = await signTypedData(getConfig(), {
-        domain: typedData.domain,
-        types: typedData.types,
-        primaryType: 'SocialRecovery' as const,
-        message: typedData.message,
-        connector,
-      });
-
-      await mutate(MUTATION_ADD_CONTACT_SIGNATURE, {
-        input: {
-          recoveryRecordID: recoveryRecord.recoveryRecordID,
-          guardian: address?.toLowerCase(),
-          guardianSignature: signature,
-        },
-      });
-
-      toast({
-        title: 'Signed successlly',
-        //description: 'Signature sent successfully',
-      });
-
-      backToHome();
+      // backToHome();
     } catch (error) {
-      console.error('Signature error:', error);
+      console.error('Transaction error:', error);
       toast({
-        title: 'Signing failed',
-        description: error instanceof Error ? error.message : 'Please try again',
-        //description: (error as SafeAny)?.details || 'Please try again',
+        title: 'Transaction Failed',
+        description: error instanceof Error ? error.message : 'Failed to send transaction',
         variant: 'destructive',
       });
     }
   };
+
+  useEffect(() => {
+    if (receiptStatus === 'success') {
+      toast({
+        title: 'You have signed the recovery successfully.',
+      });
+      setLoading(false);
+      updateContactsSignStatus();
+    } else if (error) {
+      toast({
+        title: 'Transaction Failed',
+        description: error instanceof Error ? error.message : 'Failed to send transaction',
+        variant: 'destructive',
+      });
+      setLoading(false);
+    }
+  }, [receiptStatus, error]);
 
   return (
     <div>
       <AddressWithChain
         className="border !p-lg border-gray-300 rounded-[16px]"
         address={address}
-        chainID={Number(recoveryRecord?.chainID)}
+        chainID={recoveryChainId}
       />
 
       <Button
         size="lg"
-        className="w-full mt-lg shadow-none"
-        disabled={!isConnected || isSigned}
+        className="w-full group mt-lg shadow-none"
+        disabled={!isConnected || isSigned || loading}
         onClick={sendSignatureRequest}
       >
-        {isSigned ? 'You have already signed' : 'Sign'}
+        <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
+        {loading ? 'Confirming...' : isSigned ? 'You have already confirmed' : 'Confirm Recovery'}
       </Button>
     </div>
   );

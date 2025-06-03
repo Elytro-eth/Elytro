@@ -1,6 +1,5 @@
 import { RUNTIME_MESSAGE_TYPE } from '@/constants/message';
-import { sendReadyMessageToTabs } from './utils';
-import { PortMessageManager } from '@/utils/message/portMessageManager';
+import { sendReadyMessageToTabs, RuntimeMessage, PortMessageManager } from '@/utils/message';
 import { walletController, WalletController } from './walletController';
 import connectionManager from '@/background/services/connection';
 import rpcFlow, { TProviderRequest } from '@/background/provider/rpcFlow';
@@ -8,7 +7,6 @@ import { getDAppInfoFromSender } from '@/utils/url';
 import sessionManager from './services/session';
 import keyring from './services/keyring';
 import eventBus from '@/utils/eventBus';
-import RuntimeMessage from '@/utils/message/runtimeMessage';
 import { EVENT_TYPES } from '@/constants/events';
 import uiReqCacheManager from '@/utils/cache/uiReqCacheManager';
 import { rpcCacheManager } from '@/utils/cache/rpcCacheManager';

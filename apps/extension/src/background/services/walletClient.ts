@@ -51,7 +51,7 @@ class ElytroWalletClient {
   }
 
   public async getBlockNumber() {
-    return toHex(await this.client.getBlockNumber());
+    return await this.client.getBlockNumber();
   }
 
   public async getCode(address: Address, block: BlockTag | bigint = 'latest') {
@@ -106,8 +106,7 @@ class ElytroWalletClient {
   }
 
   public async getENSAvatarByName(name: string) {
-    const ensResolverAddress =
-      this?.client?.chain?.contracts?.ensUniversalResolver?.address;
+    const ensResolverAddress = this?.client?.chain?.contracts?.ensUniversalResolver?.address;
 
     if (!ensResolverAddress) {
       return null;

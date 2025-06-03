@@ -37,85 +37,36 @@ export default function ContactList({
   const isEmptyContacts = contacts.length === 0;
 
   const [isRecoverContactChanged, setIsRecoverContactChanged] = useState(false);
-  const [isAddressChanged, setIsAddressChanged] = useState(false);
-
-  // 本地联系人name存储
-  function getLocalContacts(address: string): TRecoveryContact[] {
-    try {
-      const raw = localStorage.getItem(`recovery_contacts_${address}`);
-      if (!raw) return [];
-      return JSON.parse(raw);
-    } catch {
-      return [];
-    }
-  }
-
-  const initialNamesRef = useRef<{ [address: string]: string }>({});
-  useEffect(() => {
-    const localContacts = getLocalContacts(currentAccount.address);
-    const map: { [address: string]: string } = {};
-    localContacts.forEach((c) => {
-      map[c.address] = c.name || '';
-    });
-    initialNamesRef.current = map;
-  }, [currentAccount.address]);
+  const isAddressChanged = useRef(false);
 
   useEffect(() => {
     let active = true;
     async function check() {
       if (!active) return;
-      const addressChanged = await wallet.checkRecoveryContactsSettingChanged(
+      isAddressChanged.current = await wallet.checkRecoveryContactsSettingChanged(
         contacts.map((contact) => contact.address),
         Number(threshold)
       );
-      const nameChanged = contacts.some((contact) => {
-        const initialName = initialNamesRef.current[contact.address] || '';
-        return (contact.name || '') !== initialName;
-      });
 
       if (!active) return;
-      setIsAddressChanged(addressChanged);
-      setIsRecoverContactChanged(addressChanged || nameChanged);
+      setIsRecoverContactChanged(isAddressChanged.current);
     }
+
     check();
     return () => {
       active = false;
     };
-  }, [contacts, threshold, wallet, currentAccount.address]);
+  }, [contacts, threshold, wallet, isAddressChanged]);
 
   const handleConfirmContacts = async () => {
     try {
       setLoading(true);
 
-      if (isAddressChanged) {
-        const txs = await wallet.generateRecoveryContactsSettingTxs(
-          contacts.map((contact) => contact.address),
-          Number(threshold)
-        );
-        handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs);
-      } else {
-        const localContacts = getLocalContacts(currentAccount.address);
-        const updatedContacts = contacts.map((contact) => {
-          const local = localContacts.find((lc) => lc.address === contact.address);
-          return {
-            address: contact.address,
-            name: contact.name || local?.name || '',
-          };
-        });
-        localStorage.setItem(`recovery_contacts_${currentAccount.address}`, JSON.stringify(updatedContacts));
-        // 更新初始name映射
-        const map: { [address: string]: string } = {};
-        updatedContacts.forEach((c) => {
-          map[c.address] = c.name || '';
-        });
-        initialNamesRef.current = map;
-        setIsRecoverContactChanged(false);
-        toast({
-          title: 'Success',
-          description: 'Contact names updated successfully',
-          variant: 'default',
-        });
-      }
+      const txs = await wallet.generateRecoveryContactsSettingTxs(
+        contacts.map((contact) => contact.address),
+        Number(threshold)
+      );
+      handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs);
     } catch (error) {
       toast({
         title: 'Failed',
@@ -171,10 +122,10 @@ export default function ContactList({
             ))}
 
             <div className="mt-xl">
-              <h1 className="elytro-text-bold-body mb-2xs">Signatures required</h1>
+              <h1 className="elytro-text-bold-body mb-2xs">Confirmations required</h1>
 
               <p className="elytro-text-smaller-body text-gray-600 mb-md">
-                Number of confirmations needed for recovery
+                Minimum needed for recovery
               </p>
 
               <div className="flex flex-row gap-x-md items-center">

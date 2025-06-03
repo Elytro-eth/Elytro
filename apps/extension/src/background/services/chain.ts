@@ -17,31 +17,25 @@ class ChainService {
   private _store: LocalSubscribableStore<TChainsState>;
 
   constructor() {
-    this._store = new LocalSubscribableStore<TChainsState>(
-      CHAINS_STORAGE_KEY,
-      (initState) => {
-        const needReset =
-          !initState?.chains?.length ||
-          !initState?.version ||
-          isOlderThan(initState.version, CURRENT_VERSION);
+    this._store = new LocalSubscribableStore<TChainsState>(CHAINS_STORAGE_KEY, (initState) => {
+      const needReset =
+        !initState?.chains?.length || !initState?.version || isOlderThan(initState.version, CURRENT_VERSION);
 
-        let broadcastChain = initState?.currentChain;
+      // if currentChain is not in the chains, use the Ethereum mainnet as default
+      let broadcastChain = initState?.currentChain || SUPPORTED_CHAINS[0];
 
-        if (needReset) {
-          this._chains = [...SUPPORTED_CHAINS];
-          if (broadcastChain?.id) {
-            broadcastChain = SUPPORTED_CHAINS.find(
-              (n) => n.id === broadcastChain!.id
-            ) as TChainItem;
-          }
-          this._store.state.version = CURRENT_VERSION;
+      if (needReset) {
+        this._chains = [...SUPPORTED_CHAINS];
+        if (broadcastChain?.id) {
+          broadcastChain = SUPPORTED_CHAINS.find((n) => n.id === broadcastChain!.id) as TChainItem;
         }
-
-        if (broadcastChain) {
-          eventBus.emit(EVENT_TYPES.CHAIN.CHAIN_INITIALIZED, broadcastChain);
-        }
+        this._store.state.version = CURRENT_VERSION;
       }
-    );
+
+      if (broadcastChain) {
+        eventBus.emit(EVENT_TYPES.CHAIN.CHAIN_INITIALIZED, broadcastChain);
+      }
+    });
   }
 
   private get _chains() {
@@ -94,9 +88,7 @@ class ChainService {
     const updatedChain = { ...targetChain, ...config };
 
     // ! reset the array reference to trigger a fully updated state
-    this._chains = this._chains.map((n) =>
-      n.id === chainId ? updatedChain : n
-    );
+    this._chains = this._chains.map((n) => (n.id === chainId ? updatedChain : n));
 
     if (this._currentChain?.id === chainId) {
       this._currentChain = updatedChain;
@@ -115,9 +107,7 @@ class ChainService {
 
   public deleteChain(chainId: number) {
     if (this._currentChain?.id === chainId) {
-      throw new Error(
-        'Elytro::ChainService::deleteChains: cannot delete current chain'
-      );
+      throw new Error('Elytro::ChainService::deleteChains: cannot delete current chain');
     }
 
     this._chains = this._chains.filter((n) => n.id !== chainId);

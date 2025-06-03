@@ -95,7 +95,7 @@ export default function ActivityItem({
         <div className="flex flex-col min-w-0 flex-1">
           <div className="flex items-center gap-2 min-w-0">
             <span className="font-bold text-base truncate">{name}</span>
-            <span className={`elytro-text-tiny-body px-xs py-2xs rounded-xs text-white ${style} flex-shrink-0`}>
+            <span className={`elytro-text-tiny-body px-xs py-3xs rounded-xs text-white ${style} flex-shrink-0`}>
               {label}
             </span>
           </div>
@@ -108,13 +108,16 @@ export default function ActivityItem({
         </div>
       </div>
 
-      <TokenBalanceItem
-        amount={Number(value)}
-        decimals={decimals}
-        symbol={symbol}
-        address={from as `0x${string}`}
-        className="flex-shrink-0"
-      />
+      {/* TODO: Check this logic */}
+      {(type === HistoricalActivityTypeEn.Send || type === HistoricalActivityTypeEn.Receive || Number(value) > 0) && (
+        <TokenBalanceItem
+          amount={Number(value)}
+          decimals={decimals}
+          symbol={symbol}
+          address={from as `0x${string}`}
+          className="flex-shrink-0"
+        />
+      )}
     </div>
   );
 }

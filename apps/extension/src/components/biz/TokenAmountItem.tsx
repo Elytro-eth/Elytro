@@ -5,8 +5,7 @@ import { TokenInfo } from '@soulwallet/decoder';
 import { useMemo } from 'react';
 import DefaultTokenIcon from '@/assets/icons/ether.svg';
 
-interface ITokenAmountItemProps
-  extends Partial<Pick<TokenInfo, 'logoURI' | 'symbol' | 'decimals'>> {
+interface ITokenAmountItemProps extends Partial<Pick<TokenInfo, 'logoURI' | 'symbol' | 'decimals'>> {
   value?: string;
   className?: string;
   size?: 'sm' | 'md';
@@ -42,20 +41,17 @@ export default function TokenAmountItem({
   return (
     <span
       className={cn(
-        'flex items-center gap-x-sm elytro-text-bold-body',
-        size === 'sm' && 'elytro-text-small-bold',
+        'flex items-center gap-x-sm elytro-text-smaller-body',
+        size === 'sm' && 'elytro-text-smaller-bold',
         className
       )}
     >
       <img
-        className={cn(
-          'size-8 rounded-full ring-1 ring-gray-150 bg-white p-1',
-          size === 'sm' && 'size-4'
-        )}
+        className={cn('size-8 rounded-full ring-1 ring-gray-150 bg-white', size === 'sm' && 'p-1 size-5')}
         src={logoURI || DefaultTokenIcon}
         alt={symbol}
       />
-      <span>
+      <span className={cn(size === 'md' && 'elytro-text-bold-body')}>
         {tokenAmount} {symbol}
       </span>
       {displayPrice && <span className=" text-gray-600">({displayPrice})</span>}

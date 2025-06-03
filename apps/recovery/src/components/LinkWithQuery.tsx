@@ -7,11 +7,10 @@ interface ILinkWithIDProps {
 }
 
 const LinkWithQuery = ({ href, children }: ILinkWithIDProps) => {
-  const id = useSearchParams().get('id');
+  const params = useSearchParams();
 
-  const newHref = id ? `${href}?id=${id}` : href;
+  const newHref = params.toString() ? `${href}?${params.toString()}` : href;
 
   return <Link href={newHref}>{children}</Link>;
 };
-
 export default LinkWithQuery;

@@ -22,22 +22,10 @@ const TokenConfigItem = ({
 }) => {
   return (
     <div className="flex items-center gap-x-sm">
-      <img
-        src={token.logoURI}
-        alt={token.symbol}
-        className="size-8 rounded-full flex-shrink-0 "
-      />
+      <img src={token.logoURI} alt={token.symbol} className="size-8 rounded-full flex-shrink-0 " />
       <div className="flex flex-col">
-        <HighlightText
-          className="elytro-text-smaller-body"
-          text={token.symbol}
-          highlight={searchValue}
-        />
-        <HighlightText
-          className="elytro-text-tiny-body"
-          text={token.address}
-          highlight={searchValue}
-        />
+        <HighlightText className="elytro-text-smaller-body" text={token.symbol} highlight={searchValue} />
+        <HighlightText className="elytro-text-tiny-body" text={token.address} highlight={searchValue} />
       </div>
     </div>
   );
@@ -55,9 +43,10 @@ export default function ImportToken() {
   const [tokens, setTokens] = useState<TTokenInfo[]>([]);
 
   const [hasAddressError, setHasAddressError] = useState(false);
+  const [hasDecimalsError, setHasDecimalsError] = useState(false);
 
   const loadTokens = async () => {
-    const fetchedTokens = await fetchTokens(chainId, 100);
+    const fetchedTokens = await fetchTokens(chainId);
     setTokens(fetchedTokens);
   };
 
@@ -74,9 +63,7 @@ export default function ImportToken() {
       symbol: value,
     }));
 
-    return tokens.filter((token) =>
-      token.symbol.toLowerCase().includes(value.toLowerCase())
-    );
+    return tokens.filter((t) => t.symbol.toLowerCase().includes(value.toLowerCase()));
   };
 
   const handleAddressInputChange = (value: string) => {
@@ -85,9 +72,7 @@ export default function ImportToken() {
       address: value as `0x${string}`,
     }));
 
-    return tokens.filter((token) =>
-      token.address.toLowerCase().includes(value.toLowerCase())
-    );
+    return tokens.filter((t) => t.address.toLowerCase().includes(value.toLowerCase()));
   };
 
   const handleSelectToken = (token: TTokenInfo) => {
@@ -109,6 +94,12 @@ export default function ImportToken() {
     try {
       await wallet.importToken({ ...token, name: token?.name || token.symbol });
       updateTokens();
+
+      toast({
+        title: 'Token imported successfully',
+        variant: 'constructive',
+      });
+
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
     } catch (error) {
       console.error('Elytro: Import token failed', error);
@@ -121,6 +112,12 @@ export default function ImportToken() {
     }
   }, [token.address]);
 
+  useEffect(() => {
+    if (token.decimals !== undefined) {
+      setHasDecimalsError(!token.decimals || token.decimals === 0);
+    }
+  }, [token.decimals]);
+
   return (
     <SecondaryPageWrapper title="Import token">
       <div className="flex flex-col gap-y-md ">
@@ -129,13 +126,7 @@ export default function ImportToken() {
           input={token.symbol}
           onSearch={handleSymbolInputChange}
           onSelect={handleSelectToken}
-          renderItem={(token) => (
-            <TokenConfigItem
-              token={token}
-              searchType="symbol"
-              searchValue={token.symbol}
-            />
-          )}
+          renderItem={(token) => <TokenConfigItem token={token} searchType="symbol" searchValue={token.symbol} />}
           placeholder="ETH"
         />
 
@@ -145,51 +136,39 @@ export default function ImportToken() {
             input={token.address}
             onSearch={handleAddressInputChange}
             onSelect={handleSelectToken}
-            renderItem={(token) => (
-              <TokenConfigItem
-                token={token}
-                searchType="address"
-                searchValue={token.address}
-              />
-            )}
+            renderItem={(token) => <TokenConfigItem token={token} searchType="address" searchValue={token.address} />}
             placeholder="0x"
           />
-          {hasAddressError && (
-            <p className="elytro-text-tiny-body text-red">Invalid address</p>
-          )}
+          {hasAddressError && <p className="elytro-text-tiny-body text-red">Invalid address</p>}
         </div>
 
-        <LabelInput
-          label="Decimals"
-          type="number"
-          value={token.decimals}
-          onChange={(e) =>
-            setToken((prev) => ({
-              ...prev,
-              decimals: Number(e.target.value),
-            }))
-          }
-          placeholder="18"
-        />
+        <div className="flex flex-col gap-y-2xs">
+          <LabelInput
+            label="Decimals"
+            type="number"
+            value={token.decimals > 0 ? token.decimals : ''}
+            onChange={(e) =>
+              setToken((prev) => ({
+                ...prev,
+                decimals: Number(e.target.value),
+              }))
+            }
+            placeholder="18"
+          />
+          {hasDecimalsError && <p className="elytro-text-tiny-body text-red">Decimals cannot be empty or 0</p>}
+        </div>
 
         <LabelInput
           label="Token name"
           value={token.name}
-          onChange={(e) =>
-            setToken((prev) => ({ ...prev, name: e.target.value }))
-          }
-          placeholder="Ether"
+          onChange={(e) => setToken((prev) => ({ ...prev, name: e.target.value }))}
+          placeholder="ETH"
         />
 
         <Button
           className="mt-3xl"
           onClick={handleImportToken}
-          disabled={
-            !token.address ||
-            !token.symbol ||
-            !token.decimals ||
-            hasAddressError
-          }
+          disabled={!token.address || !token.symbol || !token.decimals || hasAddressError || hasDecimalsError}
         >
           Continue
         </Button>

@@ -50,32 +50,20 @@ export const ApprovalProvider = ({ children }: { children: React.ReactNode }) =>
     if (!approval) {
       isProcessingApproval.current = false;
 
-      if (APPROVAL_ROUTES.includes(pathname as ApprovalTypeEn)) {
-        if (pathname === SIDE_PANEL_ROUTE_PATHS.TxConfirm) {
-          return;
-        }
+      const isApprovalRoute = APPROVAL_ROUTES.includes(pathname as ApprovalTypeEn);
+      const isTxConfirmPage = pathname === SIDE_PANEL_ROUTE_PATHS.TxConfirm;
+
+      if (isApprovalRoute && !isTxConfirmPage) {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
       }
-    } else if (approval.type !== pathname && !isProcessingApproval.current) {
-      const currentAccount = await wallet.getCurrentAccount();
-      if (!currentAccount?.isDeployed && approval.type !== ApprovalTypeEn.Alert) {
-        setApproval({
-          ...approval,
-          type: ApprovalTypeEn.Alert,
-          data: {
-            ...approval?.data,
-            options: {
-              name: 'wallet rpc',
-              reason: 'Please activate your wallet first.',
-            },
-          } as TApprovalData,
-        });
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Alert);
-        return;
-      }
-      navigateTo('side-panel', approval.type);
       return;
     }
+
+    if (isProcessingApproval.current || approval.type === pathname) {
+      return;
+    }
+
+    navigateTo('side-panel', approval.type);
   };
 
   useEffect(() => {
@@ -99,7 +87,6 @@ export const ApprovalProvider = ({ children }: { children: React.ReactNode }) =>
     }
 
     if (approval.type === SIDE_PANEL_ROUTE_PATHS.TxConfirm) {
-      // resolve approval is processed by service automatically, only need to set the approval to null
       isProcessingApproval.current = true;
       return;
     }

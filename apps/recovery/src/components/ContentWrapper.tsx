@@ -17,22 +17,9 @@ export default function ContentWrapper({
   // currentStep,
 }: IProps) {
   return (
-    <section className="max-w-lg mt-[15%] bg-white rounded-lg min-h-fit px-4xl py-3xl inline-block">
+    <section className="max-w-xl w-[36rem] mt-[25vh] bg-white rounded-lg min-h-fit px-4xl py-3xl inline-block">
       {title && (
-        <h1 className="text-title text-center mb-xl">
-          {/* {allSteps && currentStep && (
-            <div className="flex flex-row gap-x-sm flex-nowrap mb-lg">
-              {Array.from({ length: allSteps }, (_, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    'w-full h-[1px] rounded-full min-w-28',
-                    index < currentStep ? 'bg-green' : 'bg-gray-450'
-                  )}
-                ></div>
-              ))}
-            </div>
-          )} */}
+        <h1 className="text-title text-center mb-md">
           {title}
         </h1>
       )}

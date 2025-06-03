@@ -35,13 +35,13 @@ export type TChainItem = Chain & {
     entryPoint: string;
     soulWalletLogic: string;
   };
-  opExplorer: string;
+  opExplorer?: string;
 };
 
 export const SUPPORTED_CHAINS: TChainItem[] = [
   {
     ...mainnet,
-    icon: 'https://etherscan.io/images/svg/brands/ethereum-original.svg',
+    icon: 'https://static1.tokenterminal.com//ethereum/logo.png',
     endpoint: 'https://eth.drpc.org',
     bundler: `https://api.pimlico.io/v2/1/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
     factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
@@ -49,7 +49,6 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
     validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
     infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
-    opExplorer: 'https://etherscan.io/op/',
     onchainConfig: {
       chainId: mainnet.id,
       entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
@@ -114,7 +113,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
   },
   {
     ...sepolia,
-    icon: 'https://etherscan.io/images/svg/brands/ethereum-original.svg',
+    icon: 'https://static1.tokenterminal.com//ethereum/logo.png',
     endpoint: sepolia.rpcUrls.default.http[0] || `https://eth-sepolia.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
     bundler: `https://api.pimlico.io/v2/11155111/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
     factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',

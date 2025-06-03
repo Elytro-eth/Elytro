@@ -1,7 +1,6 @@
 import twitter from '@/assets/icons/twitter.svg';
 import github from '@/assets/icons/github.svg';
 import telegram from '@/assets/icons/telegram.svg';
-import linkedin from '@/assets/icons/linkedin.svg';
 
 export const SOCIAL_MEDIA_LINKS = [
   {
@@ -11,7 +10,6 @@ export const SOCIAL_MEDIA_LINKS = [
   },
   {
     name: 'Telegram',
-    // TODO: replace this to real handle
     url: 'https://t.me/+l9coqJq9QHgyYjI1',
     icon: telegram,
   },
@@ -19,11 +17,5 @@ export const SOCIAL_MEDIA_LINKS = [
     name: 'Github',
     url: 'https://github.com/Elytro-eth',
     icon: github,
-  },
-  {
-    name: 'Linkedin',
-    // TODO: replace this to real link
-    url: 'https://www.linkedin.com/company/elytro/',
-    icon: linkedin,
   },
 ];

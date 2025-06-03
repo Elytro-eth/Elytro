@@ -65,9 +65,11 @@ export default function Settings() {
             Lock Elytro
           </Button>
 
-          <Button variant="outline">
-            <ExternalLinkIcon className="w-4 h-4 mr-2" />
-            FAQ
+          <Button variant="outline" asChild>
+            <a href="https://elytro.com/faq" target="_blank" rel="noopener noreferrer">
+              <ExternalLinkIcon className="w-4 h-4 mr-2" />
+              FAQ
+            </a>
           </Button>
 
           <div className="text-center text-gray-750">

@@ -2,7 +2,6 @@ import { ArrowDownLeft, ArrowUpRight, Settings2Icon } from 'lucide-react';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
 import ActionButton from './ActionButton';
-import ActivateButton from './ActivateButton';
 import { useAccount } from '@/contexts/account-context';
 import AccountsDropdown from './AccountsDropdown';
 import Copy from '@/components/ui/Copy';
@@ -30,8 +29,6 @@ const HeaderSection = () => {
 };
 
 const ActionButtons = () => {
-  const { currentAccount } = useAccount();
-
   const handleClickSend = () => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.SendTx);
   };
@@ -40,21 +37,21 @@ const ActionButtons = () => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Receive);
   };
 
-  if (!currentAccount.isDeployed) {
-    return <ActivateButton />;
-  }
-
   return (
     <>
       <ActionButton
         className="bg-light-green hover:bg-green hover:stroke-white"
-        icon={<ArrowDownLeft className="size-5 mr-1 duration-100 transition-all group-hover:stroke-white" />}
+        icon={
+          <ArrowDownLeft className="size-5 mr-1 stroke-dark-blue duration-100 transition-all group-hover:stroke-white" />
+        }
         label="Receive"
         onClick={handleClickReceive}
       />
       <ActionButton
         className="hover:stroke-white"
-        icon={<ArrowUpRight className="size-5 mr-1 duration-100 transition-all group-hover:stroke-white" />}
+        icon={
+          <ArrowUpRight className="size-5 mr-1 stroke-dark-blue duration-100 transition-all group-hover:stroke-white" />
+        }
         label="Send"
         onClick={handleClickSend}
       />

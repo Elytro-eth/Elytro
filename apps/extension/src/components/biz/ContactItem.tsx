@@ -3,7 +3,6 @@ import { CircleUserRound } from 'lucide-react';
 
 interface IContactItemProps {
   contact: TRecoveryContact;
-
   rightContent?: React.ReactNode;
 }
 
@@ -14,12 +13,11 @@ export default function ContactItem({ contact, rightContent }: IContactItemProps
         <CircleUserRound className="size-2xl" />
 
         <div className="flex flex-col flex-1 min-w-0">
-          <p className="elytro-text-bold-body">{contact.name || '—'}</p>
-          <p
-            className="elytro-text-tiny-body text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap"
-            title={contact.address}
-          >
+          <p className="elytro-text-bold-body" title={contact.address}>
             {formatAddressToShort(contact.address)}
+          </p>
+          <p className="elytro-text-tiny-body text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap">
+            {contact.label || 'No label'}
           </p>
         </div>
       </div>

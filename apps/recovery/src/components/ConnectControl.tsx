@@ -45,7 +45,7 @@ export default function ConnectControl() {
   const { chainId, isWrongChain } = useCurrentChain();
   const { connectors, connect } = useConnect();
   const { switchChainAsync } = useSwitchChain();
-  const { recoveryRecord } = useRecoveryRecord();
+  const { chainId: recoveryChainId } = useRecoveryRecord();
 
   const { disconnect } = useDisconnect();
 
@@ -115,11 +115,11 @@ export default function ConnectControl() {
   // }, [address]);
 
   const switchChain = async () => {
-    if (!recoveryRecord?.chainID) {
+    if (!recoveryChainId) {
       return;
     }
     try {
-      await switchChainAsync({ chainId: Number(recoveryRecord.chainID) });
+      await switchChainAsync({ chainId: recoveryChainId });
       toast({
         title: 'Switched network successfully',
       });
@@ -142,7 +142,7 @@ export default function ConnectControl() {
                 className="rounded-full font-bold shadow-none duration-0 bg-transparent hover:bg-light-blue hover:text-dark-blue text-light-blue bg-dark-blue hover:border-light-blue"
                 onClick={switchChain}
               >
-                Switch to {CHAIN_ID_TO_NAME_MAP[Number(recoveryRecord?.chainID)]}
+                Switch to {CHAIN_ID_TO_NAME_MAP[Number(recoveryChainId)]}
               </Button>
             ) : null}
             <div className="flex items-center gap-2 py-sm px-md rounded-sm bg-white">

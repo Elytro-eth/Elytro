@@ -1,19 +1,16 @@
 import { elytroSDK } from './sdk';
 import { EVENT_TYPES } from '@/constants/events';
 import eventBus from '@/utils/eventBus';
+import { localStorage } from '@/utils/storage/local';
 import LocalSubscribableStore from '@/utils/store/LocalSubscribableStore';
-import { Address } from 'viem';
 
 type TAccountsState = {
   accounts: TAccountInfo[];
   currentAccount: TAccountInfo | null;
-  recoveryRecord: {
-    id: string;
-    address: Address;
-  } | null;
 };
 
 const ACCOUNTS_STORAGE_KEY = 'elytroAccounts';
+const RECOVERY_RECORD_STORAGE_KEY = 'elytroRecoveryRecord';
 
 class AccountManager {
   private _store: LocalSubscribableStore<TAccountsState>;
@@ -43,14 +40,6 @@ class AccountManager {
     this._store.state.currentAccount = currentAccount;
   }
 
-  get recoveryRecord() {
-    return this._store.state.recoveryRecord || null;
-  }
-
-  set recoveryRecord(record: { address: Address; id: string } | null) {
-    this._store.state.recoveryRecord = record;
-  }
-
   // TODO: maybe make _accounts public?
   get accounts() {
     return this._accounts;
@@ -58,6 +47,14 @@ class AccountManager {
 
   get currentAccount() {
     return this._currentAccount;
+  }
+
+  public async getRecoveryRecord() {
+    return (await localStorage.get<TRecoveryRecord>(RECOVERY_RECORD_STORAGE_KEY)) || null;
+  }
+
+  public async updateRecoveryRecord(recoveryRecord: TRecoveryRecord | null) {
+    await localStorage.save({ [RECOVERY_RECORD_STORAGE_KEY]: recoveryRecord });
   }
 
   public getAccountByChainId(chainId: number | string) {
