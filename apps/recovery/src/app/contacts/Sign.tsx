@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { getApproveHashTxData } from '@/requests/contract';
 import { toast } from '@/hooks/use-toast';
+import { Box } from 'lucide-react';
 
 export default function Sign() {
   const { address, isConnected, chainId } = useAccount();
@@ -96,11 +97,12 @@ export default function Sign() {
 
       <Button
         size="lg"
-        className="w-full mt-lg shadow-none"
+        className="w-full group mt-lg shadow-none"
         disabled={!isConnected || isSigned || loading}
         onClick={sendSignatureRequest}
       >
-        {loading ? 'Signing...' : isSigned ? 'You have already signed' : 'Sign'}
+        <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
+        {loading ? 'Confirming...' : isSigned ? 'You have already confirmed' : 'Confirm Recovery'}
       </Button>
     </div>
   );

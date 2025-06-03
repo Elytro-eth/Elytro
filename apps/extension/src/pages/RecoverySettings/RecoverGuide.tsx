@@ -18,7 +18,7 @@ export default function RecoverGuide({ onClick }: { onClick: () => void }) {
         <TipItem title="Contacts help you recover" description="Regain access once contacts confirmed." Icon={Clock} />
       </div>
       <Button onClick={onClick} className="w-full">
-        Get Started
+        Get started
       </Button>
     </div>
   );
