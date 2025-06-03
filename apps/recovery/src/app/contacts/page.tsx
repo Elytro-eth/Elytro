@@ -22,19 +22,19 @@ export default function Contacts() {
 
     if (isGuardian) {
       return {
-        subtitle: 'Please sign the recovery',
+        subtitle: 'Please confirm the recovery',
         content: <Sign />,
       };
     }
 
     return {
       subtitle: address ? (
-        <span>
-          The connected wallet is <span className="text-red font-bold">NOT</span> a recovery contact. Please switch to a
-          recovery contact wallet.
+        <span className='text-gray-600'>
+          {/* The connected wallet is not a recovery contact. Please switch to a recovery contact wallet. */}
+          Connect to a wallet you control from the list to confirm recovery.
         </span>
       ) : (
-        <span>Please connect a wallet that matches one of the recovery contacts below.</span>
+        <span className='text-gray-600'>Connect to a wallet you control from the list to confirm recovery.</span>
       ),
       content: <Status />,
     };
@@ -42,7 +42,7 @@ export default function Contacts() {
 
   return (
     <ContentWrapper
-      title={<div className="text-left mr-5xl">Sign your friend’s recovery</div>}
+      title={<div className="text-left mr-5xl">Connect to confirm</div>}
       // allSteps={3}
       // currentStep={1}
       subtitle={subtitle}

@@ -62,7 +62,7 @@ export default function AccountRecovery() {
             <TipItem title="Wait 48 hrs until recovered" description="This is for extra security." Icon={Clock} />
           </div>
           <Button className="w-full" onClick={() => setChecked(true)}>
-            Start recovery
+            Next
           </Button>
         </div>
       </SecondaryPageWrapper>

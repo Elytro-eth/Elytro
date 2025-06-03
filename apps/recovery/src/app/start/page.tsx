@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { useAccount, usePublicClient } from 'wagmi';
 import { sendTransaction } from 'wagmi/actions';
-import { ExternalLink, Loader2 } from 'lucide-react';
+import { Box, ExternalLink, Loader2 } from 'lucide-react';
 import { RecoveryStatusEn } from '@/constants/enums';
 
 const TimeBlock = ({ time, unit }: { time: number; unit: string }) => {
@@ -264,7 +264,7 @@ export default function Start() {
       // currentStep={2}
       // allSteps={3}
       title="Start Recovery"
-      subtitle="You'll regain wallet access in 48 hours."
+      subtitle={<div className="text-center text-gray-600">Connect to a wallet to start recovery.</div>}
     >
       {/* Count down */}
       {status === RecoveryStatusEn.RECOVERY_STARTED && (
@@ -289,8 +289,9 @@ export default function Start() {
           variant={status === RecoveryStatusEn.SIGNATURE_COMPLETED ? 'default' : 'outline'}
           disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.SIGNATURE_COMPLETED}
           onClick={startRecovery}
-          className="w-full"
+          className="w-full group"
         >
+          <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
           Start Recovery
         </Button>
 
@@ -299,8 +300,9 @@ export default function Start() {
           variant={status === RecoveryStatusEn.RECOVERY_READY ? 'default' : 'outline'}
           disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.RECOVERY_READY}
           onClick={completeRecovery}
-          className="w-full"
+          className="w-full group"
         >
+          <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
           Complete Recovery
         </Button>
       </div>

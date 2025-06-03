@@ -144,7 +144,7 @@ function PageContent() {
       <div className="h-full flex flex-col items-center gap-y-xl text-center">
         <img src={WalletImg} alt="Wallet" className="size-36 mt-10" />
         <div className="flex flex-col gap-y-sm">
-          <h1 className="elytro-text-title">Enough signatures collected</h1>
+          <h1 className="elytro-text-title">Enough confirmations collected</h1>
           <p className="text-gray-600 elytro-text-smaller-body">Complete your recovery in recovery app</p>
         </div>
         <Button
