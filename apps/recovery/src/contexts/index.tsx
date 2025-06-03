@@ -23,6 +23,7 @@ interface IRecoveryRecordContext {
   status: RecoveryStatusEn | null;
   validTime: number | null;
   hash: `0x${string}` | null;
+  error: boolean;
   setStatus: (status: RecoveryStatusEn) => void;
   backToHome: () => void;
   updateContactsSignStatus: (contactAddresses?: Address[], _threshold?: number) => void;
@@ -36,6 +37,7 @@ const RecoveryRecordContext = createContext<IRecoveryRecordContext | undefined>(
 export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const params = useSearchParams();
   const recoveryRecordId = params.get('id');
   const address = params.get('address') as Address;
@@ -78,6 +80,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
   const getRecoveryContacts = async () => {
     try {
       setLoading(true);
+      setError(false);
       const res = await queryRecoveryContacts(address as Address, chainId);
       if (res) {
         await updateContactsSignStatus(res.contacts, res.threshold);
@@ -86,12 +89,12 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
       }
     } catch (error) {
       console.error(error);
+      setError(true);
       toast({
         title: 'Get Recovery Record Failed',
         description: (error as Error)?.message || 'Please try again later',
         variant: 'destructive',
       });
-      router.replace('/not-found');
     } finally {
       setLoading(false);
     }
@@ -103,12 +106,12 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
     }
 
     if (!address || !chainId || !recoveryRecordId) {
+      setError(true);
       toast({
         title: 'Invalid Recovery Record',
         description: 'Please check the url',
         variant: 'destructive',
       });
-      router.replace('/not-found');
       return;
     }
 
@@ -170,12 +173,12 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
     if (address && isAddress(address) && Number(chainId)) {
       getRecoveryContacts();
     } else {
+      setError(true);
       toast({
         title: 'Invalid Recovery Record',
         description: 'Please check the url',
         variant: 'destructive',
       });
-      router.replace('/not-found');
     }
   }, [address, chainId, status]);
 
@@ -200,6 +203,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
       value={{
         contacts,
         loading,
+        error,
         updateContactsSignStatus,
         updateRecoveryStatus,
         backToHome,
