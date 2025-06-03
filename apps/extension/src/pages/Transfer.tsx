@@ -34,7 +34,6 @@ export default function Transfer() {
           onClick={() =>
             toast({
               title: 'Import feature is not available yet',
-              description: 'Please wait for the update',
             })
           }
         >
