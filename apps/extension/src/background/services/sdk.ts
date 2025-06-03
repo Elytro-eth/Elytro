@@ -157,21 +157,22 @@ export class SDKService {
    */
   public async createUnsignedDeployWalletUserOp(
     eoaAddress: string,
+    callData: Hex = '0x',
     initialGuardianHash: string = DEFAULT_GUARDIAN_HASH,
     initialGuardianSafePeriod: number = DEFAULT_GUARDIAN_SAFE_PERIOD
   ) {
-    const emptyCallData = '0x';
     const res = await this._sdk?.createUnsignedDeployWalletUserOp(
       this._index,
       [paddingZero(eoaAddress, 32)],
       initialGuardianHash,
-      emptyCallData,
+      callData,
       initialGuardianSafePeriod
     );
 
     if (res.isErr()) {
       throw res.ERR;
     } else {
+      console.log('res.OK', res.OK);
       return res.OK;
     }
   }
@@ -469,6 +470,13 @@ export class SDKService {
       const missAmount = hasSponsored
         ? transferValue - balance // why transferValue is not accurate? missfund is wrong during preFund?
         : BigInt(missfund) + transferValue - balance;
+
+      console.log('missAmount', missAmount);
+      console.log('transferValue', transferValue);
+      console.log('balance', balance);
+      console.log('hasSponsored', hasSponsored);
+      console.log('missfund', missfund);
+      console.log('userOp.sender', userOp.sender);
 
       return {
         userOp,

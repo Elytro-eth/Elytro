@@ -325,6 +325,18 @@ class WalletController {
   }
 
   public async createTxUserOp(txs: Transaction[]): Promise<ElytroUserOperation> {
+    if (!accountManager.currentAccount?.isDeployed && keyring.owner?.address) {
+      const txOpCallData = await elytroSDK.createUserOpFromTxs(accountManager.currentAccount?.address as string, txs);
+      const deployOp = await elytroSDK.createUnsignedDeployWalletUserOp(
+        keyring.owner.address as string,
+        txOpCallData.callData as `0x${string}`
+      );
+
+      await elytroSDK.estimateGas(deployOp);
+
+      return formatObjectWithBigInt(deployOp);
+    }
+
     const userOp = await elytroSDK.createUserOpFromTxs(accountManager.currentAccount?.address as string, txs);
 
     return formatObjectWithBigInt(userOp);
