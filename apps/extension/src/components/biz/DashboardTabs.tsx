@@ -24,14 +24,14 @@ const TabsConfig = [
     component: <Assets />,
   },
   {
-    key: TABS_KEYS.ACTIVITIES,
-    label: 'Activity',
-    component: <Activities />,
-  },
-  {
     key: TABS_KEYS.APPS,
     label: 'Apps',
     component: <Apps />,
+  },
+  {
+    key: TABS_KEYS.ACTIVITIES,
+    label: 'Activity',
+    component: <Activities />,
   },
 ];
 
@@ -50,7 +50,7 @@ export default function DashboardTabs({ loading, onReload }: DashboardTabsProps)
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="flex flex-col flex-1 h-full box-border">
-      <TabsList className="px-5 relative">
+      <TabsList className="pl-5 pr-6 relative">
         {TabsConfig.map((tab) => (
           <TabsTrigger key={tab.key} value={tab.key}>
             {tab.label}
