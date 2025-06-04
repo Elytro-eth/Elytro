@@ -9,6 +9,7 @@ import React from 'react';
 import { redirect } from 'next/navigation';
 import { RecoveryStatusEn } from '@/constants/enums';
 import LinkWithQuery from '@/components/LinkWithQuery';
+import { InvalidRecordView } from '@/components/InvalidRecordView';
 
 interface StepConfig {
   title: string;
@@ -64,7 +65,7 @@ const StepBlock = ({ title, index, actionButton, isActive }: IStepBlockProps) =>
 };
 
 export default function Home() {
-  const { status, loading, address, chainId } = useRecoveryRecord();
+  const { status, loading, address, chainId, error } = useRecoveryRecord();
 
   if (loading) {
     return (
@@ -74,6 +75,14 @@ export default function Home() {
         </div>
         <div className="text-bold-body">Fetching recovery details...</div>
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <ContentWrapper title="The recovery link you visited is invalid">
+        <InvalidRecordView />
+      </ContentWrapper>
     );
   }
 

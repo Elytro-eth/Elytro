@@ -38,11 +38,11 @@ function ContractAddress({ address }: { address: string }) {
 
 interface IApprovalDetailItemProps {
   decodedResult: DecodeResult;
-  useExpanded?: boolean;
+  defaultExpanded?: boolean;
 }
 
-function ApprovalDetailItem({ decodedResult, useExpanded = false }: IApprovalDetailItemProps) {
-  const [isExpanded, setIsExpanded] = useState(useExpanded);
+function ApprovalDetailItem({ decodedResult, defaultExpanded = false }: IApprovalDetailItemProps) {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const transferredTokenInfo = getTransferredTokenInfo(decodedResult);
 
   return (
@@ -92,7 +92,7 @@ export default function ApprovalDetail({ decodedUserOp }: IApprovalDetailProps) 
     <>
       <SessionCard session={approval?.type === TxRequestTypeEn.ApproveTransaction ? approval?.data?.dApp : undefined} />
       {decodedUserOp.map((item, index) => (
-        <ApprovalDetailItem key={index + item.to} decodedResult={item} useExpanded={decodedUserOp.length > 1} />
+        <ApprovalDetailItem key={index + item.to} decodedResult={item} defaultExpanded={decodedUserOp.length === 1} />
       ))}
     </>
   );
