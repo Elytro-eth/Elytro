@@ -778,7 +778,7 @@ export class SDKService {
 
       return installedUpgradeModules;
     } catch (error) {
-      console.error('Elytro: Failed to get installed upgrade modules.', error);
+      console.error('Elytro: Failed to get installed update modules.', error);
       return [];
     }
   }

@@ -47,7 +47,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
         return <InnerSendingDetail decodedUserOp={decodedDetail?.[0]} />;
 
       // case TxRequestTypeEn.ApproveTransaction:
-      // TODO: add upgrade contract detail
+      // TODO: add update contract detail
       default:
         return <ApprovalDetail decodedUserOp={decodedDetail} />;
     }
