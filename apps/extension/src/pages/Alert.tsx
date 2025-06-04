@@ -2,7 +2,6 @@ import { useApproval } from '@/contexts/approval-context';
 import { ethErrors } from 'eth-rpc-errors';
 import Spin from '@/components/ui/Spin';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UnsupportedMethod } from '@/background/provider/rpcFlow/checkCallable';
 import ErrorIcon from '@/assets/error.svg';
 export default function BlockedAlert() {
@@ -13,7 +12,7 @@ export default function BlockedAlert() {
   }
 
   const {
-    data: { dApp, options },
+    data: { options },
   } = approval;
 
   const handleReject = () => {
@@ -39,7 +38,7 @@ export default function BlockedAlert() {
       <img src={ErrorIcon} alt="error" className="size-16 self-center" />
 
       <div className="elytro-text-small">
-          {(options as UnsupportedMethod).name} failed, {(options as UnsupportedMethod).reason}
+        {(options as UnsupportedMethod).name} failed, {(options as UnsupportedMethod).reason}
       </div>
 
       <Button className="w-full " onClick={handleReject}>
