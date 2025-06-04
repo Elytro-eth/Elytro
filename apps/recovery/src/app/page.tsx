@@ -79,11 +79,7 @@ export default function Home() {
   }
 
   if (error) {
-    return (
-      <ContentWrapper title="The recovery link you visited is invalid">
-        <InvalidRecordView />
-      </ContentWrapper>
-    );
+    return <InvalidRecordView />;
   }
 
   if (status === RecoveryStatusEn.RECOVERY_COMPLETED) {
