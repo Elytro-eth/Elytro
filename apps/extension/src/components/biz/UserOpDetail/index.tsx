@@ -136,7 +136,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
       </InfoCardList>
 
       {!isDeployed && requestType !== TxRequestTypeEn.DeployWallet && (
-        <HelperText description="Wallet activation included with a one-time network cost" />
+        <HelperText description="Wallet activation included with a one-time cost" />
       )}
 
       {/* Transaction Raw Data: Only show for approve transaction */}

@@ -140,8 +140,8 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
       updateTokenPrices(tokens);
     } catch {
       toast({
-        title: 'Failed to get tokens',
-        description: 'Please try again',
+        title: 'Failed to get tokens, please try again',
+        // description: 'Please try again',
         variant: 'destructive',
       });
     } finally {

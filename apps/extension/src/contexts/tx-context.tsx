@@ -99,8 +99,8 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
           });
         } else {
           toast({
-            title: 'Transaction failed',
-            description: 'Please try again',
+            title: 'Transaction failed, please try again',
+            // description: 'Please try again',
             variant: 'destructive',
           });
         }
@@ -245,8 +245,8 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const onRetry = (noSponsor = false) => {
     if (!requestType) {
       toast({
-        title: 'Failed to retry',
-        description: 'Invalid request type or transaction parameters',
+        title: 'Invalid request type or transaction parameters',
+        // description: 'Invalid request type or transaction parameters',
         variant: 'destructive',
       });
       return;

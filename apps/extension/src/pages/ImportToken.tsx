@@ -85,7 +85,7 @@ export default function ImportToken() {
     if (existingTokens.find((t) => t.address === token.address)) {
       toast({
         title: 'Token already exists',
-        description: 'Please check your token list',
+        // description: 'Please check your token list',
         variant: 'destructive',
       });
       return;

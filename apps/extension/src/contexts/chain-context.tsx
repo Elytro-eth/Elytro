@@ -45,8 +45,8 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error('Elytro chain-context: Failed to get chains', error);
       toast({
-        title: 'Error',
-        description: 'Failed to get chains',
+        title: 'Failed to get networks',
+        // description: 'Failed to get chains',
       });
     }
   };
@@ -58,8 +58,8 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error('Elytro chain-context: Failed to get current chain', error);
       toast({
-        title: 'Error',
-        description: 'Failed to get current chain',
+        title: 'Failed to get current network',
+        // description: 'Failed to get current chain',
       });
     }
 

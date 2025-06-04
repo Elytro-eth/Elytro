@@ -42,8 +42,8 @@ export default function AccountsDropdown() {
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Failed to switch wallet',
-        description: 'Please try again',
+        title: 'Failed to switch wallet, please try again',
+        //description: 'Please try again',
         variant: 'destructive',
       });
     }
@@ -60,8 +60,8 @@ export default function AccountsDropdown() {
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Failed to delete wallet',
-        description: 'Please try again',
+        title: 'Failed to delete wallet, please try again',
+        //description: 'Please try again',
         variant: 'destructive',
       });
     } finally {

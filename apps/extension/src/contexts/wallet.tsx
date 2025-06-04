@@ -97,8 +97,8 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch {
       toast({
-        title: 'Failed to get wallet status',
-        description: 'Please try again later',
+        title: 'Failed to get wallet status, please try later',
+        // description: 'Please try again later',
         variant: 'destructive',
       });
       setStatus(WalletStatusEn.NoOwner);

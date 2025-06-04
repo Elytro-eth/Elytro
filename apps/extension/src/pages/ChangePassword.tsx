@@ -96,15 +96,15 @@ const ChangePassword: React.FC = () => {
 
       await wallet.changePassword(data.oldPassword, data.password);
       toast({
-        title: 'Passcode changed',
-        description: 'Your passcode has been changed successfully',
+        title: 'Passcode changed successfully',
+        // description: 'Your passcode has been changed successfully',
       });
       await wallet.lock();
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'An error occurred while changing the passcode',
+        title: 'An error occurred while changing the passcode',
+        // description: 'An error occurred while changing the passcode',
       });
       console.error(error);
     }

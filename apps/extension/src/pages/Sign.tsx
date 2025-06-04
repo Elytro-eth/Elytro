@@ -9,6 +9,8 @@ import { useAccount } from '@/contexts/account-context';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useTx, TxRequestTypeEn } from '@/contexts/tx-context';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import LogoWithCircle from '@/assets/logoWithCircle.svg';
 
 export default function Sign() {
   const {
@@ -21,8 +23,7 @@ export default function Sign() {
   const handleCancel = async () => {
     await reject();
     toast({
-      title: 'Canceled',
-      description: 'Sign canceled',
+      title: 'Signing cancelled',
     });
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
   };
@@ -46,11 +47,16 @@ export default function Sign() {
     return (
       <SecondaryPageWrapper title="Activate Wallet" onBack={handleCancel} className="p-md">
         <div className="flex flex-col items-center gap-y-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            Your smart wallet is not activated yet. You need to activate it before signing messages.
+          <Avatar className="size-5xl mt-10 z-10 rounded-full">
+            <AvatarImage src={LogoWithCircle} alt="Elytro" />
+            <AvatarFallback>Elytro</AvatarFallback>
+          </Avatar>
+          <span className="elytro-text-bold-body">You’re almost ready</span>
+          <p className="text-sm text-gray-600 -mt-4">
+            Activating confirms your wallet<br />onchain and make it ready to use.
           </p>
           <Button onClick={activateNow} disabled={isSending} className="w-full rounded-md">
-            Activate Wallet
+            Activate now
           </Button>
         </div>
         <Spin isLoading={isSending} />
@@ -62,8 +68,7 @@ export default function Sign() {
     resolve(signature);
 
     toast({
-      title: 'Success',
-      description: 'Sign successfully',
+      title: 'Sign successfully',
     });
   };
 
