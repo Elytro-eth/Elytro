@@ -11,6 +11,7 @@ import { useAccount, usePublicClient } from 'wagmi';
 import { sendTransaction } from 'wagmi/actions';
 import { Box, ExternalLink, Loader2 } from 'lucide-react';
 import { RecoveryStatusEn } from '@/constants/enums';
+import { cn } from '@/lib/utils';
 
 const TimeBlock = ({ time, unit }: { time: number; unit: string }) => {
   return (
@@ -267,8 +268,13 @@ export default function Start() {
       subtitle={<div className="text-center text-gray-600">Connect to a wallet to start recovery.</div>}
     >
       {/* Count down */}
-      {status === RecoveryStatusEn.RECOVERY_STARTED && (
-        <div className="flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg">
+      {txStatus !== 'pending' && status && (
+        <div
+          className={cn(
+            'flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg ',
+            [RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status) && 'opacity-60'
+          )}
+        >
           <TimeBlock time={leftTime.hours} unit="Hours" />
           <TimeBlock time={leftTime.minutes} unit="Minutes" />
           <TimeBlock time={leftTime.seconds} unit="Seconds" />
@@ -283,28 +289,28 @@ export default function Start() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-x-sm">
-        <Button
-          size="lg"
-          variant={status === RecoveryStatusEn.SIGNATURE_COMPLETED ? 'default' : 'outline'}
-          disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.SIGNATURE_COMPLETED}
-          onClick={startRecovery}
-          className="w-full group"
-        >
-          <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
-          Start Recovery
-        </Button>
-
-        <Button
-          size="lg"
-          variant={status === RecoveryStatusEn.RECOVERY_READY ? 'default' : 'outline'}
-          disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.RECOVERY_READY}
-          onClick={completeRecovery}
-          className="w-full group"
-        >
-          <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
-          Complete Recovery
-        </Button>
+      <div className="grid grid-cols-1 gap-x-sm">
+        {status === RecoveryStatusEn.SIGNATURE_COMPLETED ? (
+          <Button
+            size="lg"
+            disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.SIGNATURE_COMPLETED}
+            onClick={startRecovery}
+            className="w-full group"
+          >
+            <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
+            Start Recovery
+          </Button>
+        ) : (
+          <Button
+            size="lg"
+            disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.RECOVERY_READY}
+            onClick={completeRecovery}
+            className="w-full group"
+          >
+            <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
+            Complete Recovery
+          </Button>
+        )}
       </div>
     </ContentWrapper>
   );

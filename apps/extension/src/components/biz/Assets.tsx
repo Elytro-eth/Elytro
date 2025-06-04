@@ -14,7 +14,7 @@ const LoadingSkeleton = () => (
 const TokenList = ({ tokens }: { tokens: TTokenInfo[] }) => (
   <div className="flex flex-col">
     {tokens.map((token) => (
-      <TokenItem key={`${token.address}-${token.chainId}`} token={token} />
+      <TokenItem key={`${token.address}-${token.chainId}`} token={token} showSymbol={false} />
     ))}
   </div>
 );
