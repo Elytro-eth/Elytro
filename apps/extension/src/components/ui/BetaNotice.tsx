@@ -11,22 +11,14 @@ interface IBetaNoticeProps {
 const BETA_NOTICE_STORAGE_KEY = 'beta_notice_storage_key';
 const DAYS = 24 * 60 * 60 * 1000;
 
-export default function BetaNotice({
-  text,
-  closeable,
-  onClose,
-}: IBetaNoticeProps) {
+export default function BetaNotice({ text, closeable, onClose }: IBetaNoticeProps) {
   const [isShow, setIsShow] = useState(false);
 
   useEffect(() => {
     const checkNoticeVisibility = async () => {
-      const lastCloseTimestamp =
-        (await localStorage.get<number>(BETA_NOTICE_STORAGE_KEY)) || 0;
+      const lastCloseTimestamp = (await localStorage.get<number>(BETA_NOTICE_STORAGE_KEY)) || 0;
 
-      if (
-        !lastCloseTimestamp ||
-        Date.now() - (lastCloseTimestamp as number) > 30 * DAYS
-      ) {
+      if (!lastCloseTimestamp || Date.now() - (lastCloseTimestamp as number) > 30 * DAYS) {
         setIsShow(true);
       }
     };
@@ -50,17 +42,11 @@ export default function BetaNotice({
     <div
       className="h-9 p-2 flex"
       style={{
-        background:
-          'radial-gradient(100% 336.18% at 0% 0%, #F1E8DF 0%, #F7F7F0 25.15%, #DAECEE 100%)',
+        background: 'radial-gradient(100% 336.18% at 0% 0%, #F1E8DF 0%, #F7F7F0 25.15%, #DAECEE 100%)',
       }}
     >
       <div>{text}</div>
-      {closeable && (
-        <X
-          className="elytro-clickable-icon absolute right-2"
-          onClick={handleClose}
-        />
-      )}
+      {closeable && <X className="elytro-clickable-icon absolute right-2" onClick={handleClose} />}
     </div>
   );
 }

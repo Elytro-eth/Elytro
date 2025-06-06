@@ -46,6 +46,7 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
       if (existingENS) {
         setEnsInfo(existingENS);
         field.onChange(existingENS.address);
+        inputRef.current?.blur();
         return;
       }
 
@@ -60,6 +61,7 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
 
         setEnsInfo(newEnsInfo);
         field.onChange(newEnsInfo.address);
+        inputRef.current?.blur();
       } else {
         setEnsInfo(null);
       }
@@ -78,6 +80,8 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
     if (isAddress(newValue)) {
       setDisplayLabel(newValue);
       setEnsInfo(null);
+      field.onChange(newValue);
+      inputRef.current?.blur();
     } else if (newValue.endsWith('.eth')) {
       setDisplayLabel('');
       resolveENS(newValue);
@@ -147,11 +151,7 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
         <Input
           ref={inputRef}
           className="text-lg border-none"
-          placeholder={
-            !isFocused && !(displayLabel || ensInfo)
-              ? 'Recipient address / ENS'
-              : ''
-          }
+          placeholder={!isFocused && !(displayLabel || ensInfo) ? 'Recipient address / ENS' : ''}
           value={isFocused ? value : displayLabel || ensInfo ? '' : value}
           onBlur={handleBlur}
           onFocus={handleFocus}
@@ -169,29 +169,17 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
 
       {isFocused && (
         <div className="absolute top-full left-0 right-0 bg-white shadow-md rounded-md mt-1 z-10 overflow-hidden max-h-80 overflow-y-auto">
-          <ENSSearchResults
-            value={value}
-            ensInfo={ensInfo}
-            loading={loading}
-            onSelectENS={() => handleSelectENS()}
-          />
+          <ENSSearchResults value={value} ensInfo={ensInfo} loading={loading} onSelectENS={() => handleSelectENS()} />
 
           <RecentAddressesList
-            recentAddresses={recentAddresses?.filter(
-              (item) => item.address !== ensInfo?.address
-            )}
+            recentAddresses={recentAddresses?.filter((item) => item.address !== ensInfo?.address)}
             chainId={chainId}
             onSelectAddress={handleSelectRecentAddress}
           />
 
-          {!loading &&
-            !ensInfo &&
-            !recentAddresses.length &&
-            !value.endsWith('.eth') && (
-              <div className="p-4 text-gray-500">
-                No recent addresses. Enter an address or ENS name.
-              </div>
-            )}
+          {!loading && !ensInfo && !recentAddresses.length && !value.endsWith('.eth') && (
+            <div className="p-4 text-gray-500">No recent addresses. Enter an address or ENS name.</div>
+          )}
         </div>
       )}
     </div>

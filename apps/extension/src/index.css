@@ -4,12 +4,7 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --elytro-btn-bg: linear-gradient(
-      to right,
-      #f0eee6 0%,
-      #f5edeb 36%,
-      #bad5f5 80%
-    );
+    --elytro-btn-bg: linear-gradient(to right, #f0eee6 0%, #f5edeb 36%, #bad5f5 80%);
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -76,15 +71,17 @@
   @font-face {
     font-family: 'ElytroSoehne';
     font-family: 'ElytroSoehne';
-    src:  url('/src/assets/fonts/soehne-buch.woff2') format('woff2'),
-          url('/src/assets/fonts/soehne-buch.woff') format('woff');
+    src:
+      url('/src/assets/fonts/soehne-buch.woff2') format('woff2'),
+      url('/src/assets/fonts/soehne-buch.woff') format('woff');
     font-weight: 400;
   }
   @font-face {
     font-family: 'ElytroSoehne';
     font-family: 'ElytroSoehne';
-    src:  url('/src/assets/fonts/soehne-kraftig.woff2') format('woff2'),
-          url('/src/assets/fonts/soehne-kraftig.woff') format('woff');
+    src:
+      url('/src/assets/fonts/soehne-kraftig.woff2') format('woff2'),
+      url('/src/assets/fonts/soehne-kraftig.woff') format('woff');
     font-weight: 700;
   }
   body {
@@ -162,11 +159,7 @@
   }
 
   .elytro-horizontal-gradient-bg {
-    background: radial-gradient(
-      93.78% 93.78% at 83.78% 16.41%,
-      #fffaf5 0%,
-      #e5f2f3 100%
-    );
+    background: radial-gradient(93.78% 93.78% at 83.78% 16.41%, #fffaf5 0%, #e5f2f3 100%);
     background-blend-mode: overlay;
   }
 
@@ -178,4 +171,15 @@
     width: var(--radix-select-trigger-width);
     max-height: var(--radix-select-content-available-height);
   }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

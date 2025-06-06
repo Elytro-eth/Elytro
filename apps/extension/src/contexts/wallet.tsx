@@ -5,6 +5,8 @@ import { toast } from '@/hooks/use-toast';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo, SidePanelRoutePath } from '@/utils/navigation';
 import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';
+import { cn } from '@/utils/shadcn/utils';
+import { Loader2 } from 'lucide-react';
 const portMessage = new PortMessage('elytro-ui');
 
 const INIT_PATHS = [
@@ -54,9 +56,15 @@ const WalletContext = createContext<IWalletContext>({
 export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
   const [status, setStatus] = useState<WalletStatusEn | undefined>();
   const [pathname] = useEnhancedHashLocation();
+  const [loading, setLoading] = useState(false);
 
   const getWalletStatus = async () => {
     try {
+      if (loading) {
+        return;
+      }
+
+      setLoading(true);
       const res = await walletControllerProxy.getWalletStatus();
 
       // We should NOT navigate if user already in the home/dashboard page and the status is the same and the status is not in the list of statuses
@@ -102,6 +110,8 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
         variant: 'destructive',
       });
       setStatus(WalletStatusEn.NoOwner);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,7 +119,20 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
     getWalletStatus();
   }, [walletControllerProxy, pathname]);
 
-  return <WalletContext.Provider value={{ wallet: walletControllerProxy, status }}>{children}</WalletContext.Provider>;
+  return (
+    <WalletContext.Provider value={{ wallet: walletControllerProxy, status }}>
+      <div
+        className={cn('flex flex-1 items-center justify-center relative', loading && 'opacity-70 pointer-events-none')}
+      >
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-[4px] z-10">
+            <Loader2 className="size-12 animate-spin text-primary" />
+          </div>
+        )}
+        {children}
+      </div>
+    </WalletContext.Provider>
+  );
 };
 
 export const useWallet = () => {
