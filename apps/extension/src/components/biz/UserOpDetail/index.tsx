@@ -47,7 +47,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
         return <InnerSendingDetail decodedUserOp={decodedDetail?.[0]} />;
 
       // case TxRequestTypeEn.ApproveTransaction:
-      // TODO: add upgrade contract detail
+      // TODO: add update contract detail
       default:
         return <ApprovalDetail decodedUserOp={decodedDetail} />;
     }
@@ -136,7 +136,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
       </InfoCardList>
 
       {!isDeployed && requestType !== TxRequestTypeEn.DeployWallet && (
-        <HelperText description="Wallet activation included with a one-time network cost" />
+        <HelperText description="Wallet activation included with a one-time cost" />
       )}
 
       {/* Transaction Raw Data: Only show for approve transaction */}

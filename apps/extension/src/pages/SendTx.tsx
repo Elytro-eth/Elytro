@@ -140,7 +140,7 @@ export default function SendTx() {
       if (to.toLowerCase() === address.toLowerCase()) {
         toast({
           title: 'Cannot send to yourself',
-          description: 'Please enter a different address',
+          // description: 'Please enter a different address',
           variant: 'destructive',
         });
         return;

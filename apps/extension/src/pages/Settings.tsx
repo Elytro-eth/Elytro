@@ -41,7 +41,7 @@ export default function Settings() {
           {needUpgrade && (
             <SettingItem
               icon={RefreshCcw}
-              label="Upgrade contract"
+              label="Update contract"
               path={SIDE_PANEL_ROUTE_PATHS.UpgradeContract}
               showRedDot
             />

@@ -21,8 +21,8 @@ const CreateAccount: React.FC = () => {
   const handleCreateAccount = async () => {
     if (!selectedChain) {
       toast({
-        title: 'Please select a chain',
-        description: 'Please select a chain to create your wallet',
+        title: 'Please select a network',
+        // description: 'Please select a chain to create your wallet',
       });
       return;
     }

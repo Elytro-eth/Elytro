@@ -4,13 +4,14 @@ import { Button } from '@/components/ui/button';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { UserOpDetail } from '@/components/biz/UserOpDetail';
 import { useAccount } from '@/contexts/account-context';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react'
+import { Box } from 'lucide-react'
 
 const UserOpTitleMap: Record<TxRequestTypeEn, string> = {
   [TxRequestTypeEn.DeployWallet]: 'Activate wallet',
   [TxRequestTypeEn.SendTransaction]: 'Send',
   [TxRequestTypeEn.ApproveTransaction]: 'Confirm transaction',
-  [TxRequestTypeEn.UpgradeContract]: 'Upgrade contract',
+  [TxRequestTypeEn.UpgradeContract]: 'Update contract',
 };
 
 function TxConfirm() {
@@ -62,6 +63,7 @@ function TxConfirm() {
             </Button>
 
             <Button onClick={onConfirm} className="flex-1 rounded-md" disabled={!hasSufficientBalance || isSending}>
+               <Box className="size-4 mr-sm" color="#cce1ea" />
               {hasSufficientBalance ? 'Confirm' : 'Insufficient balance'}
             </Button>
           </>

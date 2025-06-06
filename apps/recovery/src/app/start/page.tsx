@@ -285,7 +285,7 @@ export default function Start() {
         // Loading: waiting for transaction to be confirmed
         <div className="flex flex-col my-2xl w-full justify-center items-center gap-y-sm flex-nowrap mb-lg text-gray-300">
           <Loader2 className="size-8 animate-spin" />
-          <div className="text-tiny flex flex-row items-center">Waiting for transaction to be confirmed...</div>
+          <div className="text-tiny flex flex-row items-center">Confirming transaction...</div>
         </div>
       )}
 

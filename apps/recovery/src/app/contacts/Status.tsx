@@ -15,7 +15,7 @@ export default function Status() {
           chainID={chainId!}
           rightExtra={
             contact.confirmed ? (
-              <div className="flex items-center text-tiny rounded-xs bg-light-green px-xs py-3xs">Signed</div>
+              <div className="flex items-center text-tiny rounded-xs bg-light-green px-xs py-3xs">Confirmed</div>
             ) : null
           }
         />
