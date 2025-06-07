@@ -31,6 +31,7 @@ const YouAreIn: React.FC = () => {
 
   return (
     <FullPageWrapper
+      className="h-full"
       onBack={() => {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
       }}

@@ -37,7 +37,7 @@ const Create: React.FC = () => {
   };
 
   return (
-    <FullPageWrapper className="elytro-gradient-bg-2" showBack>
+    <FullPageWrapper className="elytro-gradient-bg-2 h-full" showBack>
       <div className="flex justify-center mt-10">
         <img src={IconPasscode} alt="Passcode" width={144} />
       </div>

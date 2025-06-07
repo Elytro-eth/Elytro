@@ -7,7 +7,7 @@ import FullPageWrapper from '@/components/biz/FullPageWrapper';
 
 export default function Transfer() {
   return (
-    <FullPageWrapper className="elytro-gradient-bg-2">
+    <FullPageWrapper className="elytro-gradient-bg-2 h-full">
       <img src={WalletImg} alt="Wallet" className="size-[9rem] mt-10" />
       <div className="text-center flex flex-col gap-y-2xs">
         <h1 className="elytro-text-subtitle mb-2">

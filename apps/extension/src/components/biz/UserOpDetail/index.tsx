@@ -7,11 +7,13 @@ import { useMemo, useState } from 'react';
 import ActivateDetail from './ActivationDetail';
 import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronUp, ChevronDown, Copy, RefreshCw, AlertCircle } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import HelperText from '@/components/ui/HelperText';
+import ShortedAddress from '@/components/ui/ShortedAddress';
+import { safeClipboard } from '@/utils/clipboard';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -34,9 +36,9 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   const [expandSponsorSelector, setExpandSponsorSelector] = useState(false);
   const {
     tokenInfo: { tokenPrices },
-    currentAccount: { isDeployed },
+    currentAccount: { isDeployed, address },
   } = useAccount();
-  const { requestType, calcResult, decodedDetail, onRetry } = useTx();
+  const { requestType, calcResult, decodedDetail, onRetry, hasSufficientBalance } = useTx();
 
   const DetailContent = useMemo(() => {
     switch (requestType) {
@@ -131,6 +133,29 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                 </Label>
               </div>
             </RadioGroup>
+          </div>
+        )}
+
+        {/* Insufficient Balance Warning */}
+        {!hasSufficientBalance && (
+          <div className="bg-light-blue rounded-md p-3">
+            <div className="flex flex-row items-center gap-2 text-red mb-1">
+              <AlertCircle className="size-4 text-red stroke-red" />
+              <span className="elytro-text-small-body text-red">Not enough ETH. Please deposit some first</span>
+            </div>
+            <div className="bg-white rounded-md p-2  flex items-center justify-between">
+              <div className="flex items-center gap-2 cursor-pointer" onClick={() => safeClipboard(address)}>
+                <ShortedAddress address={address} chainId={chainId} className="bg-white" />
+                <Copy className="size-4 text-gray-600" />
+              </div>
+              <div
+                className="flex flex-row items-center text-primary hover:text-primary hover:bg-primary/10"
+                onClick={() => onRetry()}
+              >
+                <RefreshCw className="size-4 mr-1" />
+                Check again
+              </div>
+            </div>
           </div>
         )}
       </InfoCardList>
