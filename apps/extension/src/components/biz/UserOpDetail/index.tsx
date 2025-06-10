@@ -139,21 +139,21 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
         {/* Insufficient Balance Warning */}
         {!hasSufficientBalance && (
           <div className="bg-light-blue rounded-md p-3">
-            <div className="flex flex-row items-center gap-2 text-red mb-1">
-              <AlertCircle className="size-4 text-red stroke-red" />
-              <span className="elytro-text-small-body text-red">Not enough ETH. Please deposit some first</span>
+            <div className="flex flex-row items-center gap-1 text-red mb-1">
+              <AlertCircle className="size-4 text-red stroke-dark-red" />
+              <span className="elytro-text-small-body text-dark-red">Not enough ETH, please deposit some first</span>
             </div>
             <div className="bg-white rounded-md p-2  flex items-center justify-between">
-              <div className="flex items-center gap-2 cursor-pointer" onClick={() => safeClipboard(address)}>
+              <div className="flex items-center 1 cursor-pointer" onClick={() => safeClipboard(address)}>
                 <ShortedAddress address={address} chainId={chainId} className="bg-white" />
-                <Copy className="size-4 text-gray-600" />
+                <Copy className="size-3 stroke-gray-600" />
               </div>
               <div
-                className="flex flex-row items-center text-primary hover:text-primary hover:bg-primary/10"
+                className="flex flex-row items-center text-black-blue px-2 py-1 rounded-xs  hover:text-primary hover:bg-primary/10"
                 onClick={() => onRetry()}
               >
-                <RefreshCw className="size-4 mr-1" />
-                Check again
+                <RefreshCw className="size-3 mr-1" />
+                Check
               </div>
             </div>
           </div>

@@ -12,14 +12,14 @@ export const InvalidRecordView = () => {
   return (
     <div className="h-full w-full flex items-center justify-center">
       <div className="rounded-full bg-red-50 p-md flex flex-col items-center justify-center gap-y-sm">
-        <AlertCircle className="size-16 animate-pulse stroke-red rounded-full" />
+        <AlertCircle className="size-20 stroke-red rounded-full" />
 
         <div className="text-dark-blue text-bold-body">Invalid recovery link</div>
 
         <p className="text-md text-gray-600">
           {/* {hasValidParams
             ? 'The link appears to be broken. Please contact the person who sent you the link.'
-            : 'This link is missing required information. Please get a new recovery link from Elytro wallet.'}
+            : 'This link is missing required information. Please get a new recovery link from Elytro wallet..'}
              */}
           Please get the complete recovery link from Elytro wallet.
         </p>
