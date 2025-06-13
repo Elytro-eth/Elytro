@@ -48,7 +48,7 @@ export default function Start() {
 
   if (!address || !chainId || !hash) {
     router.push('/not-found');
-    return;
+    return null;
   }
 
   const openExplorer = (txHash: string) => {
@@ -268,7 +268,7 @@ export default function Start() {
       subtitle={<div className="text-center text-gray-600">Connect to a wallet to start recovery.</div>}
     >
       {/* Count down */}
-      {txStatus !== 'pending' && status && (
+      {txStatus !== 'pending' && status !== null && status !== undefined && (
         <div
           className={cn(
             'flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg ',

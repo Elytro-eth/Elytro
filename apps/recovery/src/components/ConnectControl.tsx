@@ -96,24 +96,6 @@ export default function ConnectControl() {
   //     return;
   //   }
 
-  //   // if (
-  //   //   isConnectedAccountAContact(
-  //   //     address,
-  //   //     recoveryRecord?.guardianInfo?.guardians
-  //   //   )
-  //   // ) {
-  //   //   toast({
-  //   //     title: 'Wallet connected successfully',
-  //   //   });
-  //   // } else {
-  //   //   toast({
-  //   //     title: 'Wallet not authorized',
-  //   //     description: 'Please connect with a guardian wallet.',
-  //   //     variant: 'destructive',
-  //   //   });
-  //   // }
-  // }, [address]);
-
   const switchChain = async () => {
     if (!recoveryChainId) {
       return;
