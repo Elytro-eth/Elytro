@@ -11,7 +11,7 @@ import {
 } from '@/requests/contract';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, Suspense } from 'react';
 import { Address, isAddress } from 'viem';
 
 interface IRecoveryRecordContext {
@@ -34,7 +34,7 @@ interface IRecoveryRecordContext {
 
 const RecoveryRecordContext = createContext<IRecoveryRecordContext | undefined>(undefined);
 
-export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+const RecoveryRecordProviderInner: React.FC<{ children: ReactNode }> = ({ children }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -201,25 +201,33 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
   return (
     <RecoveryRecordContext.Provider
       value={{
-        contacts,
         loading,
-        error,
-        updateContactsSignStatus,
-        updateRecoveryStatus,
-        backToHome,
+        contacts,
+        address,
+        chainId,
         threshold,
         status,
         validTime,
-        setStatus,
-        address,
-        chainId,
         hash,
+        error,
+        setStatus,
+        backToHome,
+        updateContactsSignStatus,
+        updateRecoveryStatus,
         generateStartRecoveryTxData,
         generateExecuteRecoveryTxData,
       }}
     >
       {children}
     </RecoveryRecordContext.Provider>
+  );
+};
+
+export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RecoveryRecordProviderInner>{children}</RecoveryRecordProviderInner>
+    </Suspense>
   );
 };
 
