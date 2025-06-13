@@ -1,10 +1,6 @@
 import { decrypt, encrypt, TPasswordEncryptedData } from '@/utils/passworder';
 import { Hex } from 'viem';
-import {
-  PrivateKeyAccount,
-  generatePrivateKey,
-  privateKeyToAccount,
-} from 'viem/accounts';
+import { PrivateKeyAccount, generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import sessionManager from './session';
 import { sessionStorage } from '@/utils/storage/session';
 import { SigningKey } from '@ethersproject/signing-key';
@@ -23,12 +19,9 @@ class KeyringService {
   private _store: LocalSubscribableStore<KeyringServiceState>;
 
   constructor() {
-    this._store = new LocalSubscribableStore<KeyringServiceState>(
-      KEYRING_STORAGE_KEY,
-      () => {
-        this._verifyPassword();
-      }
-    );
+    this._store = new LocalSubscribableStore<KeyringServiceState>(KEYRING_STORAGE_KEY, () => {
+      this._verifyPassword();
+    });
   }
 
   get hasOwner() {
@@ -120,6 +113,14 @@ class KeyringService {
     } catch {
       this._locked = true;
     }
+  }
+
+  public async exportOwnerKey(password: string) {
+    if (!this._encryptData) {
+      throw new Error('Cannot export owner if owner is not set');
+    }
+    const { key } = await decrypt(this._encryptData, password);
+    return key as Hex;
   }
 
   public async reset() {

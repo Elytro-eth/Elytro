@@ -22,6 +22,7 @@ import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 import { isOlderThan } from '@/utils/version';
 import { RecoveryStatusEn } from '@/constants/recovery';
 import { ETH_TOKEN_INFO } from '@/constants/token';
+import { decrypt, encrypt, TPasswordEncryptedData } from '@/utils/passworder';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -594,6 +595,28 @@ class WalletController {
       console.error('Elytro: createRecoveryRecord error', error);
       throw error;
     }
+  }
+
+  public async importWallet(encryptedText: string, password: string) {
+    const decryptedText = await decrypt(JSON.parse(encryptedText) as TPasswordEncryptedData, password);
+    const data = decryptedText;
+    console.log('data', data);
+  }
+
+  public async exportOwnerAndAccounts(password: string) {
+    const owner = await keyring.exportOwnerKey(password);
+    const accounts = accountManager.accounts.map((account) => ({
+      address: account.address,
+      chainId: account.chainId,
+      isDeployed: account.isDeployed,
+    }));
+
+    const text = JSON.stringify({
+      owner,
+      accounts,
+    });
+    const encryptedText = await encrypt(text, password);
+    return JSON.stringify(encryptedText);
   }
 }
 
