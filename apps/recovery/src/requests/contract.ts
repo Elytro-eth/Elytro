@@ -189,6 +189,8 @@ export const getRecoveryStartTxData = (
     args: [walletAddress as Address, ownersInBytes32, rawGuardian as Hex, packedGuardianSignature as Hex],
   });
 
+  console.log('data', data);
+  console.log('to', SocialRecoveryContractConfig);
   return {
     data,
     to: SocialRecoveryContractConfig.address,

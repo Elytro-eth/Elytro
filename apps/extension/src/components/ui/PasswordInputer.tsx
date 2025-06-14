@@ -42,10 +42,7 @@ export default function PasswordInput<T extends FieldValues>({
         {...rest}
       />
       {showEye && (
-        <EyeOnOff
-          className="absolute top-1/4 right-4 cursor-pointer"
-          onChangeVisible={handlePwdVisibleChange}
-        />
+        <EyeOnOff className="absolute top-1/4 right-4 cursor-pointer" onChangeVisible={handlePwdVisibleChange} />
       )}
     </div>
   );

@@ -25,6 +25,7 @@ import NetworkConfiguration from './pages/NetworkConfiguration';
 import UpgradeContract from './pages/UpgradeContract';
 import { ApprovalTypeEn } from './constants/operations';
 import Unlock from './pages/Unlock';
+import ExportBackupPage from './pages/ExportBackup';
 
 export enum SIDE_PANEL_ROUTE_PATHS {
   Home = '/',
@@ -53,6 +54,7 @@ export enum SIDE_PANEL_ROUTE_PATHS {
   RetrieveContacts = '/retrieve-contacts',
   Transfer = '/transfer',
   ImportToken = '/import-token',
+  ExportBackup = '/export',
 }
 
 export const routes: TRoute[] = [
@@ -160,5 +162,9 @@ export const routes: TRoute[] = [
   {
     path: SIDE_PANEL_ROUTE_PATHS.ImportToken,
     component: ImportToken,
+  },
+  {
+    path: SIDE_PANEL_ROUTE_PATHS.ExportBackup,
+    component: ExportBackupPage,
   },
 ];

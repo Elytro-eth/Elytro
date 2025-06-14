@@ -16,8 +16,9 @@ import { navigateTo } from '@/utils/navigation';
 import Spin from '@/components/ui/Spin';
 import { toast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/utils/shadcn/utils';
 
-export default function AccountsDropdown() {
+export default function AccountsDropdown({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const { currentAccount, accounts, getAccounts, reloadAccount } = useAccount();
   const { wallet } = useWallet();
@@ -88,7 +89,12 @@ export default function AccountsDropdown() {
   return (
     <DropdownMenu open={open} onOpenChange={handleOpenChange}>
       <div onClick={() => handleOpenChange(!open)}>
-        <div className="max-w-fit cursor-pointer flex items-center gap-x-sm border border-gray-200 rounded-[8px] bg-white px-sm py-xs text-gray-750 hover:bg-gray-100">
+        <div
+          className={cn(
+            'max-w-fit cursor-pointer flex items-center gap-x-sm border border-gray-200 rounded-[8px] bg-white px-sm py-xs text-gray-750 hover:bg-gray-100',
+            className
+          )}
+        >
           <DropdownMenuTrigger asChild>
             <Avatar className="size-4">
               <AvatarImage src={getIconByChainId(currentAccount.chainId)} />
