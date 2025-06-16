@@ -52,11 +52,11 @@ export default function Settings() {
       </div>
 
       <div className="mb-4">
-        <h2 className="elytro-text-small-bold text-gray-600 my-4">Local settings</h2>
+        <h2 className="elytro-text-small-bold text-gray-600 my-4">Device settings</h2>
         <div className="space-y-2">
           <SettingItem icon={UserRoundIcon} label="Device profile" path={SIDE_PANEL_ROUTE_PATHS.LocalProfile} />
-          <SettingItem icon={Settings2Icon} label="Network" path={SIDE_PANEL_ROUTE_PATHS.NetworkConfiguration} />
           <SettingItem icon={WalletCardsIcon} label="Export backup" path={SIDE_PANEL_ROUTE_PATHS.ExportBackup} />
+          <SettingItem icon={Settings2Icon} label="Networks" path={SIDE_PANEL_ROUTE_PATHS.NetworkConfiguration} />
         </div>
         <div className="flex flex-col space-y-2 w-full my-8">
           <Button variant="secondary" onClick={handleLock}>

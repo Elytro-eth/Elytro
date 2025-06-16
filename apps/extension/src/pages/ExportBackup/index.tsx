@@ -13,24 +13,24 @@ import { writeFile } from '@/utils/file';
 import { formatErrorMsg } from '@/utils/format';
 import { navigateTo } from '@/utils/navigation';
 import dayjs from 'dayjs';
-import { Clock, DownloadIcon, Shield, WalletCards } from 'lucide-react';
+import { LaptopMinimal, DownloadIcon, LockKeyhole, WalletCards } from 'lucide-react';
 import { useState } from 'react';
 
 const tips = [
   {
-    title: '1. You’ll get a backup file for each wallet',
-    description: 'Includes its Social Recovery contacts',
+    title: '1. Get a backup file for all wallets',
+    description: 'Includes their Social Recovery contacts',
     Icon: WalletCards,
   },
   {
-    title: '2. It’s locked with your device passcode',
+    title: '2. It’s locked with device passcode',
     description: 'Only you can unlock it later',
-    Icon: Shield,
+    Icon: LockKeyhole,
   },
   {
-    title: '3. Use it to import on a new device',
+    title: '3. Import all wallets on new device',
     description: 'Import and unlock with the same passcode',
-    Icon: Clock,
+    Icon: LaptopMinimal,
   },
 ];
 
@@ -80,13 +80,13 @@ export default function ExportBackupPage() {
       writeFile(backup, `${date}-elytro-backup.json`);
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
       toast({
-        title: 'Backup file is downloaded to your device',
-        description: 'You can find it in the Downloads folder',
+        title: 'Backup downloaded',
+        //description: 'You can find it in the Downloads folder',
         variant: 'constructive',
       });
     } catch (error) {
       toast({
-        title: 'Failed to export backup',
+        title: 'Export backup failed',
         variant: 'destructive',
         description: formatErrorMsg(error),
       });
@@ -98,42 +98,44 @@ export default function ExportBackupPage() {
   return (
     <SecondaryPageWrapper title="Export backup">
       {isGuiding ? (
-        <Guide title="How wallet backup works" action="Start backup" onAction={handleGuiding} tips={tips} />
+        <Guide title="How wallets backup works" action="Start backup" onAction={handleGuiding} tips={tips} />
       ) : (
         <div className="flex flex-col gap-y-lg items-center h-full justify-between">
           <div className="flex flex-col w-full">
-            <div className="elytro-text-bold-body">Create a protected backup</div>
+            <div className="elytro-text-bold-body">Create a backup</div>
             <div className="elytro-text-smaller-body text-gray-600">Use your device passcode to lock the file</div>
           </div>
           <PasswordInput
-            placeholder="Enter your device passcode"
+            placeholder="Device passcode to lock file"
             style={{ border: '1px solid #e2e2e2', background: '#fff' }}
             outerPwdVisible
             value={pwd}
             onValueChange={handlePwdChange}
           />
-          <HelperText description="This passcode will be required to unlock your backup file" />
+          <HelperText description="Passcode will be required to unlock your backup file" />
           <Button className="w-full" disabled={!isPwdPassed} onClick={handleCreateBackup}>
-            {isPwdPassed ? 'Prepare file' : 'Encrypt file'}
+            {isPwdPassed ? 'Prepare file' : 'Prepare file'}
           </Button>
 
           <Dialog open={isDownloading} onOpenChange={setIsDownloading}>
             <DialogContent className="gap-y-lg max-w-md mx-auto">
               <DialogHeader>
-                <DialogTitle>Locked backup is ready</DialogTitle>
+                <DialogTitle>Backup is ready</DialogTitle>
                 <DialogDescription>Confirm below to download the file</DialogDescription>
               </DialogHeader>
 
               <div className="flex flex-col gap-y-sm">
-                <div className="flex items-center gap-x-sm" onClick={() => setIsTermOneChecked((prev) => !prev)}>
+                <div className="flex items-start gap-x-sm" onClick={() => setIsTermOneChecked((prev) => !prev)}>
                   <Checkbox checked={isTermOneChecked} />
-                  <Label className="elytro-text-small-body text-gray-600">
-                    I need this device passcode to unlock backup
+                  <Label className="elytro-text-small-body text-gray-600 cursor-pointer">
+                    I need this passcode to unlock backup
                   </Label>
                 </div>
-                <div className="flex items-center gap-x-sm" onClick={() => setIsTermTwoChecked((prev) => !prev)}>
+                <div className="flex items-start gap-x-sm" onClick={() => setIsTermTwoChecked((prev) => !prev)}>
                   <Checkbox checked={isTermTwoChecked} />
-                  <Label className="elytro-text-small-body text-gray-600">I will not share this file with anyone</Label>
+                  <Label className="elytro-text-small-body text-gray-600 cursor-pointer">
+                    I will not share this file with anyone
+                  </Label>
                 </div>
               </div>
               <Button

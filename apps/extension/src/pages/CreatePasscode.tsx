@@ -41,7 +41,7 @@ const Create: React.FC = () => {
       <div className="flex justify-center mt-10">
         <img src={IconPasscode} alt="Passcode" width={144} />
       </div>
-      <h1 className="elytro-text-title text-center">Create a passcode</h1>
+      <h1 className="elytro-text-title text-center">Set your passcode</h1>
       <h2 className="text-sm text-muted-foreground text-center -mt-4">
         This is for access your wallets on this device
       </h2>

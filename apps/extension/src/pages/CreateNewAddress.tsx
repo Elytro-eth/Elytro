@@ -28,19 +28,11 @@ export default function CreateNewAddress() {
     }
   };
   return (
-    <SecondaryPageWrapper title="Create New Address">
-      <NetworkSelection
-        selectedChain={selectedChain}
-        handleSelectChain={handleChange}
-      />
+    <SecondaryPageWrapper title="Create wallet">
+      <NetworkSelection selectedChain={selectedChain} handleSelectChain={handleChange} />
 
-      <Button
-        size="large"
-        className="w-full mt-4"
-        onClick={handleCreate}
-        disabled={!selectedChain}
-      >
-        Create
+      <Button size="large" className="w-full mt-4" onClick={handleCreate} disabled={!selectedChain}>
+        Create a wallet
       </Button>
     </SecondaryPageWrapper>
   );

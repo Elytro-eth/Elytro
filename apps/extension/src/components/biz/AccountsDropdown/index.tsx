@@ -123,7 +123,7 @@ export default function AccountsDropdown({ className }: { className?: string }) 
         className="w-[330px] max-w-fit bg-white rounded-md shadow-lg py-lg px-0"
       >
         <div className="flex items-center justify-between  gap-x-3xl px-lg pb-sm">
-          <span className="elytro-text-small-bold text-gray-900">Switch wallet</span>
+          <span className="elytro-text-small-bold text-gray-900">Your wallets</span>
           <Button variant="outline" size="tiny" className="elytro-text-tiny-body" onClick={handleAddAccount}>
             Add new wallet
           </Button>
