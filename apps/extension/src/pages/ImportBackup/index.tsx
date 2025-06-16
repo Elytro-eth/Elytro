@@ -4,9 +4,9 @@ import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
 import { formatErrorMsg } from '@/utils/format';
 import { ArrowLeft, Laptop, Lock, WalletCards } from 'lucide-react';
-import { useRef, useState } from 'react';
-import WalletImg from '@/assets/wallet.png';
 import IconPasscode from '@/assets/passcode.png';
+import { useState, useRef } from 'react';
+import WalletImg from '@/assets/wallet.png';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -93,7 +93,7 @@ export default function ImportBackup() {
   if (isGuiding) {
     return (
       <SecondaryPageWrapper title="Import Wallets">
-        <Guide img={WalletImg} title="How import works" action="Start import" onAction={handleGuiding} tips={tips} />
+        <Guide imgSrc={WalletImg} title="How import works" action="Start import" onAction={handleGuiding} tips={tips} />
       </SecondaryPageWrapper>
     );
   }

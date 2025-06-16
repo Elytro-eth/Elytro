@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { LucideProps } from 'lucide-react';
 
 interface GuideProps {
-  img: string;
+  imgSrc: string;
   title: string;
   action: string;
   onAction: () => void;
@@ -14,10 +14,10 @@ interface GuideProps {
   }[];
 }
 
-export default function Guide({ img, title, action, onAction, tips }: GuideProps) {
+export default function Guide({ imgSrc, title, action, onAction, tips }: GuideProps) {
   return (
     <div className="flex flex-col gap-y-xl items-center mt-10 h-full justify-between">
-      <img src={img} className="size-36" />
+      <img src={imgSrc} className="size-36" />
       <div className="elytro-text-subtitle text-center text-dark-blue">{title}</div>
       <div>
         {tips.map((tip) => (

@@ -99,7 +99,13 @@ export default function ExportBackupPage() {
   return (
     <SecondaryPageWrapper title="Export backup">
       {isGuiding ? (
-        <Guide title="How wallets backup works" action="Start backup" onAction={handleGuiding} tips={tips} />
+        <Guide
+          title="How wallets backup works"
+          action="Start backup"
+          onAction={handleGuiding}
+          tips={tips}
+          imgSrc={WalletImg}
+        />
       ) : (
         <div className="flex flex-col gap-y-lg items-center h-full justify-between">
           <div className="flex flex-col w-full">
