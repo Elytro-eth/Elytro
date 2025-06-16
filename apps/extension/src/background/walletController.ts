@@ -601,10 +601,22 @@ class WalletController {
     return await keyring.isPasswordValid(password);
   }
 
-  public async importWallet(encryptedText: string, password: string) {
-    const decryptedText = await decrypt(JSON.parse(encryptedText) as TPasswordEncryptedData, password);
-    const data = decryptedText;
-    console.log('data', data);
+  public async importWallet(encryptedData: TPasswordEncryptedData, password: string) {
+    const decryptedDataStr = (await decrypt(encryptedData, password)) as unknown as string;
+
+    const decryptedData = JSON.parse(decryptedDataStr);
+
+    if (!decryptedData.owner || !decryptedData.accounts) {
+      throw new Error('Elytro: Invalid wallet data');
+    }
+
+    const { owner, accounts } = decryptedData;
+
+    await keyring.importOwner(owner as Hex, password);
+
+    accountManager.importAccounts(accounts as TAccountInfo[]);
+
+    return true;
   }
 
   public async exportOwnerAndAccounts(password: string) {

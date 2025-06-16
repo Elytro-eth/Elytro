@@ -8,7 +8,6 @@ import Alert from './pages/Alert';
 import Sign from './pages/Sign';
 import TxConfirm from './pages/TxConfirm';
 import Create from './pages/CreatePasscode';
-// import CreateAccount from './pages/CreateAccount';
 import YouAreIn from './pages/YouAreIn';
 import CreateNewAddress from './pages/CreateNewAddress';
 import Connection from './pages/Connection';
@@ -25,6 +24,7 @@ import UpgradeContract from './pages/UpgradeContract';
 import { ApprovalTypeEn } from './constants/operations';
 import Unlock from './pages/Unlock';
 import ExportBackupPage from './pages/ExportBackup';
+import ImportBackup from './pages/ImportBackup';
 
 export enum SIDE_PANEL_ROUTE_PATHS {
   Home = '/',
@@ -53,6 +53,7 @@ export enum SIDE_PANEL_ROUTE_PATHS {
   Transfer = '/transfer',
   ImportToken = '/import-token',
   ExportBackup = '/export',
+  ImportBackup = '/import',
 }
 
 export const routes: TRoute[] = [
@@ -160,5 +161,9 @@ export const routes: TRoute[] = [
   {
     path: SIDE_PANEL_ROUTE_PATHS.ExportBackup,
     component: ExportBackupPage,
+  },
+  {
+    path: SIDE_PANEL_ROUTE_PATHS.ImportBackup,
+    component: ImportBackup,
   },
 ];

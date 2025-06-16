@@ -2,7 +2,6 @@ import WalletImg from '@/assets/wallet.png';
 import { Button } from '@/components/ui/button';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
-import { toast } from '@/hooks/use-toast';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
 
 export default function Transfer() {
@@ -30,11 +29,7 @@ export default function Transfer() {
         <Button
           size="large"
           variant="secondary"
-          onClick={() =>
-            toast({
-              title: 'Import feature is not available yet',
-            })
-          }
+          onClick={() => navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportBackup)}
         >
           Import all wallets
         </Button>

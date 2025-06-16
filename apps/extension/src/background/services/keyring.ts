@@ -57,6 +57,25 @@ class KeyringService {
     sessionManager.broadcastMessage('accountsChanged', []);
   }
 
+  public async importOwner(ownerKey: Hex, password: string) {
+    try {
+      this._signingKey = new SigningKey(ownerKey);
+      this._owner = privateKeyToAccount(ownerKey);
+
+      const encryptedData = await encrypt(
+        {
+          key: ownerKey,
+        },
+        password
+      );
+      this._encryptData = encryptedData;
+      this._locked = false;
+    } catch {
+      this._locked = true;
+      throw new Error('Elytro: Failed to import owner');
+    }
+  }
+
   public async createNewOwner(password: string) {
     // !TODO: maybe this check can be removed if we make sure user cannot turn back to create owner page
     if (this._owner) {

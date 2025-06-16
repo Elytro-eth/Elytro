@@ -49,6 +49,15 @@ class AccountManager {
     return this._currentAccount;
   }
 
+  public importAccounts(accounts: TAccountInfo[]) {
+    if (!accounts || accounts.length === 0) {
+      throw new Error('Elytro::AccountManager::importAccounts: no accounts to import');
+    }
+
+    this._accounts = accounts;
+    this._currentAccount = this._accounts[0];
+  }
+
   public async getRecoveryRecord() {
     return (await localStorage.get<TRecoveryRecord>(RECOVERY_RECORD_STORAGE_KEY)) || null;
   }
