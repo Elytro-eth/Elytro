@@ -15,6 +15,7 @@ import { navigateTo } from '@/utils/navigation';
 import dayjs from 'dayjs';
 import { Clock, DownloadIcon, Shield, WalletCards } from 'lucide-react';
 import { useState } from 'react';
+import WalletImg from '@/assets/wallet.png';
 
 const tips = [
   {
@@ -98,7 +99,13 @@ export default function ExportBackupPage() {
   return (
     <SecondaryPageWrapper title="Export backup">
       {isGuiding ? (
-        <Guide title="How wallet backup works" action="Start backup" onAction={handleGuiding} tips={tips} />
+        <Guide
+          img={WalletImg}
+          title="How wallet backup works"
+          action="Start backup"
+          onAction={handleGuiding}
+          tips={tips}
+        />
       ) : (
         <div className="flex flex-col gap-y-lg items-center h-full justify-between">
           <div className="flex flex-col w-full">
@@ -108,7 +115,6 @@ export default function ExportBackupPage() {
           <PasswordInput
             placeholder="Enter your device passcode"
             style={{ border: '1px solid #e2e2e2', background: '#fff' }}
-            outerPwdVisible
             value={pwd}
             onValueChange={handlePwdChange}
           />
