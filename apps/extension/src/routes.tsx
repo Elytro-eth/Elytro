@@ -11,7 +11,6 @@ import Create from './pages/CreatePasscode';
 // import CreateAccount from './pages/CreateAccount';
 import YouAreIn from './pages/YouAreIn';
 import CreateNewAddress from './pages/CreateNewAddress';
-import LocalProfile from './pages/LocalProfile';
 import Connection from './pages/Connection';
 import ChainChange from './pages/ChainChange';
 import Launch from './pages/Launch';
@@ -46,7 +45,6 @@ export enum SIDE_PANEL_ROUTE_PATHS {
   YouAreIn = '/you-are-in',
   // CreateAccount = '/create-account',
   CreateNewAddress = '/create-new-address',
-  LocalProfile = '/local-profile',
   Connection = '/connection',
   ChainChange = ApprovalTypeEn.ChainChange,
   RecoverySetting = '/recovery-setting',
@@ -134,10 +132,6 @@ export const routes: TRoute[] = [
   {
     path: SIDE_PANEL_ROUTE_PATHS.RetrieveContacts,
     component: RetrieveContacts,
-  },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.LocalProfile,
-    component: LocalProfile,
   },
   {
     path: SIDE_PANEL_ROUTE_PATHS.Connection,

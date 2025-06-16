@@ -55,6 +55,7 @@ export default function Settings() {
         <h2 className="elytro-text-small-bold text-gray-600 my-4">Device settings</h2>
         <div className="space-y-2">
           <SettingItem icon={UserRoundIcon} label="Device profile" path={SIDE_PANEL_ROUTE_PATHS.LocalProfile} />
+          <SettingItem icon={Settings2Icon} label="Network" path={SIDE_PANEL_ROUTE_PATHS.NetworkConfiguration} />
           <SettingItem icon={WalletCardsIcon} label="Export backup" path={SIDE_PANEL_ROUTE_PATHS.ExportBackup} />
           <SettingItem icon={Settings2Icon} label="Networks" path={SIDE_PANEL_ROUTE_PATHS.NetworkConfiguration} />
         </div>

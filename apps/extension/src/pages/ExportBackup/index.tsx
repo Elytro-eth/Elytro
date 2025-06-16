@@ -15,6 +15,7 @@ import { navigateTo } from '@/utils/navigation';
 import dayjs from 'dayjs';
 import { LaptopMinimal, DownloadIcon, LockKeyhole, WalletCards } from 'lucide-react';
 import { useState } from 'react';
+import WalletImg from '@/assets/wallet.png';
 
 const tips = [
   {
@@ -108,7 +109,6 @@ export default function ExportBackupPage() {
           <PasswordInput
             placeholder="Device passcode to lock file"
             style={{ border: '1px solid #e2e2e2', background: '#fff' }}
-            outerPwdVisible
             value={pwd}
             onValueChange={handlePwdChange}
           />
