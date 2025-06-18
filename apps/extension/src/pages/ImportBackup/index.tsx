@@ -24,8 +24,8 @@ const tips = [
     Icon: WalletCards,
   },
   {
-    title: '2. Use the lock passcode to unlock',
-    description: 'This will also become your passcode on this device',
+    title: '2. Use lock passcode to unlock',
+    description: 'This is also your passcode on this new device',
     Icon: Lock,
   },
   {
@@ -83,7 +83,7 @@ export default function ImportBackup() {
       }
     } catch (error) {
       toast({
-        title: 'Failed to validate passcode',
+        title: 'Passcode not correct',
         variant: 'destructive',
         description: formatErrorMsg(error),
       });
@@ -92,18 +92,17 @@ export default function ImportBackup() {
 
   if (isGuiding) {
     return (
-      <SecondaryPageWrapper title="Import Wallets">
-        <Guide imgSrc={WalletImg} title="How import works" action="Start import" onAction={handleGuiding} tips={tips} />
+      <SecondaryPageWrapper title="Import wallets">
+        <Guide imgSrc={WalletImg} title="How Import works" action="Start import" onAction={handleGuiding} tips={tips} />
       </SecondaryPageWrapper>
     );
   }
 
   return (
-    <div className={'w-full min-h-full elytro-gradient-bg-2 p-3xl'}>
+    <div className={'w-full min-h-full elytro-gradient-bg-2 p-xl pt-8'}>
       <div className="flex flex-col flex-grow w-full min-h-full rounded-sm">
         <div className="flex flex-row items-center justify-center relative pb-lg mb-sm">
           <ArrowLeft className="elytro-clickable-icon absolute left-0" onClick={() => history.back()} />
-          <h3 className="elytro-text-bold-body">Import Wallets</h3>
         </div>
       </div>
 
@@ -112,8 +111,8 @@ export default function ImportBackup() {
         <h1 className="elytro-text-title text-center">Import all wallets</h1>
 
         <div className="flex flex-col gap-y-sm w-full max-w-full min-w-full">
-          <div className="flex justify-between  items-center bg-white rounded-2xl p-4 h-14 shadow-sm w-full max-w-md">
-            <span className={cn('font-medium max-w-36 truncate', !fileName && 'text-gray-600 font-normal')}>
+          <div className="flex justify-between  items-center bg-white rounded-2xl p-4 h-14 w-full max-w-md">
+            <span className={cn('max-w-36 truncate text-gray-600 font-normal text-lg', !fileName && 'text-gray-600 font-normal')}>
               {fileName || 'Wallet backup file'}
             </span>
             <Label className="ml-4 cursor-pointer" htmlFor="wallet-backup-file">

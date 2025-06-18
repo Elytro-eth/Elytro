@@ -10,9 +10,9 @@ export default function Transfer() {
       <img src={WalletImg} alt="Wallet" className="size-[9rem] mt-10" />
       <div className="text-center flex flex-col gap-y-2xs">
         <h1 className="elytro-text-subtitle mb-2">
-          Manage your
+          Already have
           <br />
-          Elytro wallets
+          an Elytro wallet
         </h1>
       </div>
       <div className="flex flex-col gap-y-md w-full">
