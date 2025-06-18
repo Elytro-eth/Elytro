@@ -58,7 +58,7 @@ export default function ExportBackupPage() {
       const isValid = await wallet.validatePassword(pwd);
       if (!isValid) {
         toast({
-          title: 'Invalid passcode',
+          title: 'Incorrect Passcode',
           variant: 'destructive',
         });
         return;
@@ -114,7 +114,6 @@ export default function ExportBackupPage() {
           </div>
           <PasswordInput
             placeholder="Device passcode to lock file"
-            style={{ border: '1px solid #e2e2e2', background: '#fff' }}
             value={pwd}
             onValueChange={handlePwdChange}
           />

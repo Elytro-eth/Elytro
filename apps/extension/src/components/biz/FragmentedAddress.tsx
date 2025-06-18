@@ -71,7 +71,7 @@ export default function FragmentedAddress({
           </Tooltip>
           <span>{suffix}</span>
         </div>
-        {extra && <div className={cn(extraLayout === 'row' ? 'ml-sm' : 'mt-xs')}>{extra}</div>}
+        {extra && <div className={cn(extraLayout === 'row' ? 'ml-sm' : 'mt-0')}>{extra}</div>}
       </div>
     </div>
   );

@@ -83,7 +83,7 @@ export default function ImportBackup() {
       }
     } catch (error) {
       toast({
-        title: 'Passcode not correct',
+        title: 'Incorrect passcode',
         variant: 'destructive',
         description: formatErrorMsg(error),
       });
@@ -134,7 +134,12 @@ export default function ImportBackup() {
               />
             </Label>
           </div>
-          <PasswordInput placeholder="Passcode to unlock backup" value={pwd} onValueChange={handlePwdChange} />
+          <PasswordInput 
+            placeholder="Passcode to unlock backup" 
+            value={pwd} 
+            onValueChange={handlePwdChange} 
+            style={{ backgroundColor: 'white' }}
+          />
 
           <div className="flex flex-row  gap-x-sm cursor-pointer" onClick={() => setIsChecked((prev) => !prev)}>
             <Checkbox className="flex-shrink-0 mt-1" checked={isChecked} />
