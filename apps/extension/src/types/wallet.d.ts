@@ -13,6 +13,7 @@ type TAccountInfo = {
   isDeployed: boolean;
   balance?: Nullable<number>;
   needUpgrade?: boolean;
+  owner?: Address;
 };
 
 type TTransactionInfo = {

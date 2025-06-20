@@ -144,7 +144,7 @@ export class SDKService {
     } else {
       // no need await for createAccount request. it's not a blocking request.
       createAccount(res.OK, chainId, this._index, initialKeysStrArr, initialGuardianHash, initialGuardianSafePeriod);
-      return res.OK as Address;
+      return { address: res.OK as Address, owner: keyring.currentOwner?.address };
     }
   }
 
@@ -291,7 +291,7 @@ export class SDKService {
    * @returns The signature.
    */
   private async _personalSign(message: Hex) {
-    const _eoaSignature = keyring.owner?.signMessage({
+    const _eoaSignature = await keyring.currentOwner?.signMessage({
       message: { raw: message },
     });
 

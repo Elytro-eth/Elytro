@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useWallet } from '@/contexts/wallet';
 import { TChainItem } from '@/constants/chains';
 import { toast } from '@/hooks/use-toast';
@@ -15,13 +9,7 @@ type IChainContext = {
   currentChain: TChainItem | null;
   getCurrentChain: () => Promise<void>;
   getChains: () => Promise<void>;
-  openExplorer: ({
-    txHash,
-    opHash,
-  }: {
-    txHash?: string;
-    opHash: string;
-  }) => void;
+  openExplorer: ({ txHash, opHash }: { txHash?: string; opHash: string }) => void;
 };
 
 const ChainContext = createContext<IChainContext>({
@@ -79,21 +67,19 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
         chrome.tabs.create({
           url,
         });
-        return;
       } else if (opHash && currentChain?.opExplorer) {
         const url = `${currentChain.opExplorer}/${opHash}`;
-
         chrome.tabs.create({
           url,
         });
-        return;
+      } else {
+        toast({
+          title: 'Failed to open explorer',
+          description: 'No explorer url or hash',
+          variant: 'destructive',
+        });
+        console.error('Elytro chain-context: No explorer url or hash', { txHash, opHash });
       }
-
-      toast({
-        title: 'Failed to open explorer',
-        description: 'No explorer url or hash',
-        variant: 'destructive',
-      });
     },
     [currentChain]
   );

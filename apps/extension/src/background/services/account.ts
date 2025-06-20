@@ -66,12 +66,20 @@ class AccountManager {
     await localStorage.save({ [RECOVERY_RECORD_STORAGE_KEY]: recoveryRecord });
   }
 
-  public getAccountByChainId(chainId: number | string) {
-    return this._accounts.find((account) => account.chainId === Number(chainId));
+  public getAccountsByChainId(chainId: number | string) {
+    return this._accounts.filter((account) => account.chainId === Number(chainId));
+  }
+
+  public getAccountsByOwner(owner: string) {
+    return this._accounts.filter((account) => account.owner === owner);
+  }
+
+  public getAccountByOwnerAndChainId(owner: string, chainId: number | string) {
+    return this._accounts.find((account) => account.owner === owner && account.chainId === Number(chainId));
   }
 
   public async createAccountAsCurrent(eoaAddress: string, chainId: number) {
-    const account = this.getAccountByChainId(chainId);
+    const account = this.getAccountByOwnerAndChainId(eoaAddress, chainId);
 
     if (account) {
       console.log('Elytro::AccountManager::createAccount: wallet already exists');
@@ -81,12 +89,16 @@ class AccountManager {
 
     try {
       // creating address is not a sdk chain related request, so we don't rely on switch chain
-      const newAccountAddress = await elytroSDK.createWalletAddress(eoaAddress, chainId);
+      const { address: newAccountAddress, owner: ownerAddress } = await elytroSDK.createWalletAddress(
+        eoaAddress,
+        chainId
+      );
 
       const newAccount = {
         address: newAccountAddress,
         chainId,
         hasRecoveryContacts: false,
+        owner: ownerAddress,
       } as unknown as TAccountInfo;
 
       // ! push method will not trigger state update, so we need to reset the array
@@ -98,7 +110,8 @@ class AccountManager {
   }
 
   public async switchAccountByChainId(chainId: number) {
-    const account = this.getAccountByChainId(chainId);
+    // TODO: check if this is the correct way to get the account
+    const account = this.getAccountsByChainId(chainId)?.[0];
 
     if (!account) {
       throw new Error('Elytro::AccountManager::switchAccountByChainId: wallet not found');

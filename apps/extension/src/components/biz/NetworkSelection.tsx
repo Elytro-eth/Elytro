@@ -1,6 +1,5 @@
 import ChainItem from '@/components/ui/ChainItem';
 import { TChainItem } from '@/constants/chains';
-import { useAccount } from '@/contexts/account-context';
 import { useChain } from '@/contexts/chain-context';
 import { useMemo } from 'react';
 
@@ -10,36 +9,31 @@ interface INetworkSelectionProps {
   handleSelectChain: (chain: TChainItem) => void;
 }
 
-export default function NetworkSelection({
-  selectedChain,
-  disabledChainsWhichHasExistAccount,
-  handleSelectChain,
-}: INetworkSelectionProps) {
+export default function NetworkSelection({ selectedChain, handleSelectChain }: INetworkSelectionProps) {
   const { chains } = useChain();
-  const { accounts } = useAccount();
 
   const { testnetChains, mainnetChains } = useMemo(() => {
-    const disabledChainsThatHasAccount = (targetChains: TChainItem[]) => {
-      if (disabledChainsWhichHasExistAccount === false) {
-        return targetChains;
-      }
-      return targetChains.map((chain) => {
-        const disabled = accounts.some(({ chainId }) => chainId === chain.id);
-        return {
-          ...chain,
-          disabled,
-        };
-      });
-    };
+    // const disabledChainsThatHasAccount = (targetChains: TChainItem[]) => {
+    //   if (disabledChainsWhichHasExistAccount === false) {
+    //     return targetChains;
+    //   }
+    //   return targetChains.map((chain) => {
+    //     const disabled = accounts.some(({ chainId }) => chainId === chain.id);
+    //     return {
+    //       ...chain,
+    //       disabled,
+    //     };
+    //   });
+    // };
 
-    const testnetChains = disabledChainsThatHasAccount(chains.filter((chain) => chain.testnet));
-    const mainnetChains = disabledChainsThatHasAccount(chains.filter((chain) => !chain.testnet));
+    const testnetChains = chains.filter((chain) => chain.testnet);
+    const mainnetChains = chains.filter((chain) => !chain.testnet);
 
     return {
       testnetChains,
       mainnetChains,
     };
-  }, [chains, accounts, disabledChainsWhichHasExistAccount]);
+  }, [chains]);
 
   const renderChains = (chains: TChainItem[], title: string) => {
     if (!chains.length) return null;
