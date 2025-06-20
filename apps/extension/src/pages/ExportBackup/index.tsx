@@ -76,7 +76,7 @@ export default function ExportBackupPage() {
 
   const handleDownloadBackup = async () => {
     try {
-      const backup = await wallet.exportOwnerAndAccounts(pwd);
+      const backup = await wallet.exportOwnersAndAccounts(pwd);
       const date = dayjs().format('YYYY-MM-DD-HH-mm');
       writeFile(backup, `${date}-elytro-backup.json`);
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
