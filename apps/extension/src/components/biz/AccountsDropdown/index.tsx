@@ -18,7 +18,12 @@ import { toast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/utils/shadcn/utils';
 
-export default function AccountsDropdown({ className }: { className?: string }) {
+interface IAccountsDropdownProps {
+  className?: string;
+  chainId?: number;
+}
+
+export default function AccountsDropdown({ className, chainId }: IAccountsDropdownProps) {
   const [open, setOpen] = useState(false);
   const { currentAccount, accounts, getAccounts, reloadAccount } = useAccount();
   const { wallet } = useWallet();
@@ -38,7 +43,7 @@ export default function AccountsDropdown({ className }: { className?: string }) 
 
   const handleSelectAccount = async (account: TAccountInfo) => {
     try {
-      await wallet.switchAccountByChain(account.chainId);
+      await wallet.switchAccount(account);
       await reloadAccount();
     } catch (error) {
       console.error(error);
@@ -71,8 +76,6 @@ export default function AccountsDropdown({ className }: { className?: string }) 
   };
 
   const ChevronIcon = open ? ChevronUp : ChevronDown;
-
-  const accountGroupByChainId = groupBy(accounts, 'chainId');
 
   const handleSwitchAccount = (account: TAccountInfo) => {
     handleSelectAccount(account);
@@ -130,22 +133,34 @@ export default function AccountsDropdown({ className }: { className?: string }) 
         </div>
 
         <div className="flex flex-col gap-y-sm">
-          {Object.entries(accountGroupByChainId).map(([chainId, accounts]) => (
-            <div key={chainId}>
-              <div className="elytro-text-smaller-bold-body text-gray-600 px-lg py-sm">
-                {getChainNameByChainId(Number(chainId))}
-              </div>
-              {accounts.map((account) => (
-                <AccountOption
-                  key={account.address}
-                  account={account}
-                  isSelected={account.address === currentAccount.address}
-                  onDelete={() => handleRemoveAccount(account)}
-                  onSelect={() => handleSwitchAccount(account)}
-                />
+          {chainId
+            ? accounts
+                .filter((account) => account.chainId === chainId)
+                .map((account) => (
+                  <AccountOption
+                    key={account.address}
+                    account={account}
+                    isSelected={account.address === currentAccount.address}
+                    onDelete={() => handleRemoveAccount(account)}
+                    onSelect={() => handleSwitchAccount(account)}
+                  />
+                ))
+            : Object.entries(groupBy(accounts, 'chainId')).map(([chainId, accounts]) => (
+                <div key={chainId}>
+                  <div className="elytro-text-smaller-bold-body text-gray-600 px-lg py-sm">
+                    {getChainNameByChainId(Number(chainId))}
+                  </div>
+                  {accounts.map((account) => (
+                    <AccountOption
+                      key={account.address}
+                      account={account}
+                      isSelected={account.address === currentAccount.address}
+                      onDelete={() => handleRemoveAccount(account)}
+                      onSelect={() => handleSwitchAccount(account)}
+                    />
+                  ))}
+                </div>
               ))}
-            </div>
-          ))}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

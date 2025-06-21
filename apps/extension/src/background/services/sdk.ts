@@ -320,7 +320,6 @@ export class SDKService {
       throw rawHashRes.ERR;
     }
 
-    // TODO： move sign userOp to wallet controller, so the keyring will be same instance
     await keyring.tryUnlock();
 
     const signature = useRawSign

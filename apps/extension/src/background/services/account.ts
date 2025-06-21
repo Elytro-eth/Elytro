@@ -66,6 +66,10 @@ class AccountManager {
     await localStorage.save({ [RECOVERY_RECORD_STORAGE_KEY]: recoveryRecord });
   }
 
+  public getAccountByAddress(address: string) {
+    return this._accounts.find((account) => account.address === address);
+  }
+
   public getAccountsByChainId(chainId: number | string) {
     return this._accounts.filter((account) => account.chainId === Number(chainId));
   }
@@ -109,12 +113,9 @@ class AccountManager {
     }
   }
 
-  public async switchAccountByChainId(chainId: number) {
-    // TODO: check if this is the correct way to get the account
-    const account = this.getAccountsByChainId(chainId)?.[0];
-
-    if (!account) {
-      throw new Error('Elytro::AccountManager::switchAccountByChainId: wallet not found');
+  public async switchAccount(account: TAccountInfo) {
+    if (!this._accounts.find((acc) => acc.address === account.address)) {
+      throw new Error('Elytro::AccountManager::switchAccount: account not found');
     }
 
     this._currentAccount = account;

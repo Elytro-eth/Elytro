@@ -114,21 +114,18 @@ class KeyringService {
     return ownerData;
   }
 
-  public async importOwners(ownerKeys: Hex[], password: string) {
+  public async importOwners(vaultData: TVaultData, password: string) {
     try {
-      const ownerData = ownerKeys.map((key) => {
-        const ownerAccount = privateKeyToAccount(key);
-        return {
-          id: ownerAccount.address,
-          key,
-        };
-      });
+      this._owners = vaultData.owners;
 
-      this._owners = ownerData;
-      this._signingKey = new SigningKey(ownerData[0].key);
-      this._currentOwner = privateKeyToAccount(ownerData[0].key);
+      const currentOwner = this._owners.find((owner) => owner.id === vaultData.currentOwnerId);
+      if (!currentOwner) {
+        throw new Error('Elytro: Current owner not found');
+      }
 
-      this._encryptData = await encrypt({ ...this._owners }, password);
+      this._encryptData = await encrypt<TVaultData>(vaultData, password);
+      this._signingKey = new SigningKey(currentOwner.key);
+      this._currentOwner = privateKeyToAccount(currentOwner.key);
       this._locked = false;
     } catch {
       this._locked = true;
