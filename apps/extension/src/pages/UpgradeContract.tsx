@@ -44,9 +44,9 @@ export default function UpgradeContract() {
 
       handleTxRequest(TxRequestTypeEn.UpgradeContract, txs as Transaction[]);
     } catch (error) {
-      console.error('Upgrade contract failed:', error);
+      console.error('Update contract failed:', error);
       toast({
-        title: 'Failed to upgrade contract',
+        title: 'Failed to update contract',
         description: formatErrorMsg(error),
       });
     }
@@ -67,7 +67,7 @@ export default function UpgradeContract() {
           Version {VERSION_MODULE_ADDRESS_MAP[chainId]?.latestVersion}
         </div>
         <div className="flex text-gray-750 text-center">
-          You may not be able to access funds until the update is successful.
+          You may need to complete the update to access funds.
         </div>
 
         <Button variant="secondary" size="large" className="w-full gap-xl" onClick={handleStartUpgrade}>

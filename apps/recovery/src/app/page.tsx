@@ -69,21 +69,18 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="my-auto flex flex-col items-center justify-center gap-y-sm">
+      <div className="my-auto flex flex-col items-center justify-center gap-y-lg">
         <div className="bg-blue rounded-pill p-md">
           <LoaderCircle className="size-12 animate-spin" stroke="#fff" strokeOpacity={0.9} />
         </div>
-        <div className="text-bold-body">Fetching recovery details...</div>
+        <div className="text-bold-body">Fetching...</div>
+        <div className="text-tiny text-gray-600">It may take a while for us to gather everything from the chain</div>
       </div>
     );
   }
 
   if (error) {
-    return (
-      <ContentWrapper title="The recovery link you visited is invalid">
-        <InvalidRecordView />
-      </ContentWrapper>
-    );
+    return <InvalidRecordView />;
   }
 
   if (status === RecoveryStatusEn.RECOVERY_COMPLETED) {

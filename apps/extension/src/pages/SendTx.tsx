@@ -140,7 +140,7 @@ export default function SendTx() {
       if (to.toLowerCase() === address.toLowerCase()) {
         toast({
           title: 'Cannot send to yourself',
-          description: 'Please enter a different address',
+          // description: 'Please enter a different address',
           variant: 'destructive',
         });
         return;
@@ -150,7 +150,7 @@ export default function SendTx() {
       const formattedMaxAmount = formatTokenAmount(token.balance || 0, token.decimals);
       const parsedAmount =
         amount === formattedMaxAmount
-          ? token.balance?.toString() || '0'
+          ? BigInt(token.balance || 0).toString()
           : parseUnits(amount || '0', token.decimals).toString();
 
       if (token.address === zeroAddress) {

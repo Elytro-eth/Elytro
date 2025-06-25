@@ -49,14 +49,15 @@ function ApprovalDetailItem({ decodedResult, defaultExpanded = false }: IApprova
     <div className="w-full">
       <InfoCardList>
         <InfoCardItem
-          label="Contract Interaction"
+          label={<span className="text-black-blue">Contract Interaction</span>
+          }
           content={
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="p-1 hover:bg-gray-50 rounded transition-colors"
-            >
-              {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
-            </button>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="p-1 hover:bg-gray-50 rounded transition-colors"
+        >
+          {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+        </button>
           }
         />
 
@@ -64,11 +65,22 @@ function ApprovalDetailItem({ decodedResult, defaultExpanded = false }: IApprova
 
         {isExpanded && (
           <>
-            <InfoCardItem label="Sending" content={<TokenAmountItem {...transferredTokenInfo} size="sm" />} />
+        <InfoCardItem
+          label="Sending"
+          content={<TokenAmountItem {...transferredTokenInfo} size="sm" />}
+        />
 
-            {decodedResult?.method?.text && <InfoCardItem label="Function" content={decodedResult?.method?.text} />}
+        {decodedResult?.method?.text && (
+          <InfoCardItem
+            label="Function"
+            content={decodedResult?.method?.text}
+          />
+        )}
 
-            <InfoCardItem label="Data" content={decodedResult?.method?.bytes4} />
+        <InfoCardItem
+          label="Data"
+          content={decodedResult?.method?.bytes4}
+        />
           </>
         )}
       </InfoCardList>

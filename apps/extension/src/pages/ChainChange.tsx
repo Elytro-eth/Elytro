@@ -8,6 +8,7 @@ import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
 import { SUPPORTED_CHAINS, ChainOperationEn, TChainItem } from '@/constants/chains';
 import { getChainNameByChainId } from '@/constants/chains';
+import AccountsDropdown from '@/components/biz/AccountsDropdown';
 
 function URLSection({ title, items }: { title: string; items: string[] }) {
   return (
@@ -54,7 +55,7 @@ export default function ChainChange() {
   const handleConfirm = async () => {
     try {
       if (method === ChainOperationEn.Switch) {
-        await wallet.switchAccountByChain(Number(targetChainId));
+        // await wallet.switchAccountByChain(Number(targetChainId));
       } else {
         const updateConfig = {} as TChainItem;
 
@@ -98,13 +99,17 @@ export default function ChainChange() {
       <CardContent className="flex flex-col h-full p-3 text-sm space-y-6 mx-lg my-md">
         {/* Description of the chain change */}
         {method === ChainOperationEn.Switch && (
-          <div className="text-gray-900">
-              Current network is <span className="font-bold text-gray-900">{getChainNameByChainId(chainId)}</span>. Do you want to
-              switch to{' '}
+          <div className="space-y-4 flex flex-col ">
+            <div className="text-gray-900">
+              Current network is <span className="font-bold text-gray-900">{getChainNameByChainId(chainId)}</span>. Do
+              you want to switch to{' '}
               <span className="font-bold text-gray-900">
                 {chainName || SUPPORTED_CHAINS.find((chain) => chain.id === Number(targetChainId))?.name}
               </span>
               ?
+            </div>
+
+            <AccountsDropdown chainId={Number(targetChainId)} />
           </div>
         )}
 

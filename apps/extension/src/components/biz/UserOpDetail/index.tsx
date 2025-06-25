@@ -7,11 +7,13 @@ import { useMemo, useState } from 'react';
 import ActivateDetail from './ActivationDetail';
 import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronUp, ChevronDown, Copy, RefreshCw, AlertCircle } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import HelperText from '@/components/ui/HelperText';
+import ShortedAddress from '@/components/ui/ShortedAddress';
+import { safeClipboard } from '@/utils/clipboard';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -34,9 +36,9 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   const [expandSponsorSelector, setExpandSponsorSelector] = useState(false);
   const {
     tokenInfo: { tokenPrices },
-    currentAccount: { isDeployed },
+    currentAccount: { isDeployed, address },
   } = useAccount();
-  const { requestType, calcResult, decodedDetail, onRetry } = useTx();
+  const { requestType, calcResult, decodedDetail, onRetry, hasSufficientBalance } = useTx();
 
   const DetailContent = useMemo(() => {
     switch (requestType) {
@@ -47,7 +49,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
         return <InnerSendingDetail decodedUserOp={decodedDetail?.[0]} />;
 
       // case TxRequestTypeEn.ApproveTransaction:
-      // TODO: add upgrade contract detail
+      // TODO: add update contract detail
       default:
         return <ApprovalDetail decodedUserOp={decodedDetail} />;
     }
@@ -133,10 +135,33 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
             </RadioGroup>
           </div>
         )}
+
+        {/* Insufficient Balance Warning */}
+        {!hasSufficientBalance && (
+          <div className="bg-light-blue rounded-md p-3">
+            <div className="flex flex-row items-center gap-1 text-red mb-1">
+              <AlertCircle className="size-4 text-red stroke-dark-red" />
+              <span className="elytro-text-small-body text-dark-red">Not enough ETH, please deposit some first</span>
+            </div>
+            <div className="bg-white rounded-md p-2  flex items-center justify-between">
+              <div className="flex items-center 1 cursor-pointer" onClick={() => safeClipboard(address)}>
+                <ShortedAddress address={address} chainId={chainId} className="bg-white" />
+                <Copy className="size-3 stroke-gray-600" />
+              </div>
+              <div
+                className="flex flex-row items-center text-black-blue px-2 py-1 rounded-xs  hover:text-primary hover:bg-primary/10"
+                onClick={() => onRetry()}
+              >
+                <RefreshCw className="size-3 mr-1" />
+                Check
+              </div>
+            </div>
+          </div>
+        )}
       </InfoCardList>
 
       {!isDeployed && requestType !== TxRequestTypeEn.DeployWallet && (
-        <HelperText description="Wallet activation included with a one-time network cost" />
+        <HelperText description="Wallet activation included with a one-time cost" />
       )}
 
       {/* Transaction Raw Data: Only show for approve transaction */}

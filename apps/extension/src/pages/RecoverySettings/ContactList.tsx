@@ -6,7 +6,7 @@ import { useTx } from '@/contexts/tx-context';
 import { TxRequestTypeEn } from '@/contexts/tx-context';
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
-import { PencilLine, Plus, Trash2 } from 'lucide-react';
+import { Box, PencilLine, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import ContactsImg from '@/assets/contacts.png';
 import ShortedAddress from '@/components/ui/ShortedAddress';
@@ -154,6 +154,7 @@ export default function ContactList({
               disabled={loading || Number(threshold) < 1 || !isRecoverContactChanged}
               onClick={handleConfirmContacts}
             >
+               <Box className="size-4 mr-sm" color="#cce1ea" />
               {loading ? 'Confirming...' : 'Confirm contacts'}
             </Button>
           </div>

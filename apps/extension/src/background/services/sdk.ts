@@ -144,7 +144,7 @@ export class SDKService {
     } else {
       // no need await for createAccount request. it's not a blocking request.
       createAccount(res.OK, chainId, this._index, initialKeysStrArr, initialGuardianHash, initialGuardianSafePeriod);
-      return res.OK as Address;
+      return { address: res.OK as Address, owner: keyring.currentOwner?.address };
     }
   }
 
@@ -291,7 +291,7 @@ export class SDKService {
    * @returns The signature.
    */
   private async _personalSign(message: Hex) {
-    const _eoaSignature = keyring.owner?.signMessage({
+    const _eoaSignature = await keyring.currentOwner?.signMessage({
       message: { raw: message },
     });
 
@@ -320,7 +320,6 @@ export class SDKService {
       throw rawHashRes.ERR;
     }
 
-    // TODO： move sign userOp to wallet controller, so the keyring will be same instance
     await keyring.tryUnlock();
 
     const signature = useRawSign
@@ -778,7 +777,7 @@ export class SDKService {
 
       return installedUpgradeModules;
     } catch (error) {
-      console.error('Elytro: Failed to get installed upgrade modules.', error);
+      console.error('Elytro: Failed to get installed update modules.', error);
       return [];
     }
   }

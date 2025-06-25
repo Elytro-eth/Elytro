@@ -7,13 +7,7 @@ import { createPublicClient, http } from 'viem';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useEffect, useState } from 'react';
 import { maskApiKeyInUrl } from '@/utils/url';
 
@@ -49,8 +43,7 @@ const createNetworkFormSchema = (chainId: number) => {
         } catch {
           ctx.addIssue({
             code: 'custom',
-            message:
-              'Unable to connect to RPC URL. Please check if the URL is correct and accessible.',
+            message: 'Unable to connect to RPC URL. Please check if the URL is correct and accessible.',
           });
         }
       }),
@@ -74,25 +67,16 @@ const createNetworkFormSchema = (chainId: number) => {
           }
         },
         {
-          message:
-            'Unable to connect to bundler URL or no supported entry points found',
+          message: 'Unable to connect to bundler URL or no supported entry points found',
         }
       ),
   });
 };
 
-export default function NetworkEditor({
-  chain,
-  onChanged,
-}: {
-  chain: TChainItem;
-  onChanged: () => void;
-}) {
+export default function NetworkEditor({ chain, onChanged }: { chain: TChainItem; onChanged: () => void }) {
   const { toast } = useToast();
   const { wallet } = useWallet();
-  const [displayedBundlerUrl, setDisplayedBundlerUrl] = useState<string>(
-    maskApiKeyInUrl(chain.bundler)
-  );
+  const [displayedBundlerUrl, setDisplayedBundlerUrl] = useState<string>(maskApiKeyInUrl(chain.bundler));
 
   const form = useForm<NetworkFormValues>({
     resolver: zodResolver(createNetworkFormSchema(chain.id)),
@@ -113,9 +97,7 @@ export default function NetworkEditor({
   }, [chain, form]);
 
   const formValues = form.watch();
-  const formChanged =
-    formValues.endpoint !== chain.endpoint ||
-    formValues.bundler !== chain.bundler;
+  const formChanged = formValues.endpoint !== chain.endpoint || formValues.bundler !== chain.bundler;
 
   const onSubmit = async (data: NetworkFormValues) => {
     try {
@@ -125,9 +107,7 @@ export default function NetworkEditor({
         bundler: data.bundler,
         rpcUrls: {
           default: {
-            http: chain?.rpcUrls?.default?.http
-              ? [...chain.rpcUrls.default.http, data.endpoint]
-              : [data.endpoint],
+            http: chain?.rpcUrls?.default?.http ? [...chain.rpcUrls.default.http, data.endpoint] : [data.endpoint],
           },
         },
       };
@@ -149,14 +129,8 @@ export default function NetworkEditor({
   return (
     <div className="space-y-4">
       <div className="flex flex-row items-center mb-4">
-        <img
-          src={chain?.icon}
-          alt={chain?.name}
-          className="size-8 rounded-full"
-        />
-        <div className="elytro-text-small-bold ml-4 text-bold">
-          {chain?.name}
-        </div>
+        <img src={chain?.icon} alt={chain?.name} className="size-8 rounded-full" />
+        <div className="elytro-text-small-bold ml-4 text-bold">{chain?.name}</div>
       </div>
 
       <Form {...form}>
@@ -167,11 +141,7 @@ export default function NetworkEditor({
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <LabelInput
-                    label="RPC"
-                    placeholder="Input RPC URL"
-                    {...field}
-                  />
+                  <LabelInput label="RPC" placeholder="Input RPC URL" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -203,34 +173,11 @@ export default function NetworkEditor({
             )}
           />
 
-          <div className="space-y-2">
-            <LabelInput
-              label="Chain ID"
-              placeholder="Chain ID"
-              value={chain.id}
-              disabled
-            />
-          </div>
-
-          <div className="space-y-2">
-            <LabelInput
-              label="Currency Symbol"
-              className="bg-gray-150 rounded-md py-sm px-lg h-auto"
-              placeholder="Currency symbol"
-              value={chain.nativeCurrency.symbol}
-              disabled
-            />
-          </div>
-
           <div className="flex space-x-2 pt-2">
             <Button
               type="submit"
               className="flex-1 rounded-full"
-              disabled={
-                !formChanged ||
-                form.formState.isSubmitting ||
-                !form.formState.isValid
-              }
+              disabled={!formChanged || form.formState.isSubmitting || !form.formState.isValid}
             >
               {form.formState.isSubmitting ? 'Saving...' : 'Save'}
             </Button>

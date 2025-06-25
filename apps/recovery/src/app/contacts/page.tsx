@@ -7,6 +7,8 @@ import { useAccount } from 'wagmi';
 import Sign from './Sign';
 import Status from './Status';
 import { isConnectedAccountAContact } from '@/lib/contact';
+import { toast } from '@/hooks/use-toast';
+
 export default function Contacts() {
   const { contacts, loading } = useRecoveryRecord();
   const { address } = useAccount();
@@ -27,14 +29,20 @@ export default function Contacts() {
       };
     }
 
+    if (address && !isGuardian) {
+      toast({
+        title: 'Connected wallet is not a recovery wallet',
+        variant: 'destructive',
+      });
+    }
     return {
       subtitle: address ? (
-        <span className='text-gray-600'>
+        <span className="text-gray-600">
           {/* The connected wallet is not a recovery contact. Please switch to a recovery contact wallet. */}
           Connect to a wallet you control from the list to confirm recovery.
         </span>
       ) : (
-        <span className='text-gray-600'>Connect to a wallet you control from the list to confirm recovery.</span>
+        <span className="text-gray-600">Connect to a wallet you control from the list to confirm recovery.</span>
       ),
       content: <Status />,
     };

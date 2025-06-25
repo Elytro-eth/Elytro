@@ -61,8 +61,8 @@ export default function Connection() {
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Failed to disconnect site',
-        description: 'Please try again',
+        title: 'Failed to disconnect site, please try again',
+        // description: 'Please try again',
         variant: 'destructive',
       });
     }

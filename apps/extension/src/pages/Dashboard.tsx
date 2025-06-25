@@ -22,25 +22,27 @@ export default function Dashboard() {
         <Spin isLoading={loading} />
         <BasicAccountInfo />
       </PageLayout.Header>
-      <PageLayout.Body className="px-2">
-        <div className="rounded-xl bg-white h-full">
-          <DashboardTabs loading={loading} onReload={handleReload} />
+      <PageLayout.Body className="px-2 py-2">
+        <div className="rounded-xl bg-white h-full flex flex-col relative">
+          <div className="flex-1 overflow-auto pb-[52px]">
+            <DashboardTabs loading={loading} onReload={handleReload} />
+          </div>
+          <div className="absolute bottom-2 left-2 right-2 flex justify-center py-2 bg-white">
+            <Button
+              variant="secondary"
+              size="tiny"
+              className="m-auto"
+              onClick={() => {
+                navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportToken);
+              }}
+            >
+              <Plus className="w-3 h-3 mr-1 duration-100 group-hover:stroke-white" />
+              Import token
+            </Button>
+          </div>
         </div>
       </PageLayout.Body>
       <PageLayout.Footer>
-        <div className="flex justify-center m-2">
-          <Button
-            variant="secondary"
-            size="tiny"
-            className="m-auto"
-            onClick={() => {
-              navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportToken);
-            }}
-          >
-            <Plus className="w-3 h-3 mr-1 duration-100 group-hover:stroke-white" />
-            Import token
-          </Button>
-        </div>
         <BetaNotice text="We're in beta. Please keep deposits small." closeable />
       </PageLayout.Footer>
     </PageLayout>

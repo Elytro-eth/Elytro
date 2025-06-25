@@ -22,7 +22,7 @@ export default function AccountOption({ account, isSelected, onDelete, onSelect 
     if (isSelected) {
       toast({
         title: 'Cannot delete current wallet',
-        description: 'Please switch to another wallet',
+        // description: 'Please switch to another wallet',
         variant: 'destructive',
       });
       return;

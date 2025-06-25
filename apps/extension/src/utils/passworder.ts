@@ -1,6 +1,5 @@
 import { Buffer } from 'buffer';
 import { sessionStorage } from './storage/session';
-import { Hex } from 'viem';
 
 const DEFAULT_ALGORITHM = 'PBKDF2';
 const DERIVED_KEY_FORMAT = 'AES-GCM';
@@ -14,10 +13,6 @@ export type TPasswordEncryptedData = {
   salt: string;
 };
 
-export type TPasswordDecryptedData = {
-  key: Hex;
-};
-
 function generateSalt(size = 32) {
   const randomBytes = new Uint8Array(size);
   return crypto.getRandomValues(new Uint8Array(randomBytes));
@@ -27,10 +22,7 @@ function getBase64Salt(salt: Uint8Array) {
   return Buffer.from(salt).toString(BUFFER_ENCODING);
 }
 
-const getCryptoKeyWithBackup = async (
-  base64salt: string,
-  password?: string
-) => {
+const getCryptoKeyWithBackup = async (base64salt: string, password?: string) => {
   if (password) {
     const key = await globalThis.crypto.subtle.importKey(
       'raw',
@@ -68,13 +60,10 @@ const getCryptoKeyWithBackup = async (
     if (!storedCryptoKey || !storedSaltBase64) {
       throw new Error('locked');
     }
-    return await crypto.subtle.importKey(
-      'jwk',
-      storedCryptoKey,
-      { name: DERIVED_KEY_FORMAT, length: 256 },
-      false,
-      ['encrypt', 'decrypt']
-    );
+    return await crypto.subtle.importKey('jwk', storedCryptoKey, { name: DERIVED_KEY_FORMAT, length: 256 }, false, [
+      'encrypt',
+      'decrypt',
+    ]);
   }
 };
 
@@ -99,10 +88,26 @@ async function encryptWithKey<T>(key: CryptoKey, data: T) {
 }
 
 export async function encrypt<T>(data: T, password?: string) {
-  const salt = getBase64Salt(generateSalt());
-  const key = await getCryptoKeyWithBackup(salt, password);
+  if (password) {
+    const salt = getBase64Salt(generateSalt());
+    const key = await getCryptoKeyWithBackup(salt, password);
+    const encryptedData = await encryptWithKey(key, data);
+    return { ...encryptedData, salt };
+  }
+
+  const { storedCryptoKey, storedSaltBase64 } = (await sessionStorage.get(['storedCryptoKey', 'storedSaltBase64'])) as {
+    storedCryptoKey: JsonWebKey;
+    storedSaltBase64: string;
+  };
+
+  if (!storedCryptoKey || !storedSaltBase64) {
+    throw new Error('Cannot encrypt without a password or a cached key.');
+  }
+
+  const key = await crypto.subtle.importKey('jwk', storedCryptoKey, { name: DERIVED_KEY_FORMAT }, false, ['encrypt']);
   const encryptedData = await encryptWithKey(key, data);
-  return { ...encryptedData, salt };
+
+  return { ...encryptedData, salt: storedSaltBase64 };
 }
 
 async function decryptWithKey(
@@ -133,12 +138,9 @@ async function decryptWithKey(
   }
 }
 
-export async function decrypt(
-  payload: TPasswordEncryptedData,
-  password?: string
-): Promise<TPasswordDecryptedData> {
+export async function decrypt<T>(payload: TPasswordEncryptedData, password?: string): Promise<T> {
   const { salt } = payload;
   const key = await getCryptoKeyWithBackup(salt, password);
   const result = await decryptWithKey(key, payload);
-  return result as TPasswordDecryptedData;
+  return result as T;
 }

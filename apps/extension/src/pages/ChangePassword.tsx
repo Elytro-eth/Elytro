@@ -28,13 +28,13 @@ const ChangePassword: React.FC = () => {
     .object({
       oldPassword: z.string().min(6, {
         message:
-          'The passcode should be more than 6 characters and include more than 1 capitalized letter.',
+          'More than 6 characters with at least 1 capitalized letter.',
       }),
       password: z
         .string()
         .min(6, {
           message:
-            'The passcode should be more than 6 characters and include more than 1 capitalized letter.',
+            'More than 6 characters with at least 1 capitalized letter.',
         })
         .superRefine((value, ctx) => {
           const oldPassword = form.getValues('oldPassword');
@@ -96,15 +96,15 @@ const ChangePassword: React.FC = () => {
 
       await wallet.changePassword(data.oldPassword, data.password);
       toast({
-        title: 'Passcode changed',
-        description: 'Your passcode has been changed successfully',
+        title: 'Passcode changed successfully',
+        // description: 'Your passcode has been changed successfully',
       });
       await wallet.lock();
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'An error occurred while changing the passcode',
+        title: 'An error occurred while changing the passcode',
+        // description: 'An error occurred while changing the passcode',
       });
       console.error(error);
     }
@@ -124,6 +124,7 @@ const ChangePassword: React.FC = () => {
                     <PasswordInput
                       field={field}
                       placeholder="Enter old passcode"
+                      className="!border-gray-300"
                     />
                   </FormControl>
                   <FormMessage className="text-left" />
@@ -139,6 +140,7 @@ const ChangePassword: React.FC = () => {
                     <PasswordInput
                       field={field}
                       placeholder="Enter new passcode"
+                      className="!border-gray-300"
                     />
                   </FormControl>
                   <FormMessage className="text-left" />
@@ -154,6 +156,7 @@ const ChangePassword: React.FC = () => {
                     <PasswordInput
                       field={field}
                       placeholder="Repeat new passcode"
+                      className="!border-gray-300"
                     />
                   </FormControl>
                   <FormMessage className="text-left" />

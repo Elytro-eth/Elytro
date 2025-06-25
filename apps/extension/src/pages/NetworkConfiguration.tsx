@@ -14,9 +14,7 @@ enum NetworkConfigPageState {
 const NetworkConfiguration: React.FC = () => {
   const { getChains } = useChain();
   const [selectedChain, setSelectedChain] = useState<TChainItem | null>(null);
-  const [pageState, setPageState] = useState<NetworkConfigPageState>(
-    NetworkConfigPageState.LIST
-  );
+  const [pageState, setPageState] = useState<NetworkConfigPageState>(NetworkConfigPageState.LIST);
 
   useEffect(() => {
     getChains();
@@ -41,7 +39,7 @@ const NetworkConfiguration: React.FC = () => {
   }, []);
 
   return (
-    <SecondaryPageWrapper title="Network configuration" onBack={onPageBack}>
+    <SecondaryPageWrapper title="Networks" onBack={onPageBack}>
       {pageState === NetworkConfigPageState.LIST && (
         <NetworkSelection
           selectedChain={selectedChain}
@@ -50,10 +48,7 @@ const NetworkConfiguration: React.FC = () => {
         />
       )}
       {pageState === NetworkConfigPageState.EDIT && (
-        <NetworkEditor
-          chain={selectedChain!}
-          onChanged={onChainConfigChanged}
-        />
+        <NetworkEditor chain={selectedChain!} onChanged={onChainConfigChanged} />
       )}
     </SecondaryPageWrapper>
   );

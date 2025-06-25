@@ -16,8 +16,14 @@ import { navigateTo } from '@/utils/navigation';
 import Spin from '@/components/ui/Spin';
 import { toast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/utils/shadcn/utils';
 
-export default function AccountsDropdown() {
+interface IAccountsDropdownProps {
+  className?: string;
+  chainId?: number;
+}
+
+export default function AccountsDropdown({ className, chainId }: IAccountsDropdownProps) {
   const [open, setOpen] = useState(false);
   const { currentAccount, accounts, getAccounts, reloadAccount } = useAccount();
   const { wallet } = useWallet();
@@ -37,13 +43,13 @@ export default function AccountsDropdown() {
 
   const handleSelectAccount = async (account: TAccountInfo) => {
     try {
-      await wallet.switchAccountByChain(account.chainId);
+      await wallet.switchAccount(account);
       await reloadAccount();
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Failed to switch wallet',
-        description: 'Please try again',
+        title: 'Failed to switch wallet, please try again',
+        //description: 'Please try again',
         variant: 'destructive',
       });
     }
@@ -60,8 +66,8 @@ export default function AccountsDropdown() {
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Failed to delete wallet',
-        description: 'Please try again',
+        title: 'Failed to delete wallet, please try again',
+        //description: 'Please try again',
         variant: 'destructive',
       });
     } finally {
@@ -70,8 +76,6 @@ export default function AccountsDropdown() {
   };
 
   const ChevronIcon = open ? ChevronUp : ChevronDown;
-
-  const accountGroupByChainId = groupBy(accounts, 'chainId');
 
   const handleSwitchAccount = (account: TAccountInfo) => {
     handleSelectAccount(account);
@@ -88,7 +92,12 @@ export default function AccountsDropdown() {
   return (
     <DropdownMenu open={open} onOpenChange={handleOpenChange}>
       <div onClick={() => handleOpenChange(!open)}>
-        <div className="max-w-fit cursor-pointer flex items-center gap-x-sm border border-gray-200 rounded-[8px] bg-white px-sm py-xs text-gray-750 hover:bg-gray-100">
+        <div
+          className={cn(
+            'max-w-fit cursor-pointer flex items-center gap-x-sm border border-gray-200 rounded-[8px] bg-white px-sm py-xs text-gray-750 hover:bg-gray-100',
+            className
+          )}
+        >
           <DropdownMenuTrigger asChild>
             <Avatar className="size-4">
               <AvatarImage src={getIconByChainId(currentAccount.chainId)} />
@@ -117,29 +126,41 @@ export default function AccountsDropdown() {
         className="w-[330px] max-w-fit bg-white rounded-md shadow-lg py-lg px-0"
       >
         <div className="flex items-center justify-between  gap-x-3xl px-lg pb-sm">
-          <span className="elytro-text-small-bold text-gray-900">Switch wallet</span>
+          <span className="elytro-text-small-bold text-gray-900">Your wallets</span>
           <Button variant="outline" size="tiny" className="elytro-text-tiny-body" onClick={handleAddAccount}>
             Add new wallet
           </Button>
         </div>
 
         <div className="flex flex-col gap-y-sm">
-          {Object.entries(accountGroupByChainId).map(([chainId, accounts]) => (
-            <div key={chainId}>
-              <div className="elytro-text-smaller-bold-body text-gray-600 px-lg py-sm">
-                {getChainNameByChainId(Number(chainId))}
-              </div>
-              {accounts.map((account) => (
-                <AccountOption
-                  key={account.address}
-                  account={account}
-                  isSelected={account.address === currentAccount.address}
-                  onDelete={() => handleRemoveAccount(account)}
-                  onSelect={() => handleSwitchAccount(account)}
-                />
+          {chainId
+            ? accounts
+                .filter((account) => account.chainId === chainId)
+                .map((account) => (
+                  <AccountOption
+                    key={account.address}
+                    account={account}
+                    isSelected={account.address === currentAccount.address}
+                    onDelete={() => handleRemoveAccount(account)}
+                    onSelect={() => handleSwitchAccount(account)}
+                  />
+                ))
+            : Object.entries(groupBy(accounts, 'chainId')).map(([chainId, accounts]) => (
+                <div key={chainId}>
+                  <div className="elytro-text-smaller-bold-body text-gray-600 px-lg py-sm">
+                    {getChainNameByChainId(Number(chainId))}
+                  </div>
+                  {accounts.map((account) => (
+                    <AccountOption
+                      key={account.address}
+                      account={account}
+                      isSelected={account.address === currentAccount.address}
+                      onDelete={() => handleRemoveAccount(account)}
+                      onSelect={() => handleSwitchAccount(account)}
+                    />
+                  ))}
+                </div>
               ))}
-            </div>
-          ))}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

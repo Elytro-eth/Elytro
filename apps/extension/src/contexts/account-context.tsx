@@ -16,6 +16,7 @@ const DEFAULT_ACCOUNT_INFO: TAccountInfo = {
   isDeployed: false,
   balance: 0,
   chainId: 0,
+  owner: '',
 };
 
 type IAccountContext = {
@@ -140,8 +141,8 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
       updateTokenPrices(tokens);
     } catch {
       toast({
-        title: 'Failed to get tokens',
-        description: 'Please try again',
+        title: 'Failed to get tokens, please try again',
+        // description: 'Please try again',
         variant: 'destructive',
       });
     } finally {

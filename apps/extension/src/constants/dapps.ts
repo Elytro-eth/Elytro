@@ -5,6 +5,7 @@ import ens from '@/assets/icons/ens.svg';
 import opensea from '@/assets/icons/opensea.svg';
 import cowswap from '@/assets/icons/cowswap.svg';
 import relay from '@/assets/icons/relay.svg';
+import shield from '@/assets/icons/privacypools.svg';
 
 export const ENCOURAGE_DAPPS = [
   {
@@ -42,6 +43,12 @@ export const ENCOURAGE_DAPPS = [
     label: 'Bridge',
     url: 'https://www.relay.link/bridge',
     icon: relay,
+  },
+  {
+    name: 'PrivacyPools',
+    label: 'Shield',
+    url: 'https://privacypools.com/',
+    icon: shield,
   },
 ];
 

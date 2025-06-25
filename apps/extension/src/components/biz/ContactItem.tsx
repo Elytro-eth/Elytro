@@ -1,5 +1,5 @@
 import { formatAddressToShort } from '@/utils/format';
-import { CircleUserRound } from 'lucide-react';
+import { UserRound } from 'lucide-react';
 
 interface IContactItemProps {
   contact: TRecoveryContact;
@@ -10,7 +10,7 @@ export default function ContactItem({ contact, rightContent }: IContactItemProps
   return (
     <div className="flex w-full items-center justify-between rounded-md border border-gray-300 bg-white p-lg">
       <div className="flex items-center gap-x-sm flex-1 min-w-0">
-        <CircleUserRound className="size-2xl" />
+        <UserRound className="size-2xl" />
 
         <div className="flex flex-col flex-1 min-w-0">
           <p className="elytro-text-bold-body" title={contact.address}>

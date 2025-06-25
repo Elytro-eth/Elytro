@@ -22,6 +22,7 @@ import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 import { isOlderThan } from '@/utils/version';
 import { RecoveryStatusEn } from '@/constants/recovery';
 import { ETH_TOKEN_INFO } from '@/constants/token';
+import { decrypt, encrypt, TPasswordEncryptedData } from '@/utils/passworder';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -277,12 +278,17 @@ class WalletController {
   }
 
   public async createAccount(chainId: number) {
-    if (!keyring.owner?.address) {
-      throw new Error('Elytro: No owner address. Try create owner first.');
-    }
+    const existingAccount = accountManager.getAccountByOwnerAndChainId(
+      keyring.currentOwner?.address as string,
+      chainId
+    );
 
+    // if the account already exists, create a new owner for the account
+    if (existingAccount) {
+      await keyring.createNewOwner();
+    }
     await this.switchChain(chainId);
-    await accountManager.createAccountAsCurrent(keyring.owner.address, chainId);
+    await accountManager.createAccountAsCurrent(keyring.currentOwner?.address as string, chainId);
     this._onAccountChanged();
   }
 
@@ -299,25 +305,35 @@ class WalletController {
   }
 
   private async _onAccountChanged() {
-    await historyManager.switchAccount(accountManager.currentAccount);
+    if (!accountManager.currentAccount) {
+      console.error('Elytro: _onAccountChanged No current account');
+      return;
+    }
+
+    await keyring.switchToOwner(accountManager.currentAccount.owner);
+    historyManager.switchAccount(accountManager.currentAccount);
     await connectionManager.switchAccount(accountManager.currentAccount);
 
     this._broadcastToConnectedSites('accountsChanged', [accountManager.currentAccount?.address as string]);
   }
 
-  public async switchAccountByChain(chainId: number) {
-    await accountManager.switchAccountByChainId(chainId);
-    this.switchChain(chainId);
-    this._broadcastToConnectedSites('accountsChanged', []);
+  public async switchAccount(account: TAccountInfo) {
+    if (!account) {
+      throw new Error('Elytro: Account not found');
+    }
+
+    await accountManager.switchAccount(account);
+    this.switchChain(account.chainId);
+    this._broadcastToConnectedSites('accountsChanged', [account.address]);
     this._onAccountChanged();
   }
 
   public async createDeployUserOp(): Promise<ElytroUserOperation> {
-    if (!keyring.owner?.address) {
+    if (!keyring.currentOwner?.address) {
       throw new Error('Elytro: No owner address. Try create owner first.');
     }
 
-    const deployUserOp = await elytroSDK.createUnsignedDeployWalletUserOp(keyring.owner.address as string);
+    const deployUserOp = await elytroSDK.createUnsignedDeployWalletUserOp(keyring.currentOwner.address as string);
 
     // await elytroSDK.estimateGas(deployUserOp);
 
@@ -325,10 +341,10 @@ class WalletController {
   }
 
   public async createTxUserOp(txs: Transaction[]): Promise<ElytroUserOperation> {
-    if (!accountManager.currentAccount?.isDeployed && keyring.owner?.address) {
+    if (!accountManager.currentAccount?.isDeployed && keyring.currentOwner?.address) {
       const txOpCallData = await elytroSDK.createUserOpFromTxs(accountManager.currentAccount?.address as string, txs);
       const deployOp = await elytroSDK.createUnsignedDeployWalletUserOp(
-        keyring.owner.address as string,
+        keyring.currentOwner.address as string,
         txOpCallData.callData as `0x${string}`
       );
 
@@ -521,12 +537,11 @@ class WalletController {
         }
       }
     } else if (recoveryRecord.status === RecoveryStatusEn.RECOVERY_COMPLETED) {
-      // TODO: check this logic
-      console.log('Elytro: Recovery record is completed or canceled');
       accountManager.setCurrentAccount({
         address: recoveryRecord?.address,
         chainId: Number(recoveryRecord?.chainId),
         isDeployed: true,
+        owner: recoveryRecord?.owner,
       });
       this._onAccountChanged();
       recoveryRecord = null;
@@ -553,7 +568,7 @@ class WalletController {
   public async createRecoveryRecord(address: Address) {
     try {
       const contactsInfo = await elytroSDK.queryRecoveryContacts(address);
-      const owner = keyring.owner?.address;
+      const owner = keyring.currentOwner?.address;
       const chainId = chainService.currentChain?.id;
 
       if (!contactsInfo) {
@@ -594,6 +609,44 @@ class WalletController {
       console.error('Elytro: createRecoveryRecord error', error);
       throw error;
     }
+  }
+
+  public async validatePassword(password: string) {
+    return await keyring.isPasswordValid(password);
+  }
+
+  // TODO: adapt to multi-owners mode
+  public async importWallet(encryptedData: TPasswordEncryptedData, password: string) {
+    const decryptedDataStr = (await decrypt(encryptedData, password)) as unknown as string;
+
+    const decryptedData = JSON.parse(decryptedDataStr);
+
+    if (!decryptedData.owners || !decryptedData.accounts) {
+      throw new Error('Elytro: Invalid wallet data');
+    }
+
+    const { owners, accounts } = decryptedData;
+    await keyring.importOwners(owners, password);
+    accountManager.importAccounts(accounts as TAccountInfo[]);
+
+    return true;
+  }
+
+  public async exportOwnersAndAccounts(password: string) {
+    const owners = await keyring.exportOwners(password);
+    const accounts = accountManager.accounts.map((account) => ({
+      address: account.address,
+      chainId: account.chainId,
+      isDeployed: account.isDeployed,
+      owner: account.owner,
+    }));
+
+    const text = JSON.stringify({
+      owners,
+      accounts,
+    });
+    const encryptedText = await encrypt(text, password);
+    return JSON.stringify(encryptedText);
   }
 }
 

@@ -80,8 +80,8 @@ export default function AccountRecovery() {
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Failed to switch chain',
-        description: 'Please try again',
+        title: 'Failed to switch network',
+        // description: 'Please try again',
       });
     }
   };
@@ -119,7 +119,7 @@ export default function AccountRecovery() {
       console.error(error);
       toast({
         title: 'Failed to create recovery record',
-        description: 'Please try again',
+        // description: 'Please try again',
       });
     }
   };
