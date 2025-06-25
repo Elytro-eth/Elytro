@@ -14,6 +14,7 @@ import { CONNECTOR_ICON_MAP } from '@/wagmi';
 import { cn } from '@/lib/utils';
 import { CHAIN_ID_TO_NAME_MAP } from '@/constants/chains';
 import { useCurrentChain } from '@/hooks/use-current-chain';
+import { usePathname } from 'next/navigation';
 
 const ConnectorItem = ({
   connector,
@@ -46,7 +47,7 @@ export default function ConnectControl() {
   const { connectors, connect } = useConnect();
   const { switchChainAsync } = useSwitchChain();
   const { chainId: recoveryChainId } = useRecoveryRecord();
-
+  const pathname = usePathname();
   const { disconnect } = useDisconnect();
 
   const dividedConnectors = useMemo(() => {
@@ -86,6 +87,10 @@ export default function ConnectControl() {
       setShowDialog(open);
     }
   };
+
+  if (pathname !== '/start' && pathname !== '/contacts') {
+    return null;
+  }
 
   // useEffect(() => {
   //   if (!address || !recoveryRecord) {

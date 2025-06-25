@@ -16,6 +16,7 @@ const DEFAULT_ACCOUNT_INFO: TAccountInfo = {
   isDeployed: false,
   balance: 0,
   chainId: 0,
+  owner: '',
 };
 
 type IAccountContext = {
