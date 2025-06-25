@@ -180,11 +180,12 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
       return;
     }
 
-    const [localHistory, receives] = await Promise.all([wallet.getLatestHistories(), getReceiveActivities()]);
-
-    const res = [...localHistory, ...receives].sort((a, b) => b.timestamp - a.timestamp);
-
+    const res = await getReceiveActivities();
     setHistory(res);
+
+    // const [localHistory, receives] = await Promise.all([wallet.getLatestHistories(), getReceiveActivities()]);
+    // const res = [...localHistory, ...receives].sort((a, b) => b.timestamp - a.timestamp);
+    // setHistory(res);
   };
 
   useEffect(() => {
