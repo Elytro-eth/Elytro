@@ -11,9 +11,16 @@ interface IAccountOptionProps {
   isSelected: boolean;
   onDelete: () => void;
   onSelect: () => void;
+  showDelete?: boolean;
 }
 
-export default function AccountOption({ account, isSelected, onDelete, onSelect }: IAccountOptionProps) {
+export default function AccountOption({
+  account,
+  isSelected,
+  onDelete,
+  onSelect,
+  showDelete = true,
+}: IAccountOptionProps) {
   const { elytroAlert } = useAlert();
 
   const handleDelete = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -30,8 +37,7 @@ export default function AccountOption({ account, isSelected, onDelete, onSelect 
 
     elytroAlert({
       title: 'Delete from this device',
-      description:
-        'The wallet can be recovered later.',
+      description: 'The wallet can be recovered later.',
       onConfirm: onDelete,
     });
   };
@@ -55,7 +61,7 @@ export default function AccountOption({ account, isSelected, onDelete, onSelect 
 
       <div className="text-sm text-gray-600 flex flex-row items-center">
         <span className="text-gray-600">{formatTokenAmount(account?.balance, 18, 'ETH')}</span>
-        {!isSelected ? (
+        {showDelete && !isSelected ? (
           <Trash2 className="size-4 stroke-gray-600 hover:stroke-gray-900 ml-sm" onClick={handleDelete} />
         ) : (
           <span></span>

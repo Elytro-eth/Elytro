@@ -21,9 +21,10 @@ import { cn } from '@/utils/shadcn/utils';
 interface IAccountsDropdownProps {
   className?: string;
   chainId?: number;
+  mode?: 'default' | 'chain-change';
 }
 
-export default function AccountsDropdown({ className, chainId }: IAccountsDropdownProps) {
+export default function AccountsDropdown({ className, chainId, mode = 'default' }: IAccountsDropdownProps) {
   const [open, setOpen] = useState(false);
   const { currentAccount, accounts, getAccounts, reloadAccount } = useAccount();
   const { wallet } = useWallet();
@@ -38,7 +39,7 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
   // });
 
   const handleAddAccount = async () => {
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreateNewAddress);
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.InternalCreateAccount);
   };
 
   const handleSelectAccount = async (account: TAccountInfo) => {
@@ -118,19 +119,22 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
           <ChevronIcon className="size-3" />
         </div>
       </div>
+      {/* chain-change mode: bottom-center; default mode: bottom-start */}
       <DropdownMenuContent
         side="bottom"
         align="start"
-        alignOffset={-9}
-        sideOffset={10}
+        alignOffset={mode === 'default' ? -9 : -40}
+        sideOffset={mode === 'default' ? 10 : 20}
         className="w-[330px] max-w-fit bg-white rounded-md shadow-lg py-lg px-0"
       >
-        <div className="flex items-center justify-between  gap-x-3xl px-lg pb-sm">
-          <span className="elytro-text-small-bold text-gray-900">Your wallets</span>
-          <Button variant="outline" size="tiny" className="elytro-text-tiny-body" onClick={handleAddAccount}>
-            Add new wallet
-          </Button>
-        </div>
+        {mode === 'default' && (
+          <div className="flex items-center justify-between  gap-x-3xl px-lg pb-sm">
+            <span className="elytro-text-small-bold text-gray-900">Your wallets</span>
+            <Button variant="outline" size="tiny" className="elytro-text-tiny-body" onClick={handleAddAccount}>
+              Add new wallet
+            </Button>
+          </div>
+        )}
 
         <div className="flex flex-col gap-y-sm">
           {chainId
@@ -143,6 +147,7 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
                     isSelected={account.address === currentAccount.address}
                     onDelete={() => handleRemoveAccount(account)}
                     onSelect={() => handleSwitchAccount(account)}
+                    showDelete={mode === 'default'}
                   />
                 ))
             : Object.entries(groupBy(accounts, 'chainId')).map(([chainId, accounts]) => (

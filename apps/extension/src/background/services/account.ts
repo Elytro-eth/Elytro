@@ -54,8 +54,10 @@ class AccountManager {
       throw new Error('Elytro::AccountManager::importAccounts: no accounts to import');
     }
 
-    this._accounts = accounts;
-    this._currentAccount = this._accounts[0];
+    this._accounts = [...this._accounts, ...accounts].filter(
+      (account, index, self) => self.findIndex((t) => t.address === account.address) === index
+    );
+    this._currentAccount = this._currentAccount || this._accounts[0];
   }
 
   public async getRecoveryRecord() {

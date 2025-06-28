@@ -43,7 +43,7 @@ export default function ExportBackupPage() {
   const { wallet } = useWallet();
   const [isTermOneChecked, setIsTermOneChecked] = useState(false);
   const [isTermTwoChecked, setIsTermTwoChecked] = useState(false);
-
+  const [isTermThreeChecked, setIsTermThreeChecked] = useState(false);
   const handleGuiding = () => {
     setIsGuiding(false);
   };
@@ -87,7 +87,7 @@ export default function ExportBackupPage() {
       });
     } catch (error) {
       toast({
-        title: 'Export backup failed',
+        title: 'Export wallets failed',
         variant: 'destructive',
         description: formatErrorMsg(error),
       });
@@ -97,7 +97,7 @@ export default function ExportBackupPage() {
   };
 
   return (
-    <SecondaryPageWrapper title="Export backup">
+    <SecondaryPageWrapper title="Export wallets">
       {isGuiding ? (
         <Guide
           title="How wallets backup works"
@@ -140,13 +140,19 @@ export default function ExportBackupPage() {
                 <div className="flex items-start gap-x-sm" onClick={() => setIsTermTwoChecked((prev) => !prev)}>
                   <Checkbox checked={isTermTwoChecked} />
                   <Label className="elytro-text-small-body text-gray-600 cursor-pointer">
-                    I will not share this file with anyone
+                    This backup will no longer work if I recover the wallet on a different device
+                  </Label>
+                </div>
+                <div className="flex items-start gap-x-sm" onClick={() => setIsTermThreeChecked((prev) => !prev)}>
+                  <Checkbox checked={isTermThreeChecked} />
+                  <Label className="elytro-text-small-body text-gray-600 cursor-pointer">
+                    I will not share this backup with anyone
                   </Label>
                 </div>
               </div>
               <Button
                 className="w-full"
-                disabled={!isTermOneChecked || !isTermTwoChecked}
+                disabled={!isTermOneChecked || !isTermTwoChecked || !isTermThreeChecked}
                 onClick={handleDownloadBackup}
               >
                 <DownloadIcon className="w-4 h-4 mr-2 stroke-white" /> Download backup

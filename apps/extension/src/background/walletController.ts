@@ -617,6 +617,20 @@ class WalletController {
 
   // TODO: adapt to multi-owners mode
   public async importWallet(encryptedData: TPasswordEncryptedData, password: string) {
+    const { owners, accounts } = await this.getImportedWalletsData(encryptedData, password);
+    await keyring.importOwners(owners, password);
+    accountManager.importAccounts(accounts as TAccountInfo[]);
+
+    return true;
+  }
+
+  public async setImportedWalletsData(data: SafeAny, password: string) {
+    await keyring.isPasswordValid(password);
+    await keyring.importOwners(data.owners, password);
+    accountManager.importAccounts(data.accounts as TAccountInfo[]);
+  }
+
+  public async getImportedWalletsData(encryptedData: TPasswordEncryptedData, password: string) {
     const decryptedDataStr = (await decrypt(encryptedData, password)) as unknown as string;
 
     const decryptedData = JSON.parse(decryptedDataStr);
@@ -625,11 +639,7 @@ class WalletController {
       throw new Error('Elytro: Invalid wallet data');
     }
 
-    const { owners, accounts } = decryptedData;
-    await keyring.importOwners(owners, password);
-    accountManager.importAccounts(accounts as TAccountInfo[]);
-
-    return true;
+    return decryptedData;
   }
 
   public async exportOwnersAndAccounts(password: string) {

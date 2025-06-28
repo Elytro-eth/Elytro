@@ -25,6 +25,8 @@ import { ApprovalTypeEn } from './constants/operations';
 import Unlock from './pages/Unlock';
 import ExportBackupPage from './pages/ExportBackup';
 import ImportBackup from './pages/ImportBackup';
+import InternalCreateAccount from './pages/InternalCreateAccount';
+import InternalImportBackup from './pages/ImportBackup/internal';
 
 export enum SIDE_PANEL_ROUTE_PATHS {
   Home = '/',
@@ -54,6 +56,8 @@ export enum SIDE_PANEL_ROUTE_PATHS {
   ImportToken = '/import-token',
   ExportBackup = '/export',
   ImportBackup = '/import',
+  InternalCreateAccount = '/internal-create-account',
+  InternalImportBackup = '/internal-import-backup',
 }
 
 export const routes: TRoute[] = [
@@ -165,5 +169,13 @@ export const routes: TRoute[] = [
   {
     path: SIDE_PANEL_ROUTE_PATHS.ImportBackup,
     component: ImportBackup,
+  },
+  {
+    path: SIDE_PANEL_ROUTE_PATHS.InternalCreateAccount,
+    component: InternalCreateAccount,
+  },
+  {
+    path: SIDE_PANEL_ROUTE_PATHS.InternalImportBackup,
+    component: InternalImportBackup,
   },
 ];

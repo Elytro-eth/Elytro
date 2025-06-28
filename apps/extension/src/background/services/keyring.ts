@@ -116,9 +116,14 @@ class KeyringService {
 
   public async importOwners(vaultData: TVaultData, password: string) {
     try {
-      this._owners = vaultData.owners;
+      this._owners = [...this._owners, ...vaultData.owners].filter(
+        (owner, index, self) => self.findIndex((t) => t.id === owner.id) === index
+      );
 
-      const currentOwner = this._owners.find((owner) => owner.id === vaultData.currentOwnerId);
+      const currentOwner = this._owners.find(
+        (owner) => owner.id === this._currentOwner?.address || vaultData.currentOwnerId
+      );
+
       if (!currentOwner) {
         throw new Error('Elytro: Current owner not found');
       }

@@ -56,7 +56,7 @@ export default function Settings() {
         <div className="space-y-2">
           <SettingItem icon={UserRoundIcon} label="Change passcode" path={SIDE_PANEL_ROUTE_PATHS.ChangePassword} />
           <SettingItem icon={Settings2Icon} label="Networks" path={SIDE_PANEL_ROUTE_PATHS.NetworkConfiguration} />
-          <SettingItem icon={WalletCardsIcon} label="Export backup" path={SIDE_PANEL_ROUTE_PATHS.ExportBackup} />
+          <SettingItem icon={WalletCardsIcon} label="Export wallets" path={SIDE_PANEL_ROUTE_PATHS.ExportBackup} />
         </div>
         <div className="flex flex-col space-y-2 w-full my-8">
           <Button variant="secondary" onClick={handleLock}>
