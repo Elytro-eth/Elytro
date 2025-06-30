@@ -150,7 +150,7 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
       <div className="flex items-center relative">
         <Input
           ref={inputRef}
-          className="text-lg border-none"
+          className="text-lg border-none bg-white focus-visible:outline-none"
           placeholder={!isFocused && !(displayLabel || ensInfo) ? 'Recipient address / ENS' : ''}
           value={isFocused ? value : displayLabel || ensInfo ? '' : value}
           onBlur={handleBlur}
@@ -178,7 +178,7 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
           />
 
           {!loading && !ensInfo && !recentAddresses.length && !value.endsWith('.eth') && (
-            <div className="p-4 text-gray-500">No recent addresses. Enter an address or ENS name.</div>
+            <div className="p-4 text-gray-500">Enter an address or ENS name.</div>
           )}
         </div>
       )}
