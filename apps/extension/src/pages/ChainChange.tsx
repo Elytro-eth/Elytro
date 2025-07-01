@@ -53,6 +53,7 @@ export default function ChainChange() {
     try {
       if (method === ChainOperationEn.Switch) {
         // await wallet.switchAccountByChain(Number(targetChainId));
+        resolve();
       } else {
         const updateConfig = {} as TChainItem;
 
