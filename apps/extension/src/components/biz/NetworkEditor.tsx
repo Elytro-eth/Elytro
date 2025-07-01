@@ -43,7 +43,7 @@ const createNetworkFormSchema = (chainId: number) => {
         } catch {
           ctx.addIssue({
             code: 'custom',
-            message: 'Unable to connect to RPC URL. Please check if the URL is correct and accessible.',
+            message: 'Can’t connect, please check if the URL is correct and accessible.',
           });
         }
       }),
@@ -67,7 +67,7 @@ const createNetworkFormSchema = (chainId: number) => {
           }
         },
         {
-          message: 'Unable to connect to bundler URL or no supported entry points found',
+          message: 'Can’t connect or no supported entry points found',
         }
       ),
   });

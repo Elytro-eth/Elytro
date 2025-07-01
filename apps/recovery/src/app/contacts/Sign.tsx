@@ -102,7 +102,7 @@ export default function Sign() {
         onClick={sendSignatureRequest}
       >
         <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
-        {loading ? 'Confirming...' : isSigned ? 'You have already confirmed' : 'Confirm Recovery'}
+        {loading ? 'Confirming...' : isSigned ? 'Already confirmed' : 'Confirm Recovery'}
       </Button>
     </div>
   );

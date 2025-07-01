@@ -54,6 +54,7 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
                     field={field}
                     disabled={loading}
                     placeholder="Enter passcode"
+                    style={{ backgroundColor: 'white' }}
                     onPwdVisibleChange={setIsPwdVisible}
                   />
                 </FormControl>
@@ -78,6 +79,7 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
                     disabled={loading}
                     placeholder="Repeat passcode"
                     showEye={false}
+                    style={{ backgroundColor: 'white' }}
                     outerPwdVisible={isPwdVisible}
                   />
                 </FormControl>

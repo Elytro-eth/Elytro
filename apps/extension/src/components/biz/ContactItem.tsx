@@ -8,7 +8,7 @@ interface IContactItemProps {
 
 export default function ContactItem({ contact, rightContent }: IContactItemProps) {
   return (
-    <div className="flex w-full items-center justify-between rounded-md border border-gray-300 bg-white p-lg">
+    <div className="flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-lg py-md">
       <div className="flex items-center gap-x-sm flex-1 min-w-0">
         <UserRound className="size-2xl" />
 

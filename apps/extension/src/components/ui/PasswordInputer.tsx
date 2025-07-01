@@ -34,7 +34,7 @@ export default function PasswordInput<T extends FieldValues>({
       <Input
         disabled={disabled}
         type={outerPwdVisible || innerPwdVisible ? 'text' : 'password'}
-        className={cn('bg-gray-50 border-none rounded-2xl p-4 h-14', className)}
+        className={cn('bg-gray-150 border-none rounded-2xl p-4 h-14', className)}
         onChange={(e) => {
           onValueChange?.(e.target.value);
         }}

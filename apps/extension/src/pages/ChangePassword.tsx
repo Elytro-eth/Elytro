@@ -124,7 +124,6 @@ const ChangePassword: React.FC = () => {
                     <PasswordInput
                       field={field}
                       placeholder="Enter old passcode"
-                      className="!border-gray-300"
                     />
                   </FormControl>
                   <FormMessage className="text-left" />
@@ -140,7 +139,6 @@ const ChangePassword: React.FC = () => {
                     <PasswordInput
                       field={field}
                       placeholder="Enter new passcode"
-                      className="!border-gray-300"
                     />
                   </FormControl>
                   <FormMessage className="text-left" />
@@ -156,7 +154,6 @@ const ChangePassword: React.FC = () => {
                     <PasswordInput
                       field={field}
                       placeholder="Repeat new passcode"
-                      className="!border-gray-300"
                     />
                   </FormControl>
                   <FormMessage className="text-left" />

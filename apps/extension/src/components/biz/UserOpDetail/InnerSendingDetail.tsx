@@ -20,7 +20,7 @@ export default function InnerSendingDetail({ decodedUserOp }: IInnerSendingDetai
   return (
     <>
       <div className="elytro-text-bold-body">You are sending</div>
-      <div className="flex items-center justify-between px-lg py-lg rounded-md bg-gray-150 ">
+      <div className="flex items-center justify-between px-lg py-md rounded-md bg-gray-150 ">
         <TokenAmountItem {...transferredTokenInfo} showPrice />
       </div>
 
