@@ -56,8 +56,14 @@ const Unlock = () => {
       <h1 className="elytro-text-headline text-center">Welcome back</h1>
       <div className="flex flex-col w-full">
         <div className="flex flex-col gap-y-3xl">
-          <PasswordInput onValueChange={setPassword} placeholder="Enter your passcode" disabled={isLoading} autoFocus />
-          <Button onClick={handleUnlock} disabled={!password || password.length < 7 || isLoading}>
+          <PasswordInput
+            className="bg-white"
+            onValueChange={setPassword}
+            placeholder="Enter your passcode"
+            disabled={isLoading}
+            autoFocus
+          />
+          <Button size="large" onClick={handleUnlock} disabled={!password || password.length < 7 || isLoading}>
             {isLoading ? 'Unlocking...' : 'Unlock'}
           </Button>
         </div>

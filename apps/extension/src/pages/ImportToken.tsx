@@ -166,7 +166,6 @@ export default function ImportToken() {
         />
 
         <Button
-          className="mt-3xl"
           onClick={handleImportToken}
           disabled={!token.address || !token.symbol || !token.decimals || hasAddressError || hasDecimalsError}
         >

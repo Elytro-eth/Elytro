@@ -55,7 +55,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
     if (!address || !newOwner || !contacts || !threshold) {
       toast({
         title: 'Invalid Recovery Record',
-        description: 'Please check the url',
+        // description: 'Please check the url',
         variant: 'destructive',
       });
       return;
@@ -68,7 +68,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
     if (!address || !newOwner) {
       toast({
         title: 'Invalid Recovery Record',
-        description: 'Please check the url',
+        // description: 'Please check the url',
         variant: 'destructive',
       });
       return;
@@ -109,7 +109,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
       setError(true);
       toast({
         title: 'Invalid Recovery Record',
-        description: 'Please check the url',
+        // description: 'Please check the url',
         variant: 'destructive',
       });
       return;
@@ -176,7 +176,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
       setError(true);
       toast({
         title: 'Invalid Recovery Record',
-        description: 'Please check the url',
+        // description: 'Please check the url',
         variant: 'destructive',
       });
     }
