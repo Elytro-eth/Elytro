@@ -20,6 +20,16 @@ import {
 } from 'viem';
 import { readContract } from 'wagmi/actions';
 
+function getCurrentRpc(chainId: number) {
+  if (typeof window !== 'undefined') {
+    return (
+      localStorage.getItem('custom_rpc_url' + chainId) ||
+      SUPPORTED_CHAINS.find((chain) => chain.id === chainId)?.rpcUrls.default.http[0]
+    );
+  }
+  return SUPPORTED_CHAINS.find((chain) => chain.id === chainId)?.rpcUrls.default.http[0];
+}
+
 export const getWalletNonce = async (wallet?: string, chainId?: number) => {
   try {
     if (!wallet || !isAddress(wallet)) {
@@ -215,9 +225,10 @@ export const getExecuteRecoveryTxData = (walletAddress: string, newOwners: strin
 const GUARDIAN_INFO_KEY = '0x1ace5ad304fe21562a90af48910fa441fc548c59f541c00cc8338faaa3de3990';
 
 export const queryRecoveryContacts = async (address: Address, chainId: number) => {
+  const customRpc = getCurrentRpc(chainId);
   const client = createPublicClient({
     chain: SUPPORTED_CHAINS.find((chain) => chain.id === chainId),
-    transport: http(),
+    transport: customRpc ? http(customRpc) : http(),
   });
 
   const startBlock = await client.readContract({
@@ -267,9 +278,10 @@ export const queryRecoveryContacts = async (address: Address, chainId: number) =
 };
 
 export const getOperationValidTime = async (address: Address, chainId: number, recoveryId: `0x${string}`) => {
+  const customRpc = getCurrentRpc(chainId);
   const client = createPublicClient({
     chain: SUPPORTED_CHAINS.find((chain) => chain.id === chainId),
-    transport: http(),
+    transport: customRpc ? http(customRpc) : http(),
   });
 
   const res = await client.readContract({
@@ -282,9 +294,10 @@ export const getOperationValidTime = async (address: Address, chainId: number, r
 };
 
 export const getOperationState = async (address: Address, chainId: number, recoveryId: `0x${string}`) => {
+  const customRpc = getCurrentRpc(chainId);
   const client = createPublicClient({
     chain: SUPPORTED_CHAINS.find((chain) => chain.id === chainId),
-    transport: http(),
+    transport: customRpc ? http(customRpc) : http(),
   });
 
   const status = await client.readContract({
@@ -317,9 +330,10 @@ export const checkIsContactSigned = async ({
   fromBlock: bigint;
   chainId: number;
 }) => {
+  const customRpc = getCurrentRpc(chainId);
   const client = createPublicClient({
     chain: SUPPORTED_CHAINS.find((chain) => chain.id === chainId),
-    transport: http(),
+    transport: customRpc ? http(customRpc) : http(),
   });
 
   const logs = await getLogsOnchain(client, {

@@ -2,9 +2,11 @@ import './globals.css';
 import { Providers } from './providers';
 import ConnectControl from '@/components/ConnectControl';
 import { LogoHeader } from '@/components/LogoHeader';
+import { RPCSettingDialog } from '@/components/RPCSettingDialog';
 import { Toaster } from '@/components/ui/toaster';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
+import { RpcProvider } from '@/contexts/rpc-context';
 
 export const metadata: Metadata = {
   title: 'Elytro Recovery',
@@ -20,18 +22,21 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased w-screen h-screen screen-bg min-w-[800px]">
         <Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}>
-          <Providers>
-            <Toaster />
-            <header className="min-w-[800px] fixed top-0 left-0 right-0 flex items-center justify-between gap-2 px-xl py-lg">
-              <LogoHeader />
+          <RpcProvider>
+            <Providers>
+              <Toaster />
+              <header className="min-w-[800px] fixed top-0 left-0 right-0 flex items-center justify-between gap-2 px-xl py-lg">
+                <LogoHeader />
 
-              <div className="flex flex-row items-center gap-2">
-                <ConnectControl />
-              </div>
-            </header>
+                <div className="flex flex-row items-center gap-2">
+                  <ConnectControl />
+                  <RPCSettingDialog />
+                </div>
+              </header>
 
-            <main className="h-full flex flex-col items-center flex-grow">{children}</main>
-          </Providers>
+              <main className="h-full flex flex-col items-center flex-grow">{children}</main>
+            </Providers>
+          </RpcProvider>
         </Suspense>
       </body>
     </html>

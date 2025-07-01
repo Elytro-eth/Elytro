@@ -11,7 +11,7 @@ export const CONNECTOR_ICON_MAP = {
   walletConnect: 'https://logosarchive.com/wp-content/uploads/2022/02/WalletConnect-icon.svg',
 };
 
-export function getConfig() {
+export function getConfig(customRpc?: string, customChainId?: string | null) {
   return createConfig({
     chains: SUPPORTED_CHAINS,
     connectors: [
@@ -30,7 +30,14 @@ export function getConfig() {
       storage: cookieStorage,
     }),
     ssr: false,
-    transports: Object.fromEntries(SUPPORTED_CHAINS.map((chain) => [chain.id, http()])),
+    transports: Object.fromEntries(
+      SUPPORTED_CHAINS.map((chain) => [
+        chain.id,
+        customRpc && customChainId && customChainId === chain.id.toString()
+          ? http(customRpc)
+          : http(chain.rpcUrls.default.http[0]),
+      ])
+    ),
   });
 }
 
