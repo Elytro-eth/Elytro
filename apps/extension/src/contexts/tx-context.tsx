@@ -264,13 +264,13 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       setIsSending(true);
       const opHash = await wallet.sendUserOperation(userOpRef.current!);
       registerOpStatusListener(opHash);
-      // wallet.addNewHistory({
-      //   type: txTypeRef.current!,
-      //   opHash,
-      //   from: userOpRef.current!.sender,
-      //   decodedDetail: decodedDetail!,
-      //   approvalId: approval?.id,
-      // });
+      wallet.addNewHistory({
+        type: txTypeRef.current!,
+        opHash,
+        from: userOpRef.current!.sender,
+        decodedDetail: decodedDetail!,
+        approvalId: approval?.id,
+      });
       resolve();
       handleBack();
     } catch (error) {
