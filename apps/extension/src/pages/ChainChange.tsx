@@ -6,8 +6,9 @@ import { ethErrors } from 'eth-rpc-errors';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
 import { SUPPORTED_CHAINS, ChainOperationEn, TChainItem } from '@/constants/chains';
-import AccountsDropdown from '@/components/biz/AccountsDropdown';
 import DappInteractionBar from '@/components/biz/DappInteractionBar';
+import { useEffect, useState } from 'react';
+import ChainAccountsDropdown from '@/components/biz/ChainAccountsDropdown.tsx';
 
 function URLSection({ title, items }: { title: string; items: string[] }) {
   return (
@@ -32,8 +33,13 @@ function URLSection({ title, items }: { title: string; items: string[] }) {
 
 export default function ChainChange() {
   const { wallet } = useWallet();
-  const { accounts } = useAccount();
+  const { accounts, reloadAccount } = useAccount();
   const { approval, reject, resolve } = useApproval();
+  const [selectedAccount, setSelectedAccount] = useState<TAccountInfo>();
+
+  useEffect(() => {
+    reloadAccount();
+  }, []);
 
   if (!approval || !approval.data) {
     return <Spin isLoading />;
@@ -52,7 +58,8 @@ export default function ChainChange() {
   const handleConfirm = async () => {
     try {
       if (method === ChainOperationEn.Switch) {
-        // await wallet.switchAccountByChain(Number(targetChainId));
+        await wallet.switchAccount(selectedAccount!);
+        await reloadAccount();
         resolve();
       } else {
         const updateConfig = {} as TChainItem;
@@ -98,7 +105,7 @@ export default function ChainChange() {
         {/* Description of the chain change */}
         {method === ChainOperationEn.Switch && accounts.length > 1 && (
           <div className="space-y-4 flex flex-col items-center">
-            <AccountsDropdown chainId={Number(targetChainId)} />
+            <ChainAccountsDropdown chainId={Number(targetChainId)} onSelect={setSelectedAccount} />
           </div>
         )}
 
@@ -122,7 +129,11 @@ export default function ChainChange() {
         <Button variant="outline" onClick={handleCancel}>
           Cancel
         </Button>
-        <Button variant="default" onClick={handleConfirm}>
+        <Button
+          variant="default"
+          onClick={handleConfirm}
+          disabled={method === ChainOperationEn.Switch && !selectedAccount}
+        >
           {method.charAt(0).toUpperCase() + method.slice(1)}
         </Button>
       </CardFooter>

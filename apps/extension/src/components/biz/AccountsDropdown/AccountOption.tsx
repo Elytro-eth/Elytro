@@ -9,7 +9,7 @@ import { Trash2 } from 'lucide-react';
 interface IAccountOptionProps {
   account: TAccountInfo;
   isSelected: boolean;
-  onDelete: () => void;
+  onDelete?: () => void;
   onSelect: () => void;
   showDelete?: boolean;
 }
