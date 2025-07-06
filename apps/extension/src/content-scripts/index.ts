@@ -6,10 +6,7 @@ import { initDetectColorScheme } from './color-scheme';
 
 const portMessage = new PortMessage('elytro-cs');
 
-const dAppMessage = new ElytroDuplexMessage(
-  'elytro-content-script',
-  'elytro-page-provider'
-);
+const dAppMessage = new ElytroDuplexMessage('elytro-content-script', 'elytro-page-provider');
 
 const initDuplexMessageBetweenContentScriptAndPageProvider = () => {
   dAppMessage.connect();
@@ -34,29 +31,22 @@ const initRuntimeMessage = () => {
     });
   });
 
-  portMessage.onMessage(
-    ElytroMessageTypeEn.RESPONSE_TO_CONTENT_SCRIPT,
-    (data) => {
-      dAppMessage.send({
-        type: ElytroMessageTypeEn.RESPONSE_TO_PAGE_PROVIDER,
-        uuid: data.uuid,
-        payload: {
-          method: data.method,
-          response: data.response,
-        },
-      });
-    }
-  );
+  portMessage.onMessage(ElytroMessageTypeEn.RESPONSE_TO_CONTENT_SCRIPT, (data) => {
+    dAppMessage.send({
+      type: ElytroMessageTypeEn.RESPONSE_TO_PAGE_PROVIDER,
+      uuid: data.uuid,
+      payload: {
+        method: data.method,
+        response: data.response,
+      },
+    });
+  });
 };
 
 initRuntimeMessage();
 
 const injectMainWorldScript = () => {
-  if (
-    !document.querySelector(
-      `script[src="${chrome.runtime.getURL(mainWorldScript)}"]`
-    )
-  ) {
+  if (!document.querySelector(`script[src="${chrome.runtime.getURL(mainWorldScript)}"]`)) {
     const script = Object.assign(document.createElement('script'), {
       src: chrome.runtime.getURL(mainWorldScript),
       type: 'module',

@@ -139,7 +139,7 @@ export default function AccountsDropdown({ className, chainId, mode = 'default' 
         <div className="flex flex-col gap-y-sm">
           {chainId
             ? accounts
-                .filter((account) => account.chainId === chainId)
+                .filter((account) => Number(account.chainId) === Number(chainId))
                 .map((account) => (
                   <AccountOption
                     key={account.address}

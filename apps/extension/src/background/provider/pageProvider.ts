@@ -11,10 +11,7 @@ class PageProvider extends SafeEventEmitter {
   private _currentAddress: string | null = null;
   private _currentChainId: number | null = null;
 
-  private _message = new ElytroDuplexMessage(
-    'elytro-page-provider',
-    'elytro-content-script'
-  );
+  private _message = new ElytroDuplexMessage('elytro-page-provider', 'elytro-content-script');
 
   constructor() {
     super();
@@ -24,10 +21,7 @@ class PageProvider extends SafeEventEmitter {
   private _onDocumentReadyAndVisible(callback: () => void) {
     return new Promise((resolve) => {
       const onReadyAndVisible = () => {
-        if (
-          document.readyState === 'complete' &&
-          document.visibilityState === 'visible'
-        ) {
+        if (document.readyState === 'complete' && document.visibilityState === 'visible') {
           document.removeEventListener('readystatechange', onReadyAndVisible);
           document.removeEventListener('visibilitychange', onReadyAndVisible);
           return resolve(callback());
@@ -50,17 +44,13 @@ class PageProvider extends SafeEventEmitter {
   };
 
   send = async () => {
-    console.error(
-      'Elytro: we do not support send method as it is a legacy method'
-    );
+    console.error('Elytro: we do not support send method as it is a legacy method');
 
     throw ethErrors.rpc.methodNotFound();
   };
 
   sendAsync = async () => {
-    console.error(
-      'Elytro: we do not support sendAsync method as it is a legacy method'
-    );
+    console.error('Elytro: we do not support sendAsync method as it is a legacy method');
 
     throw ethErrors.rpc.methodNotFound();
   };
@@ -80,6 +70,8 @@ class PageProvider extends SafeEventEmitter {
 
       const uuid = UUIDv4();
 
+      console.log(`[Elytro][PageProvider] Sending request`, { uuid, data });
+
       this._message.send({
         type: ElytroMessageTypeEn.REQUEST_FROM_PAGE_PROVIDER,
         uuid,
@@ -88,6 +80,7 @@ class PageProvider extends SafeEventEmitter {
 
       return new Promise((resolve, reject) => {
         this._message.onceMessage(uuid, ({ response }) => {
+          console.log(`[Elytro][PageProvider] Received response`, { uuid, response });
           if (response?.error) {
             reject(response.error);
           } else {
