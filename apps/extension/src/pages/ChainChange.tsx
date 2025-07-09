@@ -90,7 +90,7 @@ export default function ChainChange() {
   };
 
   return (
-    <Card className="w-full min-h-screen h-full flex flex-col ">
+    <Card className="w-full min-h-full p-sm flex flex-col ">
       <CardHeader className="text-center ">
         <DappInteractionBar dapp={dApp} title={`Connect to app`} />
         <div className="elytro-text-body">
@@ -129,7 +129,7 @@ export default function ChainChange() {
         )}
       </CardContent>
 
-      <CardFooter className="grid grid-cols-2 gap-4">
+      <CardFooter className="grid grid-cols-2 gap-4 mt-8">
         <Button variant="outline" onClick={handleCancel}>
           Cancel
         </Button>
