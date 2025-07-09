@@ -33,7 +33,7 @@ function URLSection({ title, items }: { title: string; items: string[] }) {
 
 export default function ChainChange() {
   const { wallet } = useWallet();
-  const { accounts, reloadAccount } = useAccount();
+  const { reloadAccount } = useAccount();
   const { approval, reject, resolve } = useApproval();
   const [selectedAccount, setSelectedAccount] = useState<TAccountInfo>();
 
@@ -103,9 +103,13 @@ export default function ChainChange() {
 
       <CardContent className="flex flex-col h-full p-3 text-sm space-y-6 mx-lg my-md">
         {/* Description of the chain change */}
-        {method === ChainOperationEn.Switch && accounts.length > 1 && (
+        {method === ChainOperationEn.Switch && (
           <div className="space-y-4 flex flex-col items-center">
-            <ChainAccountsDropdown chainId={Number(targetChainId)} onSelect={setSelectedAccount} />
+            <ChainAccountsDropdown
+              chainId={Number(targetChainId)}
+              onSelect={setSelectedAccount}
+              selectedAccount={selectedAccount}
+            />
           </div>
         )}
 

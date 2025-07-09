@@ -49,7 +49,7 @@ type ITxContext = {
 const ConfirmSuccessMessageMap = {
   [TxRequestTypeEn.DeployWallet]: 'Activate wallet successfully',
   [TxRequestTypeEn.SendTransaction]: 'Transaction sent successfully',
-  [TxRequestTypeEn.ApproveTransaction]: 'Recovery contacts confirmed',
+  [TxRequestTypeEn.ApproveTransaction]: 'Transaction sent successfully',
   [TxRequestTypeEn.UpgradeContract]: 'Contract updated successfully',
 };
 

@@ -27,12 +27,18 @@ export default function ChainAccountsDropdown({
 }: IAccountsDropdownProps) {
   const [open, setOpen] = useState(false);
   const { accounts, getAccounts } = useAccount();
-  const [showAccount, setShowAccount] = useState<TAccountInfo>();
+  const [showAccount, setShowAccount] = useState<TAccountInfo | undefined>(selectedAccount);
   const accountOptions = accounts.filter((account) => Number(account.chainId) === Number(chainId));
 
   useEffect(() => {
-    setShowAccount(selectedAccount || accountOptions?.[0]);
-  }, [selectedAccount, accountOptions]);
+    getAccounts();
+  }, []);
+
+  useEffect(() => {
+    if (!showAccount) {
+      setShowAccount(accountOptions?.[0]);
+    }
+  }, [accountOptions, showAccount]);
 
   useEffect(() => {
     if (showAccount) {
@@ -87,7 +93,6 @@ export default function ChainAccountsDropdown({
           <ChevronIcon className="size-3" />
         </div>
       </div>
-      {/* chain-change mode: bottom-center; default mode: bottom-start */}
       <DropdownMenuContent
         side="bottom"
         align="start"
@@ -96,17 +101,15 @@ export default function ChainAccountsDropdown({
         className="w-[330px] max-w-fit bg-white rounded-md shadow-lg py-lg px-0"
       >
         <div className="flex flex-col gap-y-sm">
-          {accounts
-            .filter((account) => Number(account.chainId) === Number(chainId))
-            .map((account) => (
-              <AccountOption
-                key={account.address}
-                account={account}
-                showDelete={false}
-                isSelected={account.address === showAccount?.address}
-                onSelect={() => handleSwitchAccount(account)}
-              />
-            ))}
+          {accountOptions.map((account) => (
+            <AccountOption
+              key={account.address}
+              account={account}
+              showDelete={false}
+              isSelected={account.address === showAccount?.address}
+              onSelect={() => handleSwitchAccount(account)}
+            />
+          ))}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
