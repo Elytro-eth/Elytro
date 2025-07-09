@@ -167,6 +167,11 @@ class KeyringService {
   }
 
   private async _verifyPassword(password?: string) {
+    if (!password) {
+      this._locked = !(this._owners.length > 0 && this._currentOwner && this._signingKey);
+      return;
+    }
+
     if (!this._encryptData) {
       this._locked = true;
       return;
@@ -186,7 +191,7 @@ class KeyringService {
         this._locked = false;
       }
     } catch (error) {
-      console.error(error);
+      console.error('Elytro: _verifyPassword - Failed to decrypt:', error);
       this._locked = true;
     }
   }
