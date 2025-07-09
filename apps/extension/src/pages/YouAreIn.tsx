@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import useSearchParams from '@/hooks/use-search-params';
 import { navigateTo } from '@/utils/navigation';
 import { useWallet } from '@/contexts/wallet';
+import { Box } from 'lucide-react';
 
 const YouAreIn: React.FC = () => {
   const params = useSearchParams();
@@ -21,8 +22,13 @@ const YouAreIn: React.FC = () => {
       }
     : {
         title: 'Welcome!',
-        description: "Let's get you started",
-        action: 'Start with new wallet',
+        description: 'Let’s create your first smart contract wallet',
+        action: (
+          <>
+            <Box className="size-4 mr-sm" color="#cce1ea" />
+            Start with new wallet
+          </>
+        ),
         actionPath: SIDE_PANEL_ROUTE_PATHS.Dashboard,
         beforeAction: async () => {
           await wallet.createAccount(1); // create ethereum mainnet account as default

@@ -121,11 +121,13 @@ export default function InternalImportBackup() {
             placeholder="Passcode to unlock backup"
             value={backupPwd}
             onValueChange={handleBackupPwdChange}
+            className="bg-white"
           />
           <PasswordInput
             placeholder="Passcode for this device"
             value={devicePwd}
             onValueChange={handleDevicePwdChange}
+            className="bg-white"
           />
           <div className="flex flex-row  gap-x-sm cursor-pointer" onClick={() => setIsChecked((prev) => !prev)}>
             <Checkbox className="flex-shrink-0 mt-1" checked={isChecked} />
