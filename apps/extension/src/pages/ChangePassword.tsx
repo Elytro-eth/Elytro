@@ -6,16 +6,11 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from '@/hooks/use-toast';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import PasswordInput from '@/components/ui/PasswordInputer';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
+import HelperText from '@/components/ui/HelperText';
 
 const ChangePassword: React.FC = () => {
   const { wallet } = useWallet();
@@ -27,14 +22,12 @@ const ChangePassword: React.FC = () => {
   const passwordForm = z
     .object({
       oldPassword: z.string().min(6, {
-        message:
-          'More than 6 characters with at least 1 capitalized letter.',
+        message: 'More than 6 characters with at least 1 capitalized letter.',
       }),
       password: z
         .string()
         .min(6, {
-          message:
-            'More than 6 characters with at least 1 capitalized letter.',
+          message: 'More than 6 characters with at least 1 capitalized letter.',
         })
         .superRefine((value, ctx) => {
           const oldPassword = form.getValues('oldPassword');
@@ -42,15 +35,13 @@ const ChangePassword: React.FC = () => {
           if (!/[A-Z]/.test(value)) {
             ctx.addIssue({
               code: 'custom',
-              message:
-                'The passcode should include more than 1 capitalized letter.',
+              message: 'The passcode should include more than 1 capitalized letter.',
             });
           }
           if (value === oldPassword) {
             ctx.addIssue({
               code: 'custom',
-              message:
-                'The new passcode should be different from the old passcode',
+              message: 'The new passcode should be different from the old passcode',
             });
           }
           if (confirmPassword && confirmPassword !== value) {
@@ -121,10 +112,7 @@ const ChangePassword: React.FC = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <PasswordInput
-                      field={field}
-                      placeholder="Enter old passcode"
-                    />
+                    <PasswordInput field={field} placeholder="Enter old passcode" />
                   </FormControl>
                   <FormMessage className="text-left" />
                 </FormItem>
@@ -136,10 +124,7 @@ const ChangePassword: React.FC = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <PasswordInput
-                      field={field}
-                      placeholder="Enter new passcode"
-                    />
+                    <PasswordInput field={field} placeholder="Enter new passcode" />
                   </FormControl>
                   <FormMessage className="text-left" />
                 </FormItem>
@@ -151,10 +136,7 @@ const ChangePassword: React.FC = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <PasswordInput
-                      field={field}
-                      placeholder="Repeat new passcode"
-                    />
+                    <PasswordInput field={field} placeholder="Repeat new passcode" />
                   </FormControl>
                   <FormMessage className="text-left" />
                 </FormItem>
@@ -164,18 +146,16 @@ const ChangePassword: React.FC = () => {
         </form>
       </Form>
 
-      <div className="w-full flex justify-between gap-lg mt-4">
+      <HelperText description="Your other devices are not affected" className="my-sm" />
+
+      <div className="w-full flex justify-between gap-lg mt-lg">
         {/*<Button
                 className="flex-1"
                 variant="outline"
               >
                 Cancel
               </Button> */}
-        <Button
-          className="flex-1"
-          onClick={handleConfirm}
-          disabled={!form.formState.isValid}
-        >
+        <Button className="flex-1" onClick={handleConfirm} disabled={!form.formState.isValid}>
           Save
         </Button>
       </div>
