@@ -18,6 +18,7 @@ import { formatTokenAmount } from '@/utils/format';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import AddressInput from '@/components/biz/AddressInput';
 import { saveRecentAddress } from '@/utils/recentAddresses';
+import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
 
 export default function SendTx() {
   const {
@@ -264,7 +265,11 @@ export default function SendTx() {
               control={form.control}
               name="to"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col gap-2 bg-white px-lg py-sm rounded-lg space-y-0">
+                  <div className="flex items-center flex-row gap-x-2xs">
+                    <img src={getIconByChainId(chainId)} alt="chain" className="size-4 rounded-full" />
+                    <span className="text-sm text-gray-750 ">{getChainNameByChainId(chainId)}</span>
+                  </div>
                   <FormControl>
                     <AddressInput field={field} chainId={chainId} />
                   </FormControl>
@@ -272,12 +277,6 @@ export default function SendTx() {
                 </FormItem>
               )}
             />
-
-            {/* Warning message */}
-            <div className="flex text-gray-750">
-              <AlertCircle className="w-4 h-4 stroke-gray-750 mr-2" />
-              Tokens will be lost if sent to a different network.
-            </div>
           </div>
         </Form>
 
