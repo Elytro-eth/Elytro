@@ -139,9 +139,9 @@ class KeyringService {
   }
 
   public async lock() {
-    this.reset();
     sessionStorage.clear();
     sessionManager.broadcastMessage('accountsChanged', []);
+    this.reset();
   }
 
   public async unlock(password: string) {
@@ -167,13 +167,13 @@ class KeyringService {
   }
 
   private async _verifyPassword(password?: string) {
-    if (!password) {
-      this._locked = !(this._owners.length > 0 && this._currentOwner && this._signingKey);
+    if (!this._encryptData) {
+      this._locked = true;
       return;
     }
 
-    if (!this._encryptData) {
-      this._locked = true;
+    if (!password) {
+      this._locked = !(this._owners.length > 0 && this._currentOwner && this._signingKey);
       return;
     }
 
