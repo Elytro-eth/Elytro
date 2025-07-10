@@ -27,6 +27,7 @@ import ExportBackupPage from './pages/ExportBackup';
 import ImportBackup from './pages/ImportBackup';
 import InternalCreateAccount from './pages/InternalCreateAccount';
 import InternalImportBackup from './pages/ImportBackup/internal';
+import StablecoinsGas from './pages/StablecoinsGas';
 
 export enum SIDE_PANEL_ROUTE_PATHS {
   Home = '/',
@@ -58,6 +59,7 @@ export enum SIDE_PANEL_ROUTE_PATHS {
   ImportBackup = '/import',
   InternalCreateAccount = '/internal-create-account',
   InternalImportBackup = '/internal-import-backup',
+  StablecoinsGas = '/stablecoins-gas',
 }
 
 export const routes: TRoute[] = [
@@ -177,5 +179,9 @@ export const routes: TRoute[] = [
   {
     path: SIDE_PANEL_ROUTE_PATHS.InternalImportBackup,
     component: InternalImportBackup,
+  },
+  {
+    path: SIDE_PANEL_ROUTE_PATHS.StablecoinsGas,
+    component: StablecoinsGas,
   },
 ];

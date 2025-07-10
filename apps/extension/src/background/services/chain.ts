@@ -16,6 +16,29 @@ const CHAINS_STORAGE_KEY = 'elytroChains';
 class ChainService {
   private _store: LocalSubscribableStore<TChainsState>;
 
+  private _normalizeChain(chain: TChainItem): TChainItem {
+    if (!chain) return chain;
+
+    let stablecoins = chain.stablecoins;
+
+    // when fetching from the storage, array is converted to object, so we need to convert it back to array
+    if (stablecoins && !Array.isArray(stablecoins) && typeof stablecoins === 'object') {
+      const keys = Object.keys(stablecoins);
+      const isArrayLike = keys.every((key) => /^\d+$/.test(key));
+
+      if (isArrayLike) {
+        stablecoins = Object.values(stablecoins) as typeof chain.stablecoins;
+      } else {
+        stablecoins = [];
+      }
+    }
+
+    return {
+      ...chain,
+      stablecoins: stablecoins || [],
+    };
+  }
+
   constructor() {
     this._store = new LocalSubscribableStore<TChainsState>(CHAINS_STORAGE_KEY, (initState) => {
       const needReset =
@@ -30,6 +53,11 @@ class ChainService {
           broadcastChain = SUPPORTED_CHAINS.find((n) => n.id === broadcastChain!.id) as TChainItem;
         }
         this._store.state.version = CURRENT_VERSION;
+      } else {
+        this._chains = this._chains.map((chain) => this._normalizeChain(chain));
+        if (broadcastChain) {
+          broadcastChain = this._normalizeChain(broadcastChain);
+        }
       }
 
       if (broadcastChain) {
@@ -55,11 +83,11 @@ class ChainService {
   }
 
   public get currentChain() {
-    return this._currentChain;
+    return this._currentChain ? this._normalizeChain(this._currentChain) : null;
   }
 
   public get chains() {
-    return this._chains;
+    return this._chains.map((chain) => this._normalizeChain(chain));
   }
 
   public addChain(chain: TChainItem) {
@@ -80,7 +108,7 @@ class ChainService {
       });
     }
 
-    return targetChain;
+    return this._normalizeChain(targetChain);
   }
 
   public updateChain(chainId: number, config: Partial<TChainItem>) {

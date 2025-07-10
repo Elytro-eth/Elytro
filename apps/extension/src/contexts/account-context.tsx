@@ -159,7 +159,6 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
 
       const transactions = res.transactions
         .map((item: SafeAny) => {
-          console.log('item', item);
           if (item.type === 'receive') {
             return {
               type: HistoricalActivityTypeEn.Receive,
@@ -172,16 +171,17 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
               decimals: item.list[0].decimals,
               symbol: item.list[0].symbol,
             };
-          } else {
-            return {
-              type: HistoricalActivityTypeEn.ContractInteraction,
-              from: currentAccount.address,
-              opHash: item.opHash || item.txhash,
-              txHash: item.txhash,
-              timestamp: item.timestamp * 1000,
-              status: UserOperationStatusEn.confirmedSuccess,
-            };
           }
+          // else {
+          //   return {
+          //     type: HistoricalActivityTypeEn.ContractInteraction,
+          //     from: currentAccount.address,
+          //     opHash: item.opHash || item.txhash,
+          //     txHash: item.txhash,
+          //     timestamp: item.timestamp * 1000,
+          //     status: UserOperationStatusEn.confirmedSuccess,
+          //   };
+          // }
         })
         .filter(Boolean);
 
@@ -196,12 +196,9 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
       return;
     }
 
-    const res = await getReceiveActivities();
+    const [localHistory, receives] = await Promise.all([wallet.getLatestHistories(), getReceiveActivities()]);
+    const res = [...localHistory, ...receives].sort((a, b) => b.timestamp - a.timestamp);
     setHistory(res);
-
-    // const [localHistory, receives] = await Promise.all([wallet.getLatestHistories(), getReceiveActivities()]);
-    // const res = [...localHistory, ...receives].sort((a, b) => b.timestamp - a.timestamp);
-    // setHistory(res);
   };
 
   useEffect(() => {

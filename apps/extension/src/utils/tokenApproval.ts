@@ -1,4 +1,4 @@
-import { createPublicClient, http, parseAbiItem, Address } from 'viem';
+import { createPublicClient, http, parseAbiItem, Address, encodeFunctionData, parseAbi, maxUint256 } from 'viem';
 import { SUPPORTED_CHAINS } from '@/constants/chains';
 
 const ERC20_APPROVAL_EVENT = parseAbiItem(
@@ -96,6 +96,7 @@ export async function queryErc20Approvals(address: Address, options: QueryOption
   const startBlock = fromBlock || currentBlock - BigInt(blockRange);
 
   try {
+    // TODO: use getLogsOnchain instead of client.getLogs or more generic function?
     const approvalLogs = await client.getLogs({
       event: ERC20_APPROVAL_EVENT,
       args: {
@@ -307,4 +308,19 @@ export async function queryErc20ApprovalsForToken(
       `Failed to query ERC20 approvals for token: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
   }
+}
+
+// default amount is unlimited
+export function getApproveErc20Tx(erc20Address: Address, spender: Address, amount: bigint = maxUint256) {
+  const callData = encodeFunctionData({
+    abi: parseAbi(['function approve(address spender, uint256 amount)']),
+    functionName: 'approve',
+    args: [spender, amount],
+  });
+
+  return {
+    to: erc20Address,
+    value: '0',
+    data: callData,
+  };
 }

@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import HelperText from '@/components/ui/HelperText';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { safeClipboard } from '@/utils/clipboard';
+import { RawData } from '@/components/ui/rawData';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -32,7 +33,6 @@ const formatGasUsed = (gasUsed?: string) => {
 };
 
 export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
-  const [showRawData, setShowRawData] = useState(false);
   const [expandSponsorSelector, setExpandSponsorSelector] = useState(false);
   const {
     tokenInfo: { tokenPrices },
@@ -166,25 +166,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
 
       {/* Transaction Raw Data: Only show for approve transaction */}
       {(requestType === TxRequestTypeEn.ApproveTransaction || requestType === TxRequestTypeEn.UpgradeContract) && (
-        <div>
-          <button
-            className="flex items-center justify-center gap-x-2xs elytro-text-tiny-body text-gray-750 mb-sm"
-            onClick={() => setShowRawData((prev) => !prev)}
-          >
-            Raw Data
-            {showRawData ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
-          <pre
-            className={`
-              elytro-text-code-body text-gray-500 overflow-auto w-full flex-grow px-lg py-md bg-gray-150 rounded-2xs
-              transition-opacity whitespace-pre-wrap
-              ${showRawData ? 'block' : 'hidden'}
-              `}
-            style={{ userSelect: 'text' }}
-          >
-            {formatRawData(decodedDetail)}
-          </pre>
-        </div>
+        <RawData>{formatRawData(decodedDetail)}</RawData>
       )}
     </div>
   );

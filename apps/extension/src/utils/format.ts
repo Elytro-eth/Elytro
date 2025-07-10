@@ -1,19 +1,8 @@
 import { TTxDetail } from '@/constants/operations';
 import { SimulationResult } from './ethRpc/simulate';
-import {
-  Hex,
-  toHex,
-  size as getSize,
-  pad,
-  Block,
-  BlockTag,
-  isAddress,
-} from 'viem';
+import { Hex, toHex, size as getSize, pad, Block, BlockTag, isAddress } from 'viem';
 
-export function paddingZero(
-  value: string | number | bigint,
-  bytesLen?: number
-): string {
+export function paddingZero(value: string | number | bigint, bytesLen?: number): string {
   const hexString =
     typeof value === 'string'
       ? value.toLowerCase().startsWith('0x')
@@ -24,18 +13,13 @@ export function paddingZero(
   const targetLength = bytesLen ? bytesLen * 2 : Math.max(hexString.length, 2);
 
   if (hexString.length > targetLength) {
-    throw new Error(
-      `Value ${value} exceeds the target length of ${targetLength} characters`
-    );
+    throw new Error(`Value ${value} exceeds the target length of ${targetLength} characters`);
   }
 
   return '0x' + hexString.padStart(targetLength, '0');
 }
 
-export function getHexString(
-  value: string | number | bigint | boolean | Uint8Array,
-  size: number = 16
-): Hex {
+export function getHexString(value: string | number | bigint | boolean | Uint8Array, size: number = 16): Hex {
   if (typeof value === 'string' && value.startsWith('0x')) {
     if (getSize(value as Hex) === size) {
       return value as Hex;
@@ -47,9 +31,7 @@ export function getHexString(
   return toHex(value, { size });
 }
 
-export const formatHex = (
-  value: string | number | bigint | boolean | Uint8Array
-) => {
+export const formatHex = (value: string | number | bigint | boolean | Uint8Array) => {
   {
     if (typeof value === 'string' && value.startsWith('0x')) {
       return value;
@@ -73,9 +55,7 @@ export function paddingBytesToEven(value?: string): string | null {
 export function formatAddressToShort(address: Nullable<string>) {
   // 0x12345...123456
   // todo: check if address is valid
-  return address && isAddress(address)
-    ? `${address?.slice(0, 6)} ... ${address?.slice(-4)}`
-    : '--';
+  return address && isAddress(address) ? `${address?.slice(0, 6)} ... ${address?.slice(-4)}` : '--';
 }
 
 export function formatTokenAmount(
@@ -130,17 +110,13 @@ export function formatTokenAmount(
       fractionalPart = fractionalPart.slice(0, -1);
     }
 
-    result = fractionalPart
-      ? `${integerPart}.${fractionalPart}`
-      : `${integerPart}`;
+    result = fractionalPart ? `${integerPart}.${fractionalPart}` : `${integerPart}`;
   }
 
   return symbol ? `${result} ${symbol}` : result;
 }
 
-export function formatSimulationResultToTxDetail(
-  simulationResult: SimulationResult
-) {
+export function formatSimulationResultToTxDetail(simulationResult: SimulationResult) {
   return {
     from: simulationResult.assetChanges[0].from,
     to: simulationResult.assetChanges[0].to,
@@ -164,8 +140,7 @@ export function formatBlockInfo(block: Block) {
   // transfer bigint to Hex string
   return {
     ...block,
-    baseFeePerGas:
-      block.baseFeePerGas !== null ? toHex(block.baseFeePerGas) : null,
+    baseFeePerGas: block.baseFeePerGas !== null ? toHex(block.baseFeePerGas) : null,
     blobGasUsed: toHex(block.blobGasUsed),
     difficulty: toHex(block.difficulty),
     excessBlobGas: toHex(block.excessBlobGas),
@@ -174,8 +149,7 @@ export function formatBlockInfo(block: Block) {
     number: block.number !== null ? toHex(block.number) : null,
     size: toHex(block.size),
     timestamp: toHex(block.timestamp),
-    totalDifficulty:
-      block.totalDifficulty !== null ? toHex(block.totalDifficulty) : null,
+    totalDifficulty: block.totalDifficulty !== null ? toHex(block.totalDifficulty) : null,
   };
 }
 
@@ -224,12 +198,7 @@ export const formatObjectWithBigInt = (obj: SafeAny): SafeAny => {
 
   switch (type) {
     case 'object':
-      return Object.fromEntries(
-        Object.entries(obj).map(([key, value]) => [
-          key,
-          formatObjectWithBigInt(value),
-        ])
-      );
+      return Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, formatObjectWithBigInt(value)]));
     case 'array':
       return (obj as SafeAny[]).map((value) => formatObjectWithBigInt(value));
     case 'bigint':
@@ -268,10 +237,7 @@ const BIGINT_PARAM_KEY = [
   'maxPriorityFeePerGas',
 ];
 
-export function deformatObjectWithBigInt(
-  userOp: ElytroUserOperation,
-  customBigIntKeys: string[] = BIGINT_PARAM_KEY
-) {
+export function deformatObjectWithBigInt(userOp: ElytroUserOperation, customBigIntKeys: string[] = BIGINT_PARAM_KEY) {
   const deformatUserOp = Object.fromEntries(
     Object.entries(userOp).map(([key, value]) => [
       key,
@@ -285,9 +251,7 @@ export function deformatObjectWithBigInt(
 export function formatBlockParam(blockParam: BlockTag | bigint) {
   const useTag = typeof blockParam === 'string';
 
-  return useTag
-    ? { blockTag: blockParam as BlockTag }
-    : { blockNumber: BigInt(blockParam) };
+  return useTag ? { blockTag: blockParam as BlockTag } : { blockNumber: BigInt(blockParam) };
 }
 
 /**
@@ -372,9 +336,7 @@ export function formatBalance(
   let formattedDecimal = '';
 
   if (Number(value) < threshold) {
-    const firstNonZeroIndex = decimalPart
-      .split('')
-      .findIndex((char: string) => char !== '0');
+    const firstNonZeroIndex = decimalPart.split('').findIndex((char: string) => char !== '0');
     if (firstNonZeroIndex !== -1) {
       formattedDecimal = decimalPart.slice(0, firstNonZeroIndex + 2);
     }
@@ -403,21 +365,14 @@ export function formatStringifiedObject(str: SafeAny) {
     }
   } else if (type === 'object') {
     return Object.fromEntries(
-      Object.entries(str).map(([key, value]): [string, SafeAny] => [
-        key,
-        formatStringifiedObject(value),
-      ])
+      Object.entries(str).map(([key, value]): [string, SafeAny] => [key, formatStringifiedObject(value)])
     );
   }
 
   return str;
 }
 
-export function formatPrice(
-  tokenAmount?: number | string,
-  price?: number,
-  maxDecimalLength: number = 2
-) {
+export function formatPrice(tokenAmount?: number | string, price?: number, maxDecimalLength: number = 2) {
   const tokenAmountNumber = Number(tokenAmount);
 
   if (Number.isNaN(tokenAmountNumber) || !price) {
@@ -446,9 +401,7 @@ export function formatDollarBalance(
 
   const price =
     tokenPrices.find(
-      (item) =>
-        item.address === tokenContractAddress ||
-        item.symbol.toLowerCase() === symbol?.toLowerCase()
+      (item) => item.address === tokenContractAddress || item.symbol.toLowerCase() === symbol?.toLowerCase()
     )?.price || 0;
 
   return price > 0 ? formatPrice(balance, price) : null;

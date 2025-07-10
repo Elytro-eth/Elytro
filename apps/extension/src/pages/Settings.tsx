@@ -11,6 +11,7 @@ import {
   RefreshCcw,
   WalletCardsIcon,
   UserRoundIcon,
+  CircleDollarSignIcon,
 } from 'lucide-react';
 import { useWallet } from '@/contexts/wallet';
 import SettingItem from '@/components/ui/SettingItem';
@@ -26,7 +27,7 @@ export default function Settings() {
   };
   const appVersion = pkg.version;
   const {
-    currentAccount: { needUpgrade, isDeployed },
+    currentAccount: { needUpgrade },
   } = useAccount();
 
   return (
@@ -35,10 +36,15 @@ export default function Settings() {
         <h2 className="elytro-text-small-bold text-gray-600 pd-md">Wallet settings</h2>
         <div className="space-y-2">
           <AccountsDropdown className="bg-gray-150" />
-          {isDeployed && (
-            <SettingItem icon={ShieldIcon} label="Social Recovery" path={SIDE_PANEL_ROUTE_PATHS.RecoverySetting} />
-          )}
           <SettingItem icon={LayoutGridIcon} label="Connected apps" path={SIDE_PANEL_ROUTE_PATHS.Connection} />
+
+          <SettingItem icon={ShieldIcon} label="Social Recovery" path={SIDE_PANEL_ROUTE_PATHS.RecoverySetting} />
+
+          <SettingItem
+            icon={CircleDollarSignIcon}
+            label="Pay gas with Stablecoins"
+            path={SIDE_PANEL_ROUTE_PATHS.StablecoinsGas}
+          />
 
           {needUpgrade && (
             <SettingItem
@@ -52,11 +58,11 @@ export default function Settings() {
       </div>
 
       <div className="mb-4">
-        <h2 className="elytro-text-small-bold text-gray-600 my-4">Device settings</h2>
+        <h2 className="elytro-text-small-bold text-gray-600 my-4">Local settings</h2>
         <div className="space-y-2">
           <SettingItem icon={UserRoundIcon} label="Change passcode" path={SIDE_PANEL_ROUTE_PATHS.ChangePassword} />
           <SettingItem icon={Settings2Icon} label="Networks" path={SIDE_PANEL_ROUTE_PATHS.NetworkConfiguration} />
-          <SettingItem icon={WalletCardsIcon} label="Export wallets" path={SIDE_PANEL_ROUTE_PATHS.ExportBackup} />
+          <SettingItem icon={WalletCardsIcon} label="Backup wallets" path={SIDE_PANEL_ROUTE_PATHS.ExportBackup} />
         </div>
         <div className="flex flex-col space-y-2 w-full my-8">
           <Button variant="secondary" onClick={handleLock}>
