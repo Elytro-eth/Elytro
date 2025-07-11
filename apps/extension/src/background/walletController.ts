@@ -642,17 +642,34 @@ class WalletController {
     return decryptedData;
   }
 
-  public async exportOwnersAndAccounts(password: string) {
-    const owners = await keyring.exportOwners(password);
-    const accounts = accountManager.accounts.map((account) => ({
+  public async exportOwnersAndAccounts(password: string, selectedAccounts: string[]) {
+    const ownerInfo = (await keyring.exportOwners(password)) as {
+      owners: { id: string; key: Hex }[];
+      currentOwnerId: string;
+    };
+    let accounts = accountManager.accounts.map((account) => ({
       address: account.address,
       chainId: account.chainId,
       isDeployed: account.isDeployed,
       owner: account.owner,
     }));
 
+    console.log('test: accounts before', accounts);
+    console.log('test: ownerInfo before', ownerInfo);
+    if (selectedAccounts) {
+      accounts = accounts.filter((account) =>
+        selectedAccounts.some((selectedAccount) => selectedAccount === account.address)
+      );
+      const ownerIds = accounts.map((account) => account.owner);
+      ownerInfo.owners = ownerInfo.owners.filter((owner) => ownerIds.includes(owner.id));
+      ownerInfo.currentOwnerId = ownerIds.find((id) => id === ownerInfo.currentOwnerId) || accounts[0].owner;
+    }
+
+    console.log('test: accounts after', accounts);
+    console.log('test: ownerInfo after', ownerInfo);
+
     const text = JSON.stringify({
-      owners,
+      owners: ownerInfo,
       accounts,
     });
     const encryptedText = await encrypt(text, password);

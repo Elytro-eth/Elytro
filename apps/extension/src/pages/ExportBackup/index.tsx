@@ -14,8 +14,11 @@ import { formatErrorMsg } from '@/utils/format';
 import { navigateTo } from '@/utils/navigation';
 import dayjs from 'dayjs';
 import { LaptopMinimal, DownloadIcon, LockKeyhole, WalletCards } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import WalletImg from '@/assets/wallet.png';
+import { useAccount } from '@/contexts/account-context';
+import ShortedAddress from '@/components/ui/ShortedAddress';
+import { formatEther } from 'viem';
 
 const tips = [
   {
@@ -36,6 +39,7 @@ const tips = [
 ];
 
 export default function ExportBackupPage() {
+  const { accounts, getAccounts } = useAccount();
   const [isGuiding, setIsGuiding] = useState(true);
   const [pwd, setPwd] = useState('');
   const [isPwdPassed, setIsPwdPassed] = useState(false);
@@ -47,6 +51,7 @@ export default function ExportBackupPage() {
   const handleGuiding = () => {
     setIsGuiding(false);
   };
+  const [exportedAccounts, setExportedAccounts] = useState<string[]>(accounts.map((account) => account.address));
 
   const handlePwdChange = (value: string) => {
     setPwd(value);
@@ -76,7 +81,7 @@ export default function ExportBackupPage() {
 
   const handleDownloadBackup = async () => {
     try {
-      const backup = await wallet.exportOwnersAndAccounts(pwd);
+      const backup = await wallet.exportOwnersAndAccounts(pwd, exportedAccounts);
       const date = dayjs().format('YYYY-MM-DD-HH-mm');
       writeFile(backup, `${date}-elytro-backup.json`);
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
@@ -96,29 +101,55 @@ export default function ExportBackupPage() {
     }
   };
 
+  const toggleAccount = (address: string) => {
+    setExportedAccounts((prev) => {
+      if (prev.includes(address)) {
+        return prev.filter((addr) => addr !== address);
+      }
+      return [...prev, address];
+    });
+  };
+
+  useEffect(() => {
+    getAccounts();
+  }, []);
+
+  useEffect(() => {
+    if (accounts.length > 0) {
+      setExportedAccounts(accounts.map((account) => account.address));
+    }
+  }, [accounts]);
+
   return (
     <SecondaryPageWrapper title="Export wallets">
       {isGuiding ? (
-        <Guide
-          title="How wallets backup works"
-          action="Start backup"
-          onAction={handleGuiding}
-          tips={tips}
-          imgSrc={WalletImg}
-        />
+        <Guide title="How backup works" action="Start backup" onAction={handleGuiding} tips={tips} imgSrc={WalletImg} />
       ) : (
         <div className="flex flex-col gap-y-lg items-center h-full justify-between">
           <div className="flex flex-col w-full">
             <div className="elytro-text-bold-body">Create a backup</div>
-            <div className="elytro-text-smaller-body text-gray-600">Use your device passcode to lock the file</div>
+            <div className="elytro-text-smaller-body text-gray-600">Select which wallets to backup</div>
           </div>
-          <PasswordInput
-            placeholder="Device passcode to lock file"
-            value={pwd}
-            onValueChange={handlePwdChange}
-          />
+
+          <div className="w-full max-h-32 overflow-y-scroll flex flex-col gap-y-sm  rounded-md border bg-gray-150 p-md">
+            {accounts.map((account) => (
+              <div key={account.address} className="flex items-center" onClick={() => toggleAccount(account.address)}>
+                <Checkbox checked={exportedAccounts.includes(account.address)} />
+                <ShortedAddress address={account.address} chainId={account.chainId} />
+                <span className="elytro-text-tiny-body text-gray-750">
+                  ({formatEther(BigInt(account.balance || 0))} ETH)
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <PasswordInput placeholder="Device passcode to lock file" value={pwd} onValueChange={handlePwdChange} />
           <HelperText description="Passcode will be required to unlock your backup file" />
-          <Button className="w-full" disabled={!isPwdPassed} onClick={handleCreateBackup}>
+          <Button
+            className="w-full"
+            disabled={!isPwdPassed || exportedAccounts.length === 0}
+            onClick={handleCreateBackup}
+          >
             {isPwdPassed ? 'Prepare file' : 'Prepare file'}
           </Button>
 
