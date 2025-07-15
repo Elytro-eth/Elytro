@@ -1,4 +1,5 @@
 import CONFIG from '@/config';
+import { EntryPointVersion } from 'viem/account-abstraction';
 import {
   arbitrum,
   Chain,
@@ -33,6 +34,7 @@ export type TChainItem = Chain & {
   onchainConfig: {
     chainId: number;
     entryPoint: string;
+    entryPointVersion: EntryPointVersion;
     soulWalletLogic: string;
   };
   opExplorer?: string;
@@ -56,6 +58,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     onchainConfig: {
       chainId: mainnet.id,
       entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+      entryPointVersion: '0.7',
       soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
     },
     stablecoins: [
@@ -91,6 +94,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     onchainConfig: {
       chainId: arbitrum.id,
       entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+      entryPointVersion: '0.7',
       soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
     },
     opExplorer: 'https://jiffyscan.xyz/userOpHash/',
@@ -125,6 +129,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     onchainConfig: {
       chainId: optimism.id,
       entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+      entryPointVersion: '0.7',
       soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
     },
     stablecoins: [
@@ -158,6 +163,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     onchainConfig: {
       chainId: optimismSepolia.id,
       entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+      entryPointVersion: '0.7',
       soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
     },
     opExplorer: 'https://optimism-sepolia.blockscout.com/op/',
@@ -181,6 +187,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     onchainConfig: {
       chainId: sepolia.id,
       entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+      entryPointVersion: '0.7',
       soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
     },
     opExplorer: 'https://jiffyscan.xyz/userOpHash/',

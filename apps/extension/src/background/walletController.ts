@@ -109,16 +109,12 @@ class WalletController {
   }
 
   public async sendUserOperation(userOp: ElytroUserOperation) {
-    // TODO: check this logic
     if (!userOp?.paymaster) {
       await elytroSDK.estimateGas(userOp!);
     }
-
     const { opHash, signature } = await elytroSDK.signUserOperation(userOp!);
     userOp.signature = signature;
-
     await elytroSDK.sendUserOperation(userOp);
-
     return opHash;
   }
 
@@ -366,11 +362,12 @@ class WalletController {
     return formatObjectWithBigInt(await elytroSDK.estimateGas(userOp));
   }
 
-  public async packUserOp(userOp: ElytroUserOperation, amount: Hex, noSponsor = false) {
+  public async packUserOp(userOp: ElytroUserOperation, amount: Hex, noSponsor = false, useStablecoin?: string) {
     const { userOp: userOpRes, calcResult } = await elytroSDK.getRechargeAmountForUserOp(
       userOp,
       BigInt(amount),
-      noSponsor
+      noSponsor,
+      useStablecoin
     );
 
     return {
@@ -674,6 +671,10 @@ class WalletController {
     });
     const encryptedText = await encrypt(text, password);
     return JSON.stringify(encryptedText);
+  }
+
+  public async getTokenPaymaster() {
+    return await elytroSDK.getTokenPaymaster();
   }
 }
 

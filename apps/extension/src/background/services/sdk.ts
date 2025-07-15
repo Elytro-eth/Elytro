@@ -76,6 +76,10 @@ export class SDKService {
     });
   }
 
+  get isPimlicoBundler() {
+    return this._config.bundler.includes('pimlico');
+  }
+
   get bundler() {
     return this._bundler;
   }
@@ -103,7 +107,7 @@ export class SDKService {
     const { endpoint, bundler, factory, fallback, recovery, onchainConfig } = config;
 
     this._sdk = new SoulWallet(endpoint, bundler, factory, fallback, recovery, onchainConfig);
-
+    this._pimlicoRpc = null;
     this._bundler = new Bundler(bundler);
     this._config = config;
   }
@@ -386,7 +390,7 @@ export class SDKService {
 
   private async _getFeeData() {
     let gasPrice;
-    if (this._config.bundler.includes('pimlico')) {
+    if (this.isPimlicoBundler) {
       // pimlico uses different gas price
       gasPrice = await this._getPimlicoFeeData();
     } else {
@@ -449,10 +453,106 @@ export class SDKService {
     }
   }
 
-  public async getRechargeAmountForUserOp(userOp: ElytroUserOperation, transferValue: bigint, noSponsor = false) {
+  private _getPimlicoRpc() {
+    if (this.isPimlicoBundler) {
+      if (!this._pimlicoRpc) {
+        this._pimlicoRpc = createPublicClient({
+          transport: http(this._config.bundler),
+        });
+      }
+      return this._pimlicoRpc;
+    }
+    return null;
+  }
+
+  public async getRechargeAmountForUserOp(
+    userOp: ElytroUserOperation,
+    transferValue: bigint,
+    noSponsor = false,
+    token?: string
+  ) {
     const hasSponsored = noSponsor ? false : await this.canGetSponsored(userOp);
     if (!hasSponsored) {
-      await this.estimateGas(userOp);
+      if (token) {
+        const pimlicoRpc = this._getPimlicoRpc();
+        if (!pimlicoRpc) {
+          throw new Error('You need to use a pimlico bundler to pay gas with ERC20 token.');
+        }
+
+        const paymasterData: SafeAny = await pimlicoRpc.request({
+          method: 'pm_getPaymasterStubData' as SafeAny,
+          id: 4337,
+          params: [
+            {
+              sender: userOp.sender as `0x${string}`,
+              nonce: toHex(userOp.nonce),
+              factory: userOp.factory,
+              factoryData: userOp.factoryData,
+              callData: userOp.callData,
+              callGasLimit: userOp.callGasLimit,
+              verificationGasLimit: userOp.verificationGasLimit,
+              preVerificationGas: userOp.preVerificationGas,
+              maxPriorityFeePerGas: toHex(userOp.maxPriorityFeePerGas),
+              maxFeePerGas: toHex(userOp.maxFeePerGas),
+            },
+            this._config.onchainConfig.entryPoint as `0x${string}`,
+            toHex(this._config.id),
+            {
+              token,
+            },
+          ] as SafeAny,
+        });
+
+        if (paymasterData) {
+          userOp.paymaster = paymasterData.paymaster as `0x${string}`;
+          userOp.paymasterData = paymasterData.paymasterData as `0x${string}`;
+          userOp.paymasterPostOpGasLimit = paymasterData.paymasterPostOpGasLimit ?? '0x0';
+          userOp.paymasterVerificationGasLimit = paymasterData.paymasterVerificationGasLimit ?? '0x0';
+        } else {
+          throw new Error('Failed to get paymaster data, Please try again.');
+        }
+
+        await this.estimateGas(userOp, false);
+
+        const newPaymasterData = await pimlicoRpc.request({
+          method: 'pm_getPaymasterData' as SafeAny,
+          id: 4337,
+          params: [
+            {
+              sender: userOp.sender as `0x${string}`,
+              nonce: formatHex(userOp.nonce),
+              factory: userOp.factory,
+              factoryData: userOp.factoryData,
+              callData: userOp.callData,
+              callGasLimit: formatHex(userOp.callGasLimit),
+              verificationGasLimit: formatHex(userOp.verificationGasLimit),
+              preVerificationGas: formatHex(userOp.preVerificationGas),
+              maxPriorityFeePerGas: formatHex(userOp.maxPriorityFeePerGas) as `0x${string}`,
+              maxFeePerGas: formatHex(userOp.maxFeePerGas) as `0x${string}`,
+              paymaster: userOp.paymaster,
+              paymasterVerificationGasLimit: formatHex(userOp.paymasterVerificationGasLimit ?? '0x0'),
+              paymasterPostOpGasLimit: formatHex(userOp.paymasterPostOpGasLimit ?? '0x0'),
+              paymasterData: userOp.paymasterData,
+              signature:
+                '0x162485941ba1faf21013656dab1e60e9d7226dc0000000620100005f5e0fff000fffffffff0000000000000000000000000000000000000000b91467e570a6466aa9e9876cbcd013baba02900b8979d43fe208a4a4f339f5fd6007e74cd82e037b800186422fc2da167c747ef045e5d18a5f5d4300f8e1a0291c',
+            },
+            this._config.onchainConfig.entryPoint as `0x${string}`,
+            formatHex(this._config.id),
+            {
+              token,
+            },
+          ] as SafeAny,
+        });
+
+        if (newPaymasterData) {
+          userOp.paymaster = newPaymasterData.paymaster as `0x${string}`;
+          userOp.paymasterData = newPaymasterData.paymasterData as `0x${string}`;
+        } else {
+          throw new Error('Failed to get paymaster data, Please try again.');
+        }
+      } else {
+        await this.estimateGas(userOp);
+      }
     }
 
     const res = await this._sdk.preFund(userOp);
@@ -466,16 +566,10 @@ export class SDKService {
         //deposit, prefund
       } = res.OK;
       const balance = await this._sdk.provider.getBalance(userOp.sender);
+
       const missAmount = hasSponsored
         ? transferValue - balance // why transferValue is not accurate? missfund is wrong during preFund?
         : BigInt(missfund) + transferValue - balance;
-
-      console.log('missAmount', missAmount);
-      console.log('transferValue', transferValue);
-      console.log('balance', balance);
-      console.log('hasSponsored', hasSponsored);
-      console.log('missfund', missfund);
-      console.log('userOp.sender', userOp.sender);
 
       return {
         userOp,
@@ -516,6 +610,7 @@ export class SDKService {
     if (_userOp.isErr()) {
       throw _userOp.ERR;
     } else {
+      console.log('userOp 1', _userOp.OK);
       return _userOp.OK;
     }
   }
@@ -782,48 +877,55 @@ export class SDKService {
     }
   }
 
-  // public async getPreFund(
-  //   userOp: ElytroUserOperation,
-  //   transferValue: bigint,
-  //   isValidForSponsor: boolean
-  // ) {
-  //   const res = await this._sdk.preFund(userOp);
+  public async getTokenPaymaster() {
+    const stablecoins = this._config.stablecoins?.map?.((coin) => coin.address).flat() || [];
 
-  //   if (res.isErr()) {
-  //     throw res.ERR;
-  //   } else {
-  //     const preFund = res.OK;
-  //     const _balance = await this._sdk.provider.getBalance(userOp.sender);
-  //     const missFund = BigInt(preFund.missfund);
+    if (stablecoins.length > 0) {
+      const pimlicoRpc = this._getPimlicoRpc();
+      if (!pimlicoRpc) {
+        throw new Error('You need to use a pimlico bundler to get token paymaster.');
+      }
 
-  //     if (!isValidForSponsor || transferValue > 0) {
-  //       const maxMissFoundEth = '0.001';
-  //       const maxMissFund = parseEther(maxMissFoundEth);
+      let res = (await pimlicoRpc.request({
+        method: 'pimlico_getSupportedTokens' as SafeAny,
+        id: this._config.id,
+        params: [] as SafeAny,
+      })) as SafeAny[];
 
-  //       const fundRequest = isValidForSponsor
-  //         ? transferValue
-  //         : transferValue + missFund;
+      res = res?.filter((item) => ['USDC', 'USDT', 'DAI'].includes(item.name));
 
-  //       if (fundRequest > maxMissFund) {
-  //         throw new Error(
-  //           'Elytro: We may encounter fund issues. Please try again.'
-  //         );
-  //       }
+      if (!res || !res?.length) {
+        return [];
+      }
 
-  //       if (fundRequest > _balance) {
-  //         throw new Error('Elytro: Insufficient balance.');
-  //       }
-  //     }
-  //   }
-  // }
+      const quotesRes = await pimlicoRpc.request({
+        method: 'pimlico_getTokenQuotes' as SafeAny,
+        id: this._config.id,
+        params: [
+          {
+            tokens: res.map((item) => item.token),
+          },
+          this._config.onchainConfig.entryPoint as `0x${string}`,
+          this._config.id,
+        ] as SafeAny,
+      });
 
-  // private _isReceiptValid(receipt: unknown): boolean {
-  //   return (
-  //     receipt &&
-  //     receipt !== UserOperationStatusEn.pending &&
-  //     receipt.transactionHash
-  //   );
-  // }
+      return (quotesRes as SafeAny)?.quotes
+        ?.map((quote: SafeAny) => {
+          const paymasterInfo = res.find((item) => item.token === quote.token);
+          return paymasterInfo
+            ? {
+                name: paymasterInfo.name,
+                address: paymasterInfo?.token,
+                paymaster: quote?.paymaster,
+              }
+            : null;
+        })
+        .filter(Boolean) as TTokenPaymaster[];
+    }
+
+    return [];
+  }
 }
 
 export const elytroSDK = new SDKService();

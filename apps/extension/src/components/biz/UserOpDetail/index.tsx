@@ -3,7 +3,7 @@ import InfoCard from '@/components/biz/InfoCard';
 import { formatEther } from 'viem';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';
 import { formatBalance, formatDollarBalance, formatRawData } from '@/utils/format';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ActivateDetail from './ActivationDetail';
 import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
@@ -15,6 +15,7 @@ import HelperText from '@/components/ui/HelperText';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { safeClipboard } from '@/utils/clipboard';
 import { RawData } from '@/components/ui/rawData';
+import { useWallet } from '@/contexts/wallet';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -33,12 +34,15 @@ const formatGasUsed = (gasUsed?: string) => {
 };
 
 export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
+  const { wallet } = useWallet();
   const [expandSponsorSelector, setExpandSponsorSelector] = useState(false);
   const {
     tokenInfo: { tokenPrices },
     currentAccount: { isDeployed, address },
   } = useAccount();
-  const { requestType, calcResult, decodedDetail, onRetry, hasSufficientBalance } = useTx();
+  const { requestType, calcResult, decodedDetail, onRetry, hasSufficientBalance, useStablecoin } = useTx();
+  const [gasOption, setGasOption] = useState<string>(useStablecoin || (calcResult?.hasSponsored ? 'sponsor' : 'self'));
+  const [tokenPaymasters, setTokenPaymasters] = useState<TTokenPaymaster[]>([]);
 
   const DetailContent = useMemo(() => {
     switch (requestType) {
@@ -46,7 +50,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
         return <ActivateDetail />;
 
       case TxRequestTypeEn.SendTransaction:
-        return <InnerSendingDetail decodedUserOp={decodedDetail?.[0]} />;
+        return <InnerSendingDetail decodedUserOp={decodedDetail?.[decodedDetail.length - 1]} />;
 
       // case TxRequestTypeEn.ApproveTransaction:
       // TODO: add update contract detail
@@ -69,6 +73,37 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
     return [gasInETH, gasInDollar];
   }, [calcResult?.gasUsed, tokenPrices]);
 
+  const getTokenPaymaster = async () => {
+    try {
+      const res = await wallet.getTokenPaymaster();
+      setTokenPaymasters(res);
+    } catch (error) {
+      console.error('Elytro: Failed to get token paymaster.', error);
+      setTokenPaymasters([]);
+    }
+  };
+
+  useEffect(() => {
+    getTokenPaymaster();
+  }, []);
+
+  const handleGasOptionChange = (value: string) => {
+    if (value === 'sponsor') {
+      onRetry(false);
+    } else if (value === 'self') {
+      onRetry(true);
+    } else {
+      onRetry(
+        true,
+        tokenPaymasters.find((paymaster) => paymaster.address === value)
+      );
+    }
+  };
+
+  useEffect(() => {
+    setGasOption(useStablecoin || (calcResult?.hasSponsored ? 'sponsor' : 'self'));
+  }, [useStablecoin, calcResult?.hasSponsored]);
+
   return (
     <div className="flex flex-col w-full gap-y-md">
       {/* DApp Info: no need for sending transaction */}
@@ -88,12 +123,21 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                 setExpandSponsorSelector((prev) => !prev);
               }}
             >
-              {calcResult?.hasSponsored ? (
+              {gasOption === 'sponsor' && (
                 <span className="px-xs py-3xs bg-light-green elytro-text-tiny-body rounded-xs">Sponsored</span>
-              ) : (
+              )}
+              {gasOption === 'self' && (
                 <span className="px-xs text-sm text-gray-750">
                   {gasInETH} ETH
                   {gasInDollar && <span className="elytro-text-small-body text-gray-600 ml-2xs">({gasInDollar})</span>}
+                </span>
+              )}
+              {useStablecoin && (
+                <span className="px-xs text-sm text-gray-750">
+                  Pay gas with
+                  <span className="elytro-text-small-body text-gray-750 ml-2xs">
+                    {tokenPaymasters.find((paymaster) => paymaster.address === useStablecoin)?.name}
+                  </span>
                 </span>
               )}
               {expandSponsorSelector ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -103,9 +147,9 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
         {expandSponsorSelector && (
           <div>
             <RadioGroup
-              value={calcResult?.hasSponsored ? 'sponsor' : 'self'}
+              value={gasOption}
               onValueChange={(value: string) => {
-                onRetry(value !== 'sponsor');
+                handleGasOptionChange(value);
               }}
               className="flex flex-col gap-y-2"
             >
@@ -132,6 +176,20 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                   </span>
                 </Label>
               </div>
+
+              {tokenPaymasters.length > 0 &&
+                tokenPaymasters.map((paymaster) => (
+                  <div key={paymaster.address} className="flex items-center space-x-2">
+                    <RadioGroupItem value={paymaster.address} id={paymaster.address} />
+                    <Label
+                      htmlFor={paymaster.address}
+                      className="flex items-center elytro-text-small-body text-gray-600 truncate"
+                    >
+                      Pay gas with
+                      <span className="elytro-text-small-body text-gray-750 ml-2xs">{paymaster.name}</span>
+                    </Label>
+                  </div>
+                ))}
             </RadioGroup>
           </div>
         )}
@@ -141,7 +199,9 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
           <div className="bg-light-blue rounded-md p-3">
             <div className="flex flex-row items-center gap-1 text-red mb-1">
               <AlertCircle className="size-4 text-red stroke-dark-red" />
-              <span className="elytro-text-small-body text-dark-red">Not enough ETH, please deposit some first</span>
+              <span className="elytro-text-small-body text-dark-red">
+                Not enough gas fee, please deposit some first
+              </span>
             </div>
             <div className="bg-white rounded-md p-2  flex items-center justify-between">
               <div className="flex items-center 1 cursor-pointer" onClick={() => safeClipboard(address)}>

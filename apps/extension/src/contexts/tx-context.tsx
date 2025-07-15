@@ -13,6 +13,7 @@ import { RuntimeMessage } from '@/utils/message';
 import { EVENT_TYPES } from '@/constants/events';
 import { useAccount } from './account-context';
 import { TABS_KEYS } from '@/components/biz/DashboardTabs';
+import { getApproveErc20Tx } from '@/utils/tokenApproval';
 
 export enum TxRequestTypeEn {
   DeployWallet = 1,
@@ -38,12 +39,13 @@ type ITxContext = {
   userOp: Nullable<ElytroUserOperation>;
   calcResult: Nullable<TUserOperationPreFundResult>;
   decodedDetail: Nullable<DecodeResult[]>;
+  useStablecoin?: Nullable<string>;
 
   // Actions
   handleTxRequest: (requestType: TxRequestTypeEn, params?: Transaction[], innerDecodedDetail?: TMyDecodeResult) => void;
   onConfirm: () => void;
   onCancel: () => void;
-  onRetry: (noSponsor?: boolean) => void;
+  onRetry: (noSponsor?: boolean, paymaster?: TTokenPaymaster) => void;
 };
 
 const ConfirmSuccessMessageMap = {
@@ -63,6 +65,7 @@ const TxContext = createContext<ITxContext>({
   userOp: null,
   calcResult: null,
   decodedDetail: null,
+  useStablecoin: null,
   handleTxRequest: () => {},
   onConfirm: () => {},
   onCancel: () => {},
@@ -72,7 +75,10 @@ const TxContext = createContext<ITxContext>({
 export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
   const { approval, reject, resolve } = useApproval();
-  const { reloadAccount } = useAccount();
+  const {
+    reloadAccount,
+    tokenInfo: { tokens },
+  } = useAccount();
 
   const userOpRef = useRef<Nullable<ElytroUserOperation>>();
   const txTypeRef = useRef<Nullable<HistoricalActivityTypeEn>>(null);
@@ -86,6 +92,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const [decodedDetail, setDecodedDetail] = useState<Nullable<DecodeResult[]>>(null);
   const [hasSufficientBalance, setHasSufficientBalance] = useState(false);
   const [calcResult, setCalcResult] = useState<Nullable<TUserOperationPreFundResult>>(null);
+  const [useStablecoin, setUseStablecoin] = useState<Nullable<string>>('0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238');
 
   const registerOpStatusListener = useCallback(
     (opHash: string) => {
@@ -150,16 +157,21 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       params,
       decodedDetail,
       noSponsor = false,
+      paymaster,
     }: {
       params?: Transaction[];
       decodedDetail?: TMyDecodeResult;
       noSponsor?: boolean;
+      paymaster?: TTokenPaymaster;
     }
   ) => {
     try {
       setIsPacking(true);
       setRequestType(type);
-      txParamsRef.current = params;
+      setUseStablecoin(paymaster ? paymaster.address : null);
+      txParamsRef.current = paymaster
+        ? [getApproveErc20Tx(paymaster.address, paymaster.paymaster), ...(params || [])]
+        : params;
       txTypeRef.current = getTxType(type);
 
       let transferAmount = 0n;
@@ -188,11 +200,10 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         setDecodedDetail(decodeRes);
       }
 
-      const packedUserOp = await wallet.packUserOp(currentUserOp, toHex(transferAmount), noSponsor);
+      const packedUserOp = await wallet.packUserOp(currentUserOp, toHex(transferAmount), noSponsor, paymaster?.address);
 
       userOpRef.current = packedUserOp.userOp;
       setCalcResult(packedUserOp.calcResult);
-      setHasSufficientBalance(!packedUserOp.calcResult.needDeposit);
     } catch (err) {
       const msg = formatErrorMsg(err);
       setErrorMsg(msg);
@@ -205,6 +216,15 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       setIsPacking(false);
     }
   };
+
+  useEffect(() => {
+    if (useStablecoin) {
+      const token = tokens.find((token) => token.address.toLowerCase() === useStablecoin.toLowerCase());
+      setHasSufficientBalance(!!token && !!token.balance && token.balance > 1_000_000n);
+    } else {
+      setHasSufficientBalance(!calcResult?.needDeposit);
+    }
+  }, [calcResult?.needDeposit, useStablecoin, tokens]);
 
   const resetTxContext = () => {
     setRequestType(null);
@@ -242,7 +262,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     handleBack(true);
   };
 
-  const onRetry = (noSponsor = false) => {
+  const onRetry = (noSponsor = false, paymaster?: TTokenPaymaster) => {
     if (!requestType) {
       toast({
         title: 'Invalid request type or transaction parameters',
@@ -256,6 +276,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     packUserOp(requestType!, {
       params: txParamsRef.current as unknown as Transaction[],
       noSponsor,
+      paymaster,
     });
   };
 
@@ -310,6 +331,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         errorMsg,
         calcResult,
         decodedDetail,
+        useStablecoin,
         handleTxRequest,
         onConfirm,
         onCancel,
