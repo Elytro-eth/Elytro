@@ -514,7 +514,7 @@ export class SDKService {
 
         await this.estimateGas(userOp, false);
 
-        const newPaymasterData = await pimlicoRpc.request({
+        const newPaymasterData = (await pimlicoRpc.request({
           method: 'pm_getPaymasterData' as SafeAny,
           id: 4337,
           params: [
@@ -542,7 +542,7 @@ export class SDKService {
               token,
             },
           ] as SafeAny,
-        });
+        })) as SafeAny;
 
         if (newPaymasterData) {
           userOp.paymaster = newPaymasterData.paymaster as `0x${string}`;

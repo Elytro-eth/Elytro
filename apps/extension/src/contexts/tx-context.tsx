@@ -237,7 +237,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     setErrorMsg(null);
     txTypeRef.current = null;
     txParamsRef.current = null;
-    txDecodedDetailRef.current = null;
+    txDecodedDetailRef.current = undefined;
     userOpRef.current = null;
   };
 
