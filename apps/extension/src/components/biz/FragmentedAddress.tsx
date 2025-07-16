@@ -16,6 +16,10 @@ interface IProps {
 }
 
 const SIZE_MAP = {
+  xs: {
+    icon: 'size-4 rounded-full',
+    text: 'elytro-text-tiny-body',
+  },
   sm: {
     icon: 'size-4 rounded-full',
     text: 'elytro-text-smaller-body',
@@ -44,8 +48,8 @@ export default function FragmentedAddress({
     return '--';
   }
 
-  const prefix = address.slice(0, 6);
-  const suffix = address.slice(-6);
+  const prefix = address.slice(0, 7);
+  const suffix = address.slice(-5);
   const { icon, text } = SIZE_MAP[size];
   const chain = SUPPORTED_CHAINS.find((chain) => chain.id === chainId);
 
@@ -54,7 +58,7 @@ export default function FragmentedAddress({
       {showChainIcon && chain && <img src={chain.icon} alt={chain.name} className={icon} />}
       <div className={cn('flex', extraLayout === 'row' ? 'flex-row items-center' : 'flex-col')}>
         <div className={cn('flex items-center gap-sm', text)}>
-          <span>{prefix}</span>
+          <span className={size === 'xs' ? 'text-gray-600' : undefined}>{prefix}</span>
           <Tooltip delayDuration={0}>
             <TooltipTrigger>
               <span className="px-1 bg-gray-300 rounded-xs" style={{ backgroundColor: dotColor }}>
@@ -64,12 +68,12 @@ export default function FragmentedAddress({
             <TooltipContent className="bg-dark-blue p-4">
               <div className="text-blue">
                 <span className="text-light-blue font-bold">{prefix}</span>
-                {address.slice(6, -6)}
+                {address.slice(7, -5)}
                 <span className="text-light-blue font-bold">{suffix}</span>
               </div>
             </TooltipContent>
           </Tooltip>
-          <span>{suffix}</span>
+          <span className={size === 'xs' ? 'text-gray-600' : undefined}>{suffix}</span>
         </div>
         {extra && <div className={cn(extraLayout === 'row' ? 'ml-sm' : 'mt-0')}>{extra}</div>}
       </div>

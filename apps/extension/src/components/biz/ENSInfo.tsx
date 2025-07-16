@@ -24,7 +24,7 @@ const ENSInfo = ({
       <div className="text-base">
         <div>{ensInfo.name}</div>
         <div className="flex text-xs font-normal">
-          <FragmentedAddress address={ensInfo?.address} extra={extra} />
+          <FragmentedAddress address={ensInfo?.address} extra={extra} size="xs" />
         </div>
       </div>
     </div>

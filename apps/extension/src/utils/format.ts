@@ -74,7 +74,7 @@ export function formatAddressToShort(address: Nullable<string>) {
   // 0x12345...123456
   // todo: check if address is valid
   return address && isAddress(address)
-    ? `${address?.slice(0, 6)} ... ${address?.slice(-4)}`
+    ? `${address?.slice(0, 7)} ... ${address?.slice(-5)}`
     : '--';
 }
 

@@ -16,6 +16,7 @@ import {
 import PasswordInput from '@/components/ui/PasswordInputer';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
+import HelperText from '@/components/ui/HelperText';
 
 const ChangePassword: React.FC = () => {
   const { wallet } = useWallet();
@@ -163,6 +164,8 @@ const ChangePassword: React.FC = () => {
           </div>
         </form>
       </Form>
+
+      <HelperText className="mt-2" description="Your other devices are not affected" />
 
       <div className="w-full flex justify-between gap-lg mt-4">
         {/*<Button

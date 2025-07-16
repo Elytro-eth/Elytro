@@ -272,12 +272,6 @@ export default function SendTx() {
                 </FormItem>
               )}
             />
-
-            {/* Warning message */}
-            <div className="flex text-gray-750">
-              <AlertCircle className="w-4 h-4 stroke-gray-750 mr-2" />
-              Tokens will be lost if sent to a different network.
-            </div>
           </div>
         </Form>
 

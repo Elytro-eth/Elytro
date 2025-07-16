@@ -131,7 +131,7 @@ export default function InternalImportBackup() {
           />
           <div className="flex flex-row  gap-x-sm cursor-pointer" onClick={() => setIsChecked((prev) => !prev)}>
             <Checkbox className="flex-shrink-0 mt-1" checked={isChecked} />
-            <Label className="text-sm text-gray-750 ">
+            <Label className="text-sm text-gray-750 cursor-pointer">
               I understand this passcode will also unlock Elytro on this device. I can change it later.
             </Label>
           </div>
