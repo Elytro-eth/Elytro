@@ -22,7 +22,7 @@ const YouAreIn: React.FC = () => {
       }
     : {
         title: 'Welcome!',
-        description: 'Let’s create your first smart contract wallet',
+        description: 'Let’s create your Elytro smart contract wallet',
         action: (
           <>
             <Box className="size-4 mr-sm" color="#cce1ea" />

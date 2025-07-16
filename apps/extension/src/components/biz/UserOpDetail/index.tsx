@@ -118,7 +118,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
           label="Network cost"
           content={
             <span
-              className="flex items-center elytro-text-small truncate"
+              className="flex items-center elytro-text-small truncate cursor-pointer"
               onClick={() => {
                 setExpandSponsorSelector((prev) => !prev);
               }}
@@ -157,20 +157,20 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
               }}
               className="flex flex-col gap-y-2"
             >
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 cursor-pointer">
                 <RadioGroupItem value="sponsor" id="gas-fee-by-sponsor" />
                 <Label
                   htmlFor="gas-fee-by-sponsor"
-                  className="flex items-center elytro-text-small-body text-gray-750 truncate"
+                  className="flex items-center elytro-text-small-body text-gray-750 truncate cursor-pointer"
                 >
                   Sponsored by Elytro
                 </Label>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 cursor-pointer">
                 <RadioGroupItem value="self" id="gas-fee-by-self" />
                 <Label
                   htmlFor="gas-fee-by-self"
-                  className="flex items-center elytro-text-small-body text-gray-750 truncate"
+                  className="flex items-center elytro-text-small-body text-gray-750 truncate cursor-pointer"
                 >
                   <span className="text-gray-750">
                     {gasInETH} ETH
@@ -202,14 +202,14 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
 
         {/* Insufficient Balance Warning */}
         {!hasSufficientBalance && (
-          <div className="bg-light-blue rounded-md p-3">
+          <div className="bg-light-blue rounded-sm p-3">
             <div className="flex flex-row items-center gap-1 text-red mb-1">
               <AlertCircle className="size-4 text-red stroke-dark-red" />
               <span className="elytro-text-small-body text-dark-red">
                 Not enough gas fee, please deposit some first
               </span>
             </div>
-            <div className="bg-white rounded-md p-2  flex items-center justify-between">
+            <div className="bg-white rounded-sm px-2 py-1 flex items-center justify-between">
               <div className="flex items-center 1 cursor-pointer" onClick={() => safeClipboard(address)}>
                 <ShortedAddress address={address} chainId={chainId} className="bg-white" />
                 <Copy className="size-3 stroke-gray-600" />

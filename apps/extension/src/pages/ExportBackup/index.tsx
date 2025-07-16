@@ -2,7 +2,7 @@ import Guide from '@/components/biz/Guide';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import HelperText from '@/components/ui/HelperText';
 import { Label } from '@/components/ui/label';
 import PasswordInput from '@/components/ui/PasswordInputer';
@@ -22,18 +22,18 @@ import { formatEther } from 'viem';
 
 const tips = [
   {
-    title: '1. Get a backup file for all wallets',
-    description: 'Includes their Social Recovery contacts',
+    title: '1. You can backup multiple wallets',
+    description: 'Their Social Recovery contacts included',
     Icon: WalletCards,
   },
   {
-    title: '2. It’s locked with device passcode',
+    title: '2. Backup locked by passcode',
     description: 'Only you can unlock it later',
     Icon: LockKeyhole,
   },
   {
-    title: '3. Import all wallets on new device',
-    description: 'Import and unlock with the same passcode',
+    title: '3. You can import on a new device',
+    description: 'Unlock and import with the same passcode',
     Icon: LaptopMinimal,
   },
 ];
@@ -142,8 +142,7 @@ export default function ExportBackupPage() {
               </div>
             ))}
           </div>
-
-          <PasswordInput placeholder="Device passcode to lock file" value={pwd} onValueChange={handlePwdChange} />
+          <PasswordInput placeholder="Confirm device passcode" value={pwd} onValueChange={handlePwdChange} />
           <HelperText description="Passcode will be required to unlock your backup file" />
           <Button
             className="w-full"
@@ -157,7 +156,6 @@ export default function ExportBackupPage() {
             <DialogContent className="gap-y-lg max-w-md mx-auto">
               <DialogHeader>
                 <DialogTitle>Backup is ready</DialogTitle>
-                <DialogDescription>Confirm below to download the file</DialogDescription>
               </DialogHeader>
 
               <div className="flex flex-col gap-y-sm">
@@ -167,16 +165,16 @@ export default function ExportBackupPage() {
                     I need this passcode to unlock backup
                   </Label>
                 </div>
-                <div className="flex items-start gap-x-sm" onClick={() => setIsTermTwoChecked((prev) => !prev)}>
-                  <Checkbox checked={isTermTwoChecked} />
-                  <Label className="elytro-text-small-body text-gray-600 cursor-pointer">
-                    This backup will no longer work if I recover the wallet on a different device
-                  </Label>
-                </div>
                 <div className="flex items-start gap-x-sm" onClick={() => setIsTermThreeChecked((prev) => !prev)}>
                   <Checkbox checked={isTermThreeChecked} />
                   <Label className="elytro-text-small-body text-gray-600 cursor-pointer">
                     I will not share this backup with anyone
+                  </Label>
+                </div>
+                <div className="flex items-start gap-x-sm" onClick={() => setIsTermTwoChecked((prev) => !prev)}>
+                  <Checkbox checked={isTermTwoChecked} />
+                  <Label className="elytro-text-small-body text-gray-600 cursor-pointer">
+                    I need to create a new backup if I use Social Recovery to recover this wallet
                   </Label>
                 </div>
               </div>
