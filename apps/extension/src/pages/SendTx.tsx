@@ -265,7 +265,7 @@ export default function SendTx() {
               control={form.control}
               name="to"
               render={({ field }) => (
-                <FormItem className="flex flex-col gap-2 bg-white px-lg py-sm rounded-lg space-y-0">
+                <FormItem className="flex flex-col gap-1 bg-white px-lg py-sm rounded-lg space-y-0">
                   <div className="flex items-center flex-row gap-x-2xs">
                     <img src={getIconByChainId(chainId)} alt="chain" className="size-4 rounded-full" />
                     <span className="text-sm text-gray-750 ">{getChainNameByChainId(chainId)}</span>

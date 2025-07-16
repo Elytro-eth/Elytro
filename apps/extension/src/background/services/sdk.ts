@@ -7,7 +7,7 @@ import {
   DEFAULT_GUARDIAN_SAFE_PERIOD,
   GUARDIAN_INFO_KEY,
 } from '@/constants/sdk-config';
-import { formatHex, paddingZero } from '@/utils/format';
+import { formatHex, paddingBytesToEven, paddingZero } from '@/utils/format';
 import { Bundler, SignkeyType, SocialRecovery, SoulWallet, Transaction } from '@soulwallet/sdk';
 import { DecodeUserOp } from '@soulwallet/decoder';
 import { canUserOpGetSponsor } from '@/utils/ethRpc/sponsor';
@@ -42,6 +42,7 @@ import { ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
 import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 import { RecoveryStatusEn } from '@/constants/recovery';
 import { getLogsOnchain } from '@/utils/getLogsOnchain';
+import { TokenQuote, TokenQuoteResponse } from '@/types/pimlico';
 
 export class SDKService {
   private readonly _REQUIRED_CHAIN_FIELDS: (keyof TChainItem)[] = [
@@ -479,6 +480,7 @@ export class SDKService {
           throw new Error('You need to use a pimlico bundler to pay gas with ERC20 token.');
         }
 
+        userOp.factoryData = paddingBytesToEven(userOp.factoryData);
         const paymasterData: SafeAny = await pimlicoRpc.request({
           method: 'pm_getPaymasterStubData' as SafeAny,
           id: 4337,
@@ -877,54 +879,62 @@ export class SDKService {
     }
   }
 
-  public async getTokenPaymaster() {
-    const stablecoins = this._config.stablecoins?.map?.((coin) => coin.address).flat() || [];
-
-    if (stablecoins.length > 0) {
-      const pimlicoRpc = this._getPimlicoRpc();
-      if (!pimlicoRpc) {
-        throw new Error('You need to use a pimlico bundler to get token paymaster.');
-      }
-
-      let res = (await pimlicoRpc.request({
-        method: 'pimlico_getSupportedTokens' as SafeAny,
-        id: this._config.id,
-        params: [] as SafeAny,
-      })) as SafeAny[];
-
-      res = res?.filter((item) => ['USDC', 'USDT', 'DAI'].includes(item.name));
-
-      if (!res || !res?.length) {
-        return [];
-      }
-
-      const quotesRes = await pimlicoRpc.request({
-        method: 'pimlico_getTokenQuotes' as SafeAny,
-        id: this._config.id,
-        params: [
-          {
-            tokens: res.map((item) => item.token),
-          },
-          this._config.onchainConfig.entryPoint as `0x${string}`,
-          this._config.id,
-        ] as SafeAny,
-      });
-
-      return (quotesRes as SafeAny)?.quotes
-        ?.map((quote: SafeAny) => {
-          const paymasterInfo = res.find((item) => item.token === quote.token);
-          return paymasterInfo
-            ? {
-                name: paymasterInfo.name,
-                address: paymasterInfo?.token,
-                paymaster: quote?.paymaster,
-              }
-            : null;
-        })
-        .filter(Boolean) as TTokenPaymaster[];
+  public async getSupportedGasTokens() {
+    const pimlicoRpc = this._getPimlicoRpc();
+    if (!pimlicoRpc) {
+      throw new Error('You need to use a pimlico bundler to get token paymaster.');
     }
 
-    return [];
+    let res = (await pimlicoRpc.request({
+      method: 'pimlico_getSupportedTokens' as SafeAny,
+      id: this._config.id,
+      params: [] as SafeAny,
+    })) as SafeAny[];
+
+    res = res?.filter((item) => ['USDC', 'USDT', 'DAI'].includes(item.name));
+
+    return res || [];
+  }
+
+  public async getTokenPaymaster() {
+    const res = await this.getSupportedGasTokens();
+
+    if (!res || !res?.length) {
+      return [];
+    }
+
+    const pimlicoRpc = this._getPimlicoRpc();
+    if (!pimlicoRpc) {
+      throw new Error('You need to use a pimlico bundler to get token paymaster.');
+    }
+
+    const quotesRes = (await pimlicoRpc.request({
+      method: 'pimlico_getTokenQuotes' as SafeAny,
+      id: this._config.id,
+      params: [
+        {
+          tokens: res.map((item) => item.token),
+        },
+        this._config.onchainConfig.entryPoint as `0x${string}`,
+        this._config.id,
+      ] as SafeAny,
+    })) as TokenQuoteResponse;
+
+    return quotesRes?.quotes
+      ?.map((quote: TokenQuote) => {
+        const paymasterInfo = res.find((item) => item.token === quote.token);
+        if (paymasterInfo) {
+          return {
+            name: paymasterInfo.name,
+            address: paymasterInfo.token,
+            paymaster: quote.paymaster,
+            postOpGas: quote.postOpGas,
+            exchangeRate: quote.exchangeRate,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean) as TTokenPaymaster[];
   }
 }
 

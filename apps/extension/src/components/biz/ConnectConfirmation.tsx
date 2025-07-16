@@ -27,8 +27,13 @@ export default function ConnectionConfirmation({ dApp, onConfirm, onCancel }: IP
       </div>
 
       <div className="text-center my-8">
-        <h2 className="elytro-text-bold-body">Connect to {dApp.name}</h2>
-        <p className="elytro-text-small mt-sm text-gray-600">
+        <h2 title={dApp.name} className="elytro-text-bold-body truncate w-[300px] mx-auto text-ellipsis">
+          Connect to {dApp.name}
+        </h2>
+        <p
+          title={dApp.origin ? dApp.origin.replace(/^https:\/\//, '') : ''}
+          className="elytro-text-small mt-sm text-gray-600 truncate max-w-full px-4"
+        >
           {dApp.origin ? dApp.origin.replace(/^https:\/\//, '') : ''}
         </p>
       </div>

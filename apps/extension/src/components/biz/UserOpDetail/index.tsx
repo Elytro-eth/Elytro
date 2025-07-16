@@ -68,10 +68,10 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
     const gasInDollar = formatDollarBalance(tokenPrices, {
       balance: Number(gasInETH),
       symbol: 'ETH',
-    });
+    })?.replace('$', '');
 
     return [gasInETH, gasInDollar];
-  }, [calcResult?.gasUsed, tokenPrices]);
+  }, [calcResult?.gasUsed, tokenPrices, tokenPaymasters]);
 
   const getTokenPaymaster = async () => {
     try {
@@ -129,12 +129,16 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
               {gasOption === 'self' && (
                 <span className="px-xs text-sm text-gray-750">
                   {gasInETH} ETH
-                  {gasInDollar && <span className="elytro-text-small-body text-gray-600 ml-2xs">({gasInDollar})</span>}
+                  {gasInDollar && (
+                    <span className="elytro-text-small-body text-gray-600 ml-2xs">
+                      ({Number(gasInDollar).toFixed(4)})
+                    </span>
+                  )}
                 </span>
               )}
               {useStablecoin && (
                 <span className="px-xs text-sm text-gray-750">
-                  Pay gas with
+                  {gasInDollar ? `~${Number(gasInDollar).toFixed(8)}` : 'Pay gas with'}
                   <span className="elytro-text-small-body text-gray-750 ml-2xs">
                     {tokenPaymasters.find((paymaster) => paymaster.address === useStablecoin)?.name}
                   </span>
@@ -171,7 +175,9 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                   <span className="text-gray-750">
                     {gasInETH} ETH
                     {gasInDollar && (
-                      <span className="elytro-text-small-body text-gray-600 ml-2xs">({gasInDollar})</span>
+                      <span className="elytro-text-small-body text-gray-600 ml-2xs">
+                        ({Number(gasInDollar).toFixed(4)})
+                      </span>
                     )}
                   </span>
                 </Label>
@@ -179,14 +185,14 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
 
               {tokenPaymasters.length > 0 &&
                 tokenPaymasters.map((paymaster) => (
-                  <div key={paymaster.address} className="flex items-center space-x-2">
+                  <div key={paymaster.address} className="flex items-center space-x-2 ">
                     <RadioGroupItem value={paymaster.address} id={paymaster.address} />
                     <Label
                       htmlFor={paymaster.address}
-                      className="flex items-center elytro-text-small-body text-gray-600 truncate"
+                      className="flex items-center elytro-text-small-body text-gray-750 truncate"
                     >
-                      Pay gas with
-                      <span className="elytro-text-small-body text-gray-750 ml-2xs">{paymaster.name}</span>
+                      {gasInDollar ? `~${Number(gasInDollar).toFixed(8)}` : 'Pay gas with'}
+                      <span className="elytro-text-small-body  ml-2xs">{paymaster.name}</span>
                     </Label>
                   </div>
                 ))}

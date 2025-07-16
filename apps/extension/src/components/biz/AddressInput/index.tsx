@@ -146,7 +146,7 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
   }, [value]);
 
   return (
-    <div className="bg-white rounded-md py-sm flex flex-col relative">
+    <div className="bg-white rounded-md flex flex-col relative">
       <div className="flex items-center relative">
         <Input
           ref={inputRef}

@@ -23,6 +23,7 @@ import { isOlderThan } from '@/utils/version';
 import { RecoveryStatusEn } from '@/constants/recovery';
 import { ETH_TOKEN_INFO } from '@/constants/token';
 import { decrypt, encrypt, TPasswordEncryptedData } from '@/utils/passworder';
+import { CoinLogoNameMap } from '@/constants/token';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -441,20 +442,39 @@ class WalletController {
 
     const { address, chainId } = accountManager.currentAccount;
 
-    const [erc20Tokens, ethBalance] = await Promise.all([getTokenList(chainId), walletClient.getBalance(address)]);
+    const [erc20Tokens, ethBalance, supportedGasTokens] = await Promise.all([
+      getTokenList(chainId),
+      walletClient.getBalance(address),
+      (async (): Promise<TTokenInfo[]> => {
+        const tokens = await elytroSDK.getSupportedGasTokens();
+        return tokens.map((token) => ({
+          name: token.name,
+          address: token.token,
+          decimals: token.decimals,
+          symbol: token.symbol,
+        })) as TTokenInfo[];
+      })(),
+    ]);
 
     const ethToken = {
       balance: Number(ethBalance),
       ...ETH_TOKEN_INFO,
     };
 
-    if (erc20Tokens.length === 0) {
+    if (erc20Tokens.length === 0 && supportedGasTokens.length === 0) {
       return [ethToken];
     }
 
+    // remove duplicate tokens
+    const allTokens = [...erc20Tokens, ...supportedGasTokens].filter(
+      (token, index, self) => index === self.findIndex((t) => t.name === token.name)
+    );
+
+    console.log('test: allTokens', allTokens);
+
     const balanceResults =
       (await walletClient.client?.multicall({
-        contracts: erc20Tokens.map((token) => ({
+        contracts: allTokens.map((token) => ({
           address: token.address,
           abi: ABI_ERC20_BALANCE_OF as Abi,
           functionName: 'balanceOf',
@@ -463,7 +483,11 @@ class WalletController {
       })) ?? [];
 
     const processedTokens = balanceResults.reduce((acc, result, index) => {
-      const token = erc20Tokens[index];
+      const token = allTokens[index];
+
+      if (CoinLogoNameMap[token.name as keyof typeof CoinLogoNameMap]) {
+        token.logoURI = CoinLogoNameMap[token.name as keyof typeof CoinLogoNameMap];
+      }
       const balance = result.status === 'success' ? Number(result.result) : 0;
 
       if (token.importedByUser || balance > 0) {

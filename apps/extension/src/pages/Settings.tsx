@@ -11,7 +11,6 @@ import {
   RefreshCcw,
   WalletCardsIcon,
   UserRoundIcon,
-  CircleDollarSignIcon,
 } from 'lucide-react';
 import { useWallet } from '@/contexts/wallet';
 import SettingItem from '@/components/ui/SettingItem';
@@ -40,11 +39,11 @@ export default function Settings() {
 
           <SettingItem icon={ShieldIcon} label="Social Recovery" path={SIDE_PANEL_ROUTE_PATHS.RecoverySetting} />
 
-          <SettingItem
+          {/* <SettingItem
             icon={CircleDollarSignIcon}
             label="Pay gas with Stablecoins"
             path={SIDE_PANEL_ROUTE_PATHS.StablecoinsGas}
-          />
+          /> */}
 
           {needUpgrade && (
             <SettingItem

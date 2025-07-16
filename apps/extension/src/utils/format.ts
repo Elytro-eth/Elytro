@@ -372,15 +372,20 @@ export function formatStringifiedObject(str: SafeAny) {
   return str;
 }
 
-export function formatPrice(tokenAmount?: number | string, price?: number, maxDecimalLength: number = 2) {
+export function formatPrice(tokenAmount?: number | string, price?: number, maxDecimalLength?: number) {
   const tokenAmountNumber = Number(tokenAmount);
 
   if (Number.isNaN(tokenAmountNumber) || !price) {
     return '--';
   }
 
-  const formattedPrice = (price * tokenAmountNumber).toFixed(maxDecimalLength);
-  return Number(formattedPrice) > 0.0099 ? `$${formattedPrice}` : null;
+  const formattedPrice = price * tokenAmountNumber;
+
+  if (maxDecimalLength) {
+    return Number(formattedPrice) > 0 ? `$${formattedPrice.toFixed(maxDecimalLength)}` : null;
+  }
+
+  return Number(formattedPrice) > 0 ? `$${formattedPrice}` : null;
 }
 
 export function formatDollarBalance(
