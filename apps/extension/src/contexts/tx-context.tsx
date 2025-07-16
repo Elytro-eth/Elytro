@@ -83,6 +83,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const userOpRef = useRef<Nullable<ElytroUserOperation>>();
   const txTypeRef = useRef<Nullable<HistoricalActivityTypeEn>>(null);
   const txParamsRef = useRef<Nullable<Transaction[]>>(null);
+  const txDecodedDetailRef = useRef<TMyDecodeResult>();
 
   const [requestType, setRequestType] = useState<Nullable<TxRequestTypeEn>>(null);
   const [isPacking, setIsPacking] = useState(true);
@@ -169,6 +170,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       setIsPacking(true);
       setRequestType(type);
       setUseStablecoin(paymaster ? paymaster.address : null);
+      txDecodedDetailRef.current = decodedDetail;
       txParamsRef.current = paymaster
         ? [getApproveErc20Tx(paymaster.address, paymaster.paymaster), ...(params || [])]
         : params;
@@ -188,11 +190,11 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
 
         transferAmount = decodeRes.reduce((acc: bigint, curr: DecodeResult) => acc + BigInt(curr.value), 0n);
 
-        if (type === TxRequestTypeEn.SendTransaction && decodedDetail) {
+        if (type === TxRequestTypeEn.SendTransaction && txDecodedDetailRef.current) {
           decodeRes = [
             {
-              ...decodeRes[0],
-              ...decodedDetail,
+              ...decodeRes[decodeRes.length - 1],
+              ...txDecodedDetailRef.current,
             },
           ];
         }
@@ -235,6 +237,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     setErrorMsg(null);
     txTypeRef.current = null;
     txParamsRef.current = null;
+    txDecodedDetailRef.current = null;
     userOpRef.current = null;
   };
 
@@ -277,6 +280,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       params: txParamsRef.current as unknown as Transaction[],
       noSponsor,
       paymaster,
+      decodedDetail: txDecodedDetailRef.current,
     });
   };
 
