@@ -127,19 +127,19 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                 <span className="px-xs py-3xs bg-light-green elytro-text-tiny-body rounded-xs">Sponsored</span>
               )}
               {gasOption === 'self' && (
-                <span className="px-xs text-sm text-gray-750">
+                <span className="px-xs text-sm text-gray-600">
                   {gasInETH} ETH
                   {gasInDollar && (
                     <span className="elytro-text-small-body text-gray-600 ml-2xs">
-                      ({Number(gasInDollar).toFixed(4)})
+                      $({Number(gasInDollar).toFixed(4)})
                     </span>
                   )}
                 </span>
               )}
               {useStablecoin && (
-                <span className="px-xs text-sm text-gray-750">
-                  {gasInDollar ? `~${Number(gasInDollar).toFixed(8)}` : 'Pay gas with'}
-                  <span className="elytro-text-small-body text-gray-750 ml-2xs">
+                <span className="px-xs text-sm text-gray-600">
+                  {gasInDollar ? `~${Number(gasInDollar).toFixed(8)}` : 'Pay with'}
+                  <span className="elytro-text-small-body text-gray-600 ml-2xs">
                     {tokenPaymasters.find((paymaster) => paymaster.address === useStablecoin)?.name}
                   </span>
                 </span>
@@ -185,14 +185,14 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
 
               {tokenPaymasters.length > 0 &&
                 tokenPaymasters.map((paymaster) => (
-                  <div key={paymaster.address} className="flex items-center space-x-2 ">
+                  <div key={paymaster.address} className="flex items-center space-x-2 cursor-pointer">
                     <RadioGroupItem value={paymaster.address} id={paymaster.address} />
                     <Label
                       htmlFor={paymaster.address}
-                      className="flex items-center elytro-text-small-body text-gray-750 truncate"
+                      className="flex items-center elytro-text-small-body text-gray-750 truncate cursor-pointer"
                     >
-                      {gasInDollar ? `~${Number(gasInDollar).toFixed(8)}` : 'Pay gas with'}
-                      <span className="elytro-text-small-body  ml-2xs">{paymaster.name}</span>
+                      {gasInDollar ? `${Number(gasInDollar).toFixed(8)}` : 'Pay with'}
+                      <span className="elytro-text-small-body text-gray-750 ml-2xs">{paymaster.name}</span>
                     </Label>
                   </div>
                 ))}
@@ -205,9 +205,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
           <div className="bg-light-blue rounded-sm p-3">
             <div className="flex flex-row items-center gap-1 text-red mb-1">
               <AlertCircle className="size-4 text-red stroke-dark-red" />
-              <span className="elytro-text-small-body text-dark-red">
-                Not enough gas fee, please deposit some first
-              </span>
+              <span className="elytro-text-small-body text-dark-red">Not enough for network cost, deposit first</span>
             </div>
             <div className="bg-white rounded-sm px-2 py-1 flex items-center justify-between">
               <div className="flex items-center 1 cursor-pointer" onClick={() => safeClipboard(address)}>

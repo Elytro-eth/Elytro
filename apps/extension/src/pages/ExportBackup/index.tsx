@@ -131,7 +131,7 @@ export default function ExportBackupPage() {
             <div className="elytro-text-smaller-body text-gray-600">Select which wallets to backup</div>
           </div>
 
-          <div className="w-full max-h-32 overflow-y-scroll flex flex-col gap-y-sm  rounded-md border bg-gray-150 p-md">
+          <div className="w-full max-h-32 overflow-y-scroll flex flex-col rounded-md bg-gray-150 p-md">
             {accounts.map((account) => (
               <div key={account.address} className="flex items-center" onClick={() => toggleAccount(account.address)}>
                 <Checkbox checked={exportedAccounts.includes(account.address)} />
