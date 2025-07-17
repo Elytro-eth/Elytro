@@ -882,16 +882,17 @@ export class SDKService {
   public async getSupportedGasTokens() {
     const pimlicoRpc = this._getPimlicoRpc();
     if (!pimlicoRpc) {
-      throw new Error('You need to use a pimlico bundler to get token paymaster.');
+      console.error('Elytro: You need to use a pimlico bundler to get token paymaster.');
+      return [];
     }
 
-    let res = (await pimlicoRpc.request({
+    const res = (await pimlicoRpc.request({
       method: 'pimlico_getSupportedTokens' as SafeAny,
       id: this._config.id,
       params: [] as SafeAny,
     })) as SafeAny[];
 
-    res = res?.filter((item) => ['USDC', 'USDT', 'DAI'].includes(item.name));
+    // res = res?.filter((item) => ['USDC', 'USDT', 'DAI', 'USD Coin, Tether USD'].includes(item.name));
 
     return res || [];
   }

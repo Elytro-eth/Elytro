@@ -447,6 +447,10 @@ class WalletController {
       walletClient.getBalance(address),
       (async (): Promise<TTokenInfo[]> => {
         const tokens = await elytroSDK.getSupportedGasTokens();
+        if (tokens.length === 0) {
+          return [];
+        }
+
         return tokens.map((token) => ({
           name: token.name,
           address: token.token,
@@ -467,10 +471,8 @@ class WalletController {
 
     // remove duplicate tokens
     const allTokens = [...erc20Tokens, ...supportedGasTokens].filter(
-      (token, index, self) => index === self.findIndex((t) => t.name === token.name)
+      (token, index, self) => index === self.findIndex((t) => t.address.toLowerCase() === token.address.toLowerCase())
     );
-
-    console.log('test: allTokens', allTokens);
 
     const balanceResults =
       (await walletClient.client?.multicall({
