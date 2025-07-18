@@ -61,7 +61,7 @@ export default function SignDetail({ onConfirm, onCancel, dapp, chainId, signDat
 
           <pre
             className={cn(
-              'w-full whitespace-normal bg-gray-150 rounded-2xl p-4 text-xs text-gray-500 min-h-40 max-h-[calc(100vh-400px)] !overflow-auto ',
+              'w-full max-w-screen whitespace-normal bg-gray-150 rounded-2xl p-4 text-xs text-gray-500 min-h-40 max-h-[calc(100vh-400px)] !overflow-auto ',
               signMethod === 'signMessage' ? '[word-break:break-word]' : ''
             )}
             style={{

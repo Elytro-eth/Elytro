@@ -27,11 +27,15 @@ interface IUserOpDetailProps {
 }
 
 const formatGasUsed = (gasUsed?: string) => {
-  return gasUsed
-    ? formatBalance(formatEther(BigInt(gasUsed)), {
-        maxDecimalLength: 4,
-      }).fullDisplay
-    : '--';
+  const gasUsedNumber = gasUsed ? BigInt(gasUsed) : 0n;
+  const tempRes = formatBalance(formatEther(gasUsedNumber), {
+    maxDecimalLength: 4,
+  }).fullDisplay;
+
+  if (Number(tempRes) < 0.00000001) {
+    return '<0.00000001';
+  }
+  return tempRes;
 };
 
 export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
@@ -65,6 +69,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
       return ['--', '--'];
     }
 
+    console.log('calcResult?.gasUsed', calcResult?.gasUsed);
     const gasInETH = formatGasUsed(calcResult?.gasUsed);
     const gasInDollar = formatDollarBalance(tokenPrices, {
       balance: Number(gasInETH),

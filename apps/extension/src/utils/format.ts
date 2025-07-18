@@ -323,7 +323,7 @@ export function formatBalance(
   options: {
     threshold?: number;
     maxDecimalLength?: number;
-  } = {}
+  }
 ): {
   integerPart: string;
   decimalPart: string;
