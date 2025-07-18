@@ -44,7 +44,6 @@ import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 import { RecoveryStatusEn } from '@/constants/recovery';
 import { getLogsOnchain } from '@/utils/getLogsOnchain';
 import { SupportedToken, TokenQuote, TokenQuoteResponse, TokenPaymaster } from '@/types/pimlico';
-import { TUserOperationPreFundResult, TRecoveryContactsInfo } from '@/types/wallet';
 
 export class SDKService {
   private readonly _REQUIRED_CHAIN_FIELDS: (keyof TChainItem)[] = [

@@ -17,7 +17,6 @@ import { safeClipboard } from '@/utils/clipboard';
 import { RawData } from '@/components/ui/rawData';
 import { useWallet } from '@/contexts/wallet';
 import { TokenPaymaster } from '@/types/pimlico';
-import { TDAppInfo } from '@/types/wallet';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -131,11 +130,11 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                 <span className="px-xs py-3xs bg-light-green elytro-text-tiny-body rounded-xs">Sponsored</span>
               )}
               {gasOption === 'self' && (
-                <span className="px-xs text-sm text-gray-750">
+                <span className="px-xs text-sm text-gray-600">
                   {gasInETH} ETH
                   {gasInDollar && (
                     <span className="elytro-text-small-body text-gray-600 ml-2xs">
-                      (${Number(gasInDollar).toFixed(4)})
+                      $({Number(gasInDollar).toFixed(4)})
                     </span>
                   )}
                 </span>
@@ -207,9 +206,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
           <div className="bg-light-blue rounded-sm p-3">
             <div className="flex flex-row items-center gap-1 text-red mb-1">
               <AlertCircle className="size-4 text-red stroke-dark-red" />
-              <span className="elytro-text-small-body text-dark-red">
-                Not enough gas fee, please deposit some first
-              </span>
+              <span className="elytro-text-small-body text-dark-red">Not enough for network cost, deposit first</span>
             </div>
             <div className="bg-white rounded-sm px-2 py-1 flex items-center justify-between">
               <div className="flex items-center 1 cursor-pointer" onClick={() => safeClipboard(address)}>
