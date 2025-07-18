@@ -55,7 +55,7 @@ export default function UpgradeContract() {
   return (
     <SecondaryPageWrapper title="Update contract">
       <div className="flex flex-col gap-y-md">
-        <h1 className="elytro-text-bold-body">You are updating</h1>
+        <h2 className="elytro-text-small-bold text-gray-600 mt-4">Your are updating</h2>
         <div className="flex flex-row justify-between">
           <FragmentedAddress address={address} chainId={chainId} className="p-xs rounded-2xs bg-gray-150" />
         </div>
@@ -66,9 +66,7 @@ export default function UpgradeContract() {
         <div className="bg-gray-150 p-lg rounded-sm space-y-2">
           Version {VERSION_MODULE_ADDRESS_MAP[chainId]?.latestVersion}
         </div>
-        <div className="flex text-gray-750 text-center">
-          You may need to complete the update to access funds.
-        </div>
+        <div className="flex text-gray-750 text-center">You may need to complete the update to access funds.</div>
 
         <Button variant="secondary" size="large" className="w-full gap-xl" onClick={handleStartUpgrade}>
           Start update

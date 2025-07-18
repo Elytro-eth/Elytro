@@ -27,10 +27,7 @@ export function SearchInput<T>({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -50,9 +47,7 @@ export function SearchInput<T>({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setHighlightedIndex((prev) =>
-          prev < suggestions.length - 1 ? prev + 1 : prev
-        );
+        setHighlightedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : prev));
         break;
       case 'ArrowUp':
         e.preventDefault();
@@ -96,19 +91,15 @@ export function SearchInput<T>({
       />
 
       {isOpen && suggestions.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 py-1 bg-popover border rounded-md shadow-md max-h-60 overflow-auto">
+        <div className="absolute z-50 w-full mt-1 py-0 bg-popover border rounded-md shadow-md max-h-60 overflow-auto">
           {suggestions.map((item, index) => (
             <div
               key={index}
               onClick={() => handleSelect(item)}
               onMouseEnter={() => setHighlightedIndex(index)}
-              className={cn(
-                'px-2 py-1.5 cursor-pointer hover:bg-accent hover:text-accent-foreground',
-                {
-                  'bg-accent text-accent-foreground':
-                    index === highlightedIndex,
-                }
-              )}
+              className={cn('px-2 py-4 cursor-pointer hover:bg-accent hover:text-accent-foreground', {
+                'bg-accent text-accent-foreground': index === highlightedIndex,
+              })}
             >
               {renderItem(item)}
             </div>

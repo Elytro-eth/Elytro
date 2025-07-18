@@ -25,7 +25,11 @@ const TokenConfigItem = ({
       <img src={token.logoURI} alt={token.symbol} className="size-8 rounded-full flex-shrink-0 " />
       <div className="flex flex-col">
         <HighlightText className="elytro-text-smaller-body" text={token.symbol} highlight={searchValue} />
-        <HighlightText className="elytro-text-tiny-body" text={token.address} highlight={searchValue} />
+        <HighlightText
+          className="elytro-text-tiny-body [&>span]:text-gray-600"
+          text={token.address}
+          highlight={searchValue}
+        />
       </div>
     </div>
   );

@@ -23,13 +23,9 @@ export default function ContactDetail({ onAddContact }: IContactDetailProps) {
   return (
     <div className="flex flex-col justify-between ">
       <div className=" flex flex-col gap-y-md">
-        <h1 className="elytro-text-bold-body my-1">Add a recovery contact</h1>
+        <h1 className="elytro-text-bold-body my-1">Add a contact by wallet</h1>
 
-        <AddressInputWithChainIcon 
-          chainId={currentAccount.chainId} 
-          address={address} 
-          onChange={handleAddressChange} 
-        />
+        <AddressInputWithChainIcon chainId={currentAccount.chainId} address={address} onChange={handleAddressChange} />
 
         {!isAddressValid && (
           <div className="flex items-center gap-x-2xs">

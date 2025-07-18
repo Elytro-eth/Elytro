@@ -43,7 +43,7 @@ const Create: React.FC = () => {
       </div>
       <h1 className="elytro-text-title text-center">Set your passcode</h1>
       <h2 className="text-sm text-muted-foreground text-center -mt-4">
-        This is for access your wallets on this device
+        This is for accessing your wallets on this device
       </h2>
       <PasswordSetter onSubmit={(pwd) => handleCreatePassword(pwd)} loading={loading} />
     </FullPageWrapper>

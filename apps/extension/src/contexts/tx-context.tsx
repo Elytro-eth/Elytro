@@ -209,7 +209,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       const msg = formatErrorMsg(err);
 
       if (msg.endsWith('0x7939f424')) {
-        setErrorMsg('Looks like you have insufficient funds for gas, please deposit more');
+        setErrorMsg("You don't have sufficient funds for network cost, please deposit more");
       } else {
         setErrorMsg(msg);
       }

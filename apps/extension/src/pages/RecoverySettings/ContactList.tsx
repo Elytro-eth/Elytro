@@ -81,7 +81,7 @@ export default function ContactList({
   return (
     <div className="flex flex-col justify-between">
       <div className="flex flex-col gap-y-md">
-        <h1 className="elytro-text-bold-body">Your recovery contacts</h1>
+        <h2 className="elytro-text-small-bold text-gray-600 mt-4">Your wallet</h2>
 
         {/* Operation Bar */}
         <div className="flex flex-row justify-between">
@@ -102,6 +102,7 @@ export default function ContactList({
 
         {contacts?.length ? (
           <div className="flex flex-col gap-y-sm">
+            <h2 className="elytro-text-small-bold text-gray-600 mt-4">Your recovery contacts</h2>
             {contacts.map((contact) => (
               <ContactItem
                 key={contact.address}
@@ -122,11 +123,7 @@ export default function ContactList({
             ))}
 
             <div className="mt-xl">
-              <h1 className="elytro-text-bold-body mb-2xs">Confirmations required</h1>
-
-              <p className="elytro-text-smaller-body text-gray-600 mb-md">
-                Minimum needed for recovery
-              </p>
+              <h2 className="elytro-text-small-bold text-gray-600 mt-4 mb-2">Confirmations required</h2>
 
               <div className="flex flex-row gap-x-md items-center">
                 <Select value={threshold} onValueChange={setThreshold}>
@@ -145,7 +142,7 @@ export default function ContactList({
                   </SelectContent>
                 </Select>
 
-                <span className="elytro-text-small-bold">out of {contacts.length} contacts</span>
+                <span className="elytro-text-small-bold">out of {contacts.length} contacts need to confirm</span>
               </div>
             </div>
 
@@ -154,7 +151,7 @@ export default function ContactList({
               disabled={loading || Number(threshold) < 1 || !isRecoverContactChanged}
               onClick={handleConfirmContacts}
             >
-               <Box className="size-4 mr-sm" color="#cce1ea" />
+              <Box className="size-4 mr-sm" color="#cce1ea" />
               {loading ? 'Confirming...' : 'Confirm contacts'}
             </Button>
           </div>
