@@ -39,12 +39,6 @@ export default function Settings() {
 
           <SettingItem icon={ShieldIcon} label="Social Recovery" path={SIDE_PANEL_ROUTE_PATHS.RecoverySetting} />
 
-          {/* <SettingItem
-            icon={CircleDollarSignIcon}
-            label="Pay gas with Stablecoins"
-            path={SIDE_PANEL_ROUTE_PATHS.StablecoinsGas}
-          /> */}
-
           {needUpgrade && (
             <SettingItem
               icon={RefreshCcw}

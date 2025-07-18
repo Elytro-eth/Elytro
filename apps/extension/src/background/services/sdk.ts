@@ -498,7 +498,7 @@ export class SDKService {
       if (token) {
         const pimlicoRpc = this._getPimlicoRpc();
         if (!pimlicoRpc) {
-          throw new Error('You need to use a pimlico bundler to pay gas with ERC20 token.');
+          throw new Error('You need to use a pimlico bundler to pay network cost with ERC20 token.');
         }
 
         userOp.factoryData = paddingBytesToEven(userOp.factoryData);

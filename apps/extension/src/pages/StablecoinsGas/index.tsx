@@ -120,12 +120,12 @@ const StablecoinsGas = () => {
   };
 
   return (
-    <SecondaryPageWrapper title="Pay gas with Stablecoins">
+    <SecondaryPageWrapper title="Pay with Stablecoins">
       <Spin isLoading={isLoading} />
       <div className="flex flex-row justify-between gap-x-lg items-center border border-gray-300 rounded-md p-lg">
         <div className="flex flex-row items-center gap-2">
           <CircleDollarSignIcon className="size-4" />
-          <span className="elytro-text-small text-gray-900">Pay gas with Stablecoins</span>
+          <span className="elytro-text-small text-gray-900">Pay with Stablecoins</span>
         </div>
 
         <Switch
