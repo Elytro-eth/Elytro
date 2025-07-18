@@ -141,9 +141,3 @@ type TRecentAddress = {
   time: number;
   avatar?: string;
 };
-
-type TTokenPaymaster = {
-  name: string;
-  address: `0x${string}`;
-  paymaster: `0x${string}`;
-};

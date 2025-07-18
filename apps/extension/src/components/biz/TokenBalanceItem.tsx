@@ -29,6 +29,7 @@ export default function TokenBalanceItem({
       tokenContractAddress: address,
       symbol,
       balance: Number(tokenAmount),
+      maxDecimalLength: 2,
     });
 
     return [tokenAmount, displayPrice];

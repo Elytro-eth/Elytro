@@ -393,10 +393,12 @@ export function formatDollarBalance(
     tokenContractAddress,
     symbol,
     balance,
+    maxDecimalLength = 8,
   }: {
     tokenContractAddress?: string;
     symbol?: string;
     balance: number;
+    maxDecimalLength?: number;
   }
 ) {
   if (!tokenPrices.length) {
@@ -408,7 +410,7 @@ export function formatDollarBalance(
       (item) => item.address === tokenContractAddress || item.symbol.toLowerCase() === symbol?.toLowerCase()
     )?.price || 0;
 
-  return price > 0 ? formatPrice(balance, price) : null;
+  return price > 0 ? formatPrice(balance, price, maxDecimalLength) : null;
 }
 
 export function formatErrorMsg(error: SafeAny) {

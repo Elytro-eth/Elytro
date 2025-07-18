@@ -32,17 +32,19 @@ import {
   parseAbi,
   hashTypedData,
   keccak256,
+  Abi,
 } from 'viem';
 import { createAccount } from '@/utils/ethRpc/create-account';
 import { ethErrors } from 'eth-rpc-errors';
 import { ABI_SoulWallet, ABI_SocialRecoveryModule } from '@soulwallet/abi';
 import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
-import { ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
+import { ABI_ERC20_BALANCE_OF, ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
 import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 import { RecoveryStatusEn } from '@/constants/recovery';
 import { getLogsOnchain } from '@/utils/getLogsOnchain';
-import { TokenQuote, TokenQuoteResponse } from '@/types/pimlico';
+import { SupportedToken, TokenQuote, TokenQuoteResponse, TokenPaymaster } from '@/types/pimlico';
+import { TUserOperationPreFundResult, TRecoveryContactsInfo } from '@/types/wallet';
 
 export class SDKService {
   private readonly _REQUIRED_CHAIN_FIELDS: (keyof TChainItem)[] = [
@@ -466,12 +468,32 @@ export class SDKService {
     return null;
   }
 
+  private async _getMaxCostInToken(userOp: ElytroUserOperation, token: TokenQuote) {
+    console.log('test: userOp', userOp);
+    console.log('test: token', token);
+    const { exchangeRate, postOpGas } = token;
+    const userOperationMaxGas =
+      BigInt(userOp.preVerificationGas || 0) +
+      BigInt(userOp.callGasLimit || 0) +
+      BigInt(userOp.verificationGasLimit || 0) +
+      BigInt(userOp.paymasterPostOpGasLimit || 0) +
+      BigInt(userOp.paymasterVerificationGasLimit || 0);
+
+    const userOperationMaxCost = userOperationMaxGas * BigInt(userOp.maxFeePerGas);
+
+    const maxCostInToken =
+      ((userOperationMaxCost + BigInt(postOpGas) * BigInt(userOp.maxFeePerGas)) * BigInt(exchangeRate)) / BigInt(1e18);
+
+    return maxCostInToken;
+  }
+
   public async getRechargeAmountForUserOp(
     userOp: ElytroUserOperation,
     transferValue: bigint,
     noSponsor = false,
-    token?: string
+    token?: TokenQuote
   ) {
+    console.log('test: noSponsor', noSponsor);
     const hasSponsored = noSponsor ? false : await this.canGetSponsored(userOp);
     if (!hasSponsored) {
       if (token) {
@@ -500,7 +522,7 @@ export class SDKService {
             this._config.onchainConfig.entryPoint as `0x${string}`,
             toHex(this._config.id),
             {
-              token,
+              token: token?.token,
             },
           ] as SafeAny,
         });
@@ -552,6 +574,30 @@ export class SDKService {
         } else {
           throw new Error('Failed to get paymaster data, Please try again.');
         }
+
+        const maxCostInToken = await this._getMaxCostInToken(userOp, token);
+
+        const _client = this._getClient();
+        const gasBalance = await _client.readContract({
+          address: token.token as Address,
+          abi: ABI_ERC20_BALANCE_OF as Abi,
+          functionName: 'balanceOf',
+          args: [userOp.sender],
+        });
+
+        const missAmount = maxCostInToken - ((gasBalance as bigint) || 0n);
+
+        return {
+          userOp,
+          calcResult: {
+            balance: gasBalance as bigint, // user balance
+            gasUsed: toHex(maxCostInToken),
+            hasSponsored: false, // for this userOp, can get sponsored or not
+            missAmount: missAmount > 0n ? missAmount : 0n, // for this userOp, how much it needs to deposit
+            needDeposit: missAmount > 0n, // need to deposit or not
+            suspiciousOp: false, // if missAmount is too large, it may considered suspicious
+          } as TUserOperationPreFundResult,
+        };
       } else {
         await this.estimateGas(userOp);
       }
@@ -573,6 +619,7 @@ export class SDKService {
         ? transferValue - balance // why transferValue is not accurate? missfund is wrong during preFund?
         : BigInt(missfund) + transferValue - balance;
 
+      console.log('test: gasUsed', prefund);
       return {
         userOp,
         calcResult: {
@@ -890,7 +937,7 @@ export class SDKService {
       method: 'pimlico_getSupportedTokens' as SafeAny,
       id: this._config.id,
       params: [] as SafeAny,
-    })) as SafeAny[];
+    })) as SupportedToken[];
 
     // res = res?.filter((item) => ['USDC', 'USDT', 'DAI', 'USD Coin, Tether USD'].includes(item.name));
 
@@ -898,9 +945,9 @@ export class SDKService {
   }
 
   public async getTokenPaymaster() {
-    const res = await this.getSupportedGasTokens();
+    const tokens = await this.getSupportedGasTokens();
 
-    if (!res || !res?.length) {
+    if (!tokens || !tokens?.length) {
       return [];
     }
 
@@ -914,7 +961,7 @@ export class SDKService {
       id: this._config.id,
       params: [
         {
-          tokens: res.map((item) => item.token),
+          tokens: tokens.map((item) => item.token),
         },
         this._config.onchainConfig.entryPoint as `0x${string}`,
         this._config.id,
@@ -923,19 +970,13 @@ export class SDKService {
 
     return quotesRes?.quotes
       ?.map((quote: TokenQuote) => {
-        const paymasterInfo = res.find((item) => item.token === quote.token);
-        if (paymasterInfo) {
-          return {
-            name: paymasterInfo.name,
-            address: paymasterInfo.token,
-            paymaster: quote.paymaster,
-            postOpGas: quote.postOpGas,
-            exchangeRate: quote.exchangeRate,
-          };
+        const token = tokens.find((token) => token.token === quote.token);
+        if (token) {
+          return { ...quote, ...token };
         }
         return null;
       })
-      .filter(Boolean) as TTokenPaymaster[];
+      .filter(Boolean) as TokenPaymaster[];
   }
 }
 

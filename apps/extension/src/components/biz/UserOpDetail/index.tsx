@@ -1,6 +1,6 @@
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import InfoCard from '@/components/biz/InfoCard';
-import { formatEther } from 'viem';
+import { formatEther, formatUnits } from 'viem';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';
 import { formatBalance, formatDollarBalance, formatRawData } from '@/utils/format';
 import { useEffect, useMemo, useState } from 'react';
@@ -16,6 +16,8 @@ import ShortedAddress from '@/components/ui/ShortedAddress';
 import { safeClipboard } from '@/utils/clipboard';
 import { RawData } from '@/components/ui/rawData';
 import { useWallet } from '@/contexts/wallet';
+import { TokenPaymaster } from '@/types/pimlico';
+import { TDAppInfo } from '@/types/wallet';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -37,12 +39,12 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   const { wallet } = useWallet();
   const [expandSponsorSelector, setExpandSponsorSelector] = useState(false);
   const {
-    tokenInfo: { tokenPrices },
+    tokenInfo: { tokenPrices, tokens: currentAccountTokens },
     currentAccount: { isDeployed, address },
   } = useAccount();
   const { requestType, calcResult, decodedDetail, onRetry, hasSufficientBalance, useStablecoin } = useTx();
   const [gasOption, setGasOption] = useState<string>(useStablecoin || (calcResult?.hasSponsored ? 'sponsor' : 'self'));
-  const [tokenPaymasters, setTokenPaymasters] = useState<TTokenPaymaster[]>([]);
+  const [tokenPaymasters, setTokenPaymasters] = useState<TokenPaymaster[]>([]);
 
   const DetailContent = useMemo(() => {
     switch (requestType) {
@@ -76,7 +78,10 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   const getTokenPaymaster = async () => {
     try {
       const res = await wallet.getTokenPaymaster();
-      setTokenPaymasters(res);
+      const filteredTokens = res.filter((token) =>
+        currentAccountTokens.some((t) => t.address.toLowerCase() === token.token.toLowerCase())
+      );
+      setTokenPaymasters(filteredTokens);
     } catch (error) {
       console.error('Elytro: Failed to get token paymaster.', error);
       setTokenPaymasters([]);
@@ -88,6 +93,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   }, []);
 
   const handleGasOptionChange = (value: string) => {
+    setGasOption(value);
     if (value === 'sponsor') {
       onRetry(false);
     } else if (value === 'self') {
@@ -95,14 +101,12 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
     } else {
       onRetry(
         true,
-        tokenPaymasters.find((paymaster) => paymaster.address === value)
+        tokenPaymasters.find((paymaster) => paymaster.token === value)
       );
     }
   };
 
-  useEffect(() => {
-    setGasOption(useStablecoin || (calcResult?.hasSponsored ? 'sponsor' : 'self'));
-  }, [useStablecoin, calcResult?.hasSponsored]);
+  const selectedGasToken = tokenPaymasters?.find((paymaster) => paymaster?.token === useStablecoin) || null;
 
   return (
     <div className="flex flex-col w-full gap-y-md">
@@ -131,17 +135,15 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                   {gasInETH} ETH
                   {gasInDollar && (
                     <span className="elytro-text-small-body text-gray-600 ml-2xs">
-                      ({Number(gasInDollar).toFixed(4)})
+                      (${Number(gasInDollar).toFixed(4)})
                     </span>
                   )}
                 </span>
               )}
               {useStablecoin && (
                 <span className="px-xs text-sm text-gray-750">
-                  {gasInDollar ? `~${Number(gasInDollar).toFixed(8)}` : 'Pay gas with'}
-                  <span className="elytro-text-small-body text-gray-750 ml-2xs">
-                    {tokenPaymasters.find((paymaster) => paymaster.address === useStablecoin)?.name}
-                  </span>
+                  {formatUnits(BigInt(calcResult?.gasUsed || 0), selectedGasToken?.decimals || 18)}
+                  <span className="elytro-text-small-body text-gray-750 ml-2xs">{selectedGasToken?.name}</span>
                 </span>
               )}
               {expandSponsorSelector ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -185,13 +187,13 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
 
               {tokenPaymasters.length > 0 &&
                 tokenPaymasters.map((paymaster) => (
-                  <div key={paymaster.address} className="flex items-center space-x-2 ">
-                    <RadioGroupItem value={paymaster.address} id={paymaster.address} />
+                  <div key={paymaster.token} className="flex items-center space-x-2 ">
+                    <RadioGroupItem value={paymaster.token} id={paymaster.token} />
                     <Label
-                      htmlFor={paymaster.address}
+                      htmlFor={paymaster.token}
                       className="flex items-center elytro-text-small-body text-gray-750 truncate"
                     >
-                      {gasInDollar ? `~${Number(gasInDollar).toFixed(8)}` : 'Pay gas with'}
+                      Pay gas with
                       <span className="elytro-text-small-body  ml-2xs">{paymaster.name}</span>
                     </Label>
                   </div>

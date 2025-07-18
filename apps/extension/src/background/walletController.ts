@@ -24,6 +24,7 @@ import { RecoveryStatusEn } from '@/constants/recovery';
 import { ETH_TOKEN_INFO } from '@/constants/token';
 import { decrypt, encrypt, TPasswordEncryptedData } from '@/utils/passworder';
 import { CoinLogoNameMap } from '@/constants/token';
+import { TokenQuote } from '@/types/pimlico';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -363,12 +364,12 @@ class WalletController {
     return formatObjectWithBigInt(await elytroSDK.estimateGas(userOp));
   }
 
-  public async packUserOp(userOp: ElytroUserOperation, amount: Hex, noSponsor = false, useStablecoin?: string) {
+  public async packUserOp(userOp: ElytroUserOperation, amount: Hex, noSponsor = false, gasToken?: TokenQuote) {
     const { userOp: userOpRes, calcResult } = await elytroSDK.getRechargeAmountForUserOp(
       userOp,
       BigInt(amount),
       noSponsor,
-      useStablecoin
+      gasToken
     );
 
     return {
