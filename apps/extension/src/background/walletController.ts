@@ -24,6 +24,7 @@ import { RecoveryStatusEn } from '@/constants/recovery';
 import { ETH_TOKEN_INFO } from '@/constants/token';
 import { decrypt, encrypt, TPasswordEncryptedData } from '@/utils/passworder';
 import { CoinLogoNameMap } from '@/constants/token';
+import { TokenQuote } from '@/types/pimlico';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -363,12 +364,12 @@ class WalletController {
     return formatObjectWithBigInt(await elytroSDK.estimateGas(userOp));
   }
 
-  public async packUserOp(userOp: ElytroUserOperation, amount: Hex, noSponsor = false, useStablecoin?: string) {
+  public async packUserOp(userOp: ElytroUserOperation, amount: Hex, noSponsor = false, gasToken?: TokenQuote) {
     const { userOp: userOpRes, calcResult } = await elytroSDK.getRechargeAmountForUserOp(
       userOp,
       BigInt(amount),
       noSponsor,
-      useStablecoin
+      gasToken
     );
 
     return {
@@ -447,6 +448,10 @@ class WalletController {
       walletClient.getBalance(address),
       (async (): Promise<TTokenInfo[]> => {
         const tokens = await elytroSDK.getSupportedGasTokens();
+        if (tokens.length === 0) {
+          return [];
+        }
+
         return tokens.map((token) => ({
           name: token.name,
           address: token.token,
@@ -467,10 +472,8 @@ class WalletController {
 
     // remove duplicate tokens
     const allTokens = [...erc20Tokens, ...supportedGasTokens].filter(
-      (token, index, self) => index === self.findIndex((t) => t.name === token.name)
+      (token, index, self) => index === self.findIndex((t) => t.address.toLowerCase() === token.address.toLowerCase())
     );
-
-    console.log('test: allTokens', allTokens);
 
     const balanceResults =
       (await walletClient.client?.multicall({

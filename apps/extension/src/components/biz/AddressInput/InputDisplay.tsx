@@ -7,27 +7,18 @@ interface IInputDisplayProps {
   chainId: number;
   onClick: () => void;
 }
-const InputDisplay = ({
-  displayLabel,
-  ensInfo,
-  chainId,
-  onClick,
-}: IInputDisplayProps) => {
+const InputDisplay = ({ displayLabel, ensInfo, chainId, onClick }: IInputDisplayProps) => {
   if (!displayLabel && !ensInfo) return null;
 
   return (
     <div className="absolute bg-white" onClick={onClick}>
       {displayLabel ? (
-        <FragmentedAddress address={displayLabel} chainId={chainId} size="lg" />
+        <FragmentedAddress address={displayLabel} chainId={chainId} size="lg" showChainIcon={false} />
       ) : ensInfo ? (
         ensInfo.name ? (
           <ENSInfoComponent ensInfo={ensInfo} />
         ) : (
-          <FragmentedAddress
-            address={ensInfo.address}
-            chainId={chainId}
-            size="lg"
-          />
+          <FragmentedAddress address={ensInfo.address} chainId={chainId} size="lg" showChainIcon={false} />
         )
       ) : null}
     </div>

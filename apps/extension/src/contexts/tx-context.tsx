@@ -14,6 +14,7 @@ import { EVENT_TYPES } from '@/constants/events';
 import { useAccount } from './account-context';
 import { TABS_KEYS } from '@/components/biz/DashboardTabs';
 import { getApproveErc20Tx } from '@/utils/tokenApproval';
+import { TokenQuote } from '@/types/pimlico';
 
 export enum TxRequestTypeEn {
   DeployWallet = 1,
@@ -45,7 +46,7 @@ type ITxContext = {
   handleTxRequest: (requestType: TxRequestTypeEn, params?: Transaction[], innerDecodedDetail?: TMyDecodeResult) => void;
   onConfirm: () => void;
   onCancel: () => void;
-  onRetry: (noSponsor?: boolean, paymaster?: TTokenPaymaster) => void;
+  onRetry: (noSponsor?: boolean, gasToken?: TokenQuote) => void;
 };
 
 const ConfirmSuccessMessageMap = {
@@ -75,10 +76,7 @@ const TxContext = createContext<ITxContext>({
 export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
   const { approval, reject, resolve } = useApproval();
-  const {
-    reloadAccount,
-    tokenInfo: { tokens },
-  } = useAccount();
+  const { reloadAccount } = useAccount();
 
   const userOpRef = useRef<Nullable<ElytroUserOperation>>();
   const txTypeRef = useRef<Nullable<HistoricalActivityTypeEn>>(null);
@@ -158,21 +156,22 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       params,
       decodedDetail,
       noSponsor = false,
-      paymaster,
+      gasToken,
     }: {
       params?: Transaction[];
       decodedDetail?: TMyDecodeResult;
       noSponsor?: boolean;
-      paymaster?: TTokenPaymaster;
+      gasToken?: TokenQuote;
     }
   ) => {
+    console.log('test: noSponsor 222', noSponsor, gasToken);
     try {
       setIsPacking(true);
       setRequestType(type);
-      setUseStablecoin(paymaster ? paymaster.address : null);
+      setUseStablecoin(gasToken ? gasToken.token : null);
       txDecodedDetailRef.current = decodedDetail;
-      txParamsRef.current = paymaster
-        ? [getApproveErc20Tx(paymaster.address, paymaster.paymaster), ...(params || [])]
+      txParamsRef.current = gasToken
+        ? [getApproveErc20Tx(gasToken.token as `0x${string}`, gasToken.paymaster as `0x${string}`), ...(params || [])]
         : params;
       txTypeRef.current = getTxType(type);
 
@@ -202,13 +201,18 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         setDecodedDetail(decodeRes);
       }
 
-      const packedUserOp = await wallet.packUserOp(currentUserOp, toHex(transferAmount), noSponsor, paymaster?.address);
+      const packedUserOp = await wallet.packUserOp(currentUserOp, toHex(transferAmount), noSponsor, gasToken);
 
       userOpRef.current = packedUserOp.userOp;
       setCalcResult(packedUserOp.calcResult);
     } catch (err) {
       const msg = formatErrorMsg(err);
-      setErrorMsg(msg);
+
+      if (msg.endsWith('0x7939f424')) {
+        setErrorMsg('Looks like you have insufficient funds for gas, please deposit more');
+      } else {
+        setErrorMsg(msg);
+      }
       toast({
         title: 'Failed to pack user operation',
         variant: 'destructive',
@@ -220,13 +224,8 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    if (useStablecoin) {
-      const token = tokens.find((token) => token.address.toLowerCase() === useStablecoin.toLowerCase());
-      setHasSufficientBalance(!!token && !!token.balance && token.balance > 1_000_000n);
-    } else {
-      setHasSufficientBalance(!calcResult?.needDeposit);
-    }
-  }, [calcResult?.needDeposit, useStablecoin, tokens]);
+    setHasSufficientBalance(!calcResult?.needDeposit);
+  }, [calcResult?.needDeposit]);
 
   const resetTxContext = () => {
     setRequestType(null);
@@ -265,7 +264,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     handleBack(true);
   };
 
-  const onRetry = (noSponsor = false, paymaster?: TTokenPaymaster) => {
+  const onRetry = (noSponsor = false, gasToken?: TokenQuote) => {
     if (!requestType) {
       toast({
         title: 'Invalid request type or transaction parameters',
@@ -275,11 +274,15 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
+    if (noSponsor === false) {
+      gasToken = undefined;
+    }
+
     setErrorMsg(null);
     packUserOp(requestType!, {
       params: txParamsRef.current as unknown as Transaction[],
       noSponsor,
-      paymaster,
+      gasToken,
       decodedDetail: txDecodedDetailRef.current,
     });
   };
