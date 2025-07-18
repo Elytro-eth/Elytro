@@ -45,7 +45,7 @@ export const ENCOURAGE_DAPPS = [
     icon: relay,
   },
   {
-    name: 'PrivacyPools',
+    name: 'Privacy',
     label: 'Shield',
     url: 'https://privacypools.com/',
     icon: shield,
