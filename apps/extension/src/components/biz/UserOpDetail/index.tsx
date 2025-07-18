@@ -32,8 +32,8 @@ const formatGasUsed = (gasUsed?: string) => {
     maxDecimalLength: 4,
   }).fullDisplay;
 
-  if (Number(tempRes) < 0.00000001) {
-    return '<0.00000001';
+  if (Number(tempRes) < 0.0000001) {
+    return '<0.0000001';
   }
   return tempRes;
 };
@@ -69,10 +69,9 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
       return ['--', '--'];
     }
 
-    console.log('calcResult?.gasUsed', calcResult?.gasUsed);
     const gasInETH = formatGasUsed(calcResult?.gasUsed);
     const gasInDollar = formatDollarBalance(tokenPrices, {
-      balance: Number(gasInETH),
+      balance: Number(gasInETH?.replace('<', '')),
       symbol: 'ETH',
     })?.replace('$', '');
 
@@ -95,6 +94,20 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   useEffect(() => {
     getTokenPaymaster();
   }, []);
+
+  const calcGasInTokenByPrice = (paymaster: TokenPaymaster) => {
+    try {
+      console.log('paymaster', paymaster);
+      const { exchangeRate } = paymaster;
+      const gasInToken = (BigInt(calcResult?.gasUsed || 0) * BigInt(exchangeRate)) / BigInt(1e18);
+
+      return gasInToken && gasInToken > 0n
+        ? `${formatUnits(gasInToken, paymaster.decimals)} ${paymaster.name}`
+        : paymaster.name;
+    } catch {
+      return paymaster.name;
+    }
+  };
 
   const handleGasOptionChange = (value: string) => {
     setGasOption(value);
@@ -182,7 +195,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                     {gasInETH} ETH
                     {gasInDollar && (
                       <span className="elytro-text-small-body text-gray-600 ml-2xs">
-                        ({Number(gasInDollar).toFixed(4)})
+                        (${Number(gasInDollar).toFixed(4)})
                       </span>
                     )}
                   </span>
@@ -195,10 +208,9 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                     <RadioGroupItem value={paymaster.token} id={paymaster.token} />
                     <Label
                       htmlFor={paymaster.token}
-                      className="flex items-center elytro-text-small-body text-gray-750 truncate"
+                      className="flex items-center elytro-text-small-body text-gray-600 truncate"
                     >
-                      Pay gas with
-                      <span className="elytro-text-small-body  ml-2xs">{paymaster.name}</span>
+                      <span className="elytro-text-small-body  ml-2xs">{calcGasInTokenByPrice(paymaster)}</span>
                     </Label>
                   </div>
                 ))}

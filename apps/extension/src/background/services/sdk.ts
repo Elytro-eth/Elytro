@@ -467,9 +467,7 @@ export class SDKService {
     return null;
   }
 
-  private async _getMaxCostInToken(userOp: ElytroUserOperation, token: TokenQuote) {
-    console.log('test: userOp', userOp);
-    console.log('test: token', token);
+  public async getMaxCostInToken(userOp: ElytroUserOperation, token: TokenQuote) {
     const { exchangeRate, postOpGas } = token;
     const userOperationMaxGas =
       BigInt(userOp.preVerificationGas || 0) +
@@ -574,7 +572,7 @@ export class SDKService {
           throw new Error('Failed to get paymaster data, Please try again.');
         }
 
-        const maxCostInToken = await this._getMaxCostInToken(userOp, token);
+        const maxCostInToken = await this.getMaxCostInToken(userOp, token);
 
         const _client = this._getClient();
         const gasBalance = await _client.readContract({
