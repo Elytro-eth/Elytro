@@ -2,7 +2,7 @@ import aave from '@/assets/icons/aave.svg';
 import lido from '@/assets/icons/lido.svg';
 import logo from '@/assets/logo.svg';
 import ens from '@/assets/icons/ens.svg';
-import opensea from '@/assets/icons/opensea.svg';
+// import opensea from '@/assets/icons/opensea.svg';
 import cowswap from '@/assets/icons/cowswap.svg';
 import relay from '@/assets/icons/relay.svg';
 import shield from '@/assets/icons/privacypools.svg';
@@ -26,12 +26,12 @@ export const ENCOURAGE_DAPPS = [
     url: 'https://stake.lido.fi/',
     icon: lido,
   },
-  {
-    name: 'OpenSea',
-    label: 'NFT',
-    url: 'https://opensea.io/',
-    icon: opensea,
-  },
+  // {
+  //   name: 'OpenSea',
+  //   label: 'NFT',
+  //   url: 'https://opensea.io/',
+  //   icon: opensea,
+  // },
   {
     name: 'CoW Swap',
     label: 'Swap',
