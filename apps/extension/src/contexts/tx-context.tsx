@@ -14,7 +14,7 @@ import { EVENT_TYPES } from '@/constants/events';
 import { useAccount } from './account-context';
 import { TABS_KEYS } from '@/components/biz/DashboardTabs';
 import { getApproveErc20Tx } from '@/utils/tokenApproval';
-import { TokenPaymaster, TokenQuote } from '@/types/pimlico';
+import { TokenQuote } from '@/types/pimlico';
 
 export enum TxRequestTypeEn {
   DeployWallet = 1,
@@ -46,7 +46,7 @@ type ITxContext = {
   handleTxRequest: (requestType: TxRequestTypeEn, params?: Transaction[], innerDecodedDetail?: TMyDecodeResult) => void;
   onConfirm: () => void;
   onCancel: () => void;
-  onRetry: (noSponsor?: boolean, paymaster?: TTokenPaymaster) => void;
+  onRetry: (noSponsor?: boolean, gasToken?: TokenQuote) => void;
 };
 
 const ConfirmSuccessMessageMap = {
@@ -264,7 +264,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     handleBack(true);
   };
 
-  const onRetry = (noSponsor = false, gasToken?: TokenPaymaster) => {
+  const onRetry = (noSponsor = false, gasToken?: TokenQuote) => {
     if (!requestType) {
       toast({
         title: 'Invalid request type or transaction parameters',

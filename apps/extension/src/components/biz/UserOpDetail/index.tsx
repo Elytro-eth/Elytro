@@ -17,7 +17,6 @@ import { safeClipboard } from '@/utils/clipboard';
 import { RawData } from '@/components/ui/rawData';
 import { useWallet } from '@/contexts/wallet';
 import { TokenPaymaster } from '@/types/pimlico';
-import { TDAppInfo } from '@/types/wallet';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
