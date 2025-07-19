@@ -5,7 +5,7 @@ const MAX_RETRIES = 3;
 const TIMEOUT_MS = 20_000; // 20 seconds timeout
 
 type GetLogsOnchainArgs = GetLogsParameters<SafeAny, SafeAny, SafeAny, SafeAny, SafeAny, SafeAny>;
-type GetLogsOnchainReturnType = GetLogsReturnType<SafeAny, SafeAny, SafeAny, SafeAny, SafeAny, SafeAny, SafeAny>;
+export type GetLogsOnchainReturnType = GetLogsReturnType<SafeAny, SafeAny, SafeAny, SafeAny, SafeAny, SafeAny, SafeAny>;
 
 export const getLogsOnchain = async (
   client: PublicClient,

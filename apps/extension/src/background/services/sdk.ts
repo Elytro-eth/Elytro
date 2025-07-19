@@ -42,8 +42,9 @@ import { EVENT_TYPES } from '@/constants/events';
 import { ABI_ERC20_BALANCE_OF, ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
 import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 import { RecoveryStatusEn } from '@/constants/recovery';
-import { getLogsOnchain } from '@/utils/getLogsOnchain';
+import { getLogsOnchain, GetLogsOnchainReturnType } from '@/utils/getLogsOnchain';
 import { SupportedToken, TokenQuote, TokenQuoteResponse, TokenPaymaster } from '@/types/pimlico';
+import { arbitrum } from 'viem/chains';
 
 export class SDKService {
   private readonly _REQUIRED_CHAIN_FIELDS: (keyof TChainItem)[] = [
@@ -753,28 +754,43 @@ export class SDKService {
       throw new Error(`Elytro: Info recorder on chain ${this._config.name} is not set.`);
     }
 
-    const startBlock = await this._getInfoRecorderStartBlock(address);
+    let logs: GetLogsOnchainReturnType;
 
-    if (startBlock === 0n) {
-      return null;
+    if (this._config.id === arbitrum.id) {
+      logs = await getLogsOnchain(this._getClient(), {
+        address: this._config.infoRecorder as Address,
+        fromBlock: 0n,
+        toBlock: 'latest',
+        event: parseAbiItem('event DataRecorded(address indexed wallet, bytes32 indexed category, bytes data)'),
+        args: {
+          wallet: address,
+          category: GUARDIAN_INFO_KEY,
+        },
+      });
+    } else {
+      const startBlock = await this._getInfoRecorderStartBlock(address);
+
+      if (startBlock === 0n) {
+        return null;
+      }
+
+      const _client = this._getClient();
+      const fromBlock = startBlock - 10n > 0n ? startBlock - 10n : 0n;
+
+      logs = await _client.getLogs({
+        address: this._config.infoRecorder as Address,
+        toBlock: startBlock + 10n,
+        fromBlock,
+        event: parseAbiItem('event DataRecorded(address indexed wallet, bytes32 indexed category, bytes data)'),
+        args: {
+          wallet: address,
+          category: GUARDIAN_INFO_KEY,
+        },
+      });
     }
 
-    const _client = this._getClient();
-    const fromBlock = startBlock - 10n > 0n ? startBlock - 10n : 0n;
-
-    const logs = await _client.getLogs({
-      address: this._config.infoRecorder as Address,
-      toBlock: startBlock + 10n,
-      fromBlock,
-      event: parseAbiItem('event DataRecorded(address indexed wallet, bytes32 indexed category, bytes data)'),
-      args: {
-        wallet: address,
-        category: GUARDIAN_INFO_KEY,
-      },
-    });
-
     // Decode the events
-    const parseContactFromLog = (log: (typeof logs)[number]) => {
+    const parseContactFromLog = (log: SafeAny) => {
       if (!log || !log.args) {
         return null;
       }
