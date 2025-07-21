@@ -122,7 +122,7 @@ export default function ContactList({
               />
             ))}
 
-            <div className="mt-xl">
+            <div>
               <h2 className="elytro-text-small-bold text-gray-600 mt-4 mb-2">Confirmations required</h2>
 
               <div className="flex flex-row gap-x-md items-center">

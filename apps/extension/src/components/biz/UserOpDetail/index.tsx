@@ -148,7 +148,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                 <span className="px-xs py-3xs bg-light-green elytro-text-tiny-body rounded-xs">Sponsored</span>
               )}
               {gasOption === 'self' && (
-                <span className="px-xs text-sm text-gray-600">
+                <span className="px-xs text-xs text-gray-600">
                   {gasInETH} ETH
                   {gasInDollar && (
                     <span className="elytro-text-small-body text-gray-600 ml-2xs">
@@ -158,7 +158,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                 </span>
               )}
               {useStablecoin && (
-                <span className="px-xs text-sm text-gray-750">
+                <span className="px-xs text-xs text-gray-750">
                   {formatUnits(BigInt(calcResult?.gasUsed || 0), selectedGasToken?.decimals || 18)}
                   <span className="elytro-text-small-body text-gray-750 ml-2xs">{selectedGasToken?.name}</span>
                 </span>
@@ -180,7 +180,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                 <RadioGroupItem value="sponsor" id="gas-fee-by-sponsor" />
                 <Label
                   htmlFor="gas-fee-by-sponsor"
-                  className="flex items-center elytro-text-small-body text-gray-750 truncate cursor-pointer"
+                  className="flex items-center elytro-text-smaller-body text-gray-750 truncate cursor-pointer"
                 >
                   Sponsored by Elytro
                 </Label>
@@ -189,13 +189,14 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                 <RadioGroupItem value="self" id="gas-fee-by-self" />
                 <Label
                   htmlFor="gas-fee-by-self"
-                  className="flex items-center elytro-text-small-body text-gray-750 truncate cursor-pointer"
+                  className="flex items-center elytro-text-smaller-body text-gray-750 truncate cursor-pointer"
                 >
                   <span className="text-gray-750">
+                    {/* <span className="text-gray-750 mr-2xs">Pay with</span>  */}
                     {gasInETH} ETH
                     {gasInDollar && (
                       <span className="elytro-text-small-body text-gray-600 ml-2xs">
-                        (${Number(gasInDollar).toFixed(4)})
+                        ({Number(gasInDollar).toFixed(4)})
                       </span>
                     )}
                   </span>
@@ -208,9 +209,10 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                     <RadioGroupItem value={paymaster.token} id={paymaster.token} />
                     <Label
                       htmlFor={paymaster.token}
-                      className="flex items-center elytro-text-small-body text-gray-600 truncate"
+                      className="flex items-center elytro-text-small-body text-gray-750 truncate"
                     >
-                      <span className="elytro-text-small-body  ml-2xs">{calcGasInTokenByPrice(paymaster)}</span>
+                      Pay gas with
+                      <span className="elytro-text-small-body  ml-2xs">{paymaster.name}</span>
                     </Label>
                   </div>
                 ))}
