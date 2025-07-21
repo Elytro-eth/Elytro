@@ -83,7 +83,6 @@ export default function ActivityItem({
 
   const { name, IconComponent, bg } = type ? ActivityTypeMap[type] : UnknownActivity;
   const { label, style } = ActivityStatusMap[latestStatus];
-
   return (
     <div
       className="flex items-center w-full justify-between px-lg cursor-pointer py-md hover:bg-gray-150 gap-x-sm min-w-0"
@@ -94,7 +93,7 @@ export default function ActivityItem({
 
         <div className="flex flex-col min-w-0 flex-1">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="font-bold text-base truncate">{name}</span>
+            <span className="inline-block font-bold text-base truncate">{name}</span>
             <span className={`elytro-text-tiny-body px-xs py-3xs rounded-xs text-white ${style} flex-shrink-0`}>
               {label}
             </span>

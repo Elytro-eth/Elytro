@@ -5,9 +5,9 @@ const ENSInfo = ({ ensInfo, extra }: { ensInfo: TRecentAddress; extra?: ReactNod
   return (
     <div className="flex items-center">
       {ensInfo.avatar ? (
-        <img src={ensInfo.avatar} alt={ensInfo.name} className="w-8 h-8 rounded-full mr-2" />
+        <img src={ensInfo.avatar} alt={ensInfo.name} className="size-6 rounded-full mr-2" />
       ) : (
-        <div className="w-8 h-8 rounded-full flex items-center font-bold justify-center text-white bg-blue mr-2">
+        <div className="size-6 rounded-full flex items-center font-bold justify-center text-white bg-blue mr-2">
           {ensInfo.name ? ensInfo.name[0].toUpperCase() : ''}
         </div>
       )}

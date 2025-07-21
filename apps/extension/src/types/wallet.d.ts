@@ -124,7 +124,7 @@ type TTokenInfo = {
   symbol: string;
   decimals: number;
   logoURI: string;
-  balance?: number; // in minimum unit
+  balance?: string; // in minimum unit
   importedByUser?: boolean;
   price?: number;
 };

@@ -15,7 +15,7 @@ const ENSSearchResults = ({ value, ensInfo, loading, onSelectENS }: IENSSearchRe
     <div>
       <div className="elytro-text-smaller-body text-gray-600 font-bold mt-xs px-lg py-sm">ENS Search</div>
       <div className="relative ">
-        {<Spin isLoading={loading} />}
+        {<Spin isLoading={loading} size="sm" />}
         {ensInfo?.name && (
           <div className="cursor-pointer hover:bg-gray-150 px-lg py-md" onClick={onSelectENS}>
             <ENSInfoComponent ensInfo={ensInfo} />

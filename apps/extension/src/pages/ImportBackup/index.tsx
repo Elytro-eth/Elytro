@@ -112,7 +112,7 @@ export default function ImportBackup() {
         <h1 className="elytro-text-title text-center">Import all wallets</h1>
 
         <div className="flex flex-col gap-y-sm w-full max-w-full min-w-full">
-          <div className="flex justify-between  items-center bg-white rounded-2xl p-4 h-14 w-full min-w-md">
+          <div className="flex justify-between  items-center bg-white rounded-2xl p-4 h-14 w-full min-w-sm">
             <span
               className={cn(
                 'max-w-36 truncate text-gray-600 font-normal text-lg',

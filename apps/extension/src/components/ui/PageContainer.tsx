@@ -36,7 +36,7 @@ function PageContainer({ children, className }: IPageContainerProps) {
       <ErrorBoundary>
         <div
           ref={containerRef}
-          className={cn('w-screen min-h-screen flex justify-center mx-auto max-w-screen-md', className)}
+          className={cn('w-screen min-h-screen flex justify-center mx-auto max-w-screen-md min-w-96', className)}
         >
           <WalletProvider>
             <ChainProvider>

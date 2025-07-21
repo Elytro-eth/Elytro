@@ -292,7 +292,15 @@ export function formatQuantity(value: SafeAny): string {
   let hexString: string;
 
   if (typeof value === 'string') {
-    hexString = BigInt(value).toString(16);
+    if (value.includes('e') || value.includes('E')) {
+      const numValue = Number(value);
+      if (!Number.isInteger(numValue) || numValue < 0) {
+        throw new Error('Scientific notation must represent a non-negative integer');
+      }
+      hexString = BigInt(Math.floor(numValue)).toString(16);
+    } else {
+      hexString = BigInt(value).toString(16);
+    }
   } else if (typeof value === 'number' || typeof value === 'bigint') {
     hexString = value.toString(16);
   } else {

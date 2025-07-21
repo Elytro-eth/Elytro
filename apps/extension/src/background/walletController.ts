@@ -491,9 +491,10 @@ class WalletController {
       if (CoinLogoNameMap[token.name as keyof typeof CoinLogoNameMap]) {
         token.logoURI = CoinLogoNameMap[token.name as keyof typeof CoinLogoNameMap];
       }
-      const balance = result.status === 'success' ? Number(result.result) : 0;
 
-      if (token.importedByUser || balance > 0) {
+      const balance = result.status === 'success' ? String(result.result) : '0';
+
+      if (token.importedByUser || Number(balance) > 0) {
         acc.push({
           ...token,
           balance,

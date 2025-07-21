@@ -22,7 +22,6 @@ const main = () => {
         <AccountProvider>
           <ApprovalProvider>
             <TxProvider>
-              {/*  according to chrome dev team. the minimum width of the side panel is 360px */}
               <TooltipProvider>
                 <AlerterProvider>
                   <HashRouter routes={routes} />
