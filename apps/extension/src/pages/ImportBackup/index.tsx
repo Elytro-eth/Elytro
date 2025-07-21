@@ -79,6 +79,7 @@ export default function ImportBackup() {
           title: 'Import success',
           variant: 'constructive',
         });
+        wallet.lock();
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
       }
     } catch (error) {

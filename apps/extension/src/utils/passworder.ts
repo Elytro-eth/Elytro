@@ -133,8 +133,9 @@ async function decryptWithKey(
     const decryptedData = new Uint8Array(decryptedRes);
     const decryptedStr = Buffer.from(decryptedData).toString(STRING_ENCODING);
     return JSON.parse(decryptedStr);
-  } catch (error) {
-    throw new Error(`Elytro: Wrong password! ${error}`);
+  } catch {
+    // do nothing
+    // throw new Error(`Elytro: Wrong password! ${error}`);
   }
 }
 
