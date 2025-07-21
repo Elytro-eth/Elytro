@@ -164,12 +164,14 @@ function PageContent() {
 
       <HelperText
         // title={`${recoveryRecord?.threshold} signatures required`}
-        description={`${recoveryRecord?.threshold} confirmations required`}
+        description={`${recoveryRecord?.threshold} confirmations required. Ask your contacts to confirm with below links`}
         className="bg-light-green text-green"
       />
+      <h2 className="elytro-text-small-bold text-gray-600 mt-4">Your wallet</h2>
 
       <ShortedAddress address={recoveryRecord?.address} chainId={currentChain?.id} />
 
+      <h2 className="elytro-text-small-bold text-gray-600 mt-4">Your recovery contacts</h2>
       <div className="flex flex-col gap-y-sm">
         {recoveryRecord?.contacts.map((contact) => (
           <ContactItem
@@ -178,11 +180,11 @@ function PageContent() {
             rightContent={
               // TODO: use confirm status to decide whether to show the copy button
               contact.confirmed ? (
-                <span className="elytro-text-tiny-body bg-light-green px-xs py-3xs rounded-xs">Signed</span>
+                <span className="elytro-text-tiny-body bg-light-green px-xs py-3xs rounded-xs">Confirmed</span>
               ) : (
                 <Button variant="secondary" size="tiny" className="group" onClick={handleShareContact}>
                   <Copy className="size-md mr-xs group-hover:stroke-white" />
-                  Share link
+                  Get link
                 </Button>
               )
             }
@@ -194,7 +196,7 @@ function PageContent() {
         <DialogContent showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>Recovery link copied</DialogTitle>
-            <DialogDescription>Send this link to your contact so they can sign your recovery.</DialogDescription>
+            <DialogDescription>Send this link to your contact so they can confirm your recovery</DialogDescription>
           </DialogHeader>
 
           <pre
