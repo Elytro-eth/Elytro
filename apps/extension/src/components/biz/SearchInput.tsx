@@ -97,7 +97,7 @@ export function SearchInput<T>({
               key={index}
               onClick={() => handleSelect(item)}
               onMouseEnter={() => setHighlightedIndex(index)}
-              className={cn('px-2 py-4 cursor-pointer hover:bg-accent hover:text-accent-foreground', {
+              className={cn('px-4 py-4 cursor-pointer hover:bg-accent hover:text-accent-foreground', {
                 'bg-accent text-accent-foreground': index === highlightedIndex,
               })}
             >

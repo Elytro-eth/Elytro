@@ -73,7 +73,7 @@ export default function Sign() {
   useEffect(() => {
     if (receiptStatus === 'success') {
       toast({
-        title: 'You have signed the recovery successfully.',
+        title: 'You have confirmed the recovery successfully.',
       });
       setLoading(false);
       updateContactsSignStatus();
