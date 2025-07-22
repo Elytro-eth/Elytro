@@ -34,7 +34,7 @@ export default function SendTx() {
   const filteredTokens = useMemo(() => {
     return tokens.filter((token) => {
       const balance = Number(token.balance);
-      if (!balance || Number.isNaN(balance)) {
+      if (token.address !== zeroAddress && (!balance || Number.isNaN(balance))) {
         return false;
       }
 
@@ -46,7 +46,7 @@ export default function SendTx() {
     token: z.object({
       name: z.string(),
       logoURI: z.union([z.string(), z.null(), z.undefined()]).optional(),
-      balance: z.union([z.string(), z.null(), z.undefined()]).optional(),
+      balance: z.union([z.string(), z.null(), z.undefined(), z.number()]).optional(),
       decimals: z.number(),
       symbol: z.string(),
       address: z.string(),

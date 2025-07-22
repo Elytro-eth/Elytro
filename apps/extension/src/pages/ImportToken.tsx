@@ -11,6 +11,8 @@ import { toast } from '@/hooks/use-toast';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { LabelInput } from '@/components/biz/LabelInput';
+import { formatAddressToShort } from '@/utils/format';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const TokenConfigItem = ({
   token,
@@ -25,11 +27,16 @@ const TokenConfigItem = ({
       <img src={token.logoURI} alt={token.symbol} className="size-8 rounded-full flex-shrink-0 " />
       <div className="flex flex-col">
         <HighlightText className="elytro-text-smaller-body" text={token.symbol} highlight={searchValue} />
-        <HighlightText
-          className="elytro-text-tiny-body [&>span]:text-gray-600"
-          text={token.address}
-          highlight={searchValue}
-        />
+        <Tooltip>
+          <TooltipTrigger>
+            <HighlightText
+              className="elytro-text-tiny-body [&>span]:text-gray-600 cursor-pointer"
+              text={formatAddressToShort(token.address)}
+              highlight={searchValue}
+            />
+          </TooltipTrigger>
+          <TooltipContent>{token.address}</TooltipContent>
+        </Tooltip>
       </div>
     </div>
   );

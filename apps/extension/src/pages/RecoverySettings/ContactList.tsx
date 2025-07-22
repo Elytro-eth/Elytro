@@ -145,20 +145,11 @@ export default function ContactList({
                 <span className="elytro-text-small-bold">out of {contacts.length} contacts need to confirm</span>
               </div>
             </div>
-
-            <Button
-              className="w-full mt-10"
-              disabled={loading || Number(threshold) < 1 || !isRecoverContactChanged}
-              onClick={handleConfirmContacts}
-            >
-              <Box className="size-4 mr-sm" color="#cce1ea" />
-              {loading ? 'Confirming...' : 'Confirm contacts'}
-            </Button>
           </div>
         ) : (
           <div className="flex flex-col gap-y-md items-center mt-4xl">
             <img src={ContactsImg} className="size-36" />
-            <span className="elytro-text-subtitle">Add a new contact</span>
+            <span className="elytro-text-subtitle text-center">Add a new contact</span>
 
             <Button variant="secondary" size="tiny" onClick={onAddContact}>
               <Plus className="h-4 w-4 mr-1 stroke-[1.5px] group-hover:stroke-white" />
@@ -166,6 +157,11 @@ export default function ContactList({
             </Button>
           </div>
         )}
+
+        <Button className="w-full mt-10" disabled={loading || !isRecoverContactChanged} onClick={handleConfirmContacts}>
+          <Box className="size-4 mr-sm" color="#cce1ea" />
+          {loading ? 'Confirming...' : 'Confirm contacts'}
+        </Button>
       </div>
     </div>
   );

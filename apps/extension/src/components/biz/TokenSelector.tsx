@@ -45,9 +45,11 @@ export default function TokenSelector({
   onTokenChange?: (token: TTokenInfo) => void;
 }) {
   const [open, setOpen] = useState(false);
+  console.log('tokens', tokens);
 
   const defaultToken = useCallback(() => {
-    return tokens.find((token) => token.balance !== undefined && token.balance > 0) || tokens[0] || null;
+    const token = tokens.find((token) => token.balance !== undefined && Number(token.balance) > 0) || tokens[0] || null;
+    return token || tokens[0];
   }, [tokens]);
 
   const [selectedToken, setSelectedToken] = useState<TTokenInfo | null>();
@@ -70,7 +72,7 @@ export default function TokenSelector({
       const safeToken: TTokenInfo = {
         ...item,
         name: item.name || item.symbol,
-        balance: item.balance || 0,
+        balance: item.balance?.toString() || '0',
         logoURI: item.logoURI || '',
         address: item.address,
       };

@@ -25,8 +25,8 @@ const ActivityTypeMap = {
     IconComponent: Check,
     bg: 'bg-gray-300',
   },
-  [HistoricalActivityTypeEn.ContractInteraction]: {
-    name: 'Contract Interaction',
+  [HistoricalActivityTypeEn.ContractInteract]: {
+    name: 'Contract Interact',
     IconComponent: ChevronsLeftRight,
     bg: 'bg-gray-300',
   },

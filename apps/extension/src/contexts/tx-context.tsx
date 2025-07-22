@@ -133,7 +133,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       case TxRequestTypeEn.SendTransaction:
         return HistoricalActivityTypeEn.Send;
       default:
-        return HistoricalActivityTypeEn.ContractInteraction;
+        return HistoricalActivityTypeEn.ContractInteract;
     }
   };
 

@@ -39,7 +39,7 @@ export enum HistoricalActivityTypeEn {
   Send = 'Send',
   Receive = 'Receive',
   ActivateAccount = 'Activate Wallet',
-  ContractInteraction = 'Contract Interaction',
+  ContractInteract = 'Contract Interact',
 }
 
 export type UserOperationHistory = {

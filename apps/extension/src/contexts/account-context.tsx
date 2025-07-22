@@ -174,7 +174,7 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
           }
           // else {
           //   return {
-          //     type: HistoricalActivityTypeEn.ContractInteraction,
+          //     type: HistoricalActivityTypeEn.ContractInteract,
           //     from: currentAccount.address,
           //     opHash: item.opHash || item.txhash,
           //     txHash: item.txhash,

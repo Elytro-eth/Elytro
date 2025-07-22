@@ -39,20 +39,33 @@ export default function RecoverySettings() {
   const [threshold, setThreshold] = useState<string>('0');
   const [showType, setShowType] = useState<ShowType>(ShowType.List);
   const labelDialogRef = useRef<ILabelDialogRef>(null);
+  const originalContactsSetting = useRef<{
+    contacts: TRecoveryContact[];
+    threshold: string;
+  }>({
+    contacts: [],
+    threshold: '0',
+  });
 
   const getRecoveryContacts = async () => {
     try {
       setLoading(true);
       const { contacts = [], threshold = 0 } = (await wallet.queryRecoveryContactsByAddress(address)) || {};
       const localContacts = getLocalContacts(address);
+      const newContacts = contacts.map((c) => {
+        const local = localContacts.find((lc) => lc.address === c);
+        return { address: c, label: local?.label || '' };
+      });
+      const newThreshold = threshold.toString();
+      setContacts(newContacts);
+      setThreshold(newThreshold);
+      originalContactsSetting.current = {
+        contacts: newContacts,
+        threshold: newThreshold,
+      };
+
+      console.log('originalContactsSetting', originalContactsSetting.current);
       setShowType(contacts.length <= 0 ? ShowType.Guide : ShowType.List);
-      setContacts(
-        contacts.map((c) => {
-          const local = localContacts.find((lc) => lc.address === c);
-          return { address: c, label: local?.label || '' };
-        })
-      );
-      setThreshold(threshold.toString());
     } catch (error) {
       console.error(error);
     } finally {
