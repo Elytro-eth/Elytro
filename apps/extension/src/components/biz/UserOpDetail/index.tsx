@@ -96,16 +96,16 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   }, []);
 
   const calcGasInTokenByPrice = (paymaster: TokenPaymaster) => {
+    const defaultDisplay = `Pay gas with ${paymaster.name}`;
     try {
-      console.log('paymaster', paymaster);
       const { exchangeRate } = paymaster;
       const gasInToken = (BigInt(calcResult?.gasUsed || 0) * BigInt(exchangeRate)) / BigInt(1e18);
 
       return gasInToken && gasInToken > 0n
         ? `${formatUnits(gasInToken, paymaster.decimals)} ${paymaster.name}`
-        : paymaster.name;
+        : defaultDisplay;
     } catch {
-      return paymaster.name;
+      return defaultDisplay;
     }
   };
 
@@ -211,8 +211,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                       htmlFor={paymaster.token}
                       className="flex items-center elytro-text-small-body text-gray-750 truncate"
                     >
-                      Pay gas with
-                      <span className="elytro-text-small-body  ml-2xs">{paymaster.name}</span>
+                      <span className="elytro-text-small-body  ml-2xs">{calcGasInTokenByPrice(paymaster)}</span>
                     </Label>
                   </div>
                 ))}
