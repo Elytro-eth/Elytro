@@ -93,12 +93,19 @@ export default function Sign() {
         className="border !p-lg border-gray-300 rounded-[16px]"
         address={address}
         chainID={recoveryChainId}
+        rightExtra={
+          recoveryChainId === chainId ? (
+            <div className="flex items-center text-tiny rounded-xs bg-light-green px-xs py-3xs">Connected</div>
+          ) : (
+            <div className="flex items-center text-tiny rounded-xs bg-light-red px-xs py-3xs">Not Connected</div>
+          )
+        }
       />
 
       <Button
         size="lg"
         className="w-full group mt-lg shadow-none"
-        disabled={!isConnected || isSigned || loading}
+        disabled={!isConnected || isSigned || loading || recoveryChainId !== chainId}
         onClick={sendSignatureRequest}
       >
         <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />

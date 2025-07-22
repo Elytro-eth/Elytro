@@ -293,7 +293,9 @@ export default function Start() {
         {status === RecoveryStatusEn.SIGNATURE_COMPLETED ? (
           <Button
             size="lg"
-            disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.SIGNATURE_COMPLETED}
+            disabled={
+              !isConnected || isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.SIGNATURE_COMPLETED
+            }
             onClick={startRecovery}
             className="w-full group"
           >

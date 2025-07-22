@@ -44,7 +44,7 @@ export default function ConnectControl() {
   const [showDialog, setShowDialog] = useState(false);
   const { address, isConnected } = useAccount();
   const { chainId, isWrongChain } = useCurrentChain();
-  const { connectors, connect } = useConnect();
+  const { connectors, connectAsync: connect } = useConnect();
   const { switchChainAsync } = useSwitchChain();
   const { chainId: recoveryChainId } = useRecoveryRecord();
   const pathname = usePathname();
@@ -71,8 +71,21 @@ export default function ConnectControl() {
   }, [connectors]);
 
   const handleConnect = (connector: Connector) => {
-    connect({ connector });
-    setShowDialog(false);
+    connect({ connector })
+      .then((res) => {
+        console.log('connected', res);
+        toast({
+          title: 'Connected wallet successfully',
+        });
+        setShowDialog(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          title: 'Failed to connect wallet',
+          variant: 'destructive',
+        });
+      });
   };
 
   const handleDisconnect = () => {

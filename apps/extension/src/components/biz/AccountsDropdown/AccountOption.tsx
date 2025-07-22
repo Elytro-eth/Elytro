@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { getIconByChainId } from '@/constants/chains';
+import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
 import { toast } from '@/hooks/use-toast';
 import { formatAddressToShort, formatTokenAmount } from '@/utils/format';
 import { cn } from '@/utils/shadcn/utils';
@@ -42,6 +42,7 @@ export default function AccountOption({
       return;
     }
 
+    setIsOpen(false);
     onDelete?.();
   };
 
@@ -59,7 +60,10 @@ export default function AccountOption({
           <AvatarFallback>{account.chainId}</AvatarFallback>
         </Avatar>
 
-        <span className="font-bold text-sm">{formatAddressToShort(account.address)}</span>
+        <div className="flex flex-col gap-y-0">
+          <span className="font-bold text-sm">{formatAddressToShort(account.address)}</span>
+          <span className="elytro-text-tiny-body text-gray-500">{getChainNameByChainId(account.chainId)}</span>
+        </div>
       </div>
 
       <div className="text-sm text-gray-600 flex flex-row items-center">

@@ -2,13 +2,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/compon
 import AccountOption from './AccountOption';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
+import { getIconByChainId } from '@/constants/chains';
 import { formatAddressToShort } from '@/utils/format';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { groupBy } from 'lodash';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
@@ -27,6 +26,14 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
   const [open, setOpen] = useState(false);
   const { currentAccount, accounts, getAccounts, reloadAccount } = useAccount();
   const { wallet } = useWallet();
+
+  const showAccounts = useMemo(() => {
+    if (chainId) {
+      return accounts.filter((account) => Number(account.chainId) === Number(chainId));
+    }
+
+    return accounts;
+  }, [accounts, chainId]);
 
   if (!currentAccount) {
     return <Spin isLoading />;
@@ -133,35 +140,16 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
         </div>
 
         <div className="flex flex-col gap-y-sm">
-          {chainId
-            ? accounts
-                .filter((account) => Number(account.chainId) === Number(chainId))
-                .map((account) => (
-                  <AccountOption
-                    key={account.address}
-                    account={account}
-                    isSelected={account.address === currentAccount.address}
-                    onDelete={() => handleRemoveAccount(account)}
-                    onSelect={() => handleSwitchAccount(account)}
-                    showDelete
-                  />
-                ))
-            : Object.entries(groupBy(accounts, 'chainId')).map(([chainId, accounts]) => (
-                <div key={chainId}>
-                  <div className="elytro-text-smaller-bold-body text-gray-600 px-lg py-sm">
-                    {getChainNameByChainId(Number(chainId))}
-                  </div>
-                  {accounts.map((account) => (
-                    <AccountOption
-                      key={account.address}
-                      account={account}
-                      isSelected={account.address === currentAccount.address}
-                      onDelete={() => handleRemoveAccount(account)}
-                      onSelect={() => handleSwitchAccount(account)}
-                    />
-                  ))}
-                </div>
-              ))}
+          {showAccounts.map((account) => (
+            <AccountOption
+              key={account.address}
+              account={account}
+              isSelected={account.address === currentAccount.address}
+              onDelete={() => handleRemoveAccount(account)}
+              onSelect={() => handleSwitchAccount(account)}
+              showDelete
+            />
+          ))}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
