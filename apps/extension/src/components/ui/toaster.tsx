@@ -1,11 +1,5 @@
 import { useToast } from '@/hooks/use-toast';
-import {
-  Toast,
-  ToastDescription,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
-} from '@/components/ui/toast';
+import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from '@/components/ui/toast';
 import iconSuccess from '@/assets/toast/success.svg';
 import iconError from '@/assets/toast/error.svg';
 
@@ -20,14 +14,7 @@ export function Toaster() {
 
   return (
     <ToastProvider swipeDirection="down" duration={1500}>
-      {toasts.map(function ({
-        id,
-        title,
-        description,
-        action,
-        variant,
-        ...props
-      }) {
+      {toasts.map(function ({ id, title, description, action, variant, ...props }) {
         const icon = variant ? IconsMap[variant] : null;
         return (
           <Toast key={id} variant={variant} {...props} className="flex">
@@ -38,11 +25,10 @@ export function Toaster() {
             )}
             <div className="flex-1">
               {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
-              )}
+              {description && <ToastDescription>{description}</ToastDescription>}
             </div>
             {action}
+            <ToastClose />
           </Toast>
         );
       })}
