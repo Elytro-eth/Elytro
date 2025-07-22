@@ -1,6 +1,6 @@
 import accountManager from '@/background/services/account';
 import { approvalService, ApprovalTypeEn } from '@/background/services/approval';
-import { ChainOperationEn, SUPPORTED_CHAIN_IDS } from '@/constants/chains';
+import { ChainOperationEn, getChainNameByChainId, SUPPORTED_CHAIN_IDS } from '@/constants/chains';
 import type { TFlowMiddleWareFn } from '@/utils/asyncTaskFlow';
 import { ethErrors } from 'eth-rpc-errors';
 
@@ -38,7 +38,7 @@ export const requestChain: TFlowMiddleWareFn = async (ctx, next) => {
       dApp,
       options: {
         name: method,
-        reason: `You are trying to ${operation} an unsupported chain.`,
+        reason: `You are trying to ${operation} an unsupported chain: ${Number(chainId)}.`,
       },
     });
   }
@@ -52,7 +52,7 @@ export const requestChain: TFlowMiddleWareFn = async (ctx, next) => {
       dApp,
       options: {
         name: method,
-        reason: `You are trying to switch to a chain that you don't have any account on.`,
+        reason: `You are trying to switch to chain(${getChainNameByChainId(Number(chainId))}) that you don't have any account on.`,
       },
     });
   }

@@ -7,29 +7,37 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } 
 import { useState } from 'react';
 import PasswordInput from '@/components/ui/PasswordInputer';
 
-const passwordForm = z
-  .object({
-    password: z
-      .string()
-      .min(6, {
-        message: 'More than 6 characters with at least 1 capitalized letter.',
-      })
-      .refine((value) => /[A-Z]/.test(value), {
-        message: 'More than 6 characters with at least 1 capitalized letter.',
-      }),
-    confirm: z.string(),
-  })
-  .refine((data) => data.password === data.confirm, {
-    message: "Passcodes don't match",
-    path: ['confirm'], // path of error
-  });
-
 interface PasswordSetterProps {
   loading: boolean;
   onSubmit: (pwd: string) => void;
 }
 
 export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
+  const passwordForm = z
+    .object({
+      password: z
+        .string()
+        .min(6, {
+          message: 'More than 6 characters with at least 1 capitalized letter.',
+        })
+        .refine((value) => /[A-Z]/.test(value), {
+          message: 'More than 6 characters with at least 1 capitalized letter.',
+        }),
+      confirm: z.string().min(1, {
+        message: 'Please repeat the passcode',
+      }),
+    })
+    .superRefine((data, ctx) => {
+      if (data.password !== data.confirm) {
+        ctx.addIssue({
+          code: 'custom',
+          message: "Two passwords don't match",
+          path: ['confirm'],
+        });
+        return;
+      }
+    });
+
   const form = useForm<z.infer<typeof passwordForm>>({
     resolver: zodResolver(passwordForm),
     mode: 'onChange',
@@ -56,6 +64,10 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
                     placeholder="Enter passcode"
                     style={{ backgroundColor: 'white' }}
                     onPwdVisibleChange={setIsPwdVisible}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.trigger('confirm');
+                    }}
                   />
                 </FormControl>
 
@@ -84,7 +96,7 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
                   />
                 </FormControl>
 
-                <FormMessage />
+                <FormMessage className="text-left" />
               </FormItem>
             )}
           />
