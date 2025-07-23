@@ -98,22 +98,22 @@
 
 @layer components {
   .elytro-text-hero {
-    @apply text-[52px] font-bold leading-[100%] text-black-blue;
+    @apply text-[3.25rem] font-bold leading-[100%] text-black-blue;
   }
   .elytro-text-headline {
-    @apply text-[40px] font-bold leading-[100%] text-black-blue;
+    @apply text-[2.5rem] font-bold leading-[100%] text-black-blue;
   }
 
   .elytro-text-title {
-    @apply text-[28px] font-bold leading-[100%] text-black-blue;
+    @apply text-[1.75rem] font-bold leading-[100%] text-black-blue;
   }
 
   .elytro-text-subtitle {
-    @apply text-[28px] font-bold leading-[105%] text-black-blue;
+    @apply text-[1.75rem] font-bold leading-[105%] text-black-blue;
   }
 
   .elytro-text-body {
-    @apply text-[18px] font-normal leading-[125%] text-black-blue;
+    @apply text-[1.125rem] font-normal leading-[125%] text-black-blue;
   }
 
   .elytro-text-bold-body {
@@ -121,7 +121,7 @@
   }
 
   .elytro-text-small {
-    @apply text-[16px] font-normal leading-[130%] text-black-blue;
+    @apply text-[1rem] font-normal leading-[130%] text-black-blue;
   }
 
   .elytro-text-small-bold {
@@ -129,7 +129,7 @@
   }
 
   .elytro-text-smaller-body {
-    @apply text-[14px] font-normal leading-[135%] text-black-blue;
+    @apply text-[0.875rem] font-normal leading-[135%] text-black-blue;
   }
 
   .elytro-text-smaller-bold-body {
@@ -137,11 +137,11 @@
   }
 
   .elytro-text-code-body {
-    @apply text-[10px] font-normal leading-[140%] text-black-blue;
+    @apply text-[0.625rem] font-normal leading-[140%] text-black-blue;
   }
 
   .elytro-text-tiny-body {
-    @apply text-[12px] font-normal leading-[140%] text-black-blue;
+    @apply text-[0.75rem] font-normal leading-[140%] text-black-blue;
   }
 
   .elytro-clickable-icon {

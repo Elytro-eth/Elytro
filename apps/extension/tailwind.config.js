@@ -20,7 +20,7 @@ module.exports = {
         '5xl': '4rem', // 64px
       },
       borderRadius: {
-        pill: '9999px',
+        pill: '9999rem',
         lg: '1.5rem', // 24px
         md: '1rem', // 16px
         sm: '0.75rem', // 12px
