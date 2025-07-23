@@ -23,7 +23,7 @@ A web application for secure social recovery, allowing Elytro Wallet users to re
 
 ## Prerequisites
 
-- Node.js 22.15.0 or higher (managed with Volta)
+- Node.js 22.15.0 or higher
 - pnpm package manager
 - Web3 wallet (MetaMask, etc.) for testing
 - (Optional) API keys for blockchain infrastructure services such as Alchemy or Pimlico — not required if using public RPC endpoints
@@ -204,6 +204,8 @@ The app supports multiple EVM-compatible networks configured in `src/constants/c
 
    - Verify the recovery URL parameters are correct
    - Ensure the wallet address has an active recovery configuration
+
+   ![Get recovery link](./get_recovery_link.png)
 
 2. **"Connected wallet is not a recovery contact"**
 
