@@ -19,6 +19,8 @@ Guides users through multi-step verification and on-chain recovery.
 
 See [`apps/recovery/README.md`](apps/recovery/README.md) for details.
 
+Here is an [example link](https://recovery.elytro.com/?id=0x541759739e8a737bb885e87d5c5b22e80330f2e0a574543ca8c8590fcd3e33e0&address=0x27c310bc5E5fEDb0e8833DB4CeB31C93CC246dA5&chainId=11155111&hash=0xacd27c858e64d4fa7a560a8e1de45d1186acea0d8b850bc052ceb87369477d4d&from=8827934&owner=0xdAc441aaD418D8E323ADEaE6dCD4261de7fFB4dd) to show you how it works.
+
 ## Setup
 
 ### Recommended Environment
