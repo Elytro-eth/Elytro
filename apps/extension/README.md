@@ -117,13 +117,6 @@ pnpm lint
 # Type checking is automatically handled by TypeScript compilation
 ```
 
-### Testing
-
-```bash
-# Run tests (currently configured as placeholder)
-pnpm test
-```
-
 ## Project Structure
 
 ```
