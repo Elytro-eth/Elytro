@@ -208,6 +208,11 @@ class WalletController {
   }
 
   private _broadcastToConnectedSites(event: ElytroEventMessage['event'], data: ElytroEventMessage['data']) {
+    const _currentAccount = accountManager.currentAccount;
+    if (!_currentAccount) {
+      return;
+    }
+
     connectionManager.connectedSites.forEach((site) => {
       if (site.origin && !site.origin.startsWith('chrome-extension://')) {
         sessionManager.broadcastMessageToDApp(site.origin, event, data);
