@@ -23,8 +23,6 @@ Elytro is a modern, secure Chrome browser extension ERC-4337 wallet built with R
 | Ethereum SDK     | Viem (TypeScript native EVM interaction) |
 | Extension API    | Chrome Extension Manifest V3             |
 | Build Tooling    | Vite + CRX plugin                        |
-| Styling          | Tailwind CSS 3.4                         |
-| Type System      | TypeScript 5.5                           |
 
 ## Security Model
 
@@ -37,8 +35,8 @@ Elytro is a modern, secure Chrome browser extension ERC-4337 wallet built with R
 
 ## Prerequisites
 
-- Node.js 22.15.0 or higher (managed with Volta)
-- pnpm package manager
+- Node.js 22.15.0 or higher
+- pnpm 9.0 or higher
 - Chrome browser for testing
 
 ## Getting Started
