@@ -5,7 +5,7 @@
 
 ---
 
-## Quick Start Script (Recommended for Everyone)
+## Quick Start Script (Recommended for NON- or Junior Developers)
 
 You can set up and run everything with a single command using the provided script:
 
