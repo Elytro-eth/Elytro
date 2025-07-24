@@ -1,3 +1,6 @@
+> **IMPORTANT FOR NON-DEVELOPERS:**
+> If you are not a developer and want to run Elytro locally, please read [GETTING_STARTED_FOR_NON_DEVS.md](../../GETTING_STARTED_FOR_NON_DEVS.md) first for a simple, step-by-step guide!
+
 # Elytro Wallet Extension
 
 Elytro is a modern, secure Chrome browser extension ERC-4337 wallet built with React, TypeScript, and Vite. It provides seamless Web3 integration with support for multiple blockchain networks, account abstraction, and advanced wallet recovery features.

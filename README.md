@@ -1,3 +1,6 @@
+> **IMPORTANT FOR NON-DEVELOPERS:**
+> If you are not a developer and want to run Elytro locally, please read [GETTING_STARTED_FOR_NON_DEVS.md](./GETTING_STARTED_FOR_NON_DEVS.md) first for a simple, step-by-step guide!
+
 # Elytro Monorepo
 
 **Elytro** is a modular ERC-4337 smart wallet system for the EVM ecosystem. This monorepo contains the browser extension wallet and the social recovery web application.

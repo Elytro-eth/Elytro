@@ -1,3 +1,6 @@
+> **IMPORTANT FOR NON-DEVELOPERS:**
+> If you are not a developer and want to run Elytro locally, please read [GETTING_STARTED_FOR_NON_DEVS.md](../../GETTING_STARTED_FOR_NON_DEVS.md) first for a simple, step-by-step guide!
+
 # Elytro Recovery App
 
 A web application for secure social recovery, allowing Elytro Wallet users to regain access to their accounts with help from designated recovery contacts. This app allows recovery contacts to help wallet owners regain access to their accounts through a secure, multi-step verification process.
