@@ -3,6 +3,30 @@
 
 # Elytro Monorepo
 
+---
+
+## Quick Start Script (Recommended for Everyone)
+
+You can set up and run everything with a single command using the provided script:
+
+```bash
+./quickstart.sh
+```
+
+- This script will:
+  1. Check/install prerequisites
+  2. Install dependencies
+  3. Start both the extension and recovery app dev servers
+  4. Show you how to load the extension in Chrome
+
+If you see a permissions error, run:
+
+```bash
+chmod +x quickstart.sh
+```
+
+---
+
 **Elytro** is a modular ERC-4337 smart wallet system for the EVM ecosystem. This monorepo contains the browser extension wallet and the social recovery web application.
 
 ## Applications

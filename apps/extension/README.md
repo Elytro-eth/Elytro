@@ -3,6 +3,30 @@
 
 # Elytro Wallet Extension
 
+---
+
+## 🚀 Quick Start Script (Recommended for Everyone)
+
+You can set up and run everything with a single command from the project root:
+
+```bash
+./quickstart.sh
+```
+
+- This script will:
+  1. Check/install prerequisites
+  2. Install dependencies
+  3. Start both the extension and recovery app dev servers
+  4. Show you how to load the extension in Chrome
+
+If you see a permissions error, run:
+
+```bash
+chmod +x quickstart.sh
+```
+
+---
+
 Elytro is a modern, secure Chrome browser extension ERC-4337 wallet built with React, TypeScript, and Vite. It provides seamless Web3 integration with support for multiple blockchain networks, account abstraction, and advanced wallet recovery features.
 
 ## Core Features

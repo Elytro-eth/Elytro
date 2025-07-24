@@ -3,6 +3,30 @@
 
 # Elytro Recovery App
 
+---
+
+## 🚀 Quick Start Script (Recommended for Everyone)
+
+You can set up and run everything with a single command from the project root:
+
+```bash
+./quickstart.sh
+```
+
+- This script will:
+  1. Check/install prerequisites
+  2. Install dependencies
+  3. Start both the extension and recovery app dev servers
+  4. Show you how to load the extension in Chrome
+
+> If you see a permissions error, run:
+>
+> ```bash
+> chmod +x quickstart.sh
+> ```
+
+---
+
 A web application for secure social recovery, allowing Elytro Wallet users to regain access to their accounts with help from designated recovery contacts. This app allows recovery contacts to help wallet owners regain access to their accounts through a secure, multi-step verification process.
 
 ## Features
