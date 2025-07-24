@@ -264,8 +264,18 @@ export default function Start() {
     <ContentWrapper
       // currentStep={2}
       // allSteps={3}
-      title="Start Recovery"
-      subtitle={<div className="text-center text-gray-600">Connect to a wallet to start recovery.</div>}
+      title={
+        [RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status || 0)
+          ? 'Start Recovery'
+          : 'Recovery in progress'
+      }
+      subtitle={
+        <div className="text-center text-gray-600">
+          {status === RecoveryStatusEn.SIGNATURE_COMPLETED
+            ? 'Connect to a wallet to start recovery.'
+            : 'Wallet access will be resumed in 48 hours.'}
+        </div>
+      }
     >
       {/* Count down */}
       {txStatus !== 'pending' && status !== null && status !== undefined && (

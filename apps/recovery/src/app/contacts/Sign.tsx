@@ -17,6 +17,7 @@ export default function Sign() {
     chainId: recoveryChainId,
     hash,
     updateContactsSignStatus,
+    backToHome,
   } = useRecoveryRecord();
   const [loading, setLoading] = useState(false);
 
@@ -52,14 +53,11 @@ export default function Sign() {
         }
       }
 
-      console.log('target chainId', recoveryChainId);
-      console.log('current chainId', chainId);
-
       // call `approveHash` method in SocialRecovery contract
       const _txHash = await sendTransactionAsync(getApproveHashTxData(hash));
       setTxHash(_txHash);
 
-      // backToHome();
+      backToHome();
     } catch (error) {
       console.error('Transaction error:', error);
       toast({
