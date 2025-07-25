@@ -61,10 +61,10 @@ The output should look like this:
    cd apps/recovery
    pnpm dev
    ```
-   ![alt text](./doc_images/image/image-8.png)
+   ![alt text](./doc_images/image-8.png)
 
 You should be able to visit the recovery app in your browser by pasting the URL `http://localhost:3000` that your terminal displays.
-![alt text](./doc_images/image/image-9.png)
+![alt text](./doc_images/image-9.png)
 
 ## Getting Recovery Parameters
 

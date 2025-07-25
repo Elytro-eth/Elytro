@@ -1,6 +1,7 @@
 # Getting Started: Local Development for Non-Developers
 
 > **If you are not a developer but want to run Elytro locally, follow this step-by-step guide. No coding experience required!**
+> **If you need more help, see this doc [Illustrated Startup Guide for Non-Developers](/DETAILED_STARTED_FOR_NON_DEV.md)**
 
 ---
 
