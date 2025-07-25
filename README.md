@@ -1,4 +1,6 @@
 > **IMPORTANT FOR NON-DEVELOPERS:**
+> Elytro is committed to accessibility for everyone.
+>
 > If you are not a developer and want to run Elytro locally, please read [GETTING_STARTED_FOR_NON_DEVS.md](./GETTING_STARTED_FOR_NON_DEVS.md) first for a simple, step-by-step guide!
 
 # Elytro Monorepo
