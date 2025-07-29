@@ -421,7 +421,8 @@ class WalletController {
   }
 
   public async checkRecoveryContactsSettingChanged(contacts: string[], threshold: number): Promise<boolean> {
-    const { prevHash, newHash } = await this._getRecoveryContactsHash(contacts, threshold);
+    const { prevHash = '0x0000000000000000000000000000000000000000000000000000000000000000', newHash } =
+      await this._getRecoveryContactsHash(contacts, threshold);
 
     return prevHash !== newHash;
   }
