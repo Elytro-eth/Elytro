@@ -13,8 +13,9 @@ import { RuntimeMessage } from '@/utils/message';
 import { EVENT_TYPES } from '@/constants/events';
 import { useAccount } from './account-context';
 import { TABS_KEYS } from '@/components/biz/DashboardTabs';
-import { getApproveErc20Tx } from '@/utils/tokenApproval';
+import { getApproveErc20Tx, hasApprove } from '@/utils/tokenApproval';
 import { TokenQuote } from '@/types/pimlico';
+import { useChain } from './chain-context';
 
 export enum TxRequestTypeEn {
   DeployWallet = 1,
@@ -76,7 +77,11 @@ const TxContext = createContext<ITxContext>({
 export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
   const { approval, reject, resolve } = useApproval();
-  const { reloadAccount } = useAccount();
+  const {
+    reloadAccount,
+    currentAccount: { address },
+  } = useAccount();
+  const { currentChain } = useChain();
 
   const userOpRef = useRef<Nullable<ElytroUserOperation>>();
   const txTypeRef = useRef<Nullable<HistoricalActivityTypeEn>>(null);
@@ -164,12 +169,16 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       gasToken?: TokenQuote;
     }
   ) => {
-    console.log('test: noSponsor 222', noSponsor, gasToken);
     try {
       setIsPacking(true);
       setRequestType(type);
       setUseStablecoin(gasToken ? gasToken.token : null);
       txDecodedDetailRef.current = decodedDetail;
+
+      if (gasToken && address && currentChain) {
+        await hasApprove(gasToken.token, gasToken.paymaster, address, currentChain);
+      }
+
       txParamsRef.current = gasToken
         ? [getApproveErc20Tx(gasToken.token as `0x${string}`, gasToken.paymaster as `0x${string}`), ...(params || [])]
         : params;

@@ -293,3 +293,35 @@ const initBackgroundMessage = () => {
 };
 
 initBackgroundMessage();
+
+// update the extension icon
+chrome.action.setIcon({
+  path: {
+    16: `logo-red-dot.png`,
+    48: `logo-red-dot.png`,
+    128: `logo-red-dot.png`,
+  },
+});
+
+const pollRecoveryStatus = async () => {
+  const isUpdated = await walletController.updateRecoveryStatus();
+  if (isUpdated) {
+    chrome.action.setIcon({
+      path: {
+        16: `logo-red-dot.png`,
+        48: `logo-red-dot.png`,
+        128: `logo-red-dot.png`,
+      },
+    });
+  } else {
+    chrome.action.setIcon({
+      path: {
+        16: `logo-light-16.png`,
+        48: `logo-light-48.png`,
+        128: `logo-light-128.png`,
+      },
+    });
+  }
+};
+
+pollRecoveryStatus();

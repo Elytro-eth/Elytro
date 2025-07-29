@@ -1,5 +1,5 @@
 import { createPublicClient, http, parseAbiItem, Address, encodeFunctionData, parseAbi, maxUint256 } from 'viem';
-import { SUPPORTED_CHAINS } from '@/constants/chains';
+import { SUPPORTED_CHAINS, TChainItem } from '@/constants/chains';
 
 const ERC20_APPROVAL_EVENT = parseAbiItem(
   'event Approval(address indexed owner, address indexed spender, uint256 value)'
@@ -323,4 +323,32 @@ export function getApproveErc20Tx(erc20Address: Address, spender: Address, amoun
     value: '0',
     data: callData,
   };
+}
+
+export async function hasApprove(
+  erc20Address: string,
+  spender: string,
+  owner: Address,
+  chain: TChainItem
+): Promise<boolean> {
+  const rpcUrl = getCurrentRpc(chain.id);
+
+  const client = createPublicClient({
+    chain,
+    transport: http(rpcUrl),
+  });
+
+  try {
+    const allowance = await client.readContract({
+      address: erc20Address as Address,
+      abi: ERC20_ALLOWANCE_ABI,
+      functionName: 'allowance',
+      args: [owner as Address, spender as Address],
+    });
+
+    return allowance === maxUint256;
+  } catch (error) {
+    console.warn(`Failed to check allowance for ${erc20Address} -> ${spender}:`, error);
+    return false;
+  }
 }

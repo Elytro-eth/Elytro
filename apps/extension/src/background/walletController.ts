@@ -528,11 +528,13 @@ class WalletController {
     return await elytroSDK.getInstalledUpgradeModules(accountManager.currentAccount.address);
   }
 
-  public async updateRecoveryStatus() {
+  public async updateRecoveryStatus(): Promise<boolean> {
     let recoveryRecord = (await accountManager.getRecoveryRecord()) as TRecoveryRecord | null;
     if (!recoveryRecord) {
-      return;
+      return false;
     }
+
+    const prevStatus = recoveryRecord.status;
 
     if (recoveryRecord.status === RecoveryStatusEn.WAITING_FOR_SIGNATURE) {
       // if the recovery record is waiting for signature, check if the contacts have signed
@@ -584,6 +586,7 @@ class WalletController {
     }
 
     accountManager.updateRecoveryRecord(recoveryRecord);
+    return prevStatus !== recoveryRecord?.status;
   }
 
   public async hasRecoveryRecord() {
