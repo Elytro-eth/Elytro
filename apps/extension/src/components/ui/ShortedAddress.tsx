@@ -16,7 +16,7 @@ export default function ShortedAddress({ address, chainId, className }: IProps) 
 
   return (
     <span className={cn('w-fit flex flex-row items-center gap-x-sm p-xs rounded-2xs bg-gray-150', className)}>
-      <img src={getIconByChainId(chainId)} className="size-4 rounded-full" />
+      {chainId && <img src={getIconByChainId(chainId)} className="size-4 rounded-full" />}
       <Tooltip delayDuration={0} disableHoverableContent>
         <TooltipTrigger>
           <span className="elytro-text-tiny-body">{formatAddressToShort(address)}</span>

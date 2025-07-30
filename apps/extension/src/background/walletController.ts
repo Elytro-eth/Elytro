@@ -25,6 +25,7 @@ import { ETH_TOKEN_INFO } from '@/constants/token';
 import { decrypt, encrypt, TPasswordEncryptedData } from '@/utils/passworder';
 import { CoinLogoNameMap } from '@/constants/token';
 import { TokenQuote } from '@/types/pimlico';
+import { detectAddressType } from '@/utils/addressType';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -115,6 +116,7 @@ class WalletController {
       await elytroSDK.estimateGas(userOp!);
     }
     const { opHash, signature } = await elytroSDK.signUserOperation(userOp!);
+    console.log('signature:', signature);
     userOp.signature = signature;
     await elytroSDK.sendUserOperation(userOp);
     return opHash;
@@ -712,6 +714,14 @@ class WalletController {
 
   public async getTokenPaymaster() {
     return await elytroSDK.getTokenPaymaster();
+  }
+
+  public async isContractAddress(address: string) {
+    return (await detectAddressType(address, walletClient.client)) === 'CONTRACT';
+  }
+
+  public async isEOAAddress(address: string) {
+    return (await detectAddressType(address, walletClient.client)) === 'EOA';
   }
 }
 

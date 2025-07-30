@@ -3,11 +3,7 @@ import { mutate } from '@/requests';
 import { paddingBytesToEven, formatHex } from '../format';
 import { toHex } from 'viem';
 
-export const canUserOpGetSponsor = async (
-  userOp: ElytroUserOperation,
-  chainID: number,
-  entryPoint: string
-) => {
+export const canUserOpGetSponsor = async (userOp: ElytroUserOperation, chainID: number, entryPoint: string) => {
   try {
     const res = await mutate(mutate_sponsor_op, {
       input: {
@@ -17,10 +13,7 @@ export const canUserOpGetSponsor = async (
           sender: userOp.sender,
           nonce: formatHex(userOp.nonce),
           factory: userOp.factory,
-          factoryData:
-            userOp.factory === null
-              ? null
-              : paddingBytesToEven(userOp.factoryData ?? ''),
+          factoryData: userOp.factory === null ? null : paddingBytesToEven(userOp.factoryData ?? ''),
           callData: userOp.callData,
           callGasLimit: formatHex(userOp.callGasLimit),
           verificationGasLimit: formatHex(userOp.verificationGasLimit),

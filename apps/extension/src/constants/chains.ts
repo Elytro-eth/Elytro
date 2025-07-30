@@ -1,5 +1,4 @@
 import CONFIG from '@/config';
-import { EntryPointVersion } from 'viem/account-abstraction';
 import {
   arbitrum,
   Chain,
@@ -23,21 +22,9 @@ export type TChainConfigItem = {
 
 export type TChainItem = Chain & {
   icon?: string;
+  opExplorer?: string;
   endpoint: string; // rpc url
   bundler: string; // bundler url
-  factory: string; // factory address
-  fallback: string; // fallback address
-  recovery: string; // social recovery module address
-  validator: string; // validator address
-  infoRecorder?: string; // info recorder address
-  // onchain config. If provided, it will be used to initialize the SDK and the SDK won't check chain config anymore.
-  onchainConfig: {
-    chainId: number;
-    entryPoint: string;
-    entryPointVersion: EntryPointVersion;
-    soulWalletLogic: string;
-  };
-  opExplorer?: string;
   stablecoins?: {
     name: string;
     address: string[];
@@ -50,17 +37,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     icon: 'https://static1.tokenterminal.com//ethereum/logo.png',
     endpoint: 'https://eth.drpc.org',
     bundler: `https://api.pimlico.io/v2/1/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
-    factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
-    fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
-    recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
-    validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
-    infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
-    onchainConfig: {
-      chainId: mainnet.id,
-      entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
-      entryPointVersion: '0.7',
-      soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
-    },
+    opExplorer: 'https://jiffyscan.xyz/userOpHash/',
     stablecoins: [
       {
         name: 'USDC',
@@ -86,18 +63,8 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png',
     endpoint: arbitrum.rpcUrls.default.http[0] || `https://arb-mainnet.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
     bundler: `https://api.pimlico.io/v2/42161/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
-    factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
-    fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
-    recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
-    validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
-    infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
-    onchainConfig: {
-      chainId: arbitrum.id,
-      entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
-      entryPointVersion: '0.7',
-      soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
-    },
     opExplorer: 'https://jiffyscan.xyz/userOpHash/',
+
     stablecoins: [
       {
         name: 'USDC',
@@ -120,18 +87,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
       optimism.rpcUrls.default.http[0] ||
       `https://opt-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
     bundler: `https://api.pimlico.io/v2/10/rpc?apikey=${import.meta.env.VITE_PIMLICO_API_KEY}`,
-    factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
-    fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
-    recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
-    validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
-    infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
-    opExplorer: 'https://optimism.blockscout.com/op/',
-    onchainConfig: {
-      chainId: optimism.id,
-      entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
-      entryPointVersion: '0.7',
-      soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
-    },
+    opExplorer: 'https://explorer.optimism.io/op/',
     stablecoins: [
       {
         name: 'USDC',
@@ -154,42 +110,19 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     endpoint:
       optimismSepolia.rpcUrls.default.http[0] || `https://opt-sepolia.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
     bundler: `https://api.pimlico.io/v2/11155420/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
-    factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
-    fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
-    recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
-    validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
-    // TODO: for now only support optimism sepolia
-    infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
-    onchainConfig: {
-      chainId: optimismSepolia.id,
-      entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
-      entryPointVersion: '0.7',
-      soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
-    },
-    opExplorer: 'https://optimism-sepolia.blockscout.com/op/',
     stablecoins: [
       {
         name: 'USDC',
         address: ['0x5fd84259d66Cd46123540766Be93DFE6D43130D7'],
       },
     ],
+    opExplorer: 'https://testnet-explorer.optimism.io/op/',
   },
   {
     ...sepolia,
     icon: 'https://static1.tokenterminal.com//ethereum/logo.png',
     endpoint: sepolia.rpcUrls.default.http[0] || `https://eth-sepolia.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
     bundler: `https://api.pimlico.io/v2/11155111/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
-    factory: '0x70B616f23bDDB18c5c412dB367568Dc360e224Bb',
-    fallback: '0xe4eA02c80C3CD86B2f23c8158acF2AAFcCa5A6b3',
-    recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
-    infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
-    validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
-    onchainConfig: {
-      chainId: sepolia.id,
-      entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
-      entryPointVersion: '0.7',
-      soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
-    },
     opExplorer: 'https://jiffyscan.xyz/userOpHash/',
     stablecoins: [
       {

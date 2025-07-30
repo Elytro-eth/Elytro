@@ -19,14 +19,19 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import AddressInput from '@/components/biz/AddressInput';
 import { saveRecentAddress } from '@/utils/recentAddresses';
 import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
+import { useWallet } from '@/contexts/wallet';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 
 export default function SendTx() {
+  const { wallet } = useWallet();
   const {
     tokenInfo: { tokens, loading: tokensLoading },
     currentAccount: { address, chainId },
     updateTokens,
   } = useAccount();
   const { handleTxRequest } = useTx();
+  const [openToContractConfirmModal, setOpenToContractConfirmModal] = useState(false);
 
   const [isPreparing, setIsPreparing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -125,6 +130,42 @@ export default function SendTx() {
     [form]
   );
 
+  const handleOpenTx = useCallback(async () => {
+    const token = form.getValues('token');
+    const to = form.getValues('to');
+    const amount = form.getValues('amount');
+
+    const txParams: Transaction = { to };
+    const formattedMaxAmount = formatTokenAmount(token.balance || 0, token.decimals);
+    const parsedAmount =
+      amount === formattedMaxAmount
+        ? BigInt(token.balance || 0).toString()
+        : parseUnits(amount || '0', token.decimals).toString();
+
+    if (token.address === zeroAddress) {
+      txParams.value = parsedAmount;
+    } else if (token.address) {
+      txParams.to = token.address;
+      txParams.data = encodeFunctionData({
+        abi: ABI_ERC20_TRANSFER,
+        functionName: 'transfer',
+        args: [to, parsedAmount],
+      });
+    } else {
+      throw new Error('Invalid token address');
+    }
+
+    saveRecentAddress(to);
+    handleTxRequest(TxRequestTypeEn.SendTransaction, [txParams], {
+      to,
+      method: {
+        name: 'transfer',
+        params: [to, parsedAmount],
+      } as SafeAny,
+      toInfo: { ...token } as SafeAny,
+    });
+  }, [form]);
+
   const handleContinue = useCallback(async () => {
     if (!form.formState.isValid || !address) {
       form.trigger();
@@ -135,9 +176,7 @@ export default function SendTx() {
       setIsPreparing(true);
       setError(null);
 
-      const token = form.getValues('token');
       const to = form.getValues('to');
-      const amount = form.getValues('amount');
 
       if (to.toLowerCase() === address.toLowerCase()) {
         toast({
@@ -148,35 +187,13 @@ export default function SendTx() {
         return;
       }
 
-      const txParams: Transaction = { to };
-      const formattedMaxAmount = formatTokenAmount(token.balance || 0, token.decimals);
-      const parsedAmount =
-        amount === formattedMaxAmount
-          ? BigInt(token.balance || 0).toString()
-          : parseUnits(amount || '0', token.decimals).toString();
+      const isToContract = await wallet.isContractAddress(to);
 
-      if (token.address === zeroAddress) {
-        txParams.value = parsedAmount;
-      } else if (token.address) {
-        txParams.to = token.address;
-        txParams.data = encodeFunctionData({
-          abi: ABI_ERC20_TRANSFER,
-          functionName: 'transfer',
-          args: [to, parsedAmount],
-        });
+      if (isToContract) {
+        setOpenToContractConfirmModal(true);
       } else {
-        throw new Error('Invalid token address');
+        handleOpenTx();
       }
-
-      saveRecentAddress(to);
-      handleTxRequest(TxRequestTypeEn.SendTransaction, [txParams], {
-        to,
-        method: {
-          name: 'transfer',
-          params: [to, parsedAmount],
-        } as SafeAny,
-        toInfo: { ...token } as SafeAny,
-      });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to prepare transaction';
       setError(errorMessage);
@@ -299,6 +316,32 @@ export default function SendTx() {
           )}
         </Button>
       </div>
+
+      <Dialog open={openToContractConfirmModal} onOpenChange={setOpenToContractConfirmModal}>
+        <DialogContent>
+          <div className="flex flex-col items-center gap-2">
+            <img src={getIconByChainId(chainId)} alt="chain" className="size-10 rounded-full" />
+            <ShortedAddress address={form.getValues('to')} />
+            <div className="text-sm text-gray-750">
+              <p>It&apos;s a contract address, so it must be on {getChainNameByChainId(chainId)}</p>
+              <p>otherwise, you will lose your assets.</p>
+            </div>
+          </div>
+          <div className="flex justify-between max-w-full">
+            <Button
+              variant="outline"
+              size="large"
+              className=" gap-xl"
+              onClick={() => setOpenToContractConfirmModal(false)}
+            >
+              Back
+            </Button>
+            <Button variant="secondary" size="large" className=" gap-xl" onClick={handleOpenTx}>
+              I understand
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </SecondaryPageWrapper>
   );
 }

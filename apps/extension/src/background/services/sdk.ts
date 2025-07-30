@@ -36,7 +36,7 @@ import {
 } from 'viem';
 import { createAccount } from '@/utils/ethRpc/create-account';
 import { ethErrors } from 'eth-rpc-errors';
-import { ABI_SoulWallet, ABI_SocialRecoveryModule } from '@soulwallet/abi';
+import { ABI_Elytro, ABI_SocialRecoveryModule } from '@soulwallet/abi';
 import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 import { ABI_ERC20_BALANCE_OF, ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
@@ -45,21 +45,26 @@ import { RecoveryStatusEn } from '@/constants/recovery';
 import { getLogsOnchain, GetLogsOnchainReturnType } from '@/utils/getLogsOnchain';
 import { SupportedToken, TokenQuote, TokenQuoteResponse, TokenPaymaster } from '@/types/pimlico';
 import { arbitrum } from 'viem/chains';
+import { DEFAULT_ENTRYPOINT_ADDRESS, SDK_CONFIG_BY_ENTRYPOINT } from '@/constants/entrypoints';
+import { TSDKConfigItem } from '@/constants/entrypoints';
+
+type TSDKChainConfigItem = TChainItem & TSDKConfigItem;
 
 export class SDKService {
-  private readonly _REQUIRED_CHAIN_FIELDS: (keyof TChainItem)[] = [
+  private readonly _REQUIRED_CHAIN_FIELDS: (keyof TSDKChainConfigItem)[] = [
     'id',
     'endpoint',
     'factory',
     'fallback',
     'recovery',
-    'onchainConfig',
+    'entryPoint',
+    'soulWalletLogic',
     'bundler',
   ];
 
   private _sdk!: SoulWallet;
   private _bundler!: Bundler;
-  private _config!: TChainItem;
+  private _config!: TSDKChainConfigItem;
   private _pimlicoRpc: Nullable<PublicClient> = null;
   private _client: Nullable<PublicClient> = null;
 
@@ -79,37 +84,48 @@ export class SDKService {
     });
   }
 
-  get isPimlicoBundler() {
-    return this._config.bundler.includes('pimlico');
-  }
-
   get bundler() {
     return this._bundler;
   }
 
-  public resetSDK(chainConfig: TChainItem) {
+  public resetSDK(chainConfig: TChainItem, entrypoint?: string) {
     if (!SUPPORTED_CHAIN_IDS.includes(chainConfig.id)) {
       throw new Error(`Elytro: chain ${chainConfig.id} is not supported for now.`);
     }
 
-    if (this._isConfigUnchanged(chainConfig)) {
+    entrypoint = entrypoint ?? this._config?.entryPoint ?? DEFAULT_ENTRYPOINT_ADDRESS;
+
+    if (!SDK_CONFIG_BY_ENTRYPOINT[entrypoint]) {
+      throw new Error(`Elytro: entrypoint ${entrypoint} is not supported.`);
+    }
+
+    const sdkConfig: TSDKChainConfigItem = {
+      ...chainConfig,
+      ...SDK_CONFIG_BY_ENTRYPOINT[entrypoint],
+    };
+
+    if (this._isConfigUnchanged(sdkConfig)) {
       console.log('Elytro::SDK: chain config unchanged, no reset needed.');
       return;
     }
 
-    this.initializeSDK(chainConfig);
+    this.initializeSDK(sdkConfig);
   }
 
-  private _isConfigUnchanged(newConfig: TChainItem): boolean {
+  private _isConfigUnchanged(newConfig: TSDKChainConfigItem): boolean {
     if (!this._config) return false;
 
     return this._REQUIRED_CHAIN_FIELDS.every((field) => newConfig[field] === this._config?.[field]);
   }
 
-  private initializeSDK(config: TChainItem) {
-    const { endpoint, bundler, factory, fallback, recovery, onchainConfig } = config;
+  private initializeSDK(config: TSDKChainConfigItem) {
+    const { endpoint, bundler, factory, fallback, recovery, entryPoint, soulWalletLogic } = config;
 
-    this._sdk = new SoulWallet(endpoint, bundler, factory, fallback, recovery, onchainConfig);
+    this._sdk = new SoulWallet(endpoint, bundler, factory, fallback, recovery, {
+      chainId: config.id,
+      entryPoint,
+      soulWalletLogic,
+    });
     this._pimlicoRpc = null;
     this._bundler = new Bundler(bundler);
     this._config = config;
@@ -179,14 +195,12 @@ export class SDKService {
     if (res.isErr()) {
       throw res.ERR;
     } else {
-      console.log('res.OK', res.OK);
       return res.OK;
     }
   }
 
   public async canGetSponsored(userOp: ElytroUserOperation) {
-    const { chainId, entryPoint } = this._config.onchainConfig;
-    return await canUserOpGetSponsor(userOp, chainId, entryPoint);
+    return await canUserOpGetSponsor(userOp, this._config.id, this._config.entryPoint);
   }
 
   public async isSmartAccountDeployed(address: string) {
@@ -211,12 +225,17 @@ export class SDKService {
     if (opHash.isErr()) {
       throw opHash.ERR;
     } else {
-      const signature = await this._getSignature({
-        messageHash: opHash.OK,
-        validStartTime: 0, // 0
-        validEndTime: Math.floor(new Date().getTime() / 1000) + 60 * 5, // 5 mins
-      });
+      const signature = await this._getSignature(
+        {
+          messageHash: opHash.OK,
+          validStartTime: 0, // 0
+          validEndTime: Math.floor(new Date().getTime() / 1000) + 60 * 5, // 5 mins
+          userOp,
+        },
+        true
+      );
       userOp.signature = signature;
+      // await this._isSignatureValid(userOp.sender, opHash.OK as `0x${string}`, signature);
       return { signature, opHash: opHash.OK };
     }
   }
@@ -261,7 +280,7 @@ export class SDKService {
 
     const magicValue = await _client.readContract({
       address,
-      abi: ABI_SoulWallet,
+      abi: ABI_Elytro,
       functionName: 'isValidSignature',
       args: [messageHash, signature],
     });
@@ -309,6 +328,56 @@ export class SDKService {
     return _eoaSignature;
   }
 
+  // private async _newSign(userOp: ElytroUserOperation) {
+  //   const domain = {
+  //     name: 'ERC4337',
+  //     version: '1',
+  //     chainId: this._config.id,
+  //     verifyingContract: this._config.entryPoint as Address,
+  //   };
+
+  //   const types = {
+  //     PackedUserOperation: [
+  //       { name: 'sender', type: 'address' },
+  //       { name: 'nonce', type: 'uint256' },
+  //       { name: 'initCode', type: 'bytes' },
+  //       { name: 'callData', type: 'bytes' },
+  //       { name: 'accountGasLimits', type: 'bytes32' },
+  //       { name: 'preVerificationGas', type: 'uint256' },
+  //       { name: 'gasFees', type: 'bytes32' },
+  //       { name: 'paymasterAndData', type: 'bytes' },
+  //     ],
+  //   };
+
+  //   const packedUserOp = createPackedUserOp(userOp);
+  //   const valueToSign = {
+  //     sender: packedUserOp.sender.toLowerCase(),
+  //     nonce: packedUserOp.nonce,
+  //     initCode: packedUserOp.initCode,
+  //     callData: packedUserOp.callData,
+  //     accountGasLimits: packedUserOp.accountGasLimits,
+  //     preVerificationGas: packedUserOp.preVerificationGas,
+  //     gasFees: packedUserOp.gasFees,
+  //     paymasterAndData: packedUserOp.paymasterAndData,
+  //   };
+
+  //   console.log('test: signTypedData', {
+  //     domain,
+  //     types,
+  //     primaryType: 'PackedUserOperation',
+  //     message: valueToSign,
+  //   });
+
+  //   const _signature = await keyring.currentOwner?.signTypedData({
+  //     domain,
+  //     types,
+  //     primaryType: 'PackedUserOperation',
+  //     message: valueToSign,
+  //   });
+
+  //   return _signature!;
+  // }
+
   private async _getSignature(
     packParams: {
       messageHash: string;
@@ -318,9 +387,9 @@ export class SDKService {
     useRawSign = false
   ) {
     const rawHashRes = await this._sdk.packRawHash(
-      packParams.messageHash,
-      packParams.validStartTime,
-      packParams.validEndTime
+      packParams.messageHash
+      // unlimited time // packParams.validStartTime,
+      // unlimited time // packParams.validEndTime,
     );
 
     if (rawHashRes.isErr()) {
@@ -329,9 +398,12 @@ export class SDKService {
 
     await keyring.tryUnlock();
 
-    const signature = useRawSign
-      ? await this._rawSign(rawHashRes.OK.packedHash as Hex)
-      : await this._personalSign(rawHashRes.OK.packedHash as Hex);
+    let signature: Hex;
+    if (useRawSign) {
+      signature = await this._rawSign(rawHashRes.OK.packedHash as Hex);
+    } else {
+      signature = await this._personalSign(rawHashRes.OK.packedHash as Hex);
+    }
 
     const signRes = await this._sdk.packUserOpEOASignature(
       this._config.validator,
@@ -351,7 +423,7 @@ export class SDKService {
       return null;
     }
 
-    const res = await DecodeUserOp(this._config.id, this._config.onchainConfig.entryPoint, userOp);
+    const res = await DecodeUserOp(this._config.id, this._config.entryPoint, userOp);
 
     if (res.isErr()) {
       throw res.ERR;
@@ -361,7 +433,7 @@ export class SDKService {
   }
 
   public async simulateUserOperation(userOp: ElytroUserOperation) {
-    return await simulateSendUserOp(userOp, this._config.onchainConfig.entryPoint, this._config.id);
+    return await simulateSendUserOp(userOp, this._config.entryPoint, this._config.id);
   }
 
   private async _getFeeDataFromSDKProvider() {
@@ -407,12 +479,9 @@ export class SDKService {
     if (useDefaultGasPrice) {
       const gasPrice = await this._getFeeData();
 
-      // todo: what if it's null? set as 0?
       userOp.maxFeePerGas = gasPrice?.maxFeePerGas ?? 0;
       userOp.maxPriorityFeePerGas = gasPrice?.maxPriorityFeePerGas ?? 0;
     }
-
-    // todo: sdk can be optimized (fetch balance in sdk)
 
     const res = await this._sdk.estimateUserOperationGas(
       this._config.validator,
@@ -456,6 +525,10 @@ export class SDKService {
     }
   }
 
+  get isPimlicoBundler() {
+    return this._config.bundler.includes('pimlico');
+  }
+
   private _getPimlicoRpc() {
     if (this.isPimlicoBundler) {
       if (!this._pimlicoRpc) {
@@ -491,7 +564,6 @@ export class SDKService {
     noSponsor = false,
     token?: TokenQuote
   ) {
-    console.log('test: noSponsor', noSponsor);
     const hasSponsored = noSponsor ? false : await this.canGetSponsored(userOp);
     if (!hasSponsored) {
       if (token) {
@@ -517,7 +589,7 @@ export class SDKService {
               maxPriorityFeePerGas: toHex(userOp.maxPriorityFeePerGas),
               maxFeePerGas: toHex(userOp.maxFeePerGas),
             },
-            this._config.onchainConfig.entryPoint as `0x${string}`,
+            this._config.entryPoint as `0x${string}`,
             toHex(this._config.id),
             {
               token: token?.token,
@@ -556,9 +628,10 @@ export class SDKService {
               paymasterPostOpGasLimit: formatHex(userOp.paymasterPostOpGasLimit ?? '0x0'),
               paymasterData: userOp.paymasterData,
               signature:
-                '0x162485941ba1faf21013656dab1e60e9d7226dc0000000620100005f5e0fff000fffffffff0000000000000000000000000000000000000000b91467e570a6466aa9e9876cbcd013baba02900b8979d43fe208a4a4f339f5fd6007e74cd82e037b800186422fc2da167c747ef045e5d18a5f5d4300f8e1a0291c',
+                '0xea50a2874df3eEC9E0365425ba948989cd63FED6000000620100005f5e0fff000fffffffff0000000000000000000000000000000000000000b91467e570a6466aa9e9876cbcd013baba02900b8979d43fe208a4a4f339f5fd6007e74cd82e037b800186422fc2da167c747ef045e5d18a5f5d4300f8e1a0291c',
+              // '0x162485941ba1faf21013656dab1e60e9d7226dc0000000620100005f5e0fff000fffffffff0000000000000000000000000000000000000000b91467e570a6466aa9e9876cbcd013baba02900b8979d43fe208a4a4f339f5fd6007e74cd82e037b800186422fc2da167c747ef045e5d18a5f5d4300f8e1a0291c',
             },
-            this._config.onchainConfig.entryPoint as `0x${string}`,
+            this._config.entryPoint as `0x${string}`,
             formatHex(this._config.id),
             {
               token,
@@ -657,7 +730,6 @@ export class SDKService {
     if (_userOp.isErr()) {
       throw _userOp.ERR;
     } else {
-      console.log('userOp 1', _userOp.OK);
       return _userOp.OK;
     }
   }
@@ -976,7 +1048,7 @@ export class SDKService {
         {
           tokens: tokens.map((item) => item.token),
         },
-        this._config.onchainConfig.entryPoint as `0x${string}`,
+        this._config.entryPoint as `0x${string}`,
         this._config.id,
       ] as SafeAny,
     })) as TokenQuoteResponse;
