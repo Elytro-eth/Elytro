@@ -209,7 +209,7 @@ export default function SendTx() {
 
   // Check if the form is valid
   const isFormValid = useMemo(() => {
-    return form.formState.isValid && !isPreparing && !tokensLoading;
+    return form.formState.isValid && !isPreparing && !tokensLoading && !!form.getValues('amount');
   }, [form.formState.isValid, isPreparing, tokensLoading]);
 
   return (
@@ -319,24 +319,21 @@ export default function SendTx() {
 
       <Dialog open={openToContractConfirmModal} onOpenChange={setOpenToContractConfirmModal}>
         <DialogContent>
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-y-xl pt-3xl">
             <img src={getIconByChainId(chainId)} alt="chain" className="size-10 rounded-full" />
-            <ShortedAddress address={form.getValues('to')} />
-            <div className="text-sm text-gray-750">
-              <p>It&apos;s a contract address, so it must be on {getChainNameByChainId(chainId)}</p>
-              <p>otherwise, you will lose your assets.</p>
+            <ShortedAddress address={form.getValues('to')} hideTooltip />
+            <div className="text-center text-gray-750">
+              <p className="elytro-text-bold-body">
+                It&apos;s a contract address, so it must be on {getChainNameByChainId(chainId)}
+              </p>
+              <p className="elytro-text-body mt-sm text-gray-600">otherwise, you will lose your assets.</p>
             </div>
           </div>
-          <div className="flex justify-between max-w-full">
-            <Button
-              variant="outline"
-              size="large"
-              className=" gap-xl"
-              onClick={() => setOpenToContractConfirmModal(false)}
-            >
+          <div className="grid grid-cols-2 gap-2 mt-xl">
+            <Button variant="outline" size="medium" onClick={() => setOpenToContractConfirmModal(false)}>
               Back
             </Button>
-            <Button variant="secondary" size="large" className=" gap-xl" onClick={handleOpenTx}>
+            <Button size="medium" onClick={handleOpenTx}>
               I understand
             </Button>
           </div>
