@@ -11,11 +11,13 @@ import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import { toast } from '@/hooks/use-toast';
 import Spin from '@/components/ui/Spin';
 import { CoinLogoNameMap } from '@/constants/token';
+import { useWallet } from '@/contexts/wallet';
 
 const StablecoinsGas = () => {
   const {
     currentAccount: { address, chainId },
   } = useAccount();
+  const { wallet } = useWallet();
   const { currentChain, getCurrentChain } = useChain();
   const { handleTxRequest } = useTx();
   const [approvedStablecoins, setApprovedStablecoins] = useState<{ name: string; address: string }[]>([]);
@@ -36,7 +38,7 @@ const StablecoinsGas = () => {
     const txs: Partial<Transaction>[] = [];
     const targetStablecoinsAddresses = stablecoins?.map((coin: { name: string; address: string[] }) => coin.address[0]);
 
-    const entryPointAddress = currentChain?.onchainConfig?.entryPoint;
+    const entryPointAddress = await wallet.getEntryPoint();
     if (!entryPointAddress) {
       toast({
         title: 'EntryPoint not found',
@@ -68,7 +70,7 @@ const StablecoinsGas = () => {
         return;
       }
 
-      const entryPointAddress = currentChain?.onchainConfig?.entryPoint;
+      const entryPointAddress = await wallet.getEntryPoint();
       if (!entryPointAddress) {
         console.warn('EntryPoint not found for allowance query');
         return;

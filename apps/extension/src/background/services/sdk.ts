@@ -88,6 +88,10 @@ export class SDKService {
     return this._bundler;
   }
 
+  get entryPoint() {
+    return this._config.entryPoint;
+  }
+
   public resetSDK(chainConfig: TChainItem, entrypoint?: string) {
     if (!SUPPORTED_CHAIN_IDS.includes(chainConfig.id)) {
       throw new Error(`Elytro: chain ${chainConfig.id} is not supported for now.`);
@@ -230,7 +234,6 @@ export class SDKService {
           messageHash: opHash.OK,
           validStartTime: 0, // 0
           validEndTime: Math.floor(new Date().getTime() / 1000) + 60 * 5, // 5 mins
-          userOp,
         },
         true
       );
@@ -987,7 +990,7 @@ export class SDKService {
     try {
       const modules = (await _client.readContract({
         address: walletAddress as Address,
-        abi: ABI_SoulWallet,
+        abi: ABI_Elytro,
         functionName: 'listModule',
       })) as string[][];
 

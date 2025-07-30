@@ -723,6 +723,10 @@ class WalletController {
   public async isEOAAddress(address: string) {
     return (await detectAddressType(address, walletClient.client)) === 'EOA';
   }
+
+  public async getEntryPoint() {
+    return elytroSDK.entryPoint;
+  }
 }
 
 const walletController = new WalletController();
