@@ -96,13 +96,20 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
                   />
                 </FormControl>
 
-                <FormMessage className="text-left" />
+                {form.getFieldState('confirm').isTouched && form.getFieldState('confirm').error ? (
+                  <FormMessage className="text-left" />
+                ) : null}
               </FormItem>
             )}
           />
         </div>
 
-        <Button type="submit" className="w-full rounded-full h-14" disabled={loading} size="large">
+        <Button
+          type="submit"
+          className="w-full rounded-full h-14"
+          disabled={loading || !form.formState.isValid}
+          size="large"
+        >
           {loading ? 'Creating...' : 'Continue'}
         </Button>
       </form>
