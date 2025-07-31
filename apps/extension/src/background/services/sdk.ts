@@ -568,6 +568,7 @@ export class SDKService {
     token?: TokenQuote
   ) {
     const hasSponsored = noSponsor ? false : await this.canGetSponsored(userOp);
+
     if (!hasSponsored) {
       if (token) {
         const pimlicoRpc = this._getPimlicoRpc();

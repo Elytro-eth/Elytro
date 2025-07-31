@@ -116,7 +116,6 @@ class WalletController {
       await elytroSDK.estimateGas(userOp!);
     }
     const { opHash, signature } = await elytroSDK.signUserOperation(userOp!);
-    console.log('signature:', signature);
     userOp.signature = signature;
     await elytroSDK.sendUserOperation(userOp);
     return opHash;

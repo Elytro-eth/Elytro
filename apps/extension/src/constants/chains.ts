@@ -37,7 +37,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     icon: 'https://static1.tokenterminal.com//ethereum/logo.png',
     endpoint: 'https://eth.drpc.org',
     bundler: `https://api.pimlico.io/v2/1/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
-    opExplorer: 'https://jiffyscan.xyz/userOpHash/',
+    opExplorer: 'https://eth.blockscout.com/op/',
     stablecoins: [
       {
         name: 'USDC',
@@ -63,8 +63,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png',
     endpoint: arbitrum.rpcUrls.default.http[0] || `https://arb-mainnet.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
     bundler: `https://api.pimlico.io/v2/42161/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
-    opExplorer: 'https://jiffyscan.xyz/userOpHash/',
-
+    opExplorer: 'https://arbitrum.blockscout.com/op/',
     stablecoins: [
       {
         name: 'USDC',
@@ -123,7 +122,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     icon: 'https://static1.tokenterminal.com//ethereum/logo.png',
     endpoint: sepolia.rpcUrls.default.http[0] || `https://eth-sepolia.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
     bundler: `https://api.pimlico.io/v2/11155111/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
-    opExplorer: 'https://jiffyscan.xyz/userOpHash/',
+    opExplorer: 'https://sepolia.etherscan.io/tx/',
     stablecoins: [
       {
         name: 'USDC',
