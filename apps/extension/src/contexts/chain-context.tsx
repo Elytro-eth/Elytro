@@ -68,7 +68,7 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
           url,
         });
       } else if (opHash && currentChain?.opExplorer) {
-        const url = `${currentChain.opExplorer}/${opHash}`;
+        const url = `${currentChain.opExplorer}${opHash}`;
         chrome.tabs.create({
           url,
         });

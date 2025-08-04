@@ -122,7 +122,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     icon: 'https://static1.tokenterminal.com//ethereum/logo.png',
     endpoint: sepolia.rpcUrls.default.http[0] || `https://eth-sepolia.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
     bundler: `https://api.pimlico.io/v2/11155111/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
-    opExplorer: 'https://sepolia.etherscan.io/tx/',
+    opExplorer: 'https://eth-sepolia.blockscout.com/op/',
     stablecoins: [
       {
         name: 'USDC',
