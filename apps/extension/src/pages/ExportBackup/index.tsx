@@ -90,11 +90,11 @@ export default function ExportBackupPage() {
         //description: 'You can find it in the Downloads folder',
         variant: 'constructive',
       });
-    } catch (error) {
+    } catch {
       toast({
         title: 'Export wallets failed',
         variant: 'destructive',
-        description: formatErrorMsg(error),
+        description: 'Probably wrong passcode, please try again',
       });
     } finally {
       setIsDownloading(false);

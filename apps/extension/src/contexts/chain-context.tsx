@@ -61,14 +61,19 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
   }, [pathname]);
 
   const openExplorer = useCallback(
-    ({ txHash, opHash }: { txHash?: string; opHash: string }) => {
-      if (txHash && currentChain?.blockExplorers?.default?.url) {
-        const url = `${currentChain.blockExplorers.default.url}/tx/${txHash}`;
+    async ({ txHash, opHash }: { txHash?: string; opHash: string }) => {
+      let chain = currentChain;
+      if (!chain) {
+        chain = await wallet.getCurrentChain();
+        setCurrentChain(chain);
+      }
+      if (txHash && chain?.blockExplorers?.default?.url) {
+        const url = `${chain.blockExplorers.default.url}/tx/${txHash}`;
         chrome.tabs.create({
           url,
         });
-      } else if (opHash && currentChain?.opExplorer) {
-        const url = `${currentChain.opExplorer}${opHash}`;
+      } else if (opHash && chain?.opExplorer) {
+        const url = `${chain.opExplorer}${opHash}`;
         chrome.tabs.create({
           url,
         });
