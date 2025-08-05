@@ -53,8 +53,8 @@ export default function InternalImportBackup() {
   const handleStartImport = async () => {
     try {
       const data = fileContent ? (JSON.parse(fileContent) as TPasswordEncryptedData) : null;
-      if (!data || data?.data === undefined || data?.iv === undefined || data?.salt === undefined) {
-        throw new Error('Invalid file content');
+      if (!data || !data.data || !data.iv || !data.salt) {
+        throw new Error('Invalid backup file');
       }
 
       const decrypted = await wallet.getImportedWalletsData(data, backupPwd);
@@ -68,10 +68,14 @@ export default function InternalImportBackup() {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
       }
     } catch (error) {
+      let description = formatErrorMsg(error);
+      if (description.includes('not valid JSON')) {
+        description = 'Invalid backup file';
+      }
       toast({
         title: 'Passcode not correct',
         variant: 'destructive',
-        description: formatErrorMsg(error),
+        description,
       });
     }
   };

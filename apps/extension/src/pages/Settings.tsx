@@ -50,14 +50,14 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="mb-4">
+      <div>
         <h2 className="elytro-text-small-bold text-gray-600 my-4">Local settings</h2>
         <div className="space-y-2">
           <SettingItem icon={UserRoundIcon} label="Change passcode" path={SIDE_PANEL_ROUTE_PATHS.ChangePassword} />
           <SettingItem icon={Settings2Icon} label="Networks" path={SIDE_PANEL_ROUTE_PATHS.NetworkConfiguration} />
           <SettingItem icon={WalletCardsIcon} label="Backup wallets" path={SIDE_PANEL_ROUTE_PATHS.ExportBackup} />
         </div>
-        <div className="flex flex-col space-y-2 w-full my-8">
+        <div className="flex flex-col space-y-2 w-full mt-8 mb-4">
           <Button variant="secondary" onClick={handleLock}>
             <LockKeyholeIcon className="w-4 h-4 mr-2 duration-100 group-hover:stroke-white" />
             Lock Elytro
@@ -69,15 +69,15 @@ export default function Settings() {
               FAQ
             </a>
           </Button>
+        </div>
 
-          <div className="text-center text-gray-750">
-            <p>
-              <a href="https://t.me/+l9coqJq9QHgyYjI1" target="_blank" rel="noreferrer">
-                Join Telegram group
-              </a>
-            </p>
-            <p>version {appVersion}</p>
-          </div>
+        <div className="text-center text-gray-750">
+          <p>
+            <a href="https://t.me/+l9coqJq9QHgyYjI1" target="_blank" rel="noreferrer">
+              Join Telegram group
+            </a>
+          </p>
+          <p>version {appVersion}</p>
         </div>
       </div>
     </SecondaryPageWrapper>

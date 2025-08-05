@@ -10,6 +10,7 @@ import { removeSearchParamsOfCurrentWindow } from '@/utils/url';
 import { query, query_receive_activities, query_token_price } from '@/requests/query';
 import { debounce, DebouncedFunc } from 'lodash';
 import { toast } from '@/hooks/use-toast';
+import { useInterval } from 'usehooks-ts';
 
 const DEFAULT_ACCOUNT_INFO: TAccountInfo = {
   address: '',
@@ -166,7 +167,8 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
               to: item.list[0].asset_to,
               value: item.list[0].asset_value,
               timestamp: item.timestamp * 1000,
-              opHash: item.opHash || item.txhash,
+              opHash: item.opHash,
+              txHash: item.txhash,
               status: UserOperationStatusEn.confirmedSuccess,
               decimals: item.list[0].decimals,
               symbol: item.list[0].symbol,
@@ -239,6 +241,10 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
       await Promise.all([updateHistory(), updateTokens()]);
     }
   }, 300);
+
+  useInterval(() => {
+    onHistoryUpdated();
+  }, 20_000);
 
   const contextValue = useMemo(
     () => ({

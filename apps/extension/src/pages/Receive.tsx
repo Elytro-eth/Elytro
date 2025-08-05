@@ -68,7 +68,7 @@ export default function Receive() {
           {isCopied ? (
             <>
               <Check className="elytro-icon mr-2xs stroke-dark-blue group-hover:stroke-white" />
-              Address copied
+              Copied
             </>
           ) : (
             <>

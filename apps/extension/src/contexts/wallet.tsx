@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { WalletController, WalletStatusEn } from '@/background/walletController';
 import PortMessage from '@/utils/message/portMessage';
 import { toast } from '@/hooks/use-toast';
@@ -6,7 +6,7 @@ import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo, SidePanelRoutePath } from '@/utils/navigation';
 import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';
 import { cn } from '@/utils/shadcn/utils';
-import { Loader2 } from 'lucide-react';
+import { useInterval } from 'usehooks-ts';
 const portMessage = new PortMessage('elytro-ui');
 
 const INIT_PATHS = [
@@ -56,15 +56,17 @@ const WalletContext = createContext<IWalletContext>({
 export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
   const [status, setStatus] = useState<WalletStatusEn | undefined>();
   const [pathname] = useEnhancedHashLocation();
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
+  const isCheckingRef = useRef<boolean>(false);
 
   const getWalletStatus = async () => {
     try {
-      if (loading) {
-        return;
-      }
+      // if (loading) {
+      //   return;
+      // }
 
-      setLoading(true);
+      // setLoading(true);
+      isCheckingRef.current = true;
       const res = await walletControllerProxy.getWalletStatus();
 
       // We should NOT navigate if user already in the home/dashboard page and the status is the same and the status is not in the list of statuses
@@ -111,7 +113,8 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
       });
       setStatus(WalletStatusEn.NoOwner);
     } finally {
-      setLoading(false);
+      // setLoading(false);
+      isCheckingRef.current = false;
     }
   };
 
@@ -119,16 +122,23 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
     getWalletStatus();
   }, [walletControllerProxy, pathname]);
 
+  useInterval(() => {
+    getWalletStatus();
+  }, 15_000);
+
   return (
     <WalletContext.Provider value={{ wallet: walletControllerProxy, status }}>
       <div
-        className={cn('flex flex-1 items-center justify-center relative', loading && 'opacity-70 pointer-events-none')}
+        className={cn(
+          'flex flex-1 items-center justify-center relative'
+          // loading && 'opacity-70 pointer-events-none'
+        )}
       >
-        {loading && (
+        {/* {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-[4px] z-10">
             <Loader2 className="size-12 animate-spin text-primary" />
           </div>
-        )}
+        )} */}
         {children}
       </div>
     </WalletContext.Provider>

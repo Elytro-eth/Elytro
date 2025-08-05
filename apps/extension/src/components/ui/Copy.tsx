@@ -25,12 +25,9 @@ export default function Copy({ text }: ICopyProps) {
   return isCopied ? (
     <div className="flex items-center gap-2">
       <IconCheck className="elytro-icon size-4 stroke-green" />
-      <span className="text-green-600">Address copied</span>
+      <span className="text-green-600">Copied</span>
     </div>
   ) : (
-    <IconCopy
-      className="elytro-clickable-icon size-4 stroke-gray-600 hover:stroke-gray-900"
-      onClick={onCopy}
-    />
+    <IconCopy className="elytro-clickable-icon size-4 stroke-gray-600 hover:stroke-gray-900" onClick={onCopy} />
   );
 }

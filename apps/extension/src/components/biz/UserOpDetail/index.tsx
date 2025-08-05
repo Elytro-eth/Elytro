@@ -96,10 +96,13 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   }, []);
 
   const calcGasInTokenByPrice = (paymaster: TokenPaymaster) => {
+    console.log('Elytro: calcGasInTokenByPrice', paymaster);
     const defaultDisplay = `Pay gas with ${paymaster.name}`;
     try {
       const { exchangeRate } = paymaster;
-      const gasInToken = (BigInt(calcResult?.gasUsed || 0) * BigInt(exchangeRate)) / BigInt(1e18);
+      const gasUsed = BigInt(calcResult?.gasUsed || 0);
+      const gasInToken =
+        selectedGasToken?.token === paymaster.token ? gasUsed : (gasUsed * BigInt(exchangeRate)) / BigInt(1e18);
 
       return gasInToken && gasInToken > 0n
         ? `${formatUnits(gasInToken, paymaster.decimals)} ${paymaster.name}`

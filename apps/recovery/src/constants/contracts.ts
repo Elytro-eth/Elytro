@@ -1,6 +1,9 @@
+// const v07 = '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb';
+const v08 = '0xAFEF5D8Fb7B4650B1724a23e40633f720813c731';
+
 export const SocialRecoveryContractConfig = {
   // Elytro Social Recovery Module. It's same for all chains, for now. make it dynamic later.
-  address: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
+  address: v08,
   abi: [
     {
       type: 'constructor',

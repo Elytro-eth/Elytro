@@ -68,7 +68,7 @@ export default function ImportBackup() {
 
   const handleStartImport = async () => {
     try {
-      const data = JSON.parse(fileContent) as TPasswordEncryptedData;
+      const data = fileContent ? (JSON.parse(fileContent) as TPasswordEncryptedData) : null;
       if (!data || !data.data || !data.iv || !data.salt) {
         throw new Error('Invalid backup file');
       }
