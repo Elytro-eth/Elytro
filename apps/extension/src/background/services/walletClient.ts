@@ -122,6 +122,78 @@ class ElytroWalletClient {
       return null;
     }
   }
+
+  public async getTokenInfo(address: Address): Promise<TTokenInfo> {
+    try {
+      const erc20Abi = [
+        {
+          type: 'function',
+          name: 'name',
+          stateMutability: 'view',
+          inputs: [],
+          outputs: [{ name: '', type: 'string' }],
+        },
+        {
+          type: 'function',
+          name: 'symbol',
+          stateMutability: 'view',
+          inputs: [],
+          outputs: [{ name: '', type: 'string' }],
+        },
+        {
+          type: 'function',
+          name: 'decimals',
+          stateMutability: 'view',
+          inputs: [],
+          outputs: [{ name: '', type: 'uint8' }],
+        },
+      ] as const;
+
+      const [name, symbol, decimals] = await Promise.all([
+        this.client
+          .readContract({
+            address,
+            abi: erc20Abi,
+            functionName: 'name',
+          })
+          .catch(() => ''),
+        this.client
+          .readContract({
+            address,
+            abi: erc20Abi,
+            functionName: 'symbol',
+          })
+          .catch(() => ''),
+        this.client
+          .readContract({
+            address,
+            abi: erc20Abi,
+            functionName: 'decimals',
+          })
+          .catch(() => 0),
+      ]);
+
+      console.log('Elytro: tokenInfo', { name, symbol, decimals });
+
+      return {
+        address: address as `0x${string}`,
+        name: name as string,
+        symbol: symbol as string,
+        decimals: Number(decimals),
+        logoURI: '',
+      };
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('No contract found')) {
+        throw new Error('No contract found at this address');
+      }
+
+      if (error instanceof Error && error.message.includes('Invalid token address')) {
+        throw new Error('Invalid token address format');
+      }
+
+      throw new Error(`Failed to get token info: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
 }
 
 const walletClient = new ElytroWalletClient();

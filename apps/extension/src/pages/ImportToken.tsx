@@ -77,13 +77,36 @@ export default function ImportToken() {
     return tokens.filter((t) => t.symbol.toLowerCase().includes(value.toLowerCase()));
   };
 
-  const handleAddressInputChange = (value: string) => {
+  const handleAddressInputChange = async (value: string) => {
     setToken((prev) => ({
       ...prev,
       address: value as `0x${string}`,
     }));
 
-    return tokens.filter((t) => t.address.toLowerCase().includes(value.toLowerCase()));
+    const matchedTokens = tokens.filter((t) => t.address.toLowerCase().includes(value.toLowerCase()));
+
+    if (matchedTokens.length > 0) {
+      return matchedTokens;
+    } else if (isAddress(value)) {
+      const tokenInfo = await wallet.getTokenInfo(value);
+      if (tokenInfo.symbol) {
+        setToken((prev) => ({
+          ...prev,
+          ...tokenInfo,
+        }));
+      } else {
+        setHasAddressError(true);
+        setToken({
+          address: value as `0x${string}`,
+          symbol: '',
+          name: '',
+          logoURI: '',
+          decimals: 18,
+        });
+      }
+    }
+
+    return [];
   };
 
   const handleSelectToken = (token: TTokenInfo) => {
@@ -132,6 +155,18 @@ export default function ImportToken() {
   return (
     <SecondaryPageWrapper title="Import token">
       <div className="flex flex-col gap-y-md ">
+        <div className="flex flex-col gap-y-2xs">
+          <SearchInput<TTokenInfo>
+            label="Token contract address"
+            input={token.address}
+            onSearch={handleAddressInputChange as unknown as (value: string) => TTokenInfo[]}
+            onSelect={handleSelectToken}
+            renderItem={(token) => <TokenConfigItem token={token} searchType="address" searchValue={token.address} />}
+            placeholder="0x"
+          />
+          {hasAddressError && <p className="elytro-text-tiny-body text-red">Invalid address</p>}
+        </div>
+
         <SearchInput<TTokenInfo>
           label="Currency symbol"
           input={token.symbol}
@@ -140,18 +175,6 @@ export default function ImportToken() {
           renderItem={(token) => <TokenConfigItem token={token} searchType="symbol" searchValue={token.symbol} />}
           placeholder="ETH"
         />
-
-        <div className="flex flex-col gap-y-2xs">
-          <SearchInput<TTokenInfo>
-            label="Token contract address"
-            input={token.address}
-            onSearch={handleAddressInputChange}
-            onSelect={handleSelectToken}
-            renderItem={(token) => <TokenConfigItem token={token} searchType="address" searchValue={token.address} />}
-            placeholder="0x"
-          />
-          {hasAddressError && <p className="elytro-text-tiny-body text-red">Invalid address</p>}
-        </div>
 
         <div className="flex flex-col gap-y-2xs">
           <LabelInput

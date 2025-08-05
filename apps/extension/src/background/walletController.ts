@@ -443,6 +443,11 @@ class WalletController {
     return [infoRecordTx, contactsSettingTx];
   }
 
+  public async getTokenInfo(address: Address): Promise<TTokenInfo> {
+    const tokenInfo = await walletClient.getTokenInfo(address);
+    return tokenInfo;
+  }
+
   public async getCurrentAccountTokens() {
     if (!accountManager.currentAccount) {
       return [];
@@ -688,8 +693,6 @@ class WalletController {
       owner: account.owner,
     }));
 
-    console.log('test: accounts before', accounts);
-    console.log('test: ownerInfo before', ownerInfo);
     if (selectedAccounts) {
       accounts = accounts.filter((account) =>
         selectedAccounts.some((selectedAccount) => selectedAccount === account.address)
@@ -698,9 +701,6 @@ class WalletController {
       ownerInfo.owners = ownerInfo.owners.filter((owner) => ownerIds.includes(owner.id));
       ownerInfo.currentOwnerId = ownerIds.find((id) => id === ownerInfo.currentOwnerId) || accounts[0].owner;
     }
-
-    console.log('test: accounts after', accounts);
-    console.log('test: ownerInfo after', ownerInfo);
 
     const text = JSON.stringify({
       owners: ownerInfo,
