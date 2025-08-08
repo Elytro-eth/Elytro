@@ -128,7 +128,13 @@ class KeyringService {
         throw new Error('Elytro: Current owner not found');
       }
 
-      this._encryptData = await encrypt<TVaultData>(vaultData, password);
+      this._encryptData = await encrypt<TVaultData>(
+        {
+          owners: this._owners,
+          currentOwnerId: currentOwner.id,
+        },
+        password
+      );
       this._signingKey = new SigningKey(currentOwner.key);
       this._currentOwner = privateKeyToAccount(currentOwner.key);
       this._locked = false;

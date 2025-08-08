@@ -657,8 +657,10 @@ class WalletController {
 
   public async importWallet(encryptedData: TPasswordEncryptedData, password: string) {
     const { owners, accounts } = await this.getImportedWalletsData(encryptedData, password);
+
     await keyring.importOwners(owners, password);
     accountManager.importAccounts(accounts as TAccountInfo[]);
+    this.switchAccount(accountManager.currentAccount!);
 
     return true;
   }
