@@ -13,6 +13,7 @@ import TipItem from '@/components/biz/TipItem';
 import { TChainItem } from '@/constants/chains';
 import NetworkSelection from '@/components/biz/NetworkSelection';
 import { toast } from '@/hooks/use-toast';
+import RecoveryFileUploadDialog from './RecoveryFileUploadDialog';
 
 export default function AccountRecovery() {
   const [address, setAddress] = useState('');
@@ -21,6 +22,7 @@ export default function AccountRecovery() {
   const { wallet } = useWallet();
   const [checked, setChecked] = useState(false);
   const [isChainConfirmed, setIsChainConfirmed] = useState(false);
+  const [isFileDialogOpen, setIsFileDialogOpen] = useState(false);
 
   useEffect(() => {
     const checkRecoveryRecord = async () => {
@@ -38,6 +40,25 @@ export default function AccountRecovery() {
   }, [wallet]);
 
   if (!checked) {
+    const handleFileUpload = async (file: File) => {
+      try {
+        const content = await file.text();
+        const data = JSON.parse(content);
+        if (!data || !data.address || !data.chainId || !data.contacts || !data.threshold) {
+          throw new Error('Invalid backup file');
+        }
+
+        await wallet.switchChain(data.chainId);
+        await wallet.importRecoveryRecord(data.address as Address, data.chainId, data.contacts, data.threshold);
+        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RetrieveContacts);
+      } catch (error) {
+        console.error(error);
+        toast({
+          title: 'Failed to create recovery record',
+          // description: 'Please try again',
+        });
+      }
+    };
     return (
       <SecondaryPageWrapper
         title="Recover"
@@ -49,11 +70,7 @@ export default function AccountRecovery() {
           <img src={WalletImg} alt="Wallet" className="size-36" />
           <h1 className="elytro-text-title">How to recover</h1>
           <div>
-            <TipItem
-              title="Enter your wallet details"
-              description="You need the network & address."
-              Icon={Search}
-            />
+            <TipItem title="Enter your wallet details" description="You need the network & address." Icon={Search} />
             <TipItem
               title="Ask your contacts to confirm"
               description="You need to collect enough confirmations."
@@ -61,10 +78,21 @@ export default function AccountRecovery() {
             />
             <TipItem title="Wait 48 hrs until recovered" description="This is for extra security." Icon={Clock} />
           </div>
-          <Button className="w-full" onClick={() => setChecked(true)}>
-            Next
-          </Button>
+
+          <div className="flex flex-col gap-y-sm w-full">
+            <Button className="w-full" onClick={() => setChecked(true)}>
+              Start Recovery
+            </Button>
+            <Button variant="secondary" className="w-full" onClick={() => setIsFileDialogOpen(true)}>
+              I have a recovery file
+            </Button>
+          </div>
         </div>
+        <RecoveryFileUploadDialog
+          open={isFileDialogOpen}
+          onOpenChange={setIsFileDialogOpen}
+          onFileUpload={handleFileUpload}
+        />
       </SecondaryPageWrapper>
     );
   }

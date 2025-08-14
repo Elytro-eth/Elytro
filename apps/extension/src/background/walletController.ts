@@ -608,6 +608,38 @@ class WalletController {
     return (await accountManager.getRecoveryRecord()) as TRecoveryRecord;
   }
 
+  public async importRecoveryRecord(address: Address, chainId: number, contacts: [], threshold: number) {
+    const owner = keyring.currentOwner?.address;
+    if (!owner) {
+      throw new Error('Elytro: No owner address. Try create owner first.');
+    }
+
+    const nonce = await elytroSDK.getRecoveryNonce(address);
+
+    const [approveHash, fromBlock, recoveryID] = await Promise.all([
+      elytroSDK.generateRecoveryApproveHash(address, nonce, [owner]),
+      walletClient.getBlockNumber(),
+      elytroSDK.getRecoveryOnchainID(address, nonce, [owner]),
+    ]);
+
+    await accountManager.updateRecoveryRecord({
+      address,
+      chainId,
+      threshold,
+      salt: '', // TODO: hard code salt for now
+      contacts: contacts.map((c) => ({
+        ...(c as SafeAny),
+        confirmed: false,
+      })) as TRecoveryContact[],
+      approveHash,
+      recoveryID,
+      status: RecoveryStatusEn.WAITING_FOR_SIGNATURE,
+      signedGuardians: [],
+      fromBlock: fromBlock.toString(),
+      owner,
+    });
+  }
+
   public async createRecoveryRecord(address: Address) {
     try {
       const contactsInfo = await elytroSDK.queryRecoveryContacts(address);

@@ -65,6 +65,7 @@ class AccountManager {
   }
 
   public async updateRecoveryRecord(recoveryRecord: TRecoveryRecord | null) {
+    console.log('Elytro::AccountManager::updateRecoveryRecord', recoveryRecord);
     await localStorage.save({ [RECOVERY_RECORD_STORAGE_KEY]: recoveryRecord });
   }
 
