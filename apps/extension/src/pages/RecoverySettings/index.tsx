@@ -9,6 +9,7 @@ import { useAccount } from '@/contexts/account-context';
 import RecoverGuide from './RecoverGuide';
 import { toast } from '@/hooks/use-toast';
 import LabelDialog, { ILabelDialogRef } from './LabelDialog';
+import { localStorage } from '@/utils/storage/local';
 
 enum ShowType {
   Guide = 'guide',
@@ -16,17 +17,35 @@ enum ShowType {
   Detail = 'detail',
 }
 
-function getLocalContacts(address: string): TRecoveryContact[] {
+export async function getLocalContacts(address: string): Promise<TRecoveryContact[]> {
   try {
-    const raw = localStorage.getItem(`recovery_contacts_${address}`);
+    const raw = await localStorage.get(`recovery_contacts_${address}`);
     if (!raw) return [];
-    return JSON.parse(raw);
+    return raw as TRecoveryContact[];
   } catch {
     return [];
   }
 }
-function setLocalContacts(address: string, contacts: TRecoveryContact[]) {
-  localStorage.setItem(`recovery_contacts_${address}`, JSON.stringify(contacts));
+export function setLocalContacts(address: string, contacts: TRecoveryContact[]) {
+  localStorage.save({ [`recovery_contacts_${address}`]: contacts });
+}
+
+export async function getLocalThreshold(address: string): Promise<string> {
+  const raw = await localStorage.get(`recovery_contacts_threshold_${address}`);
+  if (!raw) return '0';
+  return raw as string;
+}
+
+export function setLocalThreshold(address: string, threshold: string) {
+  localStorage.save({ [`recovery_contacts_threshold_${address}`]: threshold });
+}
+
+export async function getLocalContactsSetting(address: string): Promise<{
+  contacts: TRecoveryContact[];
+  threshold: string;
+}> {
+  const [contacts, threshold] = await Promise.all([getLocalContacts(address), getLocalThreshold(address)]);
+  return { contacts, threshold };
 }
 
 export default function RecoverySettings() {
@@ -47,11 +66,21 @@ export default function RecoverySettings() {
     threshold: '0',
   });
 
-  const getRecoveryContacts = async () => {
+  const getRecoveryContactsFromInfoRecorder = async () => {
     try {
       setLoading(true);
       const { contacts = [], threshold = 0 } = (await wallet.queryRecoveryContactsByAddress(address)) || {};
-      const localContacts = getLocalContacts(address);
+
+      console.log('checkRecoveryContactsSettingChanged 1');
+      const isOnchainContactsChanged = await wallet.checkRecoveryContactsSettingChanged(contacts, threshold);
+
+      console.log('getRecoveryContactsFromInfoRecorder 1', isOnchainContactsChanged, contacts, threshold);
+      if (isOnchainContactsChanged) {
+        getRecoveryContactsFromLocal();
+        return;
+      }
+
+      const localContacts = await getLocalContacts(address);
       const newContacts = contacts.map((c) => {
         const local = localContacts.find((lc) => lc.address === c);
         return { address: c, label: local?.label || '' };
@@ -73,8 +102,37 @@ export default function RecoverySettings() {
     }
   };
 
+  const getRecoveryContactsFromLocal = async () => {
+    const { contacts, threshold } = await getLocalContactsSetting(address);
+
+    console.log('checkRecoveryContactsSettingChanged 4');
+    const isLocalContactsChanged = await wallet.checkRecoveryContactsSettingChanged(
+      contacts.map((contact) => contact.address),
+      Number(threshold)
+    );
+    console.log('checkRecoveryContactsSettingChanged 4', isLocalContactsChanged, contacts, threshold);
+
+    if (isLocalContactsChanged) {
+      toast({
+        title: 'Local recovery contacts setting is not the same as onchain',
+        description:
+          'We are not able to load the recovery contacts because the local setting is not the same as onchain.',
+      });
+      setShowType(ShowType.Guide);
+      return;
+    }
+
+    saveContacts(contacts);
+    handleUpdateThreshold(String(threshold));
+    originalContactsSetting.current = {
+      contacts: contacts,
+      threshold: threshold,
+    };
+    setShowType(ShowType.List);
+  };
+
   useEffect(() => {
-    getRecoveryContacts();
+    getRecoveryContactsFromInfoRecorder();
   }, []);
 
   const handleAddContact = () => {
@@ -92,7 +150,7 @@ export default function RecoverySettings() {
 
   const handleDeleteContact = (contact: TRecoveryContact) => {
     const newContacts = contacts.filter((c) => c.address !== contact.address);
-    saveContacts(newContacts);
+    setContacts(newContacts);
     setThreshold('0');
   };
 
@@ -109,13 +167,18 @@ export default function RecoverySettings() {
       });
       return;
     }
-    saveContacts([...contacts, contact]);
+    setContacts([...contacts, contact]);
     setShowType(ShowType.List);
   };
 
   const handleSaveContactLabel = (contact: TRecoveryContact) => {
     const newContacts = contacts.map((c) => (c.address === contact.address ? contact : c));
-    saveContacts(newContacts);
+    setContacts(newContacts);
+  };
+
+  const handleUpdateThreshold = (threshold: string) => {
+    setThreshold(threshold);
+    setLocalThreshold(address, threshold);
   };
 
   return (
@@ -149,7 +212,7 @@ export default function RecoverySettings() {
             <ContactList
               contacts={contacts}
               threshold={threshold}
-              setThreshold={setThreshold}
+              setThreshold={handleUpdateThreshold}
               onAddContact={handleAddContact}
               onEditContact={handleEditContact}
               onDeleteContact={handleDeleteContact}

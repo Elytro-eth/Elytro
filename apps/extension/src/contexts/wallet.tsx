@@ -24,13 +24,15 @@ const walletControllerProxy = new Proxy(
   {
     get(_, prop: keyof WalletController) {
       return function (...args: unknown[]) {
+        const random = Math.random();
         portMessage.sendMessage('UI_REQUEST', {
           method: prop,
+          random,
           params: args,
         });
 
         return new Promise((resolve, reject) => {
-          portMessage.onMessage(`UI_RESPONSE_${prop}`, (data) => {
+          portMessage.onMessage(`UI_RESPONSE_${prop}_${random}`, (data) => {
             if (data?.error) {
               reject(data?.error);
             } else {

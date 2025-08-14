@@ -256,7 +256,7 @@ const initUIMessage = (port: chrome.runtime.Port) => {
       return;
     }
 
-    const msgKey = `UI_RESPONSE_${data.method}`;
+    const msgKey = `UI_RESPONSE_${data.method}_${data.random}`;
     try {
       const result = await handleUIRequestWithCache(data as TUIRequest);
 

@@ -7,10 +7,14 @@ import { TxRequestTypeEn } from '@/contexts/tx-context';
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
 import { Box, PencilLine, Plus, Trash2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import ContactsImg from '@/assets/contacts.png';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { cn } from '@/utils/shadcn/utils';
+import { Switch } from '@/components/ui/switch';
+import { getLocalContactsSetting, setLocalContacts, setLocalThreshold } from '.';
+import { writeFile } from '@/utils/file';
+import dayjs from 'dayjs';
 
 interface IContactListProps {
   contacts: TRecoveryContact[];
@@ -33,40 +37,34 @@ export default function ContactList({
   const { wallet } = useWallet();
   const { handleTxRequest } = useTx();
   const [loading, setLoading] = useState(false);
+  const [isPrivacyMode, setIsPrivacyMode] = useState(false);
 
   const isEmptyContacts = contacts.length === 0;
-
-  const [isRecoverContactChanged, setIsRecoverContactChanged] = useState(false);
-  const isAddressChanged = useRef(false);
-
-  useEffect(() => {
-    let active = true;
-    async function check() {
-      if (!active) return;
-      isAddressChanged.current = await wallet.checkRecoveryContactsSettingChanged(
-        contacts.map((contact) => contact.address),
-        Number(threshold)
-      );
-
-      if (!active) return;
-      setIsRecoverContactChanged(isAddressChanged.current);
-    }
-
-    check();
-    return () => {
-      active = false;
-    };
-  }, [contacts, threshold, wallet, isAddressChanged]);
 
   const handleConfirmContacts = async () => {
     try {
       setLoading(true);
+      const contactAddresses = contacts.map((contact) => contact.address);
 
-      const txs = await wallet.generateRecoveryContactsSettingTxs(
-        contacts.map((contact) => contact.address),
-        Number(threshold)
-      );
+      const isChanged = await wallet.checkRecoveryContactsSettingChanged(contactAddresses, Number(threshold));
+
+      if (!isChanged) {
+        toast({
+          title: 'No changes',
+          description: 'The recovery contacts setting is the same as onchain',
+        });
+        setLoading(false);
+        return;
+      }
+
+      const txs = await wallet.generateRecoveryContactsSettingTxs(contactAddresses, Number(threshold), isPrivacyMode);
+
       handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs);
+
+      await Promise.all([
+        setLocalContacts(currentAccount.address, contacts),
+        setLocalThreshold(currentAccount.address, threshold),
+      ]);
     } catch (error) {
       toast({
         title: 'Failed',
@@ -76,6 +74,37 @@ export default function ContactList({
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDownloadRecoveryContacts = async () => {
+    const { contacts, threshold } = await getLocalContactsSetting(currentAccount.address);
+
+    const isOnchainContactsChanged = await wallet.checkRecoveryContactsSettingChanged(
+      contacts.map((contact) => contact.address),
+      Number(threshold)
+    );
+
+    if (isOnchainContactsChanged) {
+      toast({
+        title: 'Local recovery contacts setting is not the same as onchain',
+        description:
+          'We are not able to download the recovery contacts because the local setting is not the same as onchain.',
+      });
+      return;
+    }
+
+    const date = dayjs().format('YYYY-MM-DD-HH-mm');
+    const data = {
+      address: currentAccount.address,
+      chainId: currentAccount.chainId,
+      contacts,
+      threshold: String(threshold),
+    };
+    writeFile(JSON.stringify(data), `${currentAccount.address}-elytro-recovery-contacts-${date}.json`);
+    toast({
+      title: 'Recovery contacts downloaded',
+      description: 'You can find it in the Downloads folder',
+    });
   };
 
   return (
@@ -158,9 +187,20 @@ export default function ContactList({
           </div>
         )}
 
-        <Button className="w-full mt-10" disabled={loading || !isRecoverContactChanged} onClick={handleConfirmContacts}>
+        <div className="flex flex-row justify-between items-center mt-4">
+          <span className="elytro-text-small-bold text-gray-600">Privacy Mode</span>
+          <Switch checked={isPrivacyMode} onCheckedChange={setIsPrivacyMode} />
+        </div>
+
+        <Button className="w-full" disabled={loading || !threshold} onClick={handleConfirmContacts}>
           <Box className="size-4 mr-sm" color="#cce1ea" />
           {loading ? 'Confirming...' : 'Confirm contacts'}
+        </Button>
+      </div>
+
+      <div className="flex flex-row justify-end items-center mt-4">
+        <Button variant="link" onClick={handleDownloadRecoveryContacts}>
+          Download recovery contacts
         </Button>
       </div>
     </div>

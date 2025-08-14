@@ -428,19 +428,22 @@ class WalletController {
     return prevHash !== newHash;
   }
 
-  public async generateRecoveryContactsSettingTxs(contacts: string[], threshold: number) {
+  public async generateRecoveryContactsSettingTxs(contacts: string[], threshold: number, isPrivacyMode: boolean) {
     const { prevHash, newHash } = await this._getRecoveryContactsHash(contacts, threshold);
 
     if (prevHash === newHash) {
       throw new Error('Elytro: New recovery contacts hash is the same as the previous.');
     }
-
-    const [infoRecordTx, contactsSettingTx] = await Promise.all([
-      elytroSDK.generateRecoveryInfoRecordTx(contacts, threshold),
-      elytroSDK.generateRecoveryContactsSettingTxInfo(newHash),
-    ]);
-
-    return [infoRecordTx, contactsSettingTx];
+    if (isPrivacyMode) {
+      const tx = await elytroSDK.generateRecoveryContactsSettingTxInfo(newHash);
+      return [tx];
+    } else {
+      const [infoRecordTx, contactsSettingTx] = await Promise.all([
+        elytroSDK.generateRecoveryInfoRecordTx(contacts, threshold),
+        elytroSDK.generateRecoveryContactsSettingTxInfo(newHash),
+      ]);
+      return [infoRecordTx, contactsSettingTx];
+    }
   }
 
   public async getTokenInfo(address: Address): Promise<TTokenInfo> {
