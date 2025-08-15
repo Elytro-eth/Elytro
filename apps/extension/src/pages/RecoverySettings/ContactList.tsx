@@ -6,12 +6,11 @@ import { useTx } from '@/contexts/tx-context';
 import { TxRequestTypeEn } from '@/contexts/tx-context';
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
-import { Box, PencilLine, Plus, Trash2 } from 'lucide-react';
+import { Box, LockIcon, PencilLine, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import ContactsImg from '@/assets/contacts.png';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { cn } from '@/utils/shadcn/utils';
-import { Switch } from '@/components/ui/switch';
 import { getLocalContactsSetting, setLocalContacts, setLocalThreshold } from '.';
 import { writeFile } from '@/utils/file';
 import dayjs from 'dayjs';
@@ -23,6 +22,7 @@ interface IContactListProps {
   onAddContact: () => void;
   onEditContact: (contact: TRecoveryContact) => void;
   onDeleteContact: (contact: TRecoveryContact) => void;
+  isPrivacyMode: boolean;
 }
 
 export default function ContactList({
@@ -32,13 +32,12 @@ export default function ContactList({
   onAddContact,
   onEditContact,
   onDeleteContact,
+  isPrivacyMode,
 }: IContactListProps) {
   const { currentAccount: currentAccount } = useAccount();
   const { wallet } = useWallet();
   const { handleTxRequest } = useTx();
   const [loading, setLoading] = useState(false);
-  const [isPrivacyMode, setIsPrivacyMode] = useState(false);
-
   const isEmptyContacts = contacts.length === 0;
 
   const handleConfirmContacts = async () => {
@@ -109,6 +108,12 @@ export default function ContactList({
 
   return (
     <div className="flex flex-col justify-between">
+      {isPrivacyMode && (
+        <div className="w-full px-4 py-3 bg-light-purple rounded-xl inline-flex justify-start items-center gap-1">
+          <LockIcon className="size-3" />
+          <span className="flex-1 justify-center text-purple text-xs leading-none">Private mode</span>
+        </div>
+      )}
       <div className="flex flex-col gap-y-md">
         <h2 className="elytro-text-small-bold text-gray-600 mt-4">Your wallet</h2>
 
@@ -187,14 +192,9 @@ export default function ContactList({
           </div>
         )}
 
-        <div className="flex flex-row justify-between items-center mt-4">
-          <span className="elytro-text-small-bold text-gray-600">Privacy Mode</span>
-          <Switch checked={isPrivacyMode} onCheckedChange={setIsPrivacyMode} />
-        </div>
-
         <Button className="w-full" disabled={loading || !threshold} onClick={handleConfirmContacts}>
           <Box className="size-4 mr-sm" color="#cce1ea" />
-          {loading ? 'Confirming...' : 'Confirm contacts'}
+          {loading ? 'Confirming...' : !isPrivacyMode ? 'Confirm contacts' : 'Confirm contacts privately'}
         </Button>
       </div>
 

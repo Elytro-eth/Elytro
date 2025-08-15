@@ -10,6 +10,7 @@ import RecoverGuide from './RecoverGuide';
 import { toast } from '@/hooks/use-toast';
 import LabelDialog, { ILabelDialogRef } from './LabelDialog';
 import { localStorage } from '@/utils/storage/local';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 
 enum ShowType {
   Guide = 'guide',
@@ -57,6 +58,7 @@ export default function RecoverySettings() {
   const [contacts, setContacts] = useState<TRecoveryContact[]>([]);
   const [threshold, setThreshold] = useState<string>('0');
   const [showType, setShowType] = useState<ShowType>(ShowType.List);
+  const [isPrivacyMode, setIsPrivacyMode] = useLocalStorage('isPrivacyMode', false);
   const labelDialogRef = useRef<ILabelDialogRef>(null);
   const originalContactsSetting = useRef<{
     contacts: TRecoveryContact[];
@@ -187,6 +189,8 @@ export default function RecoverySettings() {
       onBack={() => {
         if (showType === ShowType.Detail) {
           setShowType(ShowType.List);
+        } else if (showType === ShowType.List) {
+          setShowType(ShowType.Guide);
         } else {
           history.back();
         }
@@ -207,9 +211,12 @@ export default function RecoverySettings() {
         </>
       ) : (
         <>
-          {showType === ShowType.Guide && <RecoverGuide onClick={onClickGuide} />}
+          {showType === ShowType.Guide && (
+            <RecoverGuide onClick={onClickGuide} isPrivacyMode={isPrivacyMode} onPrivacyModeChange={setIsPrivacyMode} />
+          )}
           {showType === ShowType.List && (
             <ContactList
+              isPrivacyMode={isPrivacyMode}
               contacts={contacts}
               threshold={threshold}
               setThreshold={handleUpdateThreshold}
@@ -218,7 +225,9 @@ export default function RecoverySettings() {
               onDeleteContact={handleDeleteContact}
             />
           )}
-          {showType === ShowType.Detail && <ContactDetail onAddContact={handleSaveAddedContact} />}
+          {showType === ShowType.Detail && (
+            <ContactDetail isPrivacyMode={isPrivacyMode} onAddContact={handleSaveAddedContact} />
+          )}
         </>
       )}
       <LabelDialog ref={labelDialogRef} onSave={handleSaveContactLabel} />
