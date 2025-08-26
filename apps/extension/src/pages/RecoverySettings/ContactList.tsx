@@ -110,7 +110,7 @@ export default function ContactList({
     <div className="flex flex-col justify-between">
       {isPrivacyMode && (
         <div className="w-full px-4 py-3 bg-light-purple rounded-xl inline-flex justify-start items-center gap-1">
-          <LockIcon className="size-3" />
+          <LockIcon className="size-3 stroke-purple" />
           <span className="flex-1 justify-center text-purple text-xs leading-none">Private mode</span>
         </div>
       )}

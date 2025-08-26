@@ -14,16 +14,16 @@ export default function RecoverGuide({ onClick, isPrivacyMode, onPrivacyModeChan
   return (
     <div className="flex flex-col w-full transition-all duration-500">
       {/* Privacy mode switch */}
-      <div className="grid grid-cols-2 bg-gray-150 rounded-lg text-center p-2xs">
+      <div className="grid grid-cols-2 bg-gray-150 rounded-md text-center p-2xs">
         <div
-          className={cn('px-md py-xs rounded font-medium cursor-pointer', !isPrivacyMode && 'bg-white font-medium')}
+          className={cn('px-md py-xs rounded-sm font-medium cursor-pointer', !isPrivacyMode && 'bg-white font-medium')}
           onClick={() => onPrivacyModeChange(false)}
         >
           Standard
         </div>
         <div
           className={cn(
-            'flex flex-row items-center gap-x-1 px-md py-xs rounded font-medium justify-center cursor-pointer',
+            'flex flex-row items-center gap-x-1 px-md py-xs rounded-sm font-medium justify-center cursor-pointer',
             isPrivacyMode && 'bg-white font-medium'
           )}
           onClick={() => onPrivacyModeChange(true)}
@@ -39,23 +39,28 @@ export default function RecoverGuide({ onClick, isPrivacyMode, onPrivacyModeChan
           {isPrivacyMode && (
             <>
               <br />
-              <span>Private</span>
+              <span className="text-gray-500">(Private)</span>
             </>
           )}
         </div>
-        <div>
-          <TipItem
-            title="Each wallet has own contacts"
-            description="Add recovery contacts for each wallet."
-            Icon={WalletCards}
-          />
-          <TipItem title="Add contact by address" description="Contact will be stored on chain." Icon={Shield} />
-          <TipItem
-            title="Contacts help you recover"
-            description="Regain access once contacts confirmed."
-            Icon={Clock}
-          />
-        </div>
+        {!isPrivacyMode && (
+          <div>
+            <TipItem title="Each wallet has own contacts" description="" Icon={WalletCards} />
+            <TipItem title="Add contact by address" description="" Icon={Shield} />
+            <TipItem title="Contacts help you recover" description="" Icon={Clock} />
+          </div>
+        )}
+        {isPrivacyMode && (
+          <div>
+            <TipItem title="Each wallet has own contacts" description="" Icon={WalletCards} />
+            <TipItem title="Keep a recovery file off-chain" description="" Icon={Shield} />
+            <TipItem
+              title="Recovery info revealed after contacts help your regain access"
+              description=""
+              Icon={Clock}
+            />
+          </div>
+        )}
         <Button onClick={onClick} className="w-full">
           Get started
         </Button>

@@ -90,7 +90,7 @@ export default function RecoveryFileUploadDialog({ open, onOpenChange, onFileUpl
       >
         <DialogHeader>
           <DialogTitle>Upload your recovery file</DialogTitle>
-          <DialogDescription>You should have this as you opted for Privacy mode</DialogDescription>
+          <DialogDescription>You should have kept this file safe</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 overflow-hidden">
