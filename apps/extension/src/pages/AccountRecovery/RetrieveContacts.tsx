@@ -78,7 +78,7 @@ function PageContent() {
   }, [recoveryRecord, wallet]);
 
   const generateShareLink = () => {
-    const { recoveryID, address, chainId, approveHash: hash, fromBlock, owner } = recoveryRecord!;
+    const { recoveryID, address, chainId, approveHash: hash, fromBlock, owner, contacts, threshold } = recoveryRecord!;
     const params = new URLSearchParams({
       id: recoveryID,
       address,
@@ -86,6 +86,8 @@ function PageContent() {
       hash,
       from: fromBlock,
       owner,
+      contacts: contacts.map((contact) => contact.address).join(','),
+      threshold: threshold.toString(),
     });
 
     return `${RECOVERY_APP_URL}?${params.toString()}`;

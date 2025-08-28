@@ -9,44 +9,13 @@ import { useAccount } from '@/contexts/account-context';
 import RecoverGuide from './RecoverGuide';
 import { toast } from '@/hooks/use-toast';
 import LabelDialog, { ILabelDialogRef } from './LabelDialog';
-import { localStorage } from '@/utils/storage/local';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import { getLocalContacts, getLocalContactsSetting, setLocalContacts, setLocalThreshold } from '@/utils/contacts';
 
 enum ShowType {
   Guide = 'guide',
   List = 'list',
   Detail = 'detail',
-}
-
-export async function getLocalContacts(address: string): Promise<TRecoveryContact[]> {
-  try {
-    const raw = await localStorage.get(`recovery_contacts_${address}`);
-    if (!raw) return [];
-    return raw as TRecoveryContact[];
-  } catch {
-    return [];
-  }
-}
-export function setLocalContacts(address: string, contacts: TRecoveryContact[]) {
-  localStorage.save({ [`recovery_contacts_${address}`]: contacts });
-}
-
-export async function getLocalThreshold(address: string): Promise<string> {
-  const raw = await localStorage.get(`recovery_contacts_threshold_${address}`);
-  if (!raw) return '0';
-  return raw as string;
-}
-
-export function setLocalThreshold(address: string, threshold: string) {
-  localStorage.save({ [`recovery_contacts_threshold_${address}`]: threshold });
-}
-
-export async function getLocalContactsSetting(address: string): Promise<{
-  contacts: TRecoveryContact[];
-  threshold: string;
-}> {
-  const [contacts, threshold] = await Promise.all([getLocalContacts(address), getLocalThreshold(address)]);
-  return { contacts, threshold };
 }
 
 export default function RecoverySettings() {
@@ -124,8 +93,8 @@ export default function RecoverySettings() {
       return;
     }
 
-    saveContacts(contacts);
-    handleUpdateThreshold(String(threshold));
+    await saveContacts(contacts);
+    await handleUpdateThreshold(String(threshold));
     originalContactsSetting.current = {
       contacts: contacts,
       threshold: threshold,
@@ -145,9 +114,9 @@ export default function RecoverySettings() {
     labelDialogRef.current?.open(contact);
   };
 
-  const saveContacts = (newContacts: TRecoveryContact[]) => {
+  const saveContacts = async (newContacts: TRecoveryContact[]) => {
     setContacts(newContacts);
-    setLocalContacts(address, newContacts);
+    await setLocalContacts(address, newContacts);
   };
 
   const handleDeleteContact = (contact: TRecoveryContact) => {
@@ -178,9 +147,9 @@ export default function RecoverySettings() {
     setContacts(newContacts);
   };
 
-  const handleUpdateThreshold = (threshold: string) => {
+  const handleUpdateThreshold = async (threshold: string) => {
     setThreshold(threshold);
-    setLocalThreshold(address, threshold);
+    await setLocalThreshold(address, threshold);
   };
 
   return (

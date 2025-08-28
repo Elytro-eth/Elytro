@@ -26,6 +26,7 @@ import { decrypt, encrypt, TPasswordEncryptedData } from '@/utils/passworder';
 import { CoinLogoNameMap } from '@/constants/token';
 import { TokenQuote } from '@/types/pimlico';
 import { detectAddressType } from '@/utils/addressType';
+import { setLocalContacts, setLocalThreshold } from '@/utils/contacts';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -622,22 +623,24 @@ class WalletController {
       elytroSDK.getRecoveryOnchainID(address, nonce, [owner]),
     ]);
 
-    await accountManager.updateRecoveryRecord({
-      address,
-      chainId,
-      threshold,
-      salt: '', // TODO: hard code salt for now
-      contacts: contacts.map((c) => ({
-        ...(c as SafeAny),
-        confirmed: false,
-      })) as TRecoveryContact[],
-      approveHash,
-      recoveryID,
-      status: RecoveryStatusEn.WAITING_FOR_SIGNATURE,
-      signedGuardians: [],
-      fromBlock: fromBlock.toString(),
-      owner,
-    });
+    const contactsInfo = contacts.map((c) => ({ address: c as Address, confirmed: false })) as TRecoveryContact[];
+    await Promise.all([
+      setLocalContacts(address, contactsInfo),
+      setLocalThreshold(address, threshold.toString()),
+      accountManager.updateRecoveryRecord({
+        address,
+        chainId,
+        threshold,
+        salt: '', // TODO: hard code salt for now
+        contacts: contactsInfo,
+        approveHash,
+        recoveryID,
+        status: RecoveryStatusEn.WAITING_FOR_SIGNATURE,
+        signedGuardians: [],
+        fromBlock: fromBlock.toString(),
+        owner,
+      }),
+    ]);
   }
 
   public async createRecoveryRecord(address: Address) {

@@ -46,8 +46,13 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
   const from = params.get('from');
   const newOwner = params.get('owner');
 
-  const [contacts, setContacts] = useState<TContact[] | null>(null);
-  const [threshold, setThreshold] = useState<number | null>(null);
+  const [contacts, setContacts] = useState<TContact[] | null>(
+    params
+      .get('contacts')
+      ?.split(',')
+      .map((contact) => ({ address: contact as Address, confirmed: false })) || null
+  );
+  const [threshold, setThreshold] = useState<number | null>(Number(params.get('threshold')) || null);
   const [status, setStatus] = useState<RecoveryStatusEn>(RecoveryStatusEn.WAITING_FOR_SIGNATURE);
   const [validTime, setValidTime] = useState<number | null>(null);
 
@@ -171,7 +176,9 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
     }
 
     if (address && isAddress(address) && Number(chainId)) {
-      getRecoveryContacts();
+      if (!contacts || !threshold) {
+        getRecoveryContacts();
+      }
     } else {
       setError(true);
       toast({

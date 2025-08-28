@@ -11,7 +11,7 @@ import { useState } from 'react';
 import ContactsImg from '@/assets/contacts.png';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { cn } from '@/utils/shadcn/utils';
-import { getLocalContactsSetting, setLocalContacts, setLocalThreshold } from '.';
+import { getLocalContactsSetting, setLocalContacts, setLocalThreshold } from '@/utils/contacts';
 import { writeFile } from '@/utils/file';
 import dayjs from 'dayjs';
 
