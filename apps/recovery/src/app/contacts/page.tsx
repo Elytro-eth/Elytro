@@ -8,6 +8,7 @@ import Sign from './Sign';
 import Status from './Status';
 import { isConnectedAccountAContact } from '@/lib/contact';
 import { toast } from '@/hooks/use-toast';
+import { SidebarStepper } from '@/components/SidebarStepper';
 
 export default function Contacts() {
   const { contacts, loading } = useRecoveryRecord();
@@ -49,13 +50,20 @@ export default function Contacts() {
   }, [address, contacts, loading]);
 
   return (
-    <ContentWrapper
-      title={<div className="text-left mr-5xl">Connect to confirm</div>}
-      // allSteps={3}
-      // currentStep={1}
-      subtitle={subtitle}
-    >
-      {content}
-    </ContentWrapper>
+    <div className="flex flex-row items-center justify-center w-full h-full">
+      <div className="flex flex-row gap-8 items-start">
+        <div className="bg-white rounded-xl p-0 flex items-center min-w-[260px]">
+          <SidebarStepper />
+        </div>
+        <ContentWrapper
+          title={<div className="text-left mr-5xl">Connect to confirm</div>}
+          // allSteps={3}
+          // currentStep={1}
+          subtitle={subtitle}
+        >
+          {content}
+        </ContentWrapper>
+      </div>
+    </div>
   );
 }

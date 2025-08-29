@@ -10,6 +10,7 @@ import { redirect } from 'next/navigation';
 import { RecoveryStatusEn } from '@/constants/enums';
 import LinkWithQuery from '@/components/LinkWithQuery';
 import { InvalidRecordView } from '@/components/InvalidRecordView';
+import { SidebarStepper } from '@/components/SidebarStepper';
 
 interface StepConfig {
   title: string;
@@ -20,13 +21,13 @@ interface StepConfig {
 
 const RECOVERY_STEPS: StepConfig[] = [
   {
-    title: 'Confirmations collection',
+    title: 'Collect confirmations',
     status: [RecoveryStatusEn.WAITING_FOR_SIGNATURE],
     href: '/contacts',
     buttonText: 'Confirm Recovery',
   },
   {
-    title: 'Wallet recovery',
+    title: 'Recover wallet',
     status: [RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_STARTED, RecoveryStatusEn.RECOVERY_READY],
     href: '/start',
     buttonText: 'Start Recovery',
@@ -42,7 +43,7 @@ interface IStepBlockProps {
 
 const StepBlock = ({ title, index, actionButton, isActive }: IStepBlockProps) => {
   const styles = {
-    container: `flex flex-col gap-y-md p-lg rounded-lg border-1 min-w-[250px] ${
+    container: `flex flex-row p-lg rounded-lg border-1 min-w-[250px] justify-between items-center gap-4 ${
       isActive ? 'bg-gray-150 border-gray-150' : 'bg-gray-0 border-gray-300'
     }`,
     index: `text-tiny-bold text-center size-5 border-[1.5px] rounded-full ${
@@ -54,10 +55,9 @@ const StepBlock = ({ title, index, actionButton, isActive }: IStepBlockProps) =>
 
   return (
     <div className={styles.container}>
-      <div className={styles.index}>{index}</div>
-      <div className="flex flex-col gap-y-2xs">
+      <div className="flex direction-row gap-2 flex-1">
+        <div className={styles.index}>{index}</div>
         <div className={styles.title}>{title}</div>
-        <div className={styles.description}></div>
       </div>
       {actionButton}
     </div>
@@ -88,32 +88,39 @@ export default function Home() {
   }
 
   return (
-    <ContentWrapper title="Wallet recovery for">
-      <div className="flex flex-col gap-xl items-center">
-        <AddressWithChain className="bg-gray-150 w-fit" address={address!} chainID={chainId!} />
-
-        <div className="flex flex-row gap-4 justify-between">
-          {RECOVERY_STEPS.map((step, index) => {
-            const isActive = status !== null && step.status.includes(status!);
-            return (
-              <StepBlock
-                key={step.title}
-                index={index + 1}
-                title={step.title}
-                isActive={isActive}
-                actionButton={
-                  <Button
-                    className={!isActive ? 'border-gray-450 border-1 text-gray-600 bg-gray-0 shadow-none' : ''}
-                    disabled={!isActive}
-                  >
-                    <LinkWithQuery href={step.href}>{step.buttonText}</LinkWithQuery>
-                  </Button>
-                }
-              />
-            );
-          })}
+    <div className="flex flex-row items-center justify-center w-full h-full">
+      <div className="flex flex-row gap-8 items-start">
+        <div className="bg-white rounded-xl p-0 flex items-center min-w-[260px]">
+          <SidebarStepper />
         </div>
+        <ContentWrapper title="Wallet recovery for">
+          <div className="flex flex-col gap-xl items-left">
+            <AddressWithChain className="bg-gray-150 w-fit" address={address!} chainID={chainId!} />
+
+            <div className="flex flex-col gap-4 justify-between w-full">
+              {RECOVERY_STEPS.map((step, index) => {
+                const isActive = status !== null && step.status.includes(status!);
+                return (
+                  <StepBlock
+                    key={step.title}
+                    index={index + 1}
+                    title={step.title}
+                    isActive={isActive}
+                    actionButton={
+                      <Button
+                        className={!isActive ? 'border-gray-450 border-1 text-gray-600 bg-gray-0 shadow-none' : ''}
+                        disabled={!isActive}
+                      >
+                        <LinkWithQuery href={step.href}>{step.buttonText}</LinkWithQuery>
+                      </Button>
+                    }
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </ContentWrapper>
       </div>
-    </ContentWrapper>
+    </div>
   );
 }

@@ -12,6 +12,7 @@ import { sendTransaction } from 'wagmi/actions';
 import { Box, ExternalLink, Loader2 } from 'lucide-react';
 import { RecoveryStatusEn } from '@/constants/enums';
 import { cn } from '@/lib/utils';
+import { SidebarStepper } from '@/components/SidebarStepper';
 
 const TimeBlock = ({ time, unit }: { time: number; unit: string }) => {
   return (
@@ -261,69 +262,78 @@ export default function Start() {
   }, [status, validTime]);
 
   return (
-    <ContentWrapper
-      // currentStep={2}
-      // allSteps={3}
-      title={
-        [RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status || 0)
-          ? 'Start Recovery'
-          : 'Recovery in progress'
-      }
-      subtitle={
-        <div className="text-center text-gray-600">
-          {status === RecoveryStatusEn.SIGNATURE_COMPLETED
-            ? 'Connect to a wallet to start recovery.'
-            : 'Wallet access will be resumed in 48 hours.'}
+    <div className="flex flex-row items-center justify-center w-full h-full">
+      <div className="flex flex-row gap-8 items-start">
+        <div className="bg-white rounded-xl p-0 flex items-center min-w-[260px]">
+          <SidebarStepper />
         </div>
-      }
-    >
-      {/* Count down */}
-      {txStatus !== 'pending' && status !== null && status !== undefined && (
-        <div
-          className={cn(
-            'flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg ',
-            [RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status) && 'opacity-60'
-          )}
+        <ContentWrapper
+          // currentStep={2}
+          // allSteps={3}
+          title={
+            <div className="text-center">
+              {[RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status || 0)
+                ? 'Start Recovery'
+                : 'Recovery in progress'}
+            </div>
+          }
+          subtitle={
+            <div className="text-center text-gray-600">
+              {status === RecoveryStatusEn.SIGNATURE_COMPLETED
+                ? 'Connect to a wallet to start recovery.'
+                : 'Wallet access will be resumed in 48 hours.'}
+            </div>
+          }
         >
-          <TimeBlock time={leftTime.hours} unit="Hours" />
-          <TimeBlock time={leftTime.minutes} unit="Minutes" />
-          <TimeBlock time={leftTime.seconds} unit="Seconds" />
-        </div>
-      )}
+          {/* Count down */}
+          {txStatus !== 'pending' && status !== null && status !== undefined && (
+            <div
+              className={cn(
+                'flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg ',
+                [RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status) && 'opacity-60'
+              )}
+            >
+              <TimeBlock time={leftTime.hours} unit="Hours" />
+              <TimeBlock time={leftTime.minutes} unit="Minutes" />
+              <TimeBlock time={leftTime.seconds} unit="Seconds" />
+            </div>
+          )}
 
-      {txStatus === 'pending' && (
-        // Loading: waiting for transaction to be confirmed
-        <div className="flex flex-col my-2xl w-full justify-center items-center gap-y-sm flex-nowrap mb-lg text-gray-300">
-          <Loader2 className="size-8 animate-spin" />
-          <div className="text-tiny flex flex-row items-center">Confirming transaction...</div>
-        </div>
-      )}
+          {txStatus === 'pending' && (
+            // Loading: waiting for transaction to be confirmed
+            <div className="flex flex-col my-2xl w-full justify-center items-center gap-y-sm flex-nowrap mb-lg text-gray-300">
+              <Loader2 className="size-8 animate-spin" />
+              <div className="text-tiny flex flex-row items-center">Confirming transaction...</div>
+            </div>
+          )}
 
-      <div className="grid grid-cols-1 gap-x-sm">
-        {status === RecoveryStatusEn.SIGNATURE_COMPLETED ? (
-          <Button
-            size="lg"
-            disabled={
-              !isConnected || isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.SIGNATURE_COMPLETED
-            }
-            onClick={startRecovery}
-            className="w-full group"
-          >
-            <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
-            Start Recovery
-          </Button>
-        ) : (
-          <Button
-            size="lg"
-            disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.RECOVERY_READY}
-            onClick={completeRecovery}
-            className="w-full group"
-          >
-            <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
-            Complete Recovery
-          </Button>
-        )}
+          <div className="grid grid-cols-1 gap-x-sm">
+            {status === RecoveryStatusEn.SIGNATURE_COMPLETED ? (
+              <Button
+                size="lg"
+                disabled={
+                  !isConnected || isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.SIGNATURE_COMPLETED
+                }
+                onClick={startRecovery}
+                className="w-full group"
+              >
+                <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
+                Start Recovery
+              </Button>
+            ) : (
+              <Button
+                size="lg"
+                disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.RECOVERY_READY}
+                onClick={completeRecovery}
+                className="w-full group"
+              >
+                <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
+                Complete Recovery
+              </Button>
+            )}
+          </div>
+        </ContentWrapper>
       </div>
-    </ContentWrapper>
+    </div>
   );
 }
