@@ -39,7 +39,7 @@ export default function BetaNotice({ text, closeable, onClose }: IBetaNoticeProp
   }
 
   return (
-    <div className="h-9 p-2 flex bg-green-200">
+    <div className="h-9 rounded-b-sm p-2 flex bg-light-green">
       <div>{text}</div>
       {closeable && <X className="elytro-clickable-icon absolute right-2" onClick={handleClose} />}
     </div>

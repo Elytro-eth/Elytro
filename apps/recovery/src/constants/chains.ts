@@ -31,7 +31,7 @@ export const CHAIN_ID_TO_NAME_MAP: Record<number, string> = {
 
 export const CHAIN_LOGOS: Record<number, string> = {
   [mainnet.id]: 'https://icons.llamao.fi/icons/chains/rsz_ethereum',
-  [arbitrum.id]: 'https://icons.llamao.fi/icons/chains/rsz_arbitrum',
+  [arbitrum.id]: 'https://icons.llamao.fi/icons/protocols/arbitrum-timeboost',
   [sepolia.id]: 'https://icons.llamao.fi/icons/chains/rsz_ethereum',
   [optimism.id]: 'https://icons.llamao.fi/icons/chains/rsz_optimism',
   [optimismSepolia.id]: 'https://icons.llamao.fi/icons/chains/rsz_optimism',
