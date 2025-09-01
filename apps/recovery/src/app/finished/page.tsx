@@ -9,7 +9,7 @@ export default function Finished() {
     <div className="flex flex-row items-center justify-center w-full h-full">
       <div className="flex flex-row gap-8 items-start">
         <div className="bg-white rounded-xl p-0 flex items-center min-w-[260px]">
-          <SidebarStepper />
+          <SidebarStepper currentStep={3} />
         </div>
         <ContentWrapper title={<div className="text-center">Recovery successful</div>}>
           <div className="flex flex-col items-center justify-center text-center gap-y-xl mx-20 mt-10">

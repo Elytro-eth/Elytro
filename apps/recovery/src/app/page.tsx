@@ -36,18 +36,14 @@ const RECOVERY_STEPS: StepConfig[] = [
 
 interface IStepBlockProps {
   title: string;
-  index: number;
   actionButton: React.ReactNode;
   isActive: boolean;
 }
 
-const StepBlock = ({ title, index, actionButton, isActive }: IStepBlockProps) => {
+const StepBlock = ({ title, actionButton, isActive }: IStepBlockProps) => {
   const styles = {
     container: `flex flex-row p-lg rounded-lg border-1 min-w-[250px] justify-between items-center gap-4 ${
       isActive ? 'bg-gray-150 border-gray-150' : 'bg-gray-0 border-gray-300'
-    }`,
-    index: `text-tiny-bold text-center size-5 border-[1.5px] rounded-full ${
-      isActive ? 'border-gray-900 text-gray-900' : 'border-gray-450 text-gray-450'
     }`,
     title: `text-small-bold text-nowrap ${isActive ? 'text-gray-900' : 'text-gray-450'}`,
     description: `text-tiny whitespace-pre-wrap ${isActive ? 'text-gray-450' : 'text-gray-300'}`,
@@ -56,7 +52,6 @@ const StepBlock = ({ title, index, actionButton, isActive }: IStepBlockProps) =>
   return (
     <div className={styles.container}>
       <div className="flex direction-row gap-2 flex-1">
-        <div className={styles.index}>{index}</div>
         <div className={styles.title}>{title}</div>
       </div>
       {actionButton}
@@ -66,6 +61,21 @@ const StepBlock = ({ title, index, actionButton, isActive }: IStepBlockProps) =>
 
 export default function Home() {
   const { status, loading, address, chainId, error } = useRecoveryRecord();
+
+  const getCurrentStep = () => {
+    if (error) return 1; // Invalid URL
+    if (status === RecoveryStatusEn.WAITING_FOR_SIGNATURE) return 2; // Collect confirmations
+    if (
+      [
+        RecoveryStatusEn.SIGNATURE_COMPLETED,
+        RecoveryStatusEn.RECOVERY_STARTED,
+        RecoveryStatusEn.RECOVERY_READY,
+        RecoveryStatusEn.RECOVERY_COMPLETED,
+      ].includes(status!)
+    )
+      return 3; // Recover wallet to Recovery successful
+    return 1; // Default to Step 1
+  };
 
   if (loading) {
     return (
@@ -79,10 +89,6 @@ export default function Home() {
     );
   }
 
-  if (error) {
-    return <InvalidRecordView />;
-  }
-
   if (status === RecoveryStatusEn.RECOVERY_COMPLETED) {
     redirect('/finished');
   }
@@ -91,35 +97,40 @@ export default function Home() {
     <div className="flex flex-row items-center justify-center w-full h-full">
       <div className="flex flex-row gap-8 items-start">
         <div className="bg-white rounded-xl p-0 flex items-center min-w-[260px]">
-          <SidebarStepper />
+          <SidebarStepper currentStep={getCurrentStep()} />
         </div>
-        <ContentWrapper title="Wallet recovery for">
-          <div className="flex flex-col gap-xl items-left">
-            <AddressWithChain className="bg-gray-150 w-fit" address={address!} chainID={chainId!} />
+        {error ? (
+          <InvalidRecordView />
+        ) : (
+          <ContentWrapper title="Wallet recovery for">
+            <div className="flex flex-col gap-xl items-left">
+              <AddressWithChain className="bg-gray-150 w-fit" address={address!} chainID={chainId!} />
 
-            <div className="flex flex-col gap-4 justify-between w-full">
-              {RECOVERY_STEPS.map((step, index) => {
-                const isActive = status !== null && step.status.includes(status!);
-                return (
-                  <StepBlock
-                    key={step.title}
-                    index={index + 1}
-                    title={step.title}
-                    isActive={isActive}
-                    actionButton={
-                      <Button
-                        className={!isActive ? 'border-gray-450 border-1 text-gray-600 bg-gray-0 shadow-none' : ''}
-                        disabled={!isActive}
-                      >
-                        <LinkWithQuery href={step.href}>{step.buttonText}</LinkWithQuery>
-                      </Button>
-                    }
-                  />
-                );
-              })}
+              <div className="flex flex-col gap-4 justify-between w-full">
+                {RECOVERY_STEPS.map((step) => {
+                  const isActive = status !== null && step.status.includes(status!);
+                  const buttonText =
+                    getCurrentStep() === 3 && step.title === 'Collect confirmations' ? 'Completed' : step.buttonText;
+                  return (
+                    <StepBlock
+                      key={step.title}
+                      title={step.title}
+                      isActive={isActive}
+                      actionButton={
+                        <Button
+                          className={!isActive ? 'border-gray-450 border-1 text-gray-600 bg-gray-0 shadow-none' : ''}
+                          disabled={!isActive}
+                        >
+                          <LinkWithQuery href={step.href}>{buttonText}</LinkWithQuery>
+                        </Button>
+                      }
+                    />
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        </ContentWrapper>
+          </ContentWrapper>
+        )}
       </div>
     </div>
   );

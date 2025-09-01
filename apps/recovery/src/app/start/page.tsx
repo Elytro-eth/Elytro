@@ -265,7 +265,7 @@ export default function Start() {
     <div className="flex flex-row items-center justify-center w-full h-full">
       <div className="flex flex-row gap-8 items-start">
         <div className="bg-white rounded-xl p-0 flex items-center min-w-[260px]">
-          <SidebarStepper />
+          <SidebarStepper currentStep={3} />
         </div>
         <ContentWrapper
           // currentStep={2}

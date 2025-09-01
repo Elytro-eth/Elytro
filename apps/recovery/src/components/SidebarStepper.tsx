@@ -1,34 +1,42 @@
-export const SidebarStepper = () => {
+import { Check } from 'lucide-react';
+
+export const SidebarStepper = ({ currentStep }: { currentStep: number }) => {
+  const getStepStyles = (step: number) => {
+    const isActive = step === currentStep;
+    const isCompleted = step < currentStep;
+    return {
+      circle: `flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-sm font-bold ${
+        isActive ? 'bg-blue text-white' : 'bg-gray-450 text-white'
+      }`,
+      text: `text-base font-medium ${isActive ? 'text-black-blue' : 'text-gray-600'}`,
+      content: isCompleted ? <Check className="w-3.5 h-3.5 stroke-white" /> : step,
+    };
+  };
+
   return (
     <div className="w-64 bg-gray-0 rounded-lg p-2xl">
       <div className="space-y-sm">
-        {/* Step 1: Find details - Active */}
+        {/* Step 1: Find details */}
         <div className="flex items-center space-x-md">
-          <div className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-sm font-bold bg-blue text-white">
-            1
-          </div>
+          <div className={getStepStyles(1).circle}>{getStepStyles(1).content}</div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-medium text-black-blue">Find details</h3>
+            <h3 className={getStepStyles(1).text}>Find details</h3>
           </div>
         </div>
 
-        {/* Step 2: Collect Confirmations - Inactive */}
+        {/* Step 2: Collect Confirmations */}
         <div className="flex items-center space-x-md">
-          <div className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-sm font-bold bg-gray-450 text-white">
-            2
-          </div>
+          <div className={getStepStyles(2).circle}>{getStepStyles(2).content}</div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-medium text-gray-600">Collect Confirmations</h3>
+            <h3 className={getStepStyles(2).text}>Collect Confirmations</h3>
           </div>
         </div>
 
-        {/* Step 3: Recover wallet - Inactive */}
+        {/* Step 3: Recover wallet */}
         <div className="flex items-center space-x-md">
-          <div className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-sm font-bold bg-gray-450 text-white">
-            3
-          </div>
+          <div className={getStepStyles(3).circle}>{getStepStyles(3).content}</div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-medium text-gray-600">Recover wallet</h3>
+            <h3 className={getStepStyles(3).text}>Recover wallet</h3>
           </div>
         </div>
       </div>
