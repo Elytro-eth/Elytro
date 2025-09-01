@@ -40,10 +40,10 @@ export default function BetaNotice({ text, closeable, onClose }: IBetaNoticeProp
 
   return (
     <div
-      className="h-9 p-2 flex"
-      style={{
-        background: 'radial-gradient(100% 336.18% at 0% 0%, #F1E8DF 0%, #F7F7F0 25.15%, #DAECEE 100%)',
-      }}
+      className="h-9 rounded-b-sm p-2 flex bg-light-green"
+      // style={{
+      //   background: 'radial-gradient(100% 336.18% at 0% 0%, #F1E8DF 0%, #F7F7F0 25.15%, #DAECEE 100%)',
+      // }}
     >
       <div>{text}</div>
       {closeable && <X className="elytro-clickable-icon absolute right-2" onClick={handleClose} />}

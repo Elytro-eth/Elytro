@@ -27,11 +27,11 @@ export default function Dashboard() {
           <div className="flex-1 overflow-auto pb-[52px]">
             <DashboardTabs loading={loading} onReload={handleReload} />
           </div>
-          <div className="absolute bottom-2 left-2 right-2 flex justify-center py-2 bg-white">
+          <div className="absolute bottom-0 rounded-md left-0 right-0 flex justify-center pt-2 bg-white flex-col">
             <Button
               variant="secondary"
               size="tiny"
-              className="m-auto"
+              className="m-auto mb-2"
               onClick={() => {
                 navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportToken);
               }}
@@ -39,12 +39,10 @@ export default function Dashboard() {
               <Plus className="w-3 h-3 mr-1 duration-100 group-hover:stroke-white" />
               Import token
             </Button>
+            <BetaNotice text="We're in beta. Please keep deposits small." closeable />
           </div>
         </div>
       </PageLayout.Body>
-      <PageLayout.Footer>
-        <BetaNotice text="We're in beta. Please keep deposits small." closeable />
-      </PageLayout.Footer>
     </PageLayout>
   );
 }
