@@ -18,6 +18,7 @@ const DEFAULT_ACCOUNT_INFO: TAccountInfo = {
   balance: 0,
   chainId: 0,
   owner: '',
+  isRecoveryEnabled: false,
 };
 
 type IAccountContext = {

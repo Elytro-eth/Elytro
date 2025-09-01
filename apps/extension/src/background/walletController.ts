@@ -261,15 +261,19 @@ class WalletController {
       const updatedInfo = { ...basicInfo };
 
       if (updatedInfo.isDeployed) {
-        const [balance, versionInfo] = await Promise.all([
+        const [balance, versionInfo, recoveryInfo] = await Promise.all([
           walletClient.getBalance(basicInfo.address),
           VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId]
             ? elytroSDK.getContractVersion(basicInfo.address)
             : Promise.resolve('0.0.0'),
+          elytroSDK.getRecoveryInfo(basicInfo.address),
         ]);
 
         updatedInfo.balance = Number(balance);
         updatedInfo.needUpgrade = isOlderThan(versionInfo, VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId].latestVersion);
+        updatedInfo.isRecoveryEnabled =
+          !!recoveryInfo?.contactsHash &&
+          recoveryInfo.contactsHash !== '0x0000000000000000000000000000000000000000000000000000000000000000';
       } else {
         updatedInfo.isDeployed = await elytroSDK.isSmartAccountDeployed(basicInfo.address);
       }
@@ -407,6 +411,12 @@ class WalletController {
 
   public async queryRecoveryContactsByAddress(address: Address) {
     return await elytroSDK.queryRecoveryContacts(address);
+  }
+
+  public async getRecoveryInfo(address: Address) {
+    const recoveryInfo = await elytroSDK.getRecoveryInfo(address);
+    console.log('recoveryInfo', recoveryInfo);
+    return recoveryInfo;
   }
 
   private async _getRecoveryContactsHash(contacts: string[], threshold: number) {

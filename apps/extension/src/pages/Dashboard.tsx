@@ -1,19 +1,58 @@
 import BasicAccountInfo from '@/components/biz/BasicAccountInfo';
 import Spin from '@/components/ui/Spin';
 import { useAccount } from '@/contexts/account-context';
-import { Plus } from 'lucide-react';
+import { CheckCircle2Icon, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import BetaNotice from '@/components/ui/BetaNotice';
 import PageLayout from '@/components/ui/PageLayout';
 import DashboardTabs from '@/components/biz/DashboardTabs';
+import { useLocalStorage } from '@/hooks/use-local-storage';
+import { getLocalContactsSetting } from '@/utils/contacts';
+import { useWallet } from '@/contexts/wallet';
+import { toast } from '@/hooks/use-toast';
+import dayjs from 'dayjs';
+import { writeFile } from '@/utils/file';
 
 export default function Dashboard() {
-  const { loading, reloadAccount } = useAccount();
+  const { loading, reloadAccount, currentAccount } = useAccount();
+  const [isPrivacyMode] = useLocalStorage('isPrivacyMode', false);
+  const { wallet } = useWallet();
 
   const handleReload = () => {
     reloadAccount(true);
+  };
+
+  const handleDownloadRecoveryContacts = async () => {
+    const { contacts, threshold } = await getLocalContactsSetting(currentAccount.address);
+
+    const isOnchainContactsChanged = await wallet.checkRecoveryContactsSettingChanged(
+      contacts.map((contact) => contact.address),
+      Number(threshold)
+    );
+
+    if (isOnchainContactsChanged) {
+      toast({
+        title: 'Local recovery contacts setting is not the same as onchain',
+        description:
+          'We are not able to download the recovery contacts because the local setting is not the same as onchain.',
+      });
+      return;
+    }
+
+    const date = dayjs().format('YYYY-MM-DD-HH-mm');
+    const data = {
+      address: currentAccount.address,
+      chainId: currentAccount.chainId,
+      contacts,
+      threshold: String(threshold),
+    };
+    writeFile(JSON.stringify(data), `${currentAccount.address}-elytro-recovery-contacts-${date}.json`);
+    toast({
+      title: 'Recovery contacts downloaded',
+      description: 'You can find it in the Downloads folder',
+    });
   };
 
   return (
@@ -43,6 +82,19 @@ export default function Dashboard() {
         </div>
       </PageLayout.Body>
       <PageLayout.Footer>
+        {currentAccount.isRecoveryEnabled && (
+          <div className="h-9 p-2 flex flex-row justify-between items-center bg-[#CEE2EB]">
+            <div className="flex flex-row items-center">
+              <CheckCircle2Icon className="w-4 h-4 mr-1 fill-white stroke-dark-blue" />
+              Social Recovery {isPrivacyMode ? '(Privacy)' : ''} enabled
+            </div>
+            {isPrivacyMode && (
+              <div className="flex flex-row items-center" onClick={handleDownloadRecoveryContacts}>
+                Recovery file
+              </div>
+            )}
+          </div>
+        )}
         <BetaNotice text="We're in beta. Please keep deposits small." closeable />
       </PageLayout.Footer>
     </PageLayout>

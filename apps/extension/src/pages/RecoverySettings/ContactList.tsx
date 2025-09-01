@@ -11,9 +11,9 @@ import { useState } from 'react';
 import ContactsImg from '@/assets/contacts.png';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { cn } from '@/utils/shadcn/utils';
-import { getLocalContactsSetting, setLocalContacts, setLocalThreshold } from '@/utils/contacts';
-import { writeFile } from '@/utils/file';
-import dayjs from 'dayjs';
+import { setLocalContacts, setLocalThreshold } from '@/utils/contacts';
+// import { writeFile } from '@/utils/file';
+// import dayjs from 'dayjs';
 
 interface IContactListProps {
   contacts: TRecoveryContact[];
@@ -75,36 +75,36 @@ export default function ContactList({
     }
   };
 
-  const handleDownloadRecoveryContacts = async () => {
-    const { contacts, threshold } = await getLocalContactsSetting(currentAccount.address);
+  // const handleDownloadRecoveryContacts = async () => {
+  //   const { contacts, threshold } = await getLocalContactsSetting(currentAccount.address);
 
-    const isOnchainContactsChanged = await wallet.checkRecoveryContactsSettingChanged(
-      contacts.map((contact) => contact.address),
-      Number(threshold)
-    );
+  //   const isOnchainContactsChanged = await wallet.checkRecoveryContactsSettingChanged(
+  //     contacts.map((contact) => contact.address),
+  //     Number(threshold)
+  //   );
 
-    if (isOnchainContactsChanged) {
-      toast({
-        title: 'Local recovery contacts setting is not the same as onchain',
-        description:
-          'We are not able to download the recovery contacts because the local setting is not the same as onchain.',
-      });
-      return;
-    }
+  //   if (isOnchainContactsChanged) {
+  //     toast({
+  //       title: 'Local recovery contacts setting is not the same as onchain',
+  //       description:
+  //         'We are not able to download the recovery contacts because the local setting is not the same as onchain.',
+  //     });
+  //     return;
+  //   }
 
-    const date = dayjs().format('YYYY-MM-DD-HH-mm');
-    const data = {
-      address: currentAccount.address,
-      chainId: currentAccount.chainId,
-      contacts,
-      threshold: String(threshold),
-    };
-    writeFile(JSON.stringify(data), `${currentAccount.address}-elytro-recovery-contacts-${date}.json`);
-    toast({
-      title: 'Recovery contacts downloaded',
-      description: 'You can find it in the Downloads folder',
-    });
-  };
+  //   const date = dayjs().format('YYYY-MM-DD-HH-mm');
+  //   const data = {
+  //     address: currentAccount.address,
+  //     chainId: currentAccount.chainId,
+  //     contacts,
+  //     threshold: String(threshold),
+  //   };
+  //   writeFile(JSON.stringify(data), `${currentAccount.address}-elytro-recovery-contacts-${date}.json`);
+  //   toast({
+  //     title: 'Recovery contacts downloaded',
+  //     description: 'You can find it in the Downloads folder',
+  //   });
+  // };
 
   return (
     <div className="flex flex-col justify-between">
@@ -198,11 +198,13 @@ export default function ContactList({
         </Button>
       </div>
 
-      <div className="flex flex-row justify-end items-center mt-4">
-        <Button variant="link" onClick={handleDownloadRecoveryContacts}>
-          Download recovery contacts
-        </Button>
-      </div>
+      {/* {!isEmptyContacts && (
+        <div className="flex flex-row justify-end items-center mt-4">
+          <Button variant="link" onClick={handleDownloadRecoveryContacts}>
+            Download recovery contacts
+          </Button>
+        </div>
+      )} */}
     </div>
   );
 }

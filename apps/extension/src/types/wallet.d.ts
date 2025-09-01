@@ -14,6 +14,7 @@ type TAccountInfo = {
   balance?: Nullable<number>;
   needUpgrade?: boolean;
   owner: Address;
+  isRecoveryEnabled: boolean;
 };
 
 type TTransactionInfo = {
