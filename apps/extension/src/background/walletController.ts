@@ -595,6 +595,7 @@ class WalletController {
         chainId: Number(recoveryRecord?.chainId),
         isDeployed: true,
         owner: recoveryRecord?.owner,
+        isRecoveryEnabled: true,
       });
       this._onAccountChanged();
       recoveryRecord = null;
