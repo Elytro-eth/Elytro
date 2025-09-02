@@ -85,9 +85,8 @@ export default function RecoverySettings() {
 
     if (isLocalContactsChanged) {
       toast({
-        title: 'Local recovery contacts setting is not the same as onchain',
-        description:
-          'We are not able to load the recovery contacts because the local setting is not the same as onchain.',
+        title: 'Local records out of sync',
+        description: '',
       });
       setShowType(ShowType.Guide);
       return;

@@ -23,17 +23,17 @@ import { formatEther } from 'viem';
 const tips = [
   {
     title: '1. You can backup multiple wallets',
-    description: 'Their Social Recovery contacts included',
+    description: '',
     Icon: WalletCards,
   },
   {
     title: '2. Backup locked by passcode',
-    description: 'Only you can unlock it later',
+    description: '',
     Icon: LockKeyhole,
   },
   {
     title: '3. You can import on a new device',
-    description: 'Unlock and import with the same passcode',
+    description: '',
     Icon: LaptopMinimal,
   },
 ];
@@ -92,9 +92,9 @@ export default function ExportBackupPage() {
       });
     } catch {
       toast({
-        title: 'Export wallets failed',
+        title: 'Export wallets failed, please try again',
         variant: 'destructive',
-        description: 'Probably wrong passcode, please try again',
+        description: '',
       });
     } finally {
       setIsDownloading(false);
@@ -162,19 +162,19 @@ export default function ExportBackupPage() {
                 <div className="flex items-start gap-x-sm" onClick={() => setIsTermOneChecked((prev) => !prev)}>
                   <Checkbox checked={isTermOneChecked} />
                   <Label className="elytro-text-small-body text-gray-600 cursor-pointer">
-                    I need this passcode to unlock backup
+                    Passcode unlocks backup — never share it
                   </Label>
                 </div>
                 <div className="flex items-start gap-x-sm" onClick={() => setIsTermThreeChecked((prev) => !prev)}>
                   <Checkbox checked={isTermThreeChecked} />
                   <Label className="elytro-text-small-body text-gray-600 cursor-pointer">
-                    I will not share this backup with anyone
+                    Backup doesn’t include recovery records
                   </Label>
                 </div>
                 <div className="flex items-start gap-x-sm" onClick={() => setIsTermTwoChecked((prev) => !prev)}>
                   <Checkbox checked={isTermTwoChecked} />
                   <Label className="elytro-text-small-body text-gray-600 cursor-pointer">
-                    I need to create a new backup if I use Social Recovery to recover this wallet
+                    New backup needed once recovered with Social Recovery elsewhere
                   </Label>
                 </div>
               </div>

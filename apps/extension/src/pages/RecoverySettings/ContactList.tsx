@@ -50,7 +50,7 @@ export default function ContactList({
       if (!isChanged) {
         toast({
           title: 'No changes',
-          description: 'The recovery contacts setting is the same as onchain',
+          description: '',
         });
         setLoading(false);
         return;
@@ -109,24 +109,17 @@ export default function ContactList({
   return (
     <div className="flex flex-col justify-between">
       {isPrivacyMode && (
-        <div className="w-full px-4 py-3 bg-light-purple rounded-xl inline-flex justify-start items-center gap-1">
+        <div className="w-full px-4 py-3 mb-4 bg-light-purple rounded-xl inline-flex justify-start items-center gap-1">
           <LockIcon className="size-3 stroke-purple" />
           <span className="flex-1 justify-center text-purple text-xs leading-none">Private mode</span>
         </div>
       )}
       <div className="flex flex-col gap-y-md">
-        <h2 className="elytro-text-small-bold text-gray-600 mt-4">Your wallet</h2>
+        <h2 className="elytro-text-small-bold text-gray-600">Your wallet</h2>
 
         {/* Operation Bar */}
         <div className="flex flex-row justify-between">
           <ShortedAddress address={currentAccount.address} chainId={currentAccount.chainId} />
-
-          {isEmptyContacts ? null : (
-            <Button className="group" variant="secondary" size="tiny" onClick={onAddContact}>
-              <Plus className="size-3 mr-1 group-hover:stroke-gray-0" />
-              Add
-            </Button>
-          )}
         </div>
 
         {/* <HelperText
@@ -136,7 +129,17 @@ export default function ContactList({
 
         {contacts?.length ? (
           <div className="flex flex-col gap-y-sm">
-            <h2 className="elytro-text-small-bold text-gray-600 mt-4">Your recovery contacts</h2>
+            <div className="flex flex-row justify-between items-center mt-4">
+              <h2 className="elytro-text-small-bold text-gray-600">Your recovery contacts</h2>
+
+              {isEmptyContacts ? null : (
+                <Button className="group" variant="secondary" size="tiny" onClick={onAddContact}>
+                  <Plus className="size-3 mr-1 group-hover:stroke-gray-0" />
+                  Add
+                </Button>
+              )}
+            </div>
+
             {contacts.map((contact) => (
               <ContactItem
                 key={contact.address}

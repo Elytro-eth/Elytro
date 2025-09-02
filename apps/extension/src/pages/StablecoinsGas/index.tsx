@@ -29,7 +29,7 @@ const StablecoinsGas = () => {
     if (stablecoins.length === 0) {
       toast({
         title: 'No supported stablecoins found',
-        description: 'Please try again later',
+        description: '',
         variant: 'destructive',
       });
       return;
@@ -42,7 +42,7 @@ const StablecoinsGas = () => {
     if (!entryPointAddress) {
       toast({
         title: 'EntryPoint not found',
-        description: 'Cannot create approve transaction',
+        description: '',
         variant: 'destructive',
       });
       return;
@@ -64,7 +64,7 @@ const StablecoinsGas = () => {
       if (stablecoins.length === 0) {
         toast({
           title: 'No supported stablecoins found',
-          description: 'Please try again later',
+          description: '',
           variant: 'destructive',
         });
         return;

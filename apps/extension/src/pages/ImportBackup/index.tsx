@@ -20,17 +20,17 @@ import { cn } from '@/utils/shadcn/utils';
 const tips = [
   {
     title: '1. You need a backup file',
-    description: 'Exported from another Elytro device',
+    description: '',
     Icon: WalletCards,
   },
   {
     title: '2. Use lock passcode to unlock',
-    description: 'This will be device passcode if device is new',
+    description: '',
     Icon: Lock,
   },
   {
     title: '3. You can import multiple wallets',
-    description: 'Do not share backup file with anyone',
+    description: '',
     Icon: Laptop,
   },
 ];

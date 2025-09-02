@@ -60,7 +60,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
   },
   {
     ...arbitrum,
-    icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png',
+    icon: 'https://icons.llamao.fi/icons/protocols/arbitrum-timeboost',
     endpoint: arbitrum.rpcUrls.default.http[0] || `https://arb-mainnet.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
     bundler: `https://api.pimlico.io/v2/42161/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
     opExplorer: 'https://arbitrum.blockscout.com/op/',
@@ -81,7 +81,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
   },
   {
     ...optimism,
-    icon: 'https://raw.githubusercontent.com/blockscout/frontend-configs/main/configs/network-icons/optimism-mainnet-light.svg',
+    icon: 'https://icons.llamao.fi/icons/chains/rsz_optimism',
     endpoint:
       optimism.rpcUrls.default.http[0] ||
       `https://opt-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,

@@ -139,7 +139,7 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
           </Button>
         </div>
 
-        <div className="flex flex-col gap-y-sm">
+        <div className="flex flex-col">
           {showAccounts.map((account) => (
             <AccountOption
               key={account.address}
