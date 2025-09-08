@@ -34,20 +34,31 @@ export default function Dashboard() {
       if (!currentAccount?.address) return;
 
       try {
-        // Get on-chain recovery contacts directly
         const recoveryData = await wallet.queryRecoveryContactsByAddress(currentAccount.address);
         console.log('Recovery Data:', recoveryData);
 
-        const isEnabled = !!recoveryData && recoveryData.contacts.length > 0;
+        const onchainInfo = await wallet.getRecoveryInfo(currentAccount.address);
+        const zeroHash = '0x0000000000000000000000000000000000000000000000000000000000000000';
+        const onchainEnabled = !!onchainInfo?.contactsHash && onchainInfo.contactsHash !== zeroHash;
 
-        // Get local settings to check sync status
+        const isEnabled = (!!recoveryData && recoveryData.contacts.length > 0) || onchainEnabled;
+
         const { contacts, threshold } = await getLocalContactsSetting(currentAccount.address);
         const hasLocalSettings = contacts.length > 0 && Number(threshold) > 0;
 
-        // Check if local and on-chain settings are in sync
         let isInSync = true;
         if (hasLocalSettings && isEnabled) {
-          isInSync = !(await wallet.checkRecoveryContactsSettingChanged(recoveryData.contacts, recoveryData.threshold));
+          if (recoveryData) {
+            isInSync = !(await wallet.checkRecoveryContactsSettingChanged(
+              recoveryData.contacts,
+              recoveryData.threshold
+            ));
+          } else {
+            isInSync = !(await wallet.checkRecoveryContactsSettingChanged(
+              contacts.map((c) => c.address),
+              Number(threshold)
+            ));
+          }
         }
 
         setRecoveryStatus({

@@ -28,6 +28,7 @@ export default function RecoverySettings() {
   const [threshold, setThreshold] = useState<string>('0');
   const [showType, setShowType] = useState<ShowType>(ShowType.List);
   const [isPrivacyMode, setIsPrivacyMode] = useLocalStorage('isPrivacyMode', false);
+  const [hasExistingContacts, setHasExistingContacts] = useState<boolean>(false);
   const labelDialogRef = useRef<ILabelDialogRef>(null);
   const originalContactsSetting = useRef<{
     contacts: TRecoveryContact[];
@@ -53,7 +54,7 @@ export default function RecoverySettings() {
 
       const localContacts = await getLocalContacts(address);
       const newContacts = contacts.map((c) => {
-        const local = localContacts.find((lc) => lc.address === c);
+        const local = localContacts.find((lc) => lc.address?.toLowerCase() === c?.toLowerCase());
         return { address: c, label: local?.label || '' };
       });
       const newThreshold = threshold.toString();
@@ -65,7 +66,9 @@ export default function RecoverySettings() {
       };
 
       console.log('originalContactsSetting', originalContactsSetting.current);
-      setShowType(contacts.length <= 0 ? ShowType.Guide : ShowType.List);
+      const hasContacts = contacts.length > 0;
+      setHasExistingContacts(hasContacts);
+      setShowType(hasContacts ? ShowType.List : ShowType.Guide);
     } catch (error) {
       console.error(error);
     } finally {
@@ -98,6 +101,7 @@ export default function RecoverySettings() {
       contacts: contacts,
       threshold: threshold,
     };
+    setHasExistingContacts(contacts.length > 0);
     setShowType(ShowType.List);
   };
 
@@ -122,6 +126,7 @@ export default function RecoverySettings() {
     const newContacts = contacts.filter((c) => c.address !== contact.address);
     setContacts(newContacts);
     setThreshold('0');
+    setHasExistingContacts(newContacts.length > 0);
   };
 
   const onClickGuide = () => {
@@ -137,13 +142,16 @@ export default function RecoverySettings() {
       });
       return;
     }
-    setContacts([...contacts, contact]);
+    const newContacts = [...contacts, contact];
+    setContacts(newContacts);
+    setHasExistingContacts(newContacts.length > 0);
     setShowType(ShowType.List);
   };
 
-  const handleSaveContactLabel = (contact: TRecoveryContact) => {
+  const handleSaveContactLabel = async (contact: TRecoveryContact) => {
     const newContacts = contacts.map((c) => (c.address === contact.address ? contact : c));
     setContacts(newContacts);
+    await setLocalContacts(address, newContacts);
   };
 
   const handleUpdateThreshold = async (threshold: string) => {
@@ -158,7 +166,11 @@ export default function RecoverySettings() {
         if (showType === ShowType.Detail) {
           setShowType(ShowType.List);
         } else if (showType === ShowType.List) {
-          setShowType(ShowType.Guide);
+          if (hasExistingContacts) {
+            history.back();
+          } else {
+            setShowType(ShowType.Guide);
+          }
         } else {
           history.back();
         }

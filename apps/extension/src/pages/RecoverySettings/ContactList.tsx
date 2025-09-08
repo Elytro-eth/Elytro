@@ -11,9 +11,9 @@ import { useState } from 'react';
 import ContactsImg from '@/assets/contacts.png';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { cn } from '@/utils/shadcn/utils';
-import { setLocalContacts, setLocalThreshold } from '@/utils/contacts';
-// import { writeFile } from '@/utils/file';
-// import dayjs from 'dayjs';
+import { getLocalContactsSetting, setLocalContacts, setLocalThreshold } from '@/utils/contacts';
+import { writeFile } from '@/utils/file';
+import dayjs from 'dayjs';
 
 interface IContactListProps {
   contacts: TRecoveryContact[];
@@ -58,7 +58,12 @@ export default function ContactList({
 
       const txs = await wallet.generateRecoveryContactsSettingTxs(contactAddresses, Number(threshold), isPrivacyMode);
 
-      handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs);
+      handleTxRequest(
+        TxRequestTypeEn.ApproveTransaction,
+        txs,
+        undefined,
+        isPrivacyMode ? { privateRecovery: true } : undefined
+      );
 
       await Promise.all([
         setLocalContacts(currentAccount.address, contacts),
@@ -75,36 +80,35 @@ export default function ContactList({
     }
   };
 
-  // const handleDownloadRecoveryContacts = async () => {
-  //   const { contacts, threshold } = await getLocalContactsSetting(currentAccount.address);
+  const handleDownloadRecoveryContacts = async () => {
+    const { contacts, threshold } = await getLocalContactsSetting(currentAccount.address);
 
-  //   const isOnchainContactsChanged = await wallet.checkRecoveryContactsSettingChanged(
-  //     contacts.map((contact) => contact.address),
-  //     Number(threshold)
-  //   );
+    const isOnchainContactsChanged = await wallet.checkRecoveryContactsSettingChanged(
+      contacts.map((contact) => contact.address),
+      Number(threshold)
+    );
 
-  //   if (isOnchainContactsChanged) {
-  //     toast({
-  //       title: 'Local recovery contacts setting is not the same as onchain',
-  //       description:
-  //         'We are not able to download the recovery contacts because the local setting is not the same as onchain.',
-  //     });
-  //     return;
-  //   }
+    if (isOnchainContactsChanged) {
+      toast({
+        title: 'Local records out of sync',
+        description: '',
+      });
+      return;
+    }
 
-  //   const date = dayjs().format('YYYY-MM-DD-HH-mm');
-  //   const data = {
-  //     address: currentAccount.address,
-  //     chainId: currentAccount.chainId,
-  //     contacts,
-  //     threshold: String(threshold),
-  //   };
-  //   writeFile(JSON.stringify(data), `${currentAccount.address}-elytro-recovery-contacts-${date}.json`);
-  //   toast({
-  //     title: 'Recovery contacts downloaded',
-  //     description: 'You can find it in the Downloads folder',
-  //   });
-  // };
+    const date = dayjs().format('YYYY-MM-DD-HH-mm');
+    const data = {
+      address: currentAccount.address,
+      chainId: currentAccount.chainId,
+      contacts,
+      threshold: String(threshold),
+    };
+    writeFile(JSON.stringify(data), `${currentAccount.address}-elytro-recovery-contacts-${date}.json`);
+    toast({
+      title: 'Recovery contacts downloaded',
+      description: '',
+    });
+  };
 
   return (
     <div className="flex flex-col justify-between">
@@ -199,6 +203,11 @@ export default function ContactList({
           <Box className="size-4 mr-sm" color="#cce1ea" />
           {loading ? 'Confirming...' : !isPrivacyMode ? 'Confirm contacts' : 'Confirm contacts privately'}
         </Button>
+        {isPrivacyMode && contacts.length > 0 && Number(threshold) > 0 && (
+          <Button variant="secondary" onClick={handleDownloadRecoveryContacts}>
+            Download file
+          </Button>
+        )}
       </div>
 
       {/* {!isEmptyContacts && (

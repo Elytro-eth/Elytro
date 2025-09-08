@@ -18,4 +18,7 @@ export const EVENT_TYPES = {
     ACCOUNT_INITIALIZED: 'accountInitialized',
     ACCOUNT_CHANGED: 'accountChanged',
   },
+  UI: {
+    PRIVATE_RECOVERY_READY: 'privateRecoveryReady',
+  },
 };

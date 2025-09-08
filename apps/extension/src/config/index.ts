@@ -6,7 +6,11 @@ import prodDefault from './default.production';
 type Environment = 'development' | 'production' | 'test';
 const env = (process.env.APP_ENV || 'development') as Environment;
 
-const defaultConfig = env === 'test' ? testDefault : env === 'development' ? devDefault : prodDefault;
+const defaultConfig = {
+  development: devDefault,
+  production: prodDefault,
+  test: testDefault,
+}[env as Environment];
 
 const config = {
   ...defaultConfig,

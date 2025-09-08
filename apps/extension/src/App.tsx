@@ -11,6 +11,7 @@ import { routes } from '@/routes';
 import { client } from '@/requests';
 import { TxProvider } from '@/contexts/tx-context';
 import { AlerterProvider } from '@/components/ui/alerter';
+import PrivateRecoveryDialog from '@/components/biz/PrivateRecoveryDialog';
 import { initializeSecurity } from '@/utils/security';
 
 initializeSecurity({ isUI: true });
@@ -25,6 +26,7 @@ const main = () => {
               <TooltipProvider>
                 <AlerterProvider>
                   <HashRouter routes={routes} />
+                  <PrivateRecoveryDialog />
                 </AlerterProvider>
                 {/* <UserOpConfirmDialog /> */}
               </TooltipProvider>

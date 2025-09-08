@@ -26,6 +26,11 @@ export enum TxRequestTypeEn {
 
 type TMyDecodeResult = Pick<DecodeResult, 'method' | 'toInfo' | 'to'>;
 
+type TTxMeta = {
+  // Set when confirming private-mode recovery contacts update
+  privateRecovery?: boolean;
+};
+
 type ITxContext = {
   // Tx/UserOp type
   requestType: Nullable<TxRequestTypeEn>;
@@ -44,7 +49,12 @@ type ITxContext = {
   useStablecoin?: Nullable<string>;
 
   // Actions
-  handleTxRequest: (requestType: TxRequestTypeEn, params?: Transaction[], innerDecodedDetail?: TMyDecodeResult) => void;
+  handleTxRequest: (
+    requestType: TxRequestTypeEn,
+    params?: Transaction[],
+    innerDecodedDetail?: TMyDecodeResult,
+    meta?: TTxMeta
+  ) => void;
   onConfirm: () => void;
   onCancel: () => void;
   onRetry: (noSponsor?: boolean, gasToken?: TokenQuote) => void;
@@ -87,6 +97,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const txTypeRef = useRef<Nullable<HistoricalActivityTypeEn>>(null);
   const txParamsRef = useRef<Nullable<Transaction[]>>(null);
   const txDecodedDetailRef = useRef<TMyDecodeResult>();
+  const txMetaRef = useRef<TTxMeta>();
 
   const [requestType, setRequestType] = useState<Nullable<TxRequestTypeEn>>(null);
   const [isPacking, setIsPacking] = useState(true);
@@ -108,6 +119,12 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
             title: ConfirmSuccessMessageMap[requestType!],
             variant: 'constructive',
           });
+
+          // Additional success hooks
+          if (txMetaRef.current?.privateRecovery) {
+            // Notify UI to show dialog instead of toast
+            RuntimeMessage.sendMessage(EVENT_TYPES.UI.PRIVATE_RECOVERY_READY);
+          }
         } else {
           toast({
             title: 'Transaction failed, please try again',
@@ -126,8 +143,14 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     [requestType]
   );
 
-  const handleTxRequest = async (type: TxRequestTypeEn, params?: Transaction[], decodedDetail?: TMyDecodeResult) => {
+  const handleTxRequest = async (
+    type: TxRequestTypeEn,
+    params?: Transaction[],
+    decodedDetail?: TMyDecodeResult,
+    meta?: TTxMeta
+  ) => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm);
+    txMetaRef.current = meta;
     packUserOp(type, { params, decodedDetail });
   };
 
@@ -247,6 +270,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     txParamsRef.current = null;
     txDecodedDetailRef.current = undefined;
     userOpRef.current = null;
+    txMetaRef.current = undefined;
   };
 
   const handleBack = (isCancel = false) => {
