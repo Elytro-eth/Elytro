@@ -155,7 +155,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                   {gasInETH} ETH
                   {gasInDollar && (
                     <span className="elytro-text-small-body text-gray-600 ml-2xs">
-                      $({Number(gasInDollar).toFixed(4)})
+                      (${Number(gasInDollar).toFixed(4)})
                     </span>
                   )}
                 </span>
@@ -199,7 +199,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                     {gasInETH} ETH
                     {gasInDollar && (
                       <span className="elytro-text-small-body text-gray-600 ml-2xs">
-                        ({Number(gasInDollar).toFixed(4)})
+                        (${Number(gasInDollar).toFixed(4)})
                       </span>
                     )}
                   </span>
@@ -214,7 +214,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                       htmlFor={paymaster.token}
                       className="flex items-center elytro-text-small-body text-gray-750 truncate"
                     >
-                      <span className="elytro-text-small-body  ml-2xs">{calcGasInTokenByPrice(paymaster)}</span>
+                      <span className="elytro-text-small-body">{calcGasInTokenByPrice(paymaster)}</span>
                     </Label>
                   </div>
                 ))}

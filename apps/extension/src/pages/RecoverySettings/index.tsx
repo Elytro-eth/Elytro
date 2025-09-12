@@ -88,7 +88,7 @@ export default function RecoverySettings() {
 
     if (isLocalContactsChanged) {
       toast({
-        title: 'Local records out of sync',
+        title: 'Local recovery records expired',
         description: '',
       });
       setShowType(ShowType.Guide);

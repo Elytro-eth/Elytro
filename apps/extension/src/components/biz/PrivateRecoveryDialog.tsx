@@ -39,7 +39,7 @@ export default function PrivateRecoveryDialog() {
     );
 
     if (isOnchainContactsChanged) {
-      toast({ title: 'Local records out of sync', description: '' });
+      toast({ title: 'Local recovery records expired', description: '' });
       return;
     }
 
@@ -67,7 +67,7 @@ export default function PrivateRecoveryDialog() {
             Later
           </Button>
           <Button size="small" onClick={handleDownload}>
-            Download file
+            Download recovery file
           </Button>
         </DialogFooter>
       </DialogContent>
