@@ -7,18 +7,26 @@ export default function Status() {
   const { contacts, chainId } = useRecoveryRecord();
   const { address, isConnected, chainId: connectedChainId } = useAccount();
 
-  // Determine if we should show "Not connected" badge
-  const shouldShowNotConnected = (contact: { address: string; confirmed: boolean }) => {
-    // Don't show if no account is connected at all
-    if (!isConnected || !address) return false;
+  // Determine connection status and return specific message
+  const getConnectionStatus = (contact: { address: string; confirmed: boolean }) => {
+    // Don't show anything if no account is connected at all
+    if (!isConnected || !address) return null;
 
-    // Show if wrong account is connected (connected account is not this contact)
+    // Check if wrong account is connected (connected account is not this contact)
     const isWrongAccount = address.toLowerCase() !== contact.address.toLowerCase();
 
-    // Show if wrong chain is connected
-    const isWrongChain = connectedChainId !== chainId;
+    // Check if wrong chain is connected (ensure both are numbers for comparison)
+    const isWrongChain = Number(connectedChainId) !== Number(chainId);
 
-    return isWrongAccount || isWrongChain;
+    if (isWrongAccount && isWrongChain) {
+      return 'Not connected (wrong wallet)';
+    } else if (isWrongAccount) {
+      return 'Not connected (wrong wallet)';
+    } else if (isWrongChain) {
+      return 'Not connected (wrong network)';
+    }
+
+    return null; // Connected correctly
   };
 
   return (
@@ -34,9 +42,9 @@ export default function Status() {
             rightExtra={
               contact.confirmed ? (
                 <div className="flex items-center text-tiny rounded-xs bg-light-green px-xs py-3xs">Confirmed</div>
-              ) : shouldShowNotConnected(contact) ? (
+              ) : getConnectionStatus(contact) ? (
                 <div className="flex items-center text-tiny rounded-xs bg-light-red text-red px-xs py-3xs">
-                  Not connected
+                  {getConnectionStatus(contact)}
                 </div>
               ) : null
             }

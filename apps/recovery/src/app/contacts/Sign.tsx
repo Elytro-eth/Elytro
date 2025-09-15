@@ -7,17 +7,18 @@ import { Button } from '@/components/ui/button';
 import { getApproveHashTxData } from '@/requests/contract';
 import { toast } from '@/hooks/use-toast';
 import { Box } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function Sign() {
   const { address, isConnected, chainId } = useAccount();
   const { switchChain } = useSwitchChain();
+  const router = useRouter();
   const {
     contacts,
     address: recoveryAddress,
     chainId: recoveryChainId,
     hash,
     updateContactsSignStatus,
-    backToHome,
   } = useRecoveryRecord();
   const [loading, setLoading] = useState(false);
 
@@ -57,7 +58,7 @@ export default function Sign() {
       const _txHash = await sendTransactionAsync(getApproveHashTxData(hash));
       setTxHash(_txHash);
 
-      backToHome();
+      // Don't redirect immediately, wait for transaction confirmation
     } catch (error) {
       console.error('Transaction error:', error);
       toast({
@@ -75,6 +76,9 @@ export default function Sign() {
       });
       setLoading(false);
       updateContactsSignStatus();
+      // Redirect to confirmed page after successful transaction with URL parameters
+      const searchParams = new URLSearchParams(window.location.search);
+      router.push(`/confirmed?${searchParams.toString()}`);
     } else if (error) {
       toast({
         title: 'Transaction Failed',
@@ -83,7 +87,7 @@ export default function Sign() {
       });
       setLoading(false);
     }
-  }, [receiptStatus, error]);
+  }, [receiptStatus, error, router, updateContactsSignStatus]);
 
   return (
     <div>
@@ -95,7 +99,9 @@ export default function Sign() {
           recoveryChainId === chainId ? (
             <div className="flex items-center text-tiny rounded-xs bg-light-green px-xs py-3xs">Connected</div>
           ) : (
-            <div className="flex items-center text-tiny rounded-xs bg-light-red px-xs py-3xs">Not Connected</div>
+            <div className="flex items-center text-tiny rounded-xs bg-light-red text-red px-xs py-3xs">
+              Not connected (wrong network)
+            </div>
           )
         }
       />

@@ -6,9 +6,9 @@ export const SidebarStepper = ({ currentStep }: { currentStep: number }) => {
     const isCompleted = step < currentStep;
     return {
       circle: `flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-sm font-bold ${
-        isActive ? 'bg-blue text-white' : 'bg-gray-450 text-white'
+        isActive ? 'bg-blue text-white' : isCompleted ? 'bg-blue text-white' : 'bg-gray-450 text-white'
       }`,
-      text: `text-base font-medium ${isActive ? 'text-black-blue' : 'text-gray-600'}`,
+      text: `text-base font-medium ${isActive ? 'text-black-blue' : isCompleted ? 'text-black-blue' : 'text-gray-600'}`,
       content: isCompleted ? <Check className="w-3.5 h-3.5 stroke-white" /> : step,
     };
   };
