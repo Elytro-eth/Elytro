@@ -10,6 +10,8 @@ import React, { useEffect, useState } from 'react';
 import { useAccount, usePublicClient } from 'wagmi';
 import { sendTransaction } from 'wagmi/actions';
 import { Box, ExternalLink, Loader2 } from 'lucide-react';
+import DoorImg from '@/assets/door.png';
+import Image from 'next/image';
 import { RecoveryStatusEn } from '@/constants/enums';
 import { cn } from '@/lib/utils';
 import { SidebarStepper } from '@/components/SidebarStepper';
@@ -44,6 +46,16 @@ export default function Start() {
     minutes: 0,
     seconds: 0,
   });
+
+  // Initialize leftTime based on status when component mounts
+  useEffect(() => {
+    console.log('Status:', status, 'ValidTime:', validTime);
+    if (status === RecoveryStatusEn.RECOVERY_READY) {
+      setLeftTime({ hours: 0, minutes: 0, seconds: 0 });
+    } else if (!validTime) {
+      setLeftTime({ hours: 48, minutes: 0, seconds: 0 });
+    }
+  }, [status, validTime]);
   const [isLoading, setIsLoading] = useState(false);
   const [txStatus, setTxStatus] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle');
 
@@ -76,7 +88,7 @@ export default function Start() {
           className="mr-3 text-sm text-light-green flex cursor-pointer items-center"
           onClick={() => openExplorer(txHash)}
         >
-          View <ExternalLink className="size-4 stroke-light-green ml-1" />
+          <ExternalLink className="size-4 stroke-light-green ml-1" />
         </a>
       ),
     });
@@ -273,30 +285,42 @@ export default function Start() {
           title={
             <div className="text-center">
               {[RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status || 0)
-                ? 'Start Recovery'
+                ? 'Complete Recovery'
                 : 'Recovery in progress'}
             </div>
           }
           subtitle={
             <div className="text-center text-gray-600">
-              {status === RecoveryStatusEn.SIGNATURE_COMPLETED
-                ? 'Connect to a wallet to start recovery.'
-                : 'Wallet access will be resumed in 48 hours.'}
+              {[RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status || 0)
+                ? 'This is the last step to regain wallet access.'
+                : 'Wallet recovery can be completed in 48 hours.'}
             </div>
           }
         >
-          {/* Count down */}
+          {/* Count down or Door Image */}
           {txStatus !== 'pending' && status !== null && status !== undefined && (
-            <div
-              className={cn(
-                'flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg ',
-                [RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status) && 'opacity-60'
+            <>
+              {status === RecoveryStatusEn.RECOVERY_READY &&
+              leftTime.hours === 0 &&
+              leftTime.minutes === 0 &&
+              leftTime.seconds === 0 ? (
+                <div className="flex flex-col items-center justify-center my-2xl">
+                  <Image src={DoorImg} alt="door" width={164} height={164} />
+                </div>
+              ) : (
+                <div
+                  className={cn(
+                    'flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg ',
+                    [RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status) &&
+                      'opacity-60'
+                  )}
+                >
+                  <TimeBlock time={leftTime.hours} unit="Hours" />
+                  <TimeBlock time={leftTime.minutes} unit="Minutes" />
+                  <TimeBlock time={leftTime.seconds} unit="Seconds" />
+                </div>
               )}
-            >
-              <TimeBlock time={leftTime.hours} unit="Hours" />
-              <TimeBlock time={leftTime.minutes} unit="Minutes" />
-              <TimeBlock time={leftTime.seconds} unit="Seconds" />
-            </div>
+            </>
           )}
 
           {txStatus === 'pending' && (
@@ -323,7 +347,9 @@ export default function Start() {
             ) : (
               <Button
                 size="lg"
-                disabled={isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.RECOVERY_READY}
+                disabled={
+                  !isConnected || isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.RECOVERY_READY
+                }
                 onClick={completeRecovery}
                 className="w-full group"
               >

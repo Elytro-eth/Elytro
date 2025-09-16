@@ -90,7 +90,7 @@ export default function ContactList({
 
     if (isOnchainContactsChanged) {
       toast({
-        title: 'Local records out of sync',
+        title: 'Local recovery records expired',
         description: '',
       });
       return;
@@ -186,6 +186,11 @@ export default function ContactList({
                 <span className="elytro-text-small-bold">out of {contacts.length} contacts need to confirm</span>
               </div>
             </div>
+
+            <Button className="w-full" disabled={loading || !threshold} onClick={handleConfirmContacts}>
+              <Box className="size-4 mr-sm" color="#cce1ea" />
+              {loading ? 'Confirming...' : !isPrivacyMode ? 'Confirm contacts' : 'Confirm contacts privately'}
+            </Button>
           </div>
         ) : (
           <div className="flex flex-col gap-y-md items-center mt-4xl">
@@ -198,25 +203,12 @@ export default function ContactList({
             </Button>
           </div>
         )}
-
-        <Button className="w-full" disabled={loading || !threshold} onClick={handleConfirmContacts}>
-          <Box className="size-4 mr-sm" color="#cce1ea" />
-          {loading ? 'Confirming...' : !isPrivacyMode ? 'Confirm contacts' : 'Confirm contacts privately'}
-        </Button>
         {isPrivacyMode && contacts.length > 0 && Number(threshold) > 0 && (
           <Button variant="secondary" onClick={handleDownloadRecoveryContacts}>
-            Download file
+            Download recovery file
           </Button>
         )}
       </div>
-
-      {/* {!isEmptyContacts && (
-        <div className="flex flex-row justify-end items-center mt-4">
-          <Button variant="link" onClick={handleDownloadRecoveryContacts}>
-            Download recovery contacts
-          </Button>
-        </div>
-      )} */}
     </div>
   );
 }

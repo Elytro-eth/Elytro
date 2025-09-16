@@ -1,7 +1,7 @@
 'use client';
 
 import { useRecoveryRecord } from '@/contexts';
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle, Check } from 'lucide-react';
 import AddressWithChain from '@/components/AddressWithChain';
 import ContentWrapper from '@/components/ContentWrapper';
 import { Button } from '@/components/ui/button';
@@ -121,7 +121,12 @@ export default function Home() {
                           className={!isActive ? 'border-gray-450 border-1 text-gray-600 bg-gray-0 shadow-none' : ''}
                           disabled={!isActive}
                         >
-                          <LinkWithQuery href={step.href}>{buttonText}</LinkWithQuery>
+                          <LinkWithQuery href={step.href}>
+                            {getCurrentStep() === 3 && step.title === 'Collect confirmations' && (
+                              <Check className="w-4 h-4 mr-2 stroke-gray-400 inline" />
+                            )}
+                            {buttonText}
+                          </LinkWithQuery>
                         </Button>
                       }
                     />

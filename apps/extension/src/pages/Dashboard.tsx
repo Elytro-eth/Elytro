@@ -93,7 +93,7 @@ export default function Dashboard() {
 
     if (isOnchainContactsChanged) {
       toast({
-        title: 'Local records out of sync',
+        title: 'Local recovery records expired',
         description: '',
       });
       return;

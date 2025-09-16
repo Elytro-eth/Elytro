@@ -190,7 +190,18 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
   }, [address, chainId, status]);
 
   const backToHome = () => {
-    router.replace(`/?${params.toString()}`);
+    try {
+      if (router && params) {
+        router.replace(`/?${params.toString()}`);
+      } else {
+        // Fallback if router or params are not available
+        window.location.href = '/';
+      }
+    } catch (error) {
+      console.error('Error in backToHome:', error);
+      // Ultimate fallback
+      window.location.href = '/';
+    }
   };
 
   useEffect(() => {
