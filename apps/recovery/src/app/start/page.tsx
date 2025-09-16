@@ -49,7 +49,6 @@ export default function Start() {
 
   // Initialize leftTime based on status when component mounts
   useEffect(() => {
-    console.log('Status:', status, 'ValidTime:', validTime);
     if (status === RecoveryStatusEn.RECOVERY_READY) {
       setLeftTime({ hours: 0, minutes: 0, seconds: 0 });
     } else if (!validTime) {

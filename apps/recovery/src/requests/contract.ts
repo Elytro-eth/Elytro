@@ -199,8 +199,6 @@ export const getRecoveryStartTxData = (
     args: [walletAddress as Address, ownersInBytes32, rawGuardian as Hex, packedGuardianSignature as Hex],
   });
 
-  console.log('data', data);
-  console.log('to', SocialRecoveryContractConfig);
   return {
     data,
     to: SocialRecoveryContractConfig.address,
@@ -325,10 +323,12 @@ export const checkIsContactSigned = async ({
   guardian,
   fromBlock,
   chainId,
+  hash,
 }: {
   guardian: Address;
   fromBlock: bigint;
   chainId: number;
+  hash?: `0x${string}`;
 }) => {
   const customRpc = getCurrentRpc(chainId);
   const client = createPublicClient({
@@ -343,6 +343,19 @@ export const checkIsContactSigned = async ({
     event: parseAbiItem('event ApproveHash(address indexed guardian, bytes32 hash)'),
     args: { guardian },
   });
+
+  // If hash is provided, filter logs by the specific recovery hash
+  if (hash) {
+    const filteredLogs = logs.filter((log) => {
+      try {
+        const logArgs = (log as { args?: { hash?: string } }).args;
+        return logArgs && logArgs.hash === hash;
+      } catch {
+        return false;
+      }
+    });
+    return filteredLogs.length > 0;
+  }
 
   return logs.length > 0;
 };

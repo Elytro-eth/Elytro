@@ -150,6 +150,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
               guardian: address as Address,
               fromBlock: BigInt(from || '0'),
               chainId: Number(chainId),
+              hash: hash || undefined,
             });
         return {
           address,
@@ -159,7 +160,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
     );
 
     const signedCount = formattedContacts.filter((contact) => contact.confirmed).length;
-    const isSignatureCompleted = signedCount >= _threshold;
+    const isSignatureCompleted = signedCount >= _threshold && signedCount > 0;
 
     setContacts(formattedContacts);
     setThreshold(_threshold);
@@ -211,7 +212,7 @@ export const RecoveryRecordProvider: React.FC<{ children: ReactNode }> = ({ chil
           contacts.map((contact) => contact.address),
           threshold
         );
-      }, 5_000);
+      }, 10_000); // Increased to 10 seconds to reduce RPC load
       return () => clearInterval(interval);
     }
   }, [status, contacts, threshold]);
