@@ -2,7 +2,7 @@
 import AddressWithChain from '@/components/AddressWithChain';
 import { useAccount, useSendTransaction, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 import { useRecoveryRecord } from '@/contexts';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { getApproveHashTxData } from '@/requests/contract';
 import { toast } from '@/hooks/use-toast';
@@ -21,6 +21,7 @@ export default function Sign() {
     updateContactsSignStatus,
   } = useRecoveryRecord();
   const [loading, setLoading] = useState(false);
+  const processedSuccessRef = useRef<string | null>(null); // Track processed transactions
 
   const { sendTransactionAsync } = useSendTransaction();
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
@@ -70,7 +71,10 @@ export default function Sign() {
   };
 
   useEffect(() => {
-    if (receiptStatus === 'success') {
+    if (receiptStatus === 'success' && txHash && processedSuccessRef.current !== txHash) {
+      // Mark this transaction as processed to prevent duplicate toasts
+      processedSuccessRef.current = txHash;
+
       toast({
         title: 'You have confirmed the recovery successfully.',
       });
@@ -87,7 +91,7 @@ export default function Sign() {
       });
       setLoading(false);
     }
-  }, [receiptStatus, error, router, updateContactsSignStatus]);
+  }, [receiptStatus, error, router, txHash]); // Added txHash to dependencies
 
   return (
     <div>

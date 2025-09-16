@@ -102,7 +102,7 @@ export default function Home() {
         {error ? (
           <InvalidRecordView />
         ) : (
-          <ContentWrapper title="Wallet recovery for">
+          <ContentWrapper title="Start recovery for">
             <div className="flex flex-col gap-xl items-left">
               <AddressWithChain className="bg-gray-150 w-fit" address={address!} chainID={chainId!} />
 
