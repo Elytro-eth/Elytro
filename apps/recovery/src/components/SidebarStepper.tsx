@@ -20,7 +20,7 @@ export const SidebarStepper = ({ currentStep }: { currentStep: number }) => {
         <div className="flex items-center space-x-md">
           <div className={getStepStyles(1).circle}>{getStepStyles(1).content}</div>
           <div className="flex-1 min-w-0">
-            <h3 className={getStepStyles(1).text}>Find details</h3>
+            <h3 className={getStepStyles(1).text}>Verify</h3>
           </div>
         </div>
 
@@ -28,7 +28,7 @@ export const SidebarStepper = ({ currentStep }: { currentStep: number }) => {
         <div className="flex items-center space-x-md">
           <div className={getStepStyles(2).circle}>{getStepStyles(2).content}</div>
           <div className="flex-1 min-w-0">
-            <h3 className={getStepStyles(2).text}>Collect Confirmations</h3>
+            <h3 className={getStepStyles(2).text}>Confirm</h3>
           </div>
         </div>
 
@@ -36,7 +36,7 @@ export const SidebarStepper = ({ currentStep }: { currentStep: number }) => {
         <div className="flex items-center space-x-md">
           <div className={getStepStyles(3).circle}>{getStepStyles(3).content}</div>
           <div className="flex-1 min-w-0">
-            <h3 className={getStepStyles(3).text}>Recover wallet</h3>
+            <h3 className={getStepStyles(3).text}>Recover</h3>
           </div>
         </div>
       </div>

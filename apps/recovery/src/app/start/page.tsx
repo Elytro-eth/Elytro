@@ -283,16 +283,20 @@ export default function Start() {
           // allSteps={3}
           title={
             <div className="text-center">
-              {[RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status || 0)
-                ? 'Complete Recovery'
-                : 'Recovery in progress'}
+              {status === RecoveryStatusEn.SIGNATURE_COMPLETED
+                ? 'Start Recovery'
+                : status === RecoveryStatusEn.RECOVERY_READY
+                  ? 'Complete Recovery'
+                  : 'Recovery in progress'}
             </div>
           }
           subtitle={
             <div className="text-center text-gray-600">
-              {[RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status || 0)
-                ? 'This is the last step to regain wallet access.'
-                : 'Wallet recovery can be completed in 48 hours.'}
+              {status === RecoveryStatusEn.SIGNATURE_COMPLETED
+                ? 'Connect to a wallet to start recovery'
+                : status === RecoveryStatusEn.RECOVERY_READY
+                  ? 'This is the last step to regain wallet access'
+                  : 'Wallet recovery can be completed in 48 hours'}
             </div>
           }
         >
