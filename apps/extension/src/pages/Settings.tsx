@@ -74,10 +74,21 @@ export default function Settings() {
         <div className="text-center text-gray-750">
           <p>
             <a href="https://t.me/+l9coqJq9QHgyYjI1" target="_blank" rel="noreferrer">
-              Join Telegram group
+              Join Telegram
+            </a>
+            <a className="ml-3" href="https://elytro.notion.site/elytro-terms-of-use" target="_blank" rel="noreferrer">
+              Terms of Use
+            </a>
+            <a
+              className="ml-3"
+              href="https://elytro.notion.site/elytro-privacy-policy"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Privacy Policy
             </a>
           </p>
-          <p>version {appVersion}</p>
+          <p>Version {appVersion}</p>
         </div>
       </div>
     </SecondaryPageWrapper>
