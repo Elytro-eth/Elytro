@@ -26,20 +26,13 @@ export default function FullPageWrapper({
   return (
     <div
       className={cn(
-        'elytro-gradient-bg w-full flex flex-col flex-grow items-center p-xl pt-10 relative',
+        'elytro-gradient-bg w-full flex flex-col flex-grow items-center p-xl pt-10 relative min-h-screen',
         className
       )}
     >
-      {showBack && (
-        <ArrowLeft
-          className="elytro-clickable-icon absolute left-lg top-lg"
-          onClick={handleBack}
-        />
-      )}
+      {showBack && <ArrowLeft className="elytro-clickable-icon absolute left-lg top-lg" onClick={handleBack} />}
 
-      <div className="flex flex-col w-full items-center justify-center gap-y-2xl">
-        {children}
-      </div>
+      {children}
     </div>
   );
 }

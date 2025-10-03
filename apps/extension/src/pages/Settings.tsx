@@ -71,24 +71,34 @@ export default function Settings() {
           </Button>
         </div>
 
-        <div className="text-center text-gray-750">
+        <div className="text-center text-gray-450">
           <p>
-            <a href="https://t.me/+l9coqJq9QHgyYjI1" target="_blank" rel="noreferrer">
+            <a
+              className="text-gray-450 hover:text-gray-750"
+              href="https://t.me/+l9coqJq9QHgyYjI1"
+              target="_blank"
+              rel="noreferrer"
+            >
               Join Telegram
             </a>
-            <a className="ml-3" href="https://elytro.notion.site/elytro-terms-of-use" target="_blank" rel="noreferrer">
+            <a
+              className="ml-3 text-gray-450 hover:text-gray-750"
+              href="https://elytro.notion.site/elytro-terms-of-use"
+              target="_blank"
+              rel="noreferrer"
+            >
               Terms of Use
             </a>
             <a
-              className="ml-3"
+              className="ml-3 text-gray-450 hover:text-gray-750"
               href="https://elytro.notion.site/elytro-privacy-policy"
               target="_blank"
               rel="noreferrer"
             >
               Privacy Policy
             </a>
+            <span className="ml-3 text-gray-450">V.{appVersion}</span>
           </p>
-          <p>Version {appVersion}</p>
         </div>
       </div>
     </SecondaryPageWrapper>
