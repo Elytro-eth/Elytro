@@ -1,9 +1,8 @@
 import ContactsImg from '@/assets/contacts.png';
 import TipItem from '@/components/biz/TipItem';
 import { Button } from '@/components/ui/button';
-// import { cn } from '@/utils/shadcn/utils';
-// import { Clock, WalletCards, Shield, Lock } from 'lucide-react';
-import { Clock, WalletCards, Shield } from 'lucide-react';
+import { cn } from '@/utils/shadcn/utils';
+import { Clock, WalletCards, Shield, Lock } from 'lucide-react';
 
 interface RecoverGuideProps {
   onClick: () => void;
@@ -11,12 +10,11 @@ interface RecoverGuideProps {
   onPrivacyModeChange: (isPrivacyMode: boolean) => void;
 }
 
-// export default function RecoverGuide({ onClick, isPrivacyMode, onPrivacyModeChange }: RecoverGuideProps) {
-export default function RecoverGuide({ onClick, isPrivacyMode }: RecoverGuideProps) {
+export default function RecoverGuide({ onClick, isPrivacyMode, onPrivacyModeChange }: RecoverGuideProps) {
   return (
     <div className="flex flex-col w-full transition-all duration-500">
       {/* Privacy mode switch */}
-      {/* <div className="grid grid-cols-2 bg-gray-150 rounded-md text-center p-2xs">
+      <div className="grid grid-cols-2 bg-gray-150 rounded-md text-center p-2xs">
         <div
           className={cn('px-md py-xs rounded-sm font-medium cursor-pointer', !isPrivacyMode && 'bg-white font-medium')}
           onClick={() => onPrivacyModeChange(false)}
@@ -33,7 +31,7 @@ export default function RecoverGuide({ onClick, isPrivacyMode }: RecoverGuidePro
           <Lock className="size-4" />
           Private
         </div>
-      </div> */}
+      </div>
       <div className="flex flex-col gap-y-xl items-center mt-10 ">
         <img src={ContactsImg} className="size-36" />
         <div className="elytro-text-subtitle text-center text-dark-blue">
