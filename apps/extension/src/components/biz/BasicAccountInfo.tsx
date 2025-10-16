@@ -6,6 +6,7 @@ import { useAccount } from '@/contexts/account-context';
 import AccountsDropdown from './AccountsDropdown';
 import Copy from '@/components/ui/Copy';
 import { RedDot } from '@/components/ui/RedDot';
+import { formatAddress } from '@/utils/format';
 
 const HeaderSection = () => {
   const { currentAccount } = useAccount();
@@ -18,7 +19,7 @@ const HeaderSection = () => {
     <div className="flex flex-row gap-3 w-full items-center justify-between mb-2">
       <div className="flex flex-row gap-x-md items-center">
         <AccountsDropdown />
-        <Copy text={currentAccount.address} />
+        <Copy text={formatAddress(currentAccount.address, currentAccount.chainId)} />
       </div>
       <div className="flex flex-row gap-x-md relative">
         <Settings2Icon className="elytro-clickable-icon" onClick={handleClickSettings} />

@@ -8,6 +8,7 @@ import { safeClipboard } from '@/utils/clipboard';
 import Spin from '@/components/ui/Spin';
 import { useCallback, useState } from 'react';
 import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
+import { formatAddress } from '@/utils/format';
 
 export default function Receive() {
   const {
@@ -27,7 +28,7 @@ export default function Receive() {
   }, []);
 
   const onCopy = useCallback(() => {
-    safeClipboard(address!, false, onCopied);
+    safeClipboard(formatAddress(address, chainId), false, onCopied);
   }, [address]);
 
   if (!address) {

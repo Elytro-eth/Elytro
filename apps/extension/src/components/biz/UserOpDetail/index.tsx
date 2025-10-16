@@ -17,6 +17,7 @@ import { safeClipboard } from '@/utils/clipboard';
 import { RawData } from '@/components/ui/rawData';
 import { useWallet } from '@/contexts/wallet';
 import { TokenPaymaster } from '@/types/pimlico';
+import { formatAddress } from '@/utils/format';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -230,7 +231,10 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
               <span className="elytro-text-small-body text-dark-red">Not enough for network cost, deposit first</span>
             </div>
             <div className="bg-white rounded-sm px-2 py-1 flex items-center justify-between">
-              <div className="flex items-center 1 cursor-pointer" onClick={() => safeClipboard(address)}>
+              <div
+                className="flex items-center 1 cursor-pointer"
+                onClick={() => safeClipboard(formatAddress(address, chainId))}
+              >
                 <ShortedAddress address={address} chainId={chainId} className="bg-white" />
                 <Copy className="size-3 stroke-gray-600" />
               </div>
