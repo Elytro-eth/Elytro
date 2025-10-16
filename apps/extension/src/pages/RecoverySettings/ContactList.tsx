@@ -169,7 +169,7 @@ export default function ContactList({
               <div className="flex flex-row gap-x-md items-center">
                 <Select value={threshold} onValueChange={setThreshold}>
                   <SelectTrigger
-                    className={cn('w-fit', Number(threshold) < 1 && 'border-red')}
+                    className={cn('w-fit', !threshold || (Number(threshold) < 1 && 'border-red'))}
                     disabled={contacts.length === 0}
                   >
                     <SelectValue placeholder="Select" />
@@ -187,7 +187,11 @@ export default function ContactList({
               </div>
             </div>
 
-            <Button className="w-full" disabled={loading || !threshold} onClick={handleConfirmContacts}>
+            <Button
+              className="w-full"
+              disabled={loading || !threshold || Number(threshold) < 1}
+              onClick={handleConfirmContacts}
+            >
               <Box className="size-4 mr-sm" color="#cce1ea" />
               {loading ? 'Confirming...' : !isPrivacyMode ? 'Confirm contacts' : 'Confirm contacts privately'}
             </Button>
