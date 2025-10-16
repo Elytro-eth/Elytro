@@ -1,6 +1,0 @@
-// Please do not modify manually,use `pnpm run generateBytes4`
-import { Bytes4 } from "./interface/bytes4.js";
-const b = new Map<string, Bytes4>();
-{{#each}}
-const elytroWalletBytes4 = b;
-export default elytroWalletBytes4;

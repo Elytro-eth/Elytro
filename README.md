@@ -97,7 +97,6 @@ packages/       # Shared libraries (WIP, do not use)
 configs/        # Shared config (eslint, tailwind, tsconfig, etc.)
 ```
 
-> ⚠️ `packages/` is under development and not production-ready. Do not import from shared packages at this stage.
 
 ## Tooling
 

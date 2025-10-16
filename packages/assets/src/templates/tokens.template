@@ -1,6 +1,0 @@
-// Please do not modify manually,use `pnpm run generateTokens`
-import { MinTokenInfo } from './interface/tokenInfo.js';
-const b = new Map<string, MinTokenInfo>();
-{{#each}}
-const tokenList = b;
-export default tokenList;
