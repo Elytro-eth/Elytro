@@ -293,7 +293,7 @@ export default function Start() {
           subtitle={
             <div className="text-center text-gray-600">
               {status === RecoveryStatusEn.SIGNATURE_COMPLETED
-                ? 'Connect to a wallet to start recovery'
+                ? 'Connect to any wallet to start recovery'
                 : status === RecoveryStatusEn.RECOVERY_READY
                   ? 'This is the last step to regain wallet access'
                   : 'Wallet recovery can be completed in 48 hours'}

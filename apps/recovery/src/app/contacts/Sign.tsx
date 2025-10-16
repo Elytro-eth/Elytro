@@ -104,7 +104,7 @@ export default function Sign() {
             <div className="flex items-center text-tiny rounded-xs bg-light-green px-xs py-3xs">Connected</div>
           ) : (
             <div className="flex items-center text-tiny rounded-xs bg-light-red text-red px-xs py-3xs">
-              Not connected (wrong network)
+              Wrong network
             </div>
           )
         }

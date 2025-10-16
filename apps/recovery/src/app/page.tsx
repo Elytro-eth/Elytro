@@ -21,13 +21,13 @@ interface StepConfig {
 
 const RECOVERY_STEPS: StepConfig[] = [
   {
-    title: 'Confirmations',
+    title: 'I’m a recovery contact',
     status: [RecoveryStatusEn.WAITING_FOR_SIGNATURE],
     href: '/contacts',
     buttonText: 'Confirm Recovery',
   },
   {
-    title: 'Recover',
+    title: 'Anyone helping to recover',
     status: [RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_STARTED, RecoveryStatusEn.RECOVERY_READY],
     href: '/start',
     buttonText: 'Start Recovery',
