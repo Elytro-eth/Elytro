@@ -14,6 +14,7 @@ import { cn } from '@/utils/shadcn/utils';
 import { getLocalContactsSetting, setLocalContacts, setLocalThreshold } from '@/utils/contacts';
 import { writeFile } from '@/utils/file';
 import dayjs from 'dayjs';
+import HelperText from '@/components/ui/HelperText';
 
 interface IContactListProps {
   contacts: TRecoveryContact[];
@@ -126,10 +127,7 @@ export default function ContactList({
           <ShortedAddress address={currentAccount.address} chainId={currentAccount.chainId} />
         </div>
 
-        {/* <HelperText
-          title="How does it work?"
-          description="Add 2–3 recovery social contacts via email or wallet address, so they can help you regain access later."
-        /> */}
+        <HelperText description="Save your address somewhere in case of recovery." />
 
         {contacts?.length ? (
           <div className="flex flex-col gap-y-sm">

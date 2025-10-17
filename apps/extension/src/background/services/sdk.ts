@@ -942,7 +942,7 @@ export class SDKService {
     return sigHash.toLowerCase();
   }
 
-  public async checkIsGuardianSigned(guardian: Address, fromBlock: bigint) {
+  public async checkIsGuardianSigned(guardian: Address, fromBlock: bigint, hash?: `0x${string}`) {
     const _client = this._getClient();
 
     const logs = await getLogsOnchain(_client, {
@@ -951,6 +951,19 @@ export class SDKService {
       event: parseAbiItem('event ApproveHash(address indexed guardian, bytes32 hash)'),
       args: { guardian },
     });
+
+    // If hash is provided, filter logs by the specific recovery hash
+    if (hash) {
+      const filteredLogs = logs.filter((log) => {
+        try {
+          const logArgs = (log as { args?: { hash?: string } }).args;
+          return logArgs && logArgs.hash === hash;
+        } catch {
+          return false;
+        }
+      });
+      return filteredLogs.length > 0;
+    }
 
     return logs.length > 0;
   }

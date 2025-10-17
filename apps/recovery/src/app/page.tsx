@@ -21,13 +21,13 @@ interface StepConfig {
 
 const RECOVERY_STEPS: StepConfig[] = [
   {
-    title: 'Collect confirmations',
+    title: 'I’m a recovery contact',
     status: [RecoveryStatusEn.WAITING_FOR_SIGNATURE],
     href: '/contacts',
     buttonText: 'Confirm Recovery',
   },
   {
-    title: 'Recover wallet',
+    title: 'Anyone helping to recover',
     status: [RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_STARTED, RecoveryStatusEn.RECOVERY_READY],
     href: '/start',
     buttonText: 'Start Recovery',
@@ -102,15 +102,14 @@ export default function Home() {
         {error ? (
           <InvalidRecordView />
         ) : (
-          <ContentWrapper title="Wallet recovery for">
+          <ContentWrapper title="Start recovery for">
             <div className="flex flex-col gap-xl items-left">
               <AddressWithChain className="bg-gray-150 w-fit" address={address!} chainID={chainId!} />
 
               <div className="flex flex-col gap-4 justify-between w-full">
                 {RECOVERY_STEPS.map((step) => {
                   const isActive = status !== null && step.status.includes(status!);
-                  const buttonText =
-                    getCurrentStep() === 3 && step.title === 'Collect confirmations' ? 'Completed' : step.buttonText;
+                  const buttonText = getCurrentStep() === 3 && step.title === 'Confirm' ? 'Completed' : step.buttonText;
                   return (
                     <StepBlock
                       key={step.title}
@@ -122,7 +121,7 @@ export default function Home() {
                           disabled={!isActive}
                         >
                           <LinkWithQuery href={step.href}>
-                            {getCurrentStep() === 3 && step.title === 'Collect confirmations' && (
+                            {getCurrentStep() === 3 && step.title === 'Confirm' && (
                               <Check className="w-4 h-4 mr-2 stroke-gray-400 inline" />
                             )}
                             {buttonText}

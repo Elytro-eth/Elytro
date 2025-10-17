@@ -24,7 +24,7 @@ export default function ContactDetail({ isPrivacyMode, onAddContact }: IContactD
   return (
     <div className="flex flex-col justify-between ">
       <div className=" flex flex-col gap-y-md">
-        <h1 className="elytro-text-bold-body my-1">Add a contact by wallet</h1>
+        <h1 className="elytro-text-bold-body my-1">Add a contact</h1>
 
         <AddressInputWithChainIcon chainId={currentAccount.chainId} address={address} onChange={handleAddressChange} />
 

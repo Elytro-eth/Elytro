@@ -136,64 +136,65 @@ export default function Dashboard() {
             </div>
 
             {/* Recovery Status */}
-            {/* Recovery Status */}
-            <div
-              className={`text-xs text-left cursor-pointer h-8 ${
-                recoveryStatus.isEnabled ? 'bg-light-green' : 'bg-yellow-100'
-              } ${isExpanded ? 'w-full rounded-b-sm ' : 'w-[50px] rounded-bl-sm'}`}
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? (
-                <div className="px-4 py-2 flex items-center w-full">
-                  <div className="flex flex-row justify-between items-center w-full">
-                    <div className="flex flex-row items-center">
-                      {recoveryStatus.isEnabled ? (
-                        <>
-                          <Check className="w-4 h-4 p-0.5 mr-2 bg-white rounded-full" />
-                          <span>Social Recovery {isPrivacyMode ? '(Private)' : ''} enabled</span>
-                          {!recoveryStatus.isInSync && (
-                            <span className="ml-2 text-xs text-yellow-600">(Settings out of sync)</span>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          <AlertTriangle className="w-4 h-4 mr-1 stroke-yellow-600" />
-                          <span className="text-yellow-700">Social Recovery not set up</span>
-                          <div
-                            className="flex flex-row items-center cursor-pointer text-yellow-600 bg-white hover:text-yellow-700 rounded-full px-2 ml-2"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RecoverySetting);
-                            }}
-                          >
-                            Set up now
-                          </div>
-                        </>
+            {
+              <div
+                className={`text-xs text-left cursor-pointer h-8 ${
+                  recoveryStatus.isEnabled ? 'bg-light-green' : 'bg-yellow-100'
+                } ${isExpanded ? 'w-full rounded-b-sm ' : 'w-[50px] rounded-bl-sm'}`}
+                onClick={() => setIsExpanded(!isExpanded)}
+              >
+                {isExpanded ? (
+                  <div className="px-4 py-2 flex items-center w-full">
+                    <div className="flex flex-row justify-between items-center w-full">
+                      <div className="flex flex-row items-center">
+                        {recoveryStatus.isEnabled ? (
+                          <>
+                            <Check className="w-4 h-4 p-0.5 mr-2 bg-white rounded-full" />
+                            <span>Social Recovery {isPrivacyMode ? '(Private)' : ''} enabled</span>
+                            {!recoveryStatus.isInSync && (
+                              <span className="ml-2 text-xs text-yellow-600">(Settings out of sync)</span>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <AlertTriangle className="w-4 h-4 mr-1 stroke-yellow-600" />
+                            <span className="text-yellow-700">Social Recovery not set up</span>
+                            <div
+                              className="flex flex-row items-center cursor-pointer text-yellow-600 bg-white hover:text-yellow-700 rounded-full px-2 ml-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RecoverySetting);
+                              }}
+                            >
+                              Set up now
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      {isPrivacyMode && recoveryStatus.hasLocalSettings && recoveryStatus.isEnabled && (
+                        <div
+                          className="flex flex-row items-center cursor-pointer bg-white hover:bg-light-blue rounded-full px-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownloadRecoveryContacts();
+                          }}
+                        >
+                          Recovery file
+                        </div>
                       )}
                     </div>
-                    {isPrivacyMode && recoveryStatus.hasLocalSettings && recoveryStatus.isEnabled && (
-                      <div
-                        className="flex flex-row items-center cursor-pointer bg-white hover:bg-light-blue rounded-full px-2"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDownloadRecoveryContacts();
-                        }}
-                      >
-                        Recovery file
-                      </div>
+                  </div>
+                ) : (
+                  <div className="px-4 py-2 flex items-center">
+                    {recoveryStatus.isEnabled ? (
+                      <Check className="w-4 h-4 p-0.5 mt-[1px] bg-white rounded-full" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 mt-[1px] stroke-yellow-600" />
                     )}
                   </div>
-                </div>
-              ) : (
-                <div className="px-4 py-2 flex items-center">
-                  {recoveryStatus.isEnabled ? (
-                    <Check className="w-4 h-4 p-0.5 mt-[1px] bg-white rounded-full" />
-                  ) : (
-                    <AlertTriangle className="w-4 h-4 mt-[1px] stroke-yellow-600" />
-                  )}
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            }
 
             {/* <BetaNotice text="We're in beta. Please keep deposits small." closeable /> */}
           </div>

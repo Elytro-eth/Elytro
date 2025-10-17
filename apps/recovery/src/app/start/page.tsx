@@ -49,7 +49,6 @@ export default function Start() {
 
   // Initialize leftTime based on status when component mounts
   useEffect(() => {
-    console.log('Status:', status, 'ValidTime:', validTime);
     if (status === RecoveryStatusEn.RECOVERY_READY) {
       setLeftTime({ hours: 0, minutes: 0, seconds: 0 });
     } else if (!validTime) {
@@ -284,16 +283,20 @@ export default function Start() {
           // allSteps={3}
           title={
             <div className="text-center">
-              {[RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status || 0)
-                ? 'Complete Recovery'
-                : 'Recovery in progress'}
+              {status === RecoveryStatusEn.SIGNATURE_COMPLETED
+                ? 'Start Recovery'
+                : status === RecoveryStatusEn.RECOVERY_READY
+                  ? 'Complete Recovery'
+                  : 'Recovery in progress'}
             </div>
           }
           subtitle={
             <div className="text-center text-gray-600">
-              {[RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_READY].includes(status || 0)
-                ? 'This is the last step to regain wallet access.'
-                : 'Wallet recovery can be completed in 48 hours.'}
+              {status === RecoveryStatusEn.SIGNATURE_COMPLETED
+                ? 'Connect to any wallet to start recovery'
+                : status === RecoveryStatusEn.RECOVERY_READY
+                  ? 'This is the last step to regain wallet access'
+                  : 'Wallet recovery can be completed in 48 hours'}
             </div>
           }
         >

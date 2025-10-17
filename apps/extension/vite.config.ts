@@ -29,6 +29,9 @@ const getVersionType = () => {
 };
 
 export default defineConfig({
+  define: {
+    'process.env.APP_ENV': JSON.stringify(process.env.APP_ENV || 'development'),
+  },
   plugins: [
     versionControlPlugin({
       type: getVersionType(),

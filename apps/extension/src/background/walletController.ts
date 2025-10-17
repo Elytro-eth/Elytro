@@ -415,7 +415,6 @@ class WalletController {
 
   public async getRecoveryInfo(address: Address) {
     const recoveryInfo = await elytroSDK.getRecoveryInfo(address);
-    console.log('recoveryInfo', recoveryInfo);
     return recoveryInfo;
   }
 
@@ -571,13 +570,14 @@ class WalletController {
         for (const contact of waitingContacts) {
           const isSigned = await elytroSDK.checkIsGuardianSigned(
             contact.address as Address,
-            BigInt(recoveryRecord.fromBlock)
+            BigInt(recoveryRecord.fromBlock),
+            recoveryRecord.approveHash as `0x${string}`
           );
 
           if (isSigned) {
             leftSignsNeeded--;
-            recoveryRecord.contacts = recoveryRecord.contacts.map((contact) =>
-              contact.address === contact.address ? { ...contact, confirmed: true } : contact
+            recoveryRecord.contacts = recoveryRecord.contacts.map((c) =>
+              c.address === contact.address ? { ...c, confirmed: true } : c
             );
             if (leftSignsNeeded <= 0) {
               recoveryRecord.status = await elytroSDK.checkOnchainRecoveryStatus(

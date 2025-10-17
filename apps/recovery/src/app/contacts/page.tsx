@@ -40,10 +40,10 @@ export default function Contacts() {
       subtitle: address ? (
         <span className="text-gray-600">
           {/* The connected wallet is not a recovery contact. Please switch to a recovery contact wallet. */}
-          Connect to a wallet you control from the list to confirm recovery.
+          CConnect to a wallet you control from below to confirm recovery.
         </span>
       ) : (
-        <span className="text-gray-600">Connect to a wallet you control from the list to confirm recovery.</span>
+        <span className="text-gray-600">Connect to a wallet you control from below to confirm recovery.</span>
       ),
       content: <Status />,
     };
@@ -56,7 +56,7 @@ export default function Contacts() {
           <SidebarStepper currentStep={2} />
         </div>
         <ContentWrapper
-          title={<div className="text-left mr-5xl">Connect to confirm</div>}
+          title={<div className="text-left mr-5xl">I’m a recovery contact</div>}
           // allSteps={3}
           // currentStep={1}
           subtitle={subtitle}

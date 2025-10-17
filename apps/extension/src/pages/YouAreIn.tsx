@@ -42,25 +42,47 @@ const YouAreIn: React.FC = () => {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
       }}
     >
-      <div className="flex justify-center pt-20">
-        <img src={IconSuccess} alt="Passcode" width={164} />
-      </div>
+      <div className="flex flex-col items-center gap-y-2xl flex-1 w-full">
+        <div className="flex justify-center pt-20">
+          <img src={IconSuccess} alt="Passcode" width={164} />
+        </div>
 
-      <div className="flex flex-col gap-y-sm">
-        <h1 className="elytro-text-title text-center">{title}</h1>
-        <h2 className="elytro-text-smaller-body text-muted-foreground text-center">{description}</h2>
-      </div>
+        <div className="flex flex-col gap-y-sm">
+          <h1 className="elytro-text-title text-center">{title}</h1>
+          <h2 className="elytro-text-smaller-body text-muted-foreground text-center">{description}</h2>
+        </div>
 
-      <Button
-        className="w-full rounded-full h-14"
-        size="large"
-        onClick={async () => {
-          await beforeAction?.();
-          navigateTo('side-panel', actionPath);
-        }}
-      >
-        {action}
-      </Button>
+        <Button
+          className="w-full rounded-full h-14"
+          size="large"
+          onClick={async () => {
+            await beforeAction?.();
+            navigateTo('side-panel', actionPath);
+          }}
+        >
+          {action}
+        </Button>
+      </div>
+      <p className="text-xs text-gray-500 text-center px-4 -mb-1">
+        By continuing, you accept our{' '}
+        <a
+          href="https://elytro.notion.site/elytro-terms-of-use"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-gray-700"
+        >
+          Terms
+        </a>{' '}
+        &{' '}
+        <a
+          href="https://elytro.notion.site/elytro-privacy-policy"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-gray-700"
+        >
+          Privacy
+        </a>
+      </p>
     </FullPageWrapper>
   );
 };

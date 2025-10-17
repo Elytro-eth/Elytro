@@ -150,6 +150,7 @@ export default function ConnectControl() {
                 address={address}
                 chainID={chainId}
                 className={cn('!p-0', isWrongChain && '!text-red !border-red')}
+                hideTooltip={true}
               />
               <div className="h-4 w-[1px] bg-gray-300" />
               <X onClick={handleDisconnect} color="gray" className="cursor-pointer hover:stroke-black" />

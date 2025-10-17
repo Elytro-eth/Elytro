@@ -9,7 +9,7 @@ export default function Transfer() {
     <FullPageWrapper className="elytro-gradient-bg-2 h-full">
       <img src={WalletImg} alt="Wallet" className="size-[9rem] mt-10" />
       <div className="text-center flex flex-col gap-y-2xs">
-        <h1 className="elytro-text-subtitle mb-2">
+        <h1 className="elytro-text-subtitle mb-6">
           Already have
           <br />
           an Elytro wallet
