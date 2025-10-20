@@ -150,7 +150,7 @@ export default function Dashboard() {
                         {recoveryStatus.isEnabled ? (
                           <>
                             <Check className="w-4 h-4 p-0.5 mr-2 bg-white rounded-full" />
-                            <span>Social Recovery {isPrivacyMode ? '(Private)' : ''} enabled</span>
+                            <span>Recovery {isPrivacyMode ? '(Private)' : ''} enabled</span>
                             {!recoveryStatus.isInSync && (
                               <span className="ml-2 text-xs text-yellow-600">(Settings out of sync)</span>
                             )}
@@ -158,7 +158,7 @@ export default function Dashboard() {
                         ) : (
                           <>
                             <AlertTriangle className="w-4 h-4 mr-1 stroke-yellow-600" />
-                            <span className="text-yellow-700">Social Recovery not set up</span>
+                            <span className="text-yellow-700">Recovery not set up</span>
                             <div
                               className="flex flex-row items-center cursor-pointer text-yellow-600 bg-white hover:text-yellow-700 rounded-full px-2 ml-2"
                               onClick={(e) => {

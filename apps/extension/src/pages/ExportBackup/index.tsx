@@ -174,7 +174,7 @@ export default function ExportBackupPage() {
                 <div className="flex items-start gap-x-sm" onClick={() => setIsTermTwoChecked((prev) => !prev)}>
                   <Checkbox checked={isTermTwoChecked} />
                   <Label className="elytro-text-small-body text-gray-600 cursor-pointer">
-                    New backup needed once recovered with Social Recovery elsewhere
+                    New backup needed once recovered with Recovery elsewhere
                   </Label>
                 </div>
               </div>

@@ -91,7 +91,7 @@ export default function AccountOption({
             <div className="flex items-start gap-x-sm" onClick={() => setHasConfirmed((prev) => !prev)}>
               <Checkbox checked={hasConfirmed} />
               <Label className="elytro-text-small-body text-gray-600 cursor-pointer">
-                I understand I’ll lose access to this wallet unless I’ve backed up or enabled Social Recovery.
+                I understand I’ll lose access to this wallet unless I’ve backed up or enabled Recovery.
               </Label>
             </div>
           </div>

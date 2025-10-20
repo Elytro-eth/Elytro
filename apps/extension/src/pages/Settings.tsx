@@ -37,7 +37,7 @@ export default function Settings() {
           <AccountsDropdown className="bg-gray-150" />
           <SettingItem icon={LayoutGridIcon} label="Connected apps" path={SIDE_PANEL_ROUTE_PATHS.Connection} />
 
-          <SettingItem icon={ShieldIcon} label="Social Recovery" path={SIDE_PANEL_ROUTE_PATHS.RecoverySetting} />
+          <SettingItem icon={ShieldIcon} label="Recovery" path={SIDE_PANEL_ROUTE_PATHS.RecoverySetting} />
 
           {needUpgrade && (
             <SettingItem
