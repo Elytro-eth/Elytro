@@ -1,3 +1,5 @@
+// Import process polyfill first
+import '@/polyfills/process';
 import { ElytroDuplexMessage, ElytroMessageTypeEn } from '@/utils/message';
 import mainWorldScript from './main-world?script&module';
 import PortMessage from '@/utils/message/portMessage';

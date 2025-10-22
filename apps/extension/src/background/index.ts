@@ -1,3 +1,5 @@
+// Import process polyfill first
+import '@/polyfills/process';
 import { RUNTIME_MESSAGE_TYPE } from '@/constants/message';
 import { sendReadyMessageToTabs, RuntimeMessage, PortMessageManager } from '@/utils/message';
 import { walletController, WalletController } from './walletController';
