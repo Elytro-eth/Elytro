@@ -16,7 +16,7 @@ const Create: React.FC = () => {
 
   useEffect(() => {
     if (status === WalletStatusEn.NoAccount) {
-      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.YouAreIn, params);
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Education, params);
     }
   }, [status, params]);
 
@@ -25,7 +25,13 @@ const Create: React.FC = () => {
       setLoading(true);
       await wallet.createNewOwner(pwd);
       // TODO: check if this is accurate.
-      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.YouAreIn, params);
+
+      console.log('params', params);
+      if (params?.from === 'recover') {
+        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.YouAreIn, params);
+      } else {
+        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Education);
+      }
     } catch (error) {
       toast({
         title: 'Oops! Something went wrong. Try again later.',

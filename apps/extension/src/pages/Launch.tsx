@@ -17,7 +17,7 @@ export default function Launch() {
         <div className="flex flex-col w-full">
           <div className="flex flex-col gap-y-3">
             <Button size="large" onClick={() => navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreatePasscode)}>
-              Get started
+              Create a new wallet
             </Button>
             <Button
               size="large"
