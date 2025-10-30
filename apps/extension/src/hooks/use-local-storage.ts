@@ -19,13 +19,28 @@ function useLocalStorage<T>(key: string, initialValue: T) {
     };
 
     loadInitialValue();
+
+    // Listen for changes from other components/contexts
+    const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => {
+      if (areaName === 'local' && changes[key]) {
+        const newValue = changes[key].newValue;
+        if (newValue !== undefined) {
+          setStoredValue(newValue as T);
+        }
+      }
+    };
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
+
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+    };
   }, [key, initialValue]);
 
   const setValue = useCallback(
     async (value: T | ((val: T) => T)) => {
       try {
-        const valueToStore =
-          value instanceof Function ? value(storedValue) : value;
+        const valueToStore = value instanceof Function ? value(storedValue) : value;
 
         setStoredValue(valueToStore);
 

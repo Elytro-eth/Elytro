@@ -2,10 +2,7 @@ import { DocumentNode, gql } from '@apollo/client';
 import { client } from './client';
 
 // wrapped query function
-export async function query<T>(
-  queryDocument: DocumentNode,
-  variables?: Record<string, unknown>
-): Promise<T> {
+export async function query<T>(queryDocument: DocumentNode, variables?: Record<string, unknown>): Promise<T> {
   try {
     const { data } = await client.query({
       query: queryDocument,
@@ -100,6 +97,14 @@ export const query_token_price = gql`
     tokenPrices(chainID: $chainId, contractAddresses: $contractAddresses) {
       address
       price
+    }
+  }
+`;
+
+export const query_has_sponsored = gql`
+  query SponsorOpCheck($input: SponsorOpCheckInput!) {
+    sponsorOpCheck(input: $input) {
+      sponsorCountLeft
     }
   }
 `;

@@ -124,6 +124,7 @@ export default function Dashboard() {
           <div className="flex-1 overflow-auto pb-[52px]">
             <DashboardTabs loading={loading} onReload={handleReload} />
           </div>
+
           <div className="absolute bottom-0 rounded-md left-0 right-0 flex justify-center pt-2 bg-white flex-col">
             <div
               className="m-auto mb-2 flex flex-row items-center group cursor-pointer text-gray-450 hover:text-gray-600"

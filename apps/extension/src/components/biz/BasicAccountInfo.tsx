@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight, Settings2Icon } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Box, Settings2Icon } from 'lucide-react';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
 import ActionButton from './ActionButton';
@@ -30,6 +30,8 @@ const HeaderSection = () => {
 };
 
 const ActionButtons = () => {
+  const { currentAccount } = useAccount();
+
   const handleClickSend = () => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.SendTx);
   };
@@ -38,40 +40,53 @@ const ActionButtons = () => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Receive);
   };
 
+  const handleClickActivateWallet = () => {
+    // TODO: Implement activate wallet
+  };
+
+  if (currentAccount.isDeployed) {
+    return (
+      <>
+        <ActionButton
+          className="bg-light-green hover:bg-green hover:stroke-white"
+          icon={
+            <ArrowDownLeft className="size-5 mr-1 stroke-dark-blue duration-100 transition-all group-hover:stroke-white" />
+          }
+          label="Receive"
+          onClick={handleClickReceive}
+        />
+        <ActionButton
+          className="hover:stroke-white"
+          icon={
+            <ArrowUpRight className="size-5 mr-1 stroke-dark-blue duration-100 transition-all group-hover:stroke-white" />
+          }
+          label="Send"
+          onClick={handleClickSend}
+        />
+      </>
+    );
+  }
+
   return (
-    <>
-      <ActionButton
-        className="bg-light-green hover:bg-green hover:stroke-white"
-        icon={
-          <ArrowDownLeft className="size-5 mr-1 stroke-dark-blue duration-100 transition-all group-hover:stroke-white" />
-        }
-        label="Receive"
-        onClick={handleClickReceive}
-      />
-      <ActionButton
-        className="hover:stroke-white"
-        icon={
-          <ArrowUpRight className="size-5 mr-1 stroke-dark-blue duration-100 transition-all group-hover:stroke-white" />
-        }
-        label="Send"
-        onClick={handleClickSend}
-      />
-    </>
+    <ActionButton
+      icon={<Box className="size-5 mr-1 stroke-dark-blue duration-100 transition-all group-hover:stroke-white" />}
+      label="Activate wallet"
+      onClick={handleClickActivateWallet}
+    />
   );
 };
 
 export default function BasicAccountInfo() {
+  const { currentAccount } = useAccount();
   return (
     <div className="flex flex-col p-sm pb-0">
       <HeaderSection />
-      {/* Balance section is currently disabled */}
-      {/* <div className="my-sm py-1 elytro-text-hero">
-        <span>{integerPart}</span>
-        <span className="text-gray-450">.{decimalPart}</span> ETH
-      </div> */}
-      <div className="flex flex-row gap-md my-sm">
-        <ActionButtons />
-      </div>
+
+      {currentAccount.isDeployed && (
+        <div className="flex flex-row gap-md my-sm">
+          <ActionButtons />
+        </div>
+      )}
     </div>
   );
 }
