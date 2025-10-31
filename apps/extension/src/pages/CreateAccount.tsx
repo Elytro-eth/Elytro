@@ -3,7 +3,7 @@ import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { Button } from '@/components/ui/button';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
-import { getIconByChainId, TChainItem } from '@/constants/chains';
+import { TChainItem } from '@/constants/chains';
 import { toast } from '@/hooks/use-toast';
 import { useChain } from '@/contexts/chain-context';
 import { useWallet } from '@/contexts/wallet';
@@ -11,15 +11,15 @@ import NetworkSelection from '@/components/biz/NetworkSelection';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
 import DoorImg from '@/assets/door.png';
 import { useAccount } from '@/contexts/account-context';
-import { formatAddressToShort } from '@/utils/format';
 import Spin from '@/components/ui/Spin';
+import CurrentAddress from '@/components/biz/CurrentAddress';
 
 const CreateAccount: React.FC = () => {
   const { getChains } = useChain();
   const { wallet } = useWallet();
   const [selectedChain, setSelectedChain] = useState<TChainItem | null>(null);
   const [isCreated, setIsCreated] = useState(false);
-  const { currentAccount, reloadAccount, loading: isLoading } = useAccount();
+  const { reloadAccount, loading: isLoading } = useAccount();
 
   useEffect(() => {
     getChains();
@@ -58,14 +58,7 @@ const CreateAccount: React.FC = () => {
 
           <h1 className="elytro-text-title text-center mt-2">Your wallet is created</h1>
 
-          {isLoading ? (
-            <Spin isLoading />
-          ) : (
-            <div className="elytro-text-xs text-center mt-2 px-2 py-1 rounded-md bg-white flex items-center gap-x-sm">
-              <img src={getIconByChainId(currentAccount?.chainId)} alt="Chain" width={16} />
-              {formatAddressToShort(currentAccount?.address)}
-            </div>
-          )}
+          {isLoading ? <Spin isLoading /> : <CurrentAddress className="mt-2" />}
         </div>
 
         <Button

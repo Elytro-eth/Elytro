@@ -64,7 +64,7 @@ export default function SetupTab() {
       icon: ContactsIcon,
       description: 'Set up on-chain recovery or enable 2FA to secure your wallet.',
       action: () => {
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RecoverySetting);
+        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.SecureWallet);
       },
       done: currentAccount.isRecoveryEnabled,
     },
