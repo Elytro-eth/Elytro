@@ -9,7 +9,6 @@ import { useAccount } from '@/contexts/account-context';
 import RecoverGuide from './RecoverGuide';
 import { toast } from '@/hooks/use-toast';
 import LabelDialog, { ILabelDialogRef } from './LabelDialog';
-import { useLocalStorage } from '@/hooks/use-local-storage';
 import { getLocalContacts, getLocalContactsSetting, setLocalContacts, setLocalThreshold } from '@/utils/contacts';
 
 enum ShowType {
@@ -23,12 +22,10 @@ export default function RecoverySettings() {
   const {
     currentAccount: { address },
   } = useAccount();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [contacts, setContacts] = useState<TRecoveryContact[]>([]);
   const [threshold, setThreshold] = useState<string>('0');
-  const [showType, setShowType] = useState<ShowType>(ShowType.List);
-  const [isPrivacyMode, setIsPrivacyMode] = useLocalStorage('isPrivacyMode', false);
-  const [hasExistingContacts, setHasExistingContacts] = useState<boolean>(false);
+  const [showType, setShowType] = useState<ShowType>(ShowType.Guide);
   const labelDialogRef = useRef<ILabelDialogRef>(null);
   const originalContactsSetting = useRef<{
     contacts: TRecoveryContact[];
@@ -67,7 +64,6 @@ export default function RecoverySettings() {
 
       console.log('originalContactsSetting', originalContactsSetting.current);
       const hasContacts = contacts.length > 0;
-      setHasExistingContacts(hasContacts);
       setShowType(hasContacts ? ShowType.List : ShowType.Guide);
     } catch (error) {
       console.error(error);
@@ -101,13 +97,14 @@ export default function RecoverySettings() {
       contacts: contacts,
       threshold: threshold,
     };
-    setHasExistingContacts(contacts.length > 0);
-    setShowType(ShowType.List);
+    setShowType(contacts.length > 0 ? ShowType.List : ShowType.Guide);
   };
 
   useEffect(() => {
-    getRecoveryContactsFromInfoRecorder();
-  }, []);
+    if (address) {
+      getRecoveryContactsFromInfoRecorder();
+    }
+  }, [address]);
 
   const handleAddContact = () => {
     setShowType(ShowType.Detail);
@@ -122,11 +119,10 @@ export default function RecoverySettings() {
     await setLocalContacts(address, newContacts);
   };
 
-  const handleDeleteContact = (contact: TRecoveryContact) => {
+  const handleDeleteContact = async (contact: TRecoveryContact) => {
     const newContacts = contacts.filter((c) => c.address !== contact.address);
-    setContacts(newContacts);
-    setThreshold('0');
-    setHasExistingContacts(newContacts.length > 0);
+    await saveContacts(newContacts);
+    await handleUpdateThreshold('0');
   };
 
   const onClickGuide = () => {
@@ -144,7 +140,6 @@ export default function RecoverySettings() {
     }
     const newContacts = [...contacts, contact];
     setContacts(newContacts);
-    setHasExistingContacts(newContacts.length > 0);
     setShowType(ShowType.List);
   };
 
@@ -165,12 +160,6 @@ export default function RecoverySettings() {
       onBack={() => {
         if (showType === ShowType.Detail) {
           setShowType(ShowType.List);
-        } else if (showType === ShowType.List) {
-          if (hasExistingContacts) {
-            history.back();
-          } else {
-            setShowType(ShowType.Guide);
-          }
         } else {
           history.back();
         }
@@ -191,23 +180,19 @@ export default function RecoverySettings() {
         </>
       ) : (
         <>
-          {showType === ShowType.Guide && (
-            <RecoverGuide onClick={onClickGuide} isPrivacyMode={isPrivacyMode} onPrivacyModeChange={setIsPrivacyMode} />
-          )}
+          {showType === ShowType.Guide && <RecoverGuide onClick={onClickGuide} />}
           {showType === ShowType.List && (
             <ContactList
-              isPrivacyMode={isPrivacyMode}
               contacts={contacts}
               threshold={threshold}
               setThreshold={handleUpdateThreshold}
               onAddContact={handleAddContact}
               onEditContact={handleEditContact}
               onDeleteContact={handleDeleteContact}
+              hasOnchainContacts={originalContactsSetting.current.contacts.length > 0}
             />
           )}
-          {showType === ShowType.Detail && (
-            <ContactDetail isPrivacyMode={isPrivacyMode} onAddContact={handleSaveAddedContact} />
-          )}
+          {showType === ShowType.Detail && <ContactDetail onAddContact={handleSaveAddedContact} />}
         </>
       )}
       <LabelDialog ref={labelDialogRef} onSave={handleSaveContactLabel} />

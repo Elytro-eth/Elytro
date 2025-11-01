@@ -63,7 +63,7 @@ export default function SecureWallet() {
           description="Keep an encrypted file to restore all your local wallets anytime."
           icon={PasscodeIcon}
           onClick={() => {
-            console.log('Local Backup');
+            navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ExportBackup);
           }}
         />
       </div>

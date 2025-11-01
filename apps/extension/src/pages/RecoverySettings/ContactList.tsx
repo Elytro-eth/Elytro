@@ -6,14 +6,12 @@ import { useTx } from '@/contexts/tx-context';
 import { TxRequestTypeEn } from '@/contexts/tx-context';
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
-import { Box, LockIcon, PencilLine, Plus, Trash2 } from 'lucide-react';
+import { Box, PencilLine, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import ContactsImg from '@/assets/contacts.png';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { cn } from '@/utils/shadcn/utils';
-import { getLocalContactsSetting, setLocalContacts, setLocalThreshold } from '@/utils/contacts';
-import { writeFile } from '@/utils/file';
-import dayjs from 'dayjs';
+import { setLocalContacts, setLocalThreshold } from '@/utils/contacts';
 import HelperText from '@/components/ui/HelperText';
 
 interface IContactListProps {
@@ -23,7 +21,7 @@ interface IContactListProps {
   onAddContact: () => void;
   onEditContact: (contact: TRecoveryContact) => void;
   onDeleteContact: (contact: TRecoveryContact) => void;
-  isPrivacyMode: boolean;
+  hasOnchainContacts: boolean;
 }
 
 export default function ContactList({
@@ -33,7 +31,7 @@ export default function ContactList({
   onAddContact,
   onEditContact,
   onDeleteContact,
-  isPrivacyMode,
+  hasOnchainContacts,
 }: IContactListProps) {
   const { currentAccount: currentAccount } = useAccount();
   const { wallet } = useWallet();
@@ -45,8 +43,22 @@ export default function ContactList({
     try {
       setLoading(true);
       const contactAddresses = contacts.map((contact) => contact.address);
+      const thresholdNumber = contacts.length === 0 ? 0 : Number(threshold);
 
-      const isChanged = await wallet.checkRecoveryContactsSettingChanged(contactAddresses, Number(threshold));
+      // If clearing all contacts, allow threshold to be 0
+      const isClearing = contacts.length === 0 && hasOnchainContacts;
+
+      if (!isClearing && (!threshold || Number(threshold) < 1)) {
+        toast({
+          title: 'Please set threshold',
+          description: '',
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
+      }
+
+      const isChanged = await wallet.checkRecoveryContactsSettingChanged(contactAddresses, thresholdNumber);
 
       if (!isChanged) {
         toast({
@@ -57,14 +69,9 @@ export default function ContactList({
         return;
       }
 
-      const txs = await wallet.generateRecoveryContactsSettingTxs(contactAddresses, Number(threshold), isPrivacyMode);
+      const txs = await wallet.generateRecoveryContactsSettingTxs(contactAddresses, thresholdNumber, false);
 
-      handleTxRequest(
-        TxRequestTypeEn.ApproveTransaction,
-        txs,
-        undefined,
-        isPrivacyMode ? { privateRecovery: true } : undefined
-      );
+      handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs);
 
       await Promise.all([
         setLocalContacts(currentAccount.address, contacts),
@@ -81,44 +88,8 @@ export default function ContactList({
     }
   };
 
-  const handleDownloadRecoveryContacts = async () => {
-    const { contacts, threshold } = await getLocalContactsSetting(currentAccount.address);
-
-    const isOnchainContactsChanged = await wallet.checkRecoveryContactsSettingChanged(
-      contacts.map((contact) => contact.address),
-      Number(threshold)
-    );
-
-    if (isOnchainContactsChanged) {
-      toast({
-        title: 'Local recovery records expired',
-        description: '',
-      });
-      return;
-    }
-
-    const date = dayjs().format('YYYY-MM-DD-HH-mm');
-    const data = {
-      address: currentAccount.address,
-      chainId: currentAccount.chainId,
-      contacts,
-      threshold: String(threshold),
-    };
-    writeFile(JSON.stringify(data), `${currentAccount.address}-elytro-recovery-contacts-${date}.json`);
-    toast({
-      title: 'Recovery contacts downloaded',
-      description: '',
-    });
-  };
-
   return (
     <div className="flex flex-col justify-between">
-      {isPrivacyMode && (
-        <div className="w-full px-4 py-3 mb-4 bg-light-purple rounded-xl inline-flex justify-start items-center gap-1">
-          <LockIcon className="size-3 stroke-purple" />
-          <span className="flex-1 justify-center text-purple text-xs leading-none">Private mode</span>
-        </div>
-      )}
       <div className="flex flex-col gap-y-md">
         <h2 className="elytro-text-small-bold text-gray-600">Your wallet</h2>
 
@@ -191,24 +162,27 @@ export default function ContactList({
               onClick={handleConfirmContacts}
             >
               <Box className="size-4 mr-sm" color="#cce1ea" />
-              {loading ? 'Confirming...' : !isPrivacyMode ? 'Confirm contacts' : 'Confirm contacts privately'}
+              {loading ? 'Confirming...' : 'Confirm contacts'}
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col gap-y-md items-center mt-4xl">
-            <img src={ContactsImg} className="size-36" />
-            <span className="elytro-text-subtitle text-center">Add a new contact</span>
+          <div className="flex flex-col gap-y-md">
+            <div className="flex flex-col gap-y-md items-center mt-4xl">
+              <img src={ContactsImg} className="size-36" />
+              <span className="elytro-text-subtitle text-center">Add a new contact</span>
 
-            <Button variant="secondary" size="tiny" onClick={onAddContact}>
-              <Plus className="h-4 w-4 mr-1 stroke-[1.5px] group-hover:stroke-white" />
-              Add contact
-            </Button>
+              <Button variant="secondary" size="tiny" onClick={onAddContact}>
+                <Plus className="h-4 w-4 mr-1 stroke-[1.5px] group-hover:stroke-white" />
+                Add contact
+              </Button>
+            </div>
+            {hasOnchainContacts && (
+              <Button className="w-full mt-4" disabled={loading} variant="destructive" onClick={handleConfirmContacts}>
+                <Box className="size-4 mr-sm" color="#cce1ea" />
+                {loading ? 'Clearing...' : 'Clear recovery settings'}
+              </Button>
+            )}
           </div>
-        )}
-        {isPrivacyMode && contacts.length > 0 && Number(threshold) > 0 && (
-          <Button variant="secondary" onClick={handleDownloadRecoveryContacts}>
-            Download recovery file
-          </Button>
         )}
       </div>
     </div>

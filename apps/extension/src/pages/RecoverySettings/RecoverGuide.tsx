@@ -1,70 +1,61 @@
 import ContactsImg from '@/assets/contacts.png';
-import TipItem from '@/components/biz/TipItem';
 import { Button } from '@/components/ui/button';
+import step1Img from '@/assets/guides/rc_1.png';
+import step2Img from '@/assets/guides/rc_2.png';
+import step3Img from '@/assets/guides/rc_3.png';
+import { useState } from 'react';
 import { cn } from '@/utils/shadcn/utils';
-import { Clock, WalletCards, Shield, Lock } from 'lucide-react';
 
 interface RecoverGuideProps {
   onClick: () => void;
-  isPrivacyMode: boolean;
-  onPrivacyModeChange: (isPrivacyMode: boolean) => void;
 }
 
-export default function RecoverGuide({ onClick, isPrivacyMode, onPrivacyModeChange }: RecoverGuideProps) {
+const STEPS = [
+  {
+    image: ContactsImg,
+    title: 'How Recovery works',
+  },
+  {
+    image: step1Img,
+    title: 'Add recovery contacts for each wallet',
+  },
+  {
+    image: step2Img,
+    title: 'Recovery contacts confirm recovery if lost',
+  },
+  {
+    image: step3Img,
+    title: 'Finalize recovery after 48 hours',
+  },
+];
+
+export default function RecoverGuide({ onClick }: RecoverGuideProps) {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const handleNext = () => {
+    setCurrentStep(currentStep + 1);
+    if (currentStep === STEPS.length - 1) {
+      onClick();
+    }
+  };
+
   return (
-    <div className="flex flex-col w-full transition-all duration-500">
-      {/* Privacy mode switch */}
-      <div className="grid grid-cols-2 bg-gray-150 rounded-md text-center p-2xs">
-        <div
-          className={cn('px-md py-xs rounded-sm font-medium cursor-pointer', !isPrivacyMode && 'bg-white font-medium')}
-          onClick={() => onPrivacyModeChange(false)}
-        >
-          Standard
-        </div>
-        <div
-          className={cn(
-            'flex flex-row items-center gap-x-1 px-md py-xs rounded-sm font-medium justify-center cursor-pointer',
-            isPrivacyMode && 'bg-white font-medium'
-          )}
-          onClick={() => onPrivacyModeChange(true)}
-        >
-          <Lock className="size-4" />
-          Private
-        </div>
-      </div>
-      <div className="flex flex-col gap-y-xl items-center mt-10 ">
-        <img src={ContactsImg} className="size-36" />
-        <div className="elytro-text-subtitle text-center text-dark-blue">
-          How Recovery works
-          {isPrivacyMode && (
-            <>
-              <br />
-              <span className="text-gray-500">(Private)</span>
-            </>
-          )}
-        </div>
-        {!isPrivacyMode && (
-          <div>
-            <TipItem title="Each wallet has own contacts" description="" Icon={WalletCards} />
-            <TipItem title="Add contact by address" description="" Icon={Shield} />
-            <TipItem title="Contacts help you recover" description="" Icon={Clock} />
-          </div>
+    <div className="flex flex-col w-full transition-all duration-500 items-center justify-center">
+      <div className="mt-10">
+        <img
+          src={STEPS[currentStep].image}
+          alt={STEPS[currentStep].title}
+          className={cn('mb-10 mx-auto', currentStep === 0 ? 'size-[180px]' : 'w-[60%]')}
+        />
+
+        {currentStep === 0 ? null : (
+          <div className="w-full text-center text-[#95979C] text-sm font-normal">How Recovery works</div>
         )}
-        {isPrivacyMode && (
-          <div>
-            <TipItem title="Each wallet has own contacts" description="" Icon={WalletCards} />
-            <TipItem title="Keep a recovery file off-chain" description="" Icon={Shield} />
-            <TipItem
-              title="Recovery info revealed after contacts help your regain access"
-              description=""
-              Icon={Clock}
-            />
-          </div>
-        )}
-        <Button onClick={onClick} className="w-full">
-          Get started
-        </Button>
       </div>
+      <h1 className="font-medium text-3xl text-center mt-md">{STEPS[currentStep].title}</h1>
+      <Button className="w-full mt-9 text-lg font-medium" onClick={handleNext}>
+        Next
+      </Button>
     </div>
   );
 }

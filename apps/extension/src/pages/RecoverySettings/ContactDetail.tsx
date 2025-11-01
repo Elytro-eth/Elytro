@@ -7,11 +7,10 @@ import { useState } from 'react';
 import { isAddress } from 'viem';
 
 interface IContactDetailProps {
-  isPrivacyMode: boolean;
   onAddContact: (contact: TRecoveryContact) => void;
 }
 
-export default function ContactDetail({ isPrivacyMode, onAddContact }: IContactDetailProps) {
+export default function ContactDetail({ onAddContact }: IContactDetailProps) {
   const { currentAccount: currentAccount } = useAccount();
   const [address, setAddress] = useState<string>('');
   const [isAddressValid, setIsAddressValid] = useState<boolean>(true);
@@ -35,13 +34,7 @@ export default function ContactDetail({ isPrivacyMode, onAddContact }: IContactD
           </div>
         )}
 
-        <HelperText
-          description={
-            isPrivacyMode
-              ? 'Recovery relationships will be hidden on chain until when recovery starts. '
-              : 'Addresses will be visible on chain'
-          }
-        />
+        <HelperText description="Addresses will be visible on chain" />
       </div>
 
       <Button className="mt-4" disabled={!isAddress(address)} onClick={() => onAddContact({ address })}>
