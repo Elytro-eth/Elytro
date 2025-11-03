@@ -26,7 +26,7 @@ export default function Settings() {
   };
   const appVersion = pkg.version;
   const {
-    currentAccount: { needUpgrade },
+    currentAccount: { needUpgrade, isDeployed },
   } = useAccount();
 
   return (
@@ -37,7 +37,9 @@ export default function Settings() {
           <AccountsDropdown className="bg-gray-150" />
           <SettingItem icon={LayoutGridIcon} label="Connected apps" path={SIDE_PANEL_ROUTE_PATHS.Connection} />
 
-          <SettingItem icon={ShieldIcon} label="Recovery" path={SIDE_PANEL_ROUTE_PATHS.RecoverySetting} />
+          {isDeployed && (
+            <SettingItem icon={ShieldIcon} label="Recovery" path={SIDE_PANEL_ROUTE_PATHS.RecoverySetting} />
+          )}
 
           {needUpgrade && (
             <SettingItem

@@ -53,6 +53,7 @@ export default function SetupTab() {
     {
       title: 'Activate wallet',
       icon: DoorIcon,
+      showTag: hasSponsored,
       description: 'This unlocks all the wallet features. The fee for activation is on us.',
       action: () => {
         handleTxRequest(TxRequestTypeEn.DeployWallet);
@@ -95,16 +96,21 @@ export default function SetupTab() {
             }}
           >
             <img src={step.icon} alt={step.title} className="size-[70px]" />
-            <div className="flex flex-col gap-y-2">
-              <div className="flex items-center gap-x-2">
+            <div className="flex flex-col gap-y-2 flex-1 min-w-0">
+              <div className="flex items-center gap-x-2 min-w-0">
                 {step.done ? (
-                  <Check className="size-5 p-1 bg-light-green rounded-full" />
+                  <Check className="size-5 p-1 bg-light-green rounded-full flex-shrink-0" />
                 ) : (
-                  <span className="font-medium text-white bg-black rounded-full size-4 text-sm flex items-center justify-center">
+                  <span className="font-medium text-white bg-black rounded-full size-4 text-sm flex items-center justify-center flex-shrink-0">
                     {index + 1}
                   </span>
                 )}
-                <span className="font-medium text-lg text-dark-blue">{step.title}</span>
+                <span className="font-medium text-lg text-dark-blue whitespace-nowrap flex-shrink-0">{step.title}</span>
+                {step.showTag && (
+                  <span className="font-medium text-sm text-dark-blue bg-light-green rounded-2xs px-2 py-1 whitespace-nowrap min-w-0 overflow-hidden text-ellipsis">
+                    Sponsored
+                  </span>
+                )}
               </div>
               <p className="text-sm text-gray-600">{step.description}</p>
             </div>

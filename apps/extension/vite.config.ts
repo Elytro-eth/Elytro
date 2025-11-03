@@ -29,10 +29,6 @@ const getVersionType = () => {
 };
 
 export default defineConfig({
-  define: {
-    'process.env.APP_ENV': JSON.stringify(process.env.APP_ENV || 'development'),
-    global: 'globalThis',
-  },
   plugins: [
     versionControlPlugin({
       type: getVersionType(),
@@ -75,8 +71,8 @@ export default defineConfig({
     },
     minify: 'esbuild',
     sourcemap: !isProd,
-    cssCodeSplit: false,
-    cssMinify: false,
+    cssCodeSplit: true,
+    cssMinify: isProd,
     chunkSizeWarningLimit: 1000,
     reportCompressedSize: isProd,
     emptyOutDir: true,

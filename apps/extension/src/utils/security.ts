@@ -7,11 +7,9 @@ type SecurityConfig = {
 
 // ! This is a workaround to make lockdown work in the extension, otherwise lockdown will throw an error
 if (typeof process === 'undefined' || !process.exit) {
-  const globalThis = (
-    typeof window !== 'undefined' ? window : global
-  ) as SafeAny;
-  globalThis.process = {
-    ...globalThis.process,
+  const globalObj = globalThis as SafeAny;
+  globalObj.process = {
+    ...globalObj.process,
     exit: (code: number) => {
       console.error(`Process exit called with code ${code}`);
     },
@@ -50,11 +48,7 @@ export const initializeSecurity = ({ isUI = false }: SecurityConfig = {}) => {
 };
 
 const configureDOMSecurity = () => {
-  const dangerousAPIs = [
-    'document.write',
-    'document.writeln',
-    'window.execScript',
-  ];
+  const dangerousAPIs = ['document.write', 'document.writeln', 'window.execScript'];
 
   dangerousAPIs.forEach((api) => {
     const [obj, prop] = api.split('.');
