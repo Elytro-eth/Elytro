@@ -8,6 +8,7 @@ import Apps from './Apps';
 import SetupTab from './SetupTab';
 import { useAccount } from '@/contexts/account-context';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import AddOnsTab from './AddOnsTab';
 
 interface DashboardTabsProps {
   loading: boolean;
@@ -19,6 +20,7 @@ export const TABS_KEYS = {
   ASSETS: 'assets',
   ACTIVITIES: 'activities',
   APPS: 'apps',
+  ADD_ONS: 'add-ons',
 };
 
 const TabsConfig = [
@@ -42,23 +44,29 @@ const TabsConfig = [
     label: 'Activity',
     component: <Activities />,
   },
+  {
+    key: TABS_KEYS.ADD_ONS,
+    label: 'Add-ons',
+    component: <AddOnsTab />,
+  },
 ];
+
+const UNDEPLOY_TABS_KEYS = [TABS_KEYS.SETUP, TABS_KEYS.ASSETS, TABS_KEYS.ACTIVITIES];
+const DEPLOYED_TABS_KEYS = [TABS_KEYS.APPS, TABS_KEYS.ACTIVITIES, TABS_KEYS.ASSETS, TABS_KEYS.ADD_ONS];
 
 export default function DashboardTabs({ loading, onReload }: DashboardTabsProps) {
   const searchParams = useSearchParams();
   const { currentAccount } = useAccount();
 
-  const [hasSetupPassed] = useLocalStorage('hasSetupPassed', false);
-  const tabs =
-    hasSetupPassed || currentAccount.isRecoveryEnabled
-      ? TabsConfig.filter((tab) => tab.key !== TABS_KEYS.SETUP)
-      : TabsConfig;
+  const [hasSetupPassed] = useLocalStorage(`hasSetupPassed_${currentAccount.address}`, false);
+  const tabKeys = hasSetupPassed || currentAccount.isRecoveryEnabled ? DEPLOYED_TABS_KEYS : UNDEPLOY_TABS_KEYS;
+  const tabs = TabsConfig.filter((tab) => tabKeys.includes(tab.key));
 
   const [activeTab, setActiveTab] = useState(searchParams.tab || TABS_KEYS.ASSETS);
 
   useEffect(() => {
-    setActiveTab(searchParams.tab || tabs[0].key);
-  }, [searchParams.tab, tabs.length]);
+    setActiveTab(searchParams.tab || tabKeys[0]);
+  }, [searchParams.tab, tabKeys.length]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);

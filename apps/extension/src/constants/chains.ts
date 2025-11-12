@@ -107,7 +107,8 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     ...optimismSepolia,
     icon: 'https://raw.githubusercontent.com/blockscout/frontend-configs/main/configs/network-icons/optimism-mainnet-light.svg',
     endpoint:
-      optimismSepolia.rpcUrls.default.http[0] || `https://opt-sepolia.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
+      // optimismSepolia.rpcUrls.default.http[0]
+      `https://opt-sepolia.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
     bundler: `https://api.pimlico.io/v2/11155420/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
     stablecoins: [
       {

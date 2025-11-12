@@ -31,6 +31,7 @@ import StablecoinsGas from './pages/StablecoinsGas';
 import Education from './pages/Education';
 import CreateAccount from './pages/CreateAccount';
 import SecureWallet from './pages/SecureWallet';
+import SecurityHookSettings from './pages/SecurityHookSettings';
 
 export enum SIDE_PANEL_ROUTE_PATHS {
   Home = '/',
@@ -66,6 +67,7 @@ export enum SIDE_PANEL_ROUTE_PATHS {
   Education = '/education',
   CreateAccount = '/create-account',
   SecureWallet = '/secure-wallet',
+  SecurityHookSettings = '/settings/security-hook',
 }
 
 export const routes: TRoute[] = [
@@ -201,5 +203,9 @@ export const routes: TRoute[] = [
   {
     path: SIDE_PANEL_ROUTE_PATHS.SecureWallet,
     component: SecureWallet,
+  },
+  {
+    path: SIDE_PANEL_ROUTE_PATHS.SecurityHookSettings,
+    component: SecurityHookSettings,
   },
 ];

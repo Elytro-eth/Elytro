@@ -18,7 +18,7 @@ export default function SetupTab() {
   const [hasSponsored, setHasSponsored] = useState(false);
   const { currentAccount, loading: isAccountLoading } = useAccount();
   const { handleTxRequest } = useTx();
-  const [_, setHasSetupPassed] = useLocalStorage('hasSetupPassed', false);
+  const [_, setHasSetupPassed] = useLocalStorage(`hasSetupPassed_${currentAccount.address}`, false);
 
   const getLeftSponsoredCount = async () => {
     setIsLoading(true);

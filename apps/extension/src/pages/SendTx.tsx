@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Loader2 } from 'lucide-react';
-import { Transaction } from '@soulwallet/sdk';
+import { Transaction } from '@elytro/sdk';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';

@@ -2,10 +2,7 @@ import { client } from './client';
 import { DocumentNode, gql } from '@apollo/client';
 
 // wrapped mutation function
-export async function mutate<T>(
-  mutationDocument: DocumentNode,
-  variables?: Record<string, unknown>
-): Promise<T> {
+export async function mutate<T>(mutationDocument: DocumentNode, variables?: Record<string, unknown>): Promise<T> {
   try {
     const { data, errors } = await client.mutate({
       mutation: mutationDocument,
@@ -75,6 +72,82 @@ export const mutate_register_device = gql`
   mutation RegisterDevice($input: RegisterDeviceInput!) {
     registerDevice(input: $input) {
       deviceID
+    }
+  }
+`;
+
+// Security Hook - Wallet Authentication
+export const mutate_request_wallet_auth_challenge = gql`
+  mutation RequestWalletAuthChallenge($input: RequestWalletAuthChallengeInput!) {
+    requestWalletAuthChallenge(input: $input) {
+      challengeId
+      message
+      expiresAt
+    }
+  }
+`;
+
+export const mutate_confirm_wallet_auth_challenge = gql`
+  mutation ConfirmWalletAuthChallenge($input: ConfirmWalletAuthChallengeInput!) {
+    confirmWalletAuthChallenge(input: $input) {
+      sessionId
+      expiresAt
+    }
+  }
+`;
+
+// Security Hook - Email Binding
+export const mutate_request_wallet_email_binding = gql`
+  mutation RequestWalletEmailBinding($input: RequestWalletEmailBindingInput!) {
+    requestWalletEmailBinding(input: $input) {
+      bindingId
+      maskedEmail
+      otpExpiresAt
+      resendAvailableAt
+    }
+  }
+`;
+
+export const mutate_confirm_wallet_email_binding = gql`
+  mutation ConfirmWalletEmailBinding($input: ConfirmWalletEmailBindingInput!) {
+    confirmWalletEmailBinding(input: $input) {
+      email
+      emailVerified
+      maskedEmail
+      dailyLimitUsdCents
+      updatedAt
+    }
+  }
+`;
+
+// Security Hook - Daily Limit
+export const mutate_set_wallet_daily_limit = gql`
+  mutation SetWalletDailyLimit($input: SetWalletDailyLimitInput!) {
+    setWalletDailyLimit(input: $input) {
+      dailyLimitUsdCents
+      updatedAt
+    }
+  }
+`;
+
+// Security Hook - Authorize User Operation (replaces getIsHookSignatureRequired)
+export const mutate_authorize_user_operation = gql`
+  mutation AuthorizeUserOperation($input: AuthorizeUserOperationInput!) {
+    authorizeUserOperation(input: $input) {
+      decision
+      signature
+      spendDeltaUsdCents
+      totalSpendUsdCents
+      refreshedAt
+    }
+  }
+`;
+
+// Legacy: Keep getIsHookSignatureRequired for backward compatibility (deprecated)
+export const mutate_get_hook_signature = gql`
+  mutation GetHookSignature($input: GetHookSignatureInput!) {
+    getIsHookSignatureRequired(input: $input) {
+      signature
     }
   }
 `;

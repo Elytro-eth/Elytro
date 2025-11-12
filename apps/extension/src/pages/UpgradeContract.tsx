@@ -6,7 +6,7 @@ import FragmentedAddress from '@/components/biz/FragmentedAddress';
 import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 import { getInstallModuleTx, getUpgradeModuleTx, getUninstallModuleTx } from '@/utils/contracts/upgrade';
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
-import type { Transaction } from '@soulwallet/sdk';
+import type { Transaction } from '@elytro/sdk';
 import { toast } from '@/hooks/use-toast';
 import { formatErrorMsg } from '@/utils/format';
 import { useWallet } from '@/contexts/wallet';

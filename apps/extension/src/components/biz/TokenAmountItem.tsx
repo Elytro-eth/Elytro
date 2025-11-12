@@ -1,7 +1,7 @@
 import { useAccount } from '@/contexts/account-context';
 import { formatDollarBalance, formatTokenAmount } from '@/utils/format';
 import { cn } from '@/utils/shadcn/utils';
-import { TokenInfo } from '@soulwallet/decoder';
+import { TokenInfo } from '@elytro/decoder';
 import { useMemo } from 'react';
 import DefaultTokenIcon from '@/assets/icons/ether.svg';
 

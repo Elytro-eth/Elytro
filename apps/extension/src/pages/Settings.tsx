@@ -7,7 +7,6 @@ import {
   LayoutGridIcon,
   LockKeyholeIcon,
   Settings2Icon,
-  ShieldIcon,
   RefreshCcw,
   WalletCardsIcon,
   UserRoundIcon,
@@ -20,13 +19,14 @@ import { useAccount } from '@/contexts/account-context';
 
 export default function Settings() {
   const { wallet } = useWallet();
+
   const handleLock = async () => {
     await wallet.lock();
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
   };
   const appVersion = pkg.version;
   const {
-    currentAccount: { needUpgrade, isDeployed },
+    currentAccount: { needUpgrade },
   } = useAccount();
 
   return (
@@ -37,9 +37,13 @@ export default function Settings() {
           <AccountsDropdown className="bg-gray-150" />
           <SettingItem icon={LayoutGridIcon} label="Connected apps" path={SIDE_PANEL_ROUTE_PATHS.Connection} />
 
-          {isDeployed && (
+          {/* {isDeployed && (
             <SettingItem icon={ShieldIcon} label="Recovery" path={SIDE_PANEL_ROUTE_PATHS.RecoverySetting} />
           )}
+
+          {isDeployed && SECURITY_HOOK_ADDRESS_MAP?.[chainId] && (
+            <SettingItem icon={ShieldCheck} label="Security Hook" path={SIDE_PANEL_ROUTE_PATHS.SecurityHookSettings} />
+          )} */}
 
           {needUpgrade && (
             <SettingItem

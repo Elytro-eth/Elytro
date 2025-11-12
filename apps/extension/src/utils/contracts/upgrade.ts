@@ -1,10 +1,7 @@
-// import { ABI_SoulWallet, ABI_UpgradeModule} from '@soulwallet/abi';
+// import { ABI_SoulWallet, ABI_UpgradeModule} from '@elytro/abi';
 import { Address, encodeFunctionData, parseAbi } from 'viem';
 
-export const getInstallModuleTx = (
-  walletAddress: Address,
-  latestModuleAddress: Address
-): Partial<TTransactionInfo> => {
+export const getInstallModuleTx = (walletAddress: Address, latestModuleAddress: Address): Partial<TTransactionInfo> => {
   // const callData = encodeFunctionData({
   //   abi: ABI_SoulWallet,
   //   functionName: 'installModule',
@@ -26,10 +23,7 @@ export const getInstallModuleTx = (
   };
 };
 
-export const getUpgradeModuleTx = (
-  walletAddress: Address,
-  latestModuleAddress: Address
-) => {
+export const getUpgradeModuleTx = (walletAddress: Address, latestModuleAddress: Address) => {
   // const callData = encodeFunctionData({
   //   abi: ABI_UpgradeModule,
   //   functionName: 'upgrade',
@@ -48,10 +42,7 @@ export const getUpgradeModuleTx = (
   };
 };
 
-export const getUninstallModuleTx = (
-  walletAddress: Address,
-  moduleAddress: Address
-) => {
+export const getUninstallModuleTx = (walletAddress: Address, moduleAddress: Address) => {
   // const callData = encodeFunctionData({
   //   abi:ABI_SoulWallet,
   //   functionName: 'uninstallModule',

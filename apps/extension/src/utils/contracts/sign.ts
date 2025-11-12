@@ -1,4 +1,4 @@
-import { UserOperation } from '@soulwallet/sdk';
+import { UserOperation } from '@elytro/sdk';
 import { Address, encodeAbiParameters, encodePacked } from 'viem';
 
 // Helper function to create packed user operation from UserOperation

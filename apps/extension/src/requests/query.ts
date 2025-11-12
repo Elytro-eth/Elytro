@@ -108,3 +108,17 @@ export const query_has_sponsored = gql`
     }
   }
 `;
+
+// Security Hook - Wallet Security Profile
+export const query_wallet_security_profile = gql`
+  query WalletSecurityProfile($input: WalletSecurityProfileInput!) {
+    walletSecurityProfile(input: $input) {
+      email
+      emailVerified
+      maskedEmail
+      dailyLimitUsdCents
+      createdAt
+      updatedAt
+    }
+  }
+`;

@@ -23,7 +23,7 @@ export type TSDKConfigItem = {
   validator: string;
   infoRecorder: string;
   entryPoint: string;
-  soulWalletLogic: string;
+  elytroWalletLogic: string;
 };
 
 export const SDK_CONFIG_BY_ENTRYPOINT = {
@@ -34,7 +34,7 @@ export const SDK_CONFIG_BY_ENTRYPOINT = {
     validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
     infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
     entryPoint: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
-    soulWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
+    elytroWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
   },
 
   [ENTRYPOINTS_ADDRESSES['v0.8']]: {
@@ -44,6 +44,6 @@ export const SDK_CONFIG_BY_ENTRYPOINT = {
     validator: '0xea50a2874df3eEC9E0365425ba948989cd63FED6', // 0xDc7007F20355219a5A6eB13f247F2E723df46cEb
     infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
     entryPoint: '0x4337084d9e255ff0702461cf8895ce9e3b5ff108',
-    soulWalletLogic: '0x2CC8A41e26dAC15F1D11F333f74D0451be6caE36',
+    elytroWalletLogic: '0x2CC8A41e26dAC15F1D11F333f74D0451be6caE36',
   },
 };

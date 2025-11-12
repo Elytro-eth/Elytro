@@ -6,7 +6,7 @@ import { getApproveErc20Tx, queryErc20Approvals } from '@/utils/tokenApproval';
 import { Address } from 'viem';
 import { CircleDollarSignIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import type { Transaction } from '@soulwallet/sdk';
+import type { Transaction } from '@elytro/sdk';
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import { toast } from '@/hooks/use-toast';
 import Spin from '@/components/ui/Spin';
