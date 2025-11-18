@@ -12,9 +12,9 @@ import { HistoricalActivityTypeEn } from '@/constants/operations';
 import { Abi, Address, Hex, isHex, toHex } from 'viem';
 import chainService from './services/chain';
 import accountManager from './services/account';
-import type { Transaction } from '@soulwallet/sdk';
+import type { Transaction } from '@elytro/sdk';
 import { TChainItem } from '@/constants/chains';
-import { DecodeResult } from '@soulwallet/decoder';
+import { DecodeResult } from '@elytro/decoder';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { getTokenList, updateUserImportedTokens } from '@/utils/tokens';
 import { ABI_ERC20_BALANCE_OF } from '@/constants/abi';
@@ -27,6 +27,13 @@ import { CoinLogoNameMap } from '@/constants/token';
 import { TokenQuote } from '@/types/pimlico';
 import { detectAddressType } from '@/utils/addressType';
 import { setLocalContacts, setLocalThreshold } from '@/utils/contacts';
+import {
+  getUninstallSecurityHookTx,
+  getForcePreUninstallSecurityHookTx,
+  getInstallSecurityHookTx,
+} from '@/utils/contracts/securityHook';
+import SecurityHookService from './services/securityHook';
+import type { TSecurityProfile } from './services/securityHook';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -39,6 +46,16 @@ enum WalletStatusEn {
 // ! DO NOT use getter. They can not be proxied.
 // ! Please declare all methods async.
 class WalletController {
+  private securityHookService: SecurityHookService;
+
+  constructor() {
+    // Initialize security hook service with dependencies
+    this.securityHookService = new SecurityHookService(
+      (message, saAddress) => elytroSDK.signMessage(message, saAddress),
+      () => accountManager.currentAccount,
+      () => elytroSDK.entryPoint
+    );
+  }
   /**
    * Create a new owner for the wallet
    */
@@ -108,17 +125,49 @@ class WalletController {
     connectionManager.disconnect(origin);
   }
 
+  public async getUserOpHash(userOp: ElytroUserOperation): Promise<string> {
+    return await elytroSDK.getUserOpHash(deformatObjectWithBigInt(userOp));
+  }
+
   public async signUserOperation(userOp: ElytroUserOperation) {
-    return await elytroSDK.signUserOperation(deformatObjectWithBigInt(userOp));
+    return await elytroSDK.signUserOperation(userOp);
   }
 
   public async sendUserOperation(userOp: ElytroUserOperation) {
     if (!userOp?.paymaster) {
       await elytroSDK.estimateGas(userOp!);
     }
-    const { opHash, signature } = await elytroSDK.signUserOperation(userOp!);
-    userOp.signature = signature;
-    await elytroSDK.sendUserOperation(userOp);
+
+    const hookStatus = await this.getSecurityHookStatus();
+    let opHash: string;
+    let finalUserOp: ElytroUserOperation;
+
+    if (hookStatus.hasPreUserOpValidationHooks) {
+      const preSign = await this.signUserOperation(userOp);
+      userOp.signature = preSign.signature;
+      const hookSignatureRes = await this.securityHookService.getHookSignature(userOp);
+      if (!hookSignatureRes?.signature) {
+        return {
+          code: hookSignatureRes?.code,
+          challengeId: hookSignatureRes?.challengeId,
+          currentSpendUsdCents: hookSignatureRes?.currentSpendUsdCents,
+          dailyLimitUsdCents: hookSignatureRes?.dailyLimitUsdCents,
+          maskedEmail: hookSignatureRes?.maskedEmail,
+          otpExpiresAt: hookSignatureRes?.otpExpiresAt,
+          projectedSpendUsdCents: hookSignatureRes?.projectedSpendUsdCents,
+        };
+      }
+      userOp.signature = hookSignatureRes?.signature;
+      const { userOp: userOpRes, opHash: opHashRes } = await elytroSDK.signUserOperationWithHook(userOp, preSign);
+      finalUserOp = userOpRes;
+      opHash = opHashRes;
+    } else {
+      const { userOp: userOpRes, opHash: opHashRes } = await elytroSDK.signUserOperation(userOp!);
+      finalUserOp = userOpRes;
+      opHash = opHashRes;
+    }
+
+    await elytroSDK.sendUserOperation(finalUserOp);
     return opHash;
   }
 
@@ -357,8 +406,6 @@ class WalletController {
         txOpCallData.callData as `0x${string}`
       );
 
-      await elytroSDK.estimateGas(deployOp);
-
       return formatObjectWithBigInt(deployOp);
     }
 
@@ -546,6 +593,81 @@ class WalletController {
     }
 
     return await elytroSDK.getInstalledUpgradeModules(accountManager.currentAccount.address);
+  }
+
+  public async getSecurityHookStatus() {
+    if (!accountManager.currentAccount) {
+      throw new Error('No current account');
+    }
+
+    const hookStatus = await elytroSDK.getSecurityHookStatus(
+      accountManager.currentAccount.address,
+      accountManager.currentAccount.chainId
+    );
+
+    return {
+      ...hookStatus,
+      currentAddress: accountManager.currentAccount.address,
+    };
+  }
+
+  public async generateInstallSecurityHookTxs() {
+    const { securityHookAddress, currentAddress } = await this.getSecurityHookStatus();
+
+    return [getInstallSecurityHookTx(currentAddress, securityHookAddress)];
+  }
+
+  // Normal uninstall SecurityHook
+  public async generateUninstallSecurityHookTxs() {
+    const { securityHookAddress, currentAddress, isInstalled } = await this.getSecurityHookStatus();
+
+    if (!isInstalled) {
+      throw new Error('SecurityHook is not installed');
+    }
+
+    return [getUninstallSecurityHookTx(currentAddress, securityHookAddress)];
+  }
+
+  // Force uninstall SecurityHook: Step 1
+  public async generatePreForceUninstallSecurityHookTxs() {
+    const { securityHookAddress, currentAddress, isInstalled } = await this.getSecurityHookStatus();
+
+    if (!isInstalled) {
+      throw new Error('SecurityHook is not installed');
+    }
+
+    const canForceUninstall = await elytroSDK.canForceUninstallSecurityHook(securityHookAddress, currentAddress);
+
+    if (!canForceUninstall) {
+      throw new Error('Cannot force uninstall yet. Please wait for the safety delay period.');
+    }
+
+    const step1Tx = getForcePreUninstallSecurityHookTx(securityHookAddress);
+
+    return [step1Tx];
+  }
+
+  // Force uninstall SecurityHook: Step 2
+  public async generateForceUninstallSecurityHookTxs() {
+    const { securityHookAddress, currentAddress, isInstalled } = await this.getSecurityHookStatus();
+
+    if (!isInstalled) {
+      throw new Error('SecurityHook is not installed');
+    }
+
+    const step2Tx = getUninstallSecurityHookTx(currentAddress, securityHookAddress);
+
+    return [step2Tx];
+  }
+
+  public async canForceUninstallSecurityHook(): Promise<boolean> {
+    const { securityHookAddress, currentAddress, isInstalled } = await this.getSecurityHookStatus();
+
+    if (!isInstalled) {
+      throw new Error('SecurityHook is not installed');
+    }
+
+    return await elytroSDK.canForceUninstallSecurityHook(securityHookAddress, currentAddress);
   }
 
   public async updateRecoveryStatus(): Promise<boolean> {
@@ -775,6 +897,88 @@ class WalletController {
 
   public async getEntryPoint() {
     return elytroSDK.entryPoint;
+  }
+
+  /**
+   * Authenticate wallet and get session ID
+   */
+  public async authenticateSecurityHook(): Promise<string> {
+    return await this.securityHookService.authenticate();
+  }
+
+  /**
+   * Clear authentication session
+   */
+  public async clearSecurityHookAuthSession(): Promise<void> {
+    return await this.securityHookService.clearAuthSession();
+  }
+
+  /**
+   * Load security profile for current account
+   */
+  public async loadSecurityHookProfile(): Promise<TSecurityProfile | null> {
+    return await this.securityHookService.loadSecurityProfile();
+  }
+
+  /**
+   * Request email binding
+   */
+  public async requestSecurityHookEmailBinding(
+    email: string,
+    locale = 'en-US'
+  ): Promise<{
+    bindingId: string;
+    maskedEmail: string;
+    otpExpiresAt: string;
+    resendAvailableAt: string;
+  }> {
+    return await this.securityHookService.requestEmailBinding(email, locale);
+  }
+
+  /**
+   * Confirm email binding with OTP
+   */
+  public async confirmSecurityHookEmailBinding(bindingId: string, otpCode: string): Promise<TSecurityProfile> {
+    return await this.securityHookService.confirmEmailBinding(bindingId, otpCode);
+  }
+
+  /**
+   * Set daily limit for current account
+   */
+  public async setSecurityHookDailyLimit(dailyLimitUsdCents: number): Promise<void> {
+    return await this.securityHookService.setDailyLimit(dailyLimitUsdCents);
+  }
+
+  /**
+   * Verify OTP
+   */
+  public async verifyOTP(
+    challengeId: string,
+    otpCode: string
+  ): Promise<{
+    challengeId: string;
+    status: string;
+    verifiedAt: string;
+  }> {
+    return await this.securityHookService.verifySecurityOtp(challengeId, otpCode);
+  }
+
+  /**
+   * Get hook signature
+   */
+  public async requestSecurityOtp(userOp: ElytroUserOperation): Promise<{
+    challengeId: string;
+    maskedEmail: string;
+    otpExpiresAt: string;
+  }> {
+    return await this.securityHookService.requestSecurityOtp(userOp);
+  }
+
+  /**
+   * Change wallet email
+   */
+  public async changeWalletEmail(email: string): Promise<TSecurityProfile> {
+    return await this.securityHookService.changeWalletEmail(email);
   }
 }
 

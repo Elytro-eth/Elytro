@@ -46,7 +46,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
     tokenInfo: { tokenPrices, tokens: currentAccountTokens },
     currentAccount: { isDeployed, address },
   } = useAccount();
-  const { requestType, calcResult, decodedDetail, onRetry, hasSufficientBalance, useStablecoin } = useTx();
+  const { requestType, calcResult, decodedDetail, onRetry, hasSufficientBalance, useStablecoin, hookError } = useTx();
   const [gasOption, setGasOption] = useState<string>(useStablecoin || (calcResult?.hasSponsored ? 'sponsor' : 'self'));
   const [tokenPaymasters, setTokenPaymasters] = useState<TokenPaymaster[]>([]);
 
@@ -128,6 +128,14 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   };
 
   const selectedGasToken = tokenPaymasters?.find((paymaster) => paymaster?.token === useStablecoin) || null;
+
+  if (hookError) {
+    return (
+      <div className="flex flex-col w-full gap-y-md">
+        {hookError?.code === 'OTP_REQUIRED' && <div className="flex flex-col gap-y-sm">test</div>}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col w-full gap-y-md">

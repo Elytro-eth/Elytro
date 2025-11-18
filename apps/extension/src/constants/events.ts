@@ -21,4 +21,13 @@ export const EVENT_TYPES = {
   UI: {
     PRIVATE_RECOVERY_READY: 'privateRecoveryReady',
   },
+  EIP5792: {
+    CALLS_CREATED: 'eip5792CallsCreated',
+    CALLS_COMPLETED: 'eip5792CallsCompleted',
+    CALLS_FAILED: 'eip5792CallsFailed',
+    CALLS_STATUS_UPDATED: 'eip5792CallsStatusUpdated',
+  },
+  SECURITY_HOOK: {
+    GET_HOOK_SIGNATURE_FAILED: 'getHookSignatureFailed',
+  },
 };

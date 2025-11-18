@@ -143,11 +143,46 @@ export const mutate_authorize_user_operation = gql`
   }
 `;
 
+// Security Hook - Request Security OTP
+export const mutate_request_security_otp = gql`
+  mutation RequestSecurityOtp($input: RequestSecurityOtpInput!) {
+    requestSecurityOtp(input: $input) {
+      challengeId
+      maskedEmail
+      otpExpiresAt
+    }
+  }
+`;
+
+// Security Hook - Verify Security OTP
+export const mutate_verify_security_otp = gql`
+  mutation VerifySecurityOtp($input: VerifySecurityOtpInput!) {
+    verifySecurityOtp(input: $input) {
+      challengeId
+      status
+      verifiedAt
+    }
+  }
+`;
+
 // Legacy: Keep getIsHookSignatureRequired for backward compatibility (deprecated)
 export const mutate_get_hook_signature = gql`
   mutation GetHookSignature($input: GetHookSignatureInput!) {
     getIsHookSignatureRequired(input: $input) {
       signature
+    }
+  }
+`;
+
+// Security Hook - Change Wallet Email
+export const mutate_change_email = gql`
+  mutation ChangeWalletEmail($input: ChangeWalletEmailInput!) {
+    changeWalletEmail(input: $input) {
+      email
+      emailVerified
+      maskedEmail
+      dailyLimitUsdCents
+      updatedAt
     }
   }
 `;

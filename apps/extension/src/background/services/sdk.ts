@@ -8,8 +8,8 @@ import {
   GUARDIAN_INFO_KEY,
 } from '@/constants/sdk-config';
 import { formatHex, paddingBytesToEven, paddingZero } from '@/utils/format';
-import { Bundler, SignkeyType, SocialRecovery, SoulWallet, Transaction } from '@soulwallet/sdk';
-import { DecodeUserOp } from '@soulwallet/decoder';
+import { Bundler, SignkeyType, SocialRecovery, ElytroWallet, Transaction, UserOpUtils } from '@elytro/sdk';
+import { DecodeUserOp } from '@elytro/decoder';
 import { canUserOpGetSponsor } from '@/utils/ethRpc/sponsor';
 import keyring from './keyring';
 import { simulateSendUserOp } from '@/utils/ethRpc/simulate';
@@ -36,7 +36,7 @@ import {
 } from 'viem';
 import { createAccount } from '@/utils/ethRpc/create-account';
 import { ethErrors } from 'eth-rpc-errors';
-import { ABI_Elytro, ABI_SocialRecoveryModule } from '@soulwallet/abi';
+import { ABI_Elytro, ABI_SocialRecoveryModule, ABI_EntryPoint } from '@elytro/abi';
 import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 import { ABI_ERC20_BALANCE_OF, ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
@@ -47,6 +47,8 @@ import { SupportedToken, TokenQuote, TokenQuoteResponse, TokenPaymaster } from '
 import { arbitrum } from 'viem/chains';
 import { DEFAULT_ENTRYPOINT_ADDRESS, SDK_CONFIG_BY_ENTRYPOINT } from '@/constants/entrypoints';
 import { TSDKConfigItem } from '@/constants/entrypoints';
+import { THookStatus, TSecurityHookUserData } from '@/types/securityHook';
+import { FAKE_SECURITY_HOOK_BYTECODE, SECURITY_HOOK_ADDRESS_MAP } from '@/constants/securityHook';
 
 type TSDKChainConfigItem = TChainItem & TSDKConfigItem;
 
@@ -58,11 +60,11 @@ export class SDKService {
     'fallback',
     'recovery',
     'entryPoint',
-    'soulWalletLogic',
+    'elytroWalletLogic',
     'bundler',
   ];
 
-  private _sdk!: SoulWallet;
+  private _sdk!: ElytroWallet;
   private _bundler!: Bundler;
   private _config!: TSDKChainConfigItem;
   private _pimlicoRpc: Nullable<PublicClient> = null;
@@ -123,12 +125,12 @@ export class SDKService {
   }
 
   private initializeSDK(config: TSDKChainConfigItem) {
-    const { endpoint, bundler, factory, fallback, recovery, entryPoint, soulWalletLogic } = config;
+    const { endpoint, bundler, factory, fallback, recovery, entryPoint, elytroWalletLogic } = config;
 
-    this._sdk = new SoulWallet(endpoint, bundler, factory, fallback, recovery, {
+    this._sdk = new ElytroWallet(endpoint, bundler, factory, fallback, recovery, {
       chainId: config.id,
       entryPoint,
-      soulWalletLogic,
+      elytroWalletLogic,
     });
     this._pimlicoRpc = null;
     this._bundler = new Bundler(bundler);
@@ -203,10 +205,6 @@ export class SDKService {
     }
   }
 
-  public async canGetSponsored(userOp: ElytroUserOperation) {
-    return await canUserOpGetSponsor(userOp, this._config.id, this._config.entryPoint);
-  }
-
   public async isSmartAccountDeployed(address: string) {
     const code = await this._sdk.provider.getCode(address);
     // when account is not deployed, it's code is undefined or 0x.
@@ -223,24 +221,123 @@ export class SDKService {
     }
   }
 
-  public async signUserOperation(userOp: ElytroUserOperation) {
+  /**
+   * Get user operation hash without signing
+   * @param userOp User operation
+   * @returns User operation hash
+   */
+  public async getUserOpHash(userOp: ElytroUserOperation): Promise<string> {
     const opHash = await this._sdk.userOpHash(userOp);
 
     if (opHash.isErr()) {
       throw opHash.ERR;
     } else {
-      const signature = await this._getSignature(
-        {
-          messageHash: opHash.OK,
-          validStartTime: 0, // 0
-          validEndTime: Math.floor(new Date().getTime() / 1000) + 60 * 5, // 5 mins
-        },
-        true
-      );
-      userOp.signature = signature;
-      // await this._isSignatureValid(userOp.sender, opHash.OK as `0x${string}`, signature);
-      return { signature, opHash: opHash.OK };
+      return opHash.OK;
     }
+  }
+
+  public async signUserOperationWithHook(
+    userOp: ElytroUserOperation,
+    preSign: {
+      signature: string;
+      rawSignature: string;
+      opHash: string;
+      validationData: string;
+      userOp: ElytroUserOperation;
+    }
+  ) {
+    // const originalOpHash = await this.getUserOpHash(userOp);
+
+    // const _packRawHash = await this._sdk.packRawHash(originalOpHash);
+
+    // if (_packRawHash.isErr()) {
+    //   throw _packRawHash.ERR;
+    // }
+
+    // const packRawHash = _packRawHash.OK;
+
+    // const packedHash = packRawHash.packedHash as Hex;
+    // const validationData: string = packRawHash.validationData;
+
+    // const _originalRawSignature = await this._rawSign(packedHash);
+    // console.log('1: _sig', _originalRawSignature);
+
+    // const _sig = await this._sdk.packUserOpEOASignature(this._config.validator, _originalRawSignature, validationData);
+
+    // if (_sig.isErr()) {
+    //   throw _sig.ERR;
+    // }
+
+    // // const originalSign = await this.signUserOperation(userOp);
+    // // userOp.signature = originalSign.signature;
+    // // const hookStatus = await this.getSecurityHookStatus(userOp.sender, this._config.id);
+
+    // const signedUserOp = {
+    //   ...userOp,
+    //   signature: _sig.OK as Hex,
+    // };
+
+    // const isValid = await this._verifyUserSignatureForHook(signedUserOp, SECURITY_HOOK_ADDRESS_MAP[this._config.id]);
+    // console.log('test: isValid', isValid);
+    // if (!isValid) {
+    //   throw new Error('Elytro: User signature validation failed for hook');
+    // }
+    // const signedOpHash = await this.getUserOpHash(signedUserOp);
+    // const hookRawSignature = await this._rawSign(signedOpHash as Hex);
+
+    // console.log('test: hookRawSignature', hookRawSignature);
+
+    const hookInputData = [
+      {
+        hookAddress: SECURITY_HOOK_ADDRESS_MAP[this._config.id],
+        inputData: userOp.signature,
+      },
+    ];
+
+    const _packedSignature = await this._sdk.packUserOpEOASignature(
+      this._config.validator,
+      preSign.rawSignature,
+      preSign.validationData,
+      hookInputData
+    );
+
+    console.log('test: _packedSignature', _packedSignature);
+
+    if (_packedSignature.isErr()) {
+      throw _packedSignature.ERR;
+    } else {
+      userOp.signature = _packedSignature.OK as Hex;
+    }
+
+    const finalOpHash = await this.getUserOpHash(userOp);
+
+    return {
+      userOp: userOp,
+      opHash: finalOpHash,
+    };
+  }
+
+  /**
+   * Sign user operation
+   * @param userOp User operation
+   * @param isHookSignatureRequired Whether hook signature is required
+   * @param hookSignature Optional hook signature (should be provided if SecurityHook is installed)
+   * @returns Signature and operation hash
+   */
+  public async signUserOperation(userOp: ElytroUserOperation) {
+    const opHash = await this.getUserOpHash(userOp);
+
+    const { signature, rawSignature, validationData } = await this._getSignature(
+      {
+        messageHash: opHash,
+        validStartTime: 0, // 0
+        validEndTime: Math.floor(new Date().getTime() / 1000) + 60 * 5, // 5 mins
+      },
+      true
+    );
+    userOp.signature = signature;
+
+    return { signature, rawSignature, opHash, validationData, userOp };
   }
 
   public async getUserOperationReceipt(userOpHash: string) {
@@ -331,56 +428,6 @@ export class SDKService {
     return _eoaSignature;
   }
 
-  // private async _newSign(userOp: ElytroUserOperation) {
-  //   const domain = {
-  //     name: 'ERC4337',
-  //     version: '1',
-  //     chainId: this._config.id,
-  //     verifyingContract: this._config.entryPoint as Address,
-  //   };
-
-  //   const types = {
-  //     PackedUserOperation: [
-  //       { name: 'sender', type: 'address' },
-  //       { name: 'nonce', type: 'uint256' },
-  //       { name: 'initCode', type: 'bytes' },
-  //       { name: 'callData', type: 'bytes' },
-  //       { name: 'accountGasLimits', type: 'bytes32' },
-  //       { name: 'preVerificationGas', type: 'uint256' },
-  //       { name: 'gasFees', type: 'bytes32' },
-  //       { name: 'paymasterAndData', type: 'bytes' },
-  //     ],
-  //   };
-
-  //   const packedUserOp = createPackedUserOp(userOp);
-  //   const valueToSign = {
-  //     sender: packedUserOp.sender.toLowerCase(),
-  //     nonce: packedUserOp.nonce,
-  //     initCode: packedUserOp.initCode,
-  //     callData: packedUserOp.callData,
-  //     accountGasLimits: packedUserOp.accountGasLimits,
-  //     preVerificationGas: packedUserOp.preVerificationGas,
-  //     gasFees: packedUserOp.gasFees,
-  //     paymasterAndData: packedUserOp.paymasterAndData,
-  //   };
-
-  //   console.log('test: signTypedData', {
-  //     domain,
-  //     types,
-  //     primaryType: 'PackedUserOperation',
-  //     message: valueToSign,
-  //   });
-
-  //   const _signature = await keyring.currentOwner?.signTypedData({
-  //     domain,
-  //     types,
-  //     primaryType: 'PackedUserOperation',
-  //     message: valueToSign,
-  //   });
-
-  //   return _signature!;
-  // }
-
   private async _getSignature(
     packParams: {
       messageHash: string;
@@ -391,8 +438,8 @@ export class SDKService {
   ) {
     const rawHashRes = await this._sdk.packRawHash(
       packParams.messageHash
-      // unlimited time // packParams.validStartTime,
-      // unlimited time // packParams.validEndTime,
+      // packParams.validStartTime,
+      // packParams.validEndTime
     );
 
     if (rawHashRes.isErr()) {
@@ -416,8 +463,60 @@ export class SDKService {
 
     if (signRes.isErr()) {
       throw signRes.ERR;
-    } else {
-      return signRes.OK; // signature
+    }
+
+    return {
+      signature: signRes.OK,
+      rawSignature: signature,
+      validationData: rawHashRes.OK.validationData,
+    };
+  }
+
+  /**
+   * Check if callData is a SecurityHook uninstall operation
+   * @param callData Transaction callData
+   * @returns Whether it is an uninstall operation
+   */
+  private _isUninstallingSecurityHook(callData: string): boolean {
+    if (!callData || callData.length < 10) {
+      return false;
+    }
+
+    try {
+      // Calculate function selector using encodeFunctionData
+      // Function selector for uninstallHook(address)
+      const uninstallHookSelector = encodeFunctionData({
+        abi: parseAbi(['function uninstallHook(address)']),
+        functionName: 'uninstallHook',
+        args: ['0x0000000000000000000000000000000000000000'], // Placeholder address
+      }).slice(0, 10);
+
+      // Function selector for forcePreUninstall()
+      const forcePreUninstallSelector = encodeFunctionData({
+        abi: parseAbi(['function forcePreUninstall()']),
+        functionName: 'forcePreUninstall',
+        args: [],
+      }).slice(0, 10);
+
+      const callDataLower = callData.toLowerCase();
+
+      // Check if it's an uninstallHook call
+      if (callDataLower.startsWith(uninstallHookSelector.toLowerCase())) {
+        return true;
+      }
+
+      // Check if it's a forcePreUninstall call
+      if (callDataLower.startsWith(forcePreUninstallSelector.toLowerCase())) {
+        return true;
+      }
+
+      // Check if batch transaction contains uninstall operation
+      // If callData contains multiple calls, need to decode and check
+      // Simplified handling: only check single call case
+      return false;
+    } catch (error) {
+      console.error('Elytro: Failed to check if uninstalling SecurityHook', error);
+      return false;
     }
   }
 
@@ -486,18 +585,38 @@ export class SDKService {
       userOp.maxPriorityFeePerGas = gasPrice?.maxPriorityFeePerGas ?? 0;
     }
 
+    const hookStatus = await this.getSecurityHookStatus(userOp.sender, this._config.id);
+    const stateOverride: Record<Address, { code: Hex }> = {
+      [userOp.sender]: {
+        balance: toHex(parseEther('1')),
+        // getHexString(
+        //   await this._sdk.provider.getBalance(userOp.sender)
+        // ),
+      },
+    };
+
+    let semiValidHookInputData: { hookAddress: Address; inputData: Hex }[] | undefined = undefined;
+
+    if (hookStatus && hookStatus.hasPreUserOpValidationHooks) {
+      stateOverride[hookStatus.securityHookAddress] = {
+        code: FAKE_SECURITY_HOOK_BYTECODE,
+      };
+
+      semiValidHookInputData = [
+        {
+          hookAddress: hookStatus.securityHookAddress,
+          inputData:
+            '0x0f66d90c36d1bba494523b6394aaf6e24e53a30e5fa8260268143eee20557c2a54d69f2327f4cf157630e442da5ec9bfc39062bb86be547db86859ea88978a3c1b',
+        },
+      ];
+    }
+
     const res = await this._sdk.estimateUserOperationGas(
       this._config.validator,
       userOp,
-      {
-        [userOp.sender]: {
-          balance: toHex(parseEther('1')),
-          // getHexString(
-          //   await this._sdk.provider.getBalance(userOp.sender)
-          // ),
-        },
-      },
-      SignkeyType.EOA // 目前仅支持EOA
+      stateOverride,
+      SignkeyType.EOA, // Only EOA is supported currently
+      semiValidHookInputData
     );
 
     if (res.isErr()) {
@@ -561,13 +680,45 @@ export class SDKService {
     return maxCostInToken;
   }
 
+  private async _getMockUserOpWithHook(userOp: ElytroUserOperation, securityHookAddress: Address) {
+    const stateOverride: Record<Address, { code: Hex }> = {
+      [userOp.sender]: {
+        balance: toHex(parseEther('1')),
+      },
+      [securityHookAddress]: {
+        code: FAKE_SECURITY_HOOK_BYTECODE,
+      },
+    };
+
+    const semiValidHookInputData = [
+      {
+        hookAddress: securityHookAddress,
+        inputData:
+          '0x0f66d90c36d1bba494523b6394aaf6e24e53a30e5fa8260268143eee20557c2a54d69f2327f4cf157630e442da5ec9bfc39062bb86be547db86859ea88978a3c1b',
+      },
+    ];
+
+    return {
+      ...userOp,
+      stateOverride,
+      semiValidHookInputData,
+    };
+  }
+
   public async getRechargeAmountForUserOp(
     userOp: ElytroUserOperation,
     transferValue: bigint,
     noSponsor = false,
     token?: TokenQuote
   ) {
-    const hasSponsored = noSponsor ? false : await this.canGetSponsored(userOp);
+    const hasSponsored = noSponsor
+      ? false
+      : await canUserOpGetSponsor(
+          userOp,
+          this._config.id,
+          this._config.entryPoint,
+          await this.getSecurityHookStatus(userOp.sender, this._config.id)
+        );
 
     if (!hasSponsored) {
       if (token) {
@@ -715,7 +866,7 @@ export class SDKService {
     const domainSeparator = getDomainSeparator(toHex(this._config.id), saAddress);
     const messageHash = getEncodedSHA(domainSeparator, encode1271MessageHash);
 
-    const signature = await this._getSignature({ messageHash }, true);
+    const { signature } = await this._getSignature({ messageHash }, true);
 
     await this._isSignatureValid(saAddress, hashedMessage, signature as Hex);
 
@@ -1079,6 +1230,176 @@ export class SDKService {
         return null;
       })
       .filter(Boolean) as TokenPaymaster[];
+  }
+
+  public async getSecurityHookStatus(walletAddress: string, chainId: number): Promise<THookStatus> {
+    const securityHookAddress = SECURITY_HOOK_ADDRESS_MAP[chainId];
+
+    if (!securityHookAddress) {
+      return {
+        hasPreIsValidSignatureHooks: false,
+        hasPreUserOpValidationHooks: false,
+        isInstalled: false,
+        securityHookAddress,
+      };
+    }
+
+    const _client = this._getClient();
+
+    try {
+      // [preIsValidSignatureHooks[], preUserOpValidationHooks[]] = [ 签名hook列表, userOp hook列表 ]
+      const hooks = (await _client.readContract({
+        address: walletAddress as Address,
+        abi: ABI_Elytro,
+        functionName: 'listHook',
+      })) as [Address[], Address[]];
+
+      let preIsValidSignatureHooks: Address[] = [];
+      let preUserOpValidationHooks: Address[] = [];
+
+      if (Array.isArray(hooks) && hooks.length === 2) {
+        preIsValidSignatureHooks = hooks[0] || [];
+        preUserOpValidationHooks = hooks[1] || [];
+      } else if (hooks && typeof hooks === 'object' && 'preIsValidSignatureHooks' in hooks) {
+        const hooksObj = hooks as unknown as {
+          preIsValidSignatureHooks: Address[];
+          preUserOpValidationHooks: Address[];
+        };
+        preIsValidSignatureHooks = hooksObj.preIsValidSignatureHooks || [];
+        preUserOpValidationHooks = hooksObj.preUserOpValidationHooks || [];
+      }
+
+      const securityHookAddressLower = securityHookAddress.toLowerCase();
+
+      const hasPreIsValidSignatureHooks = preIsValidSignatureHooks.some(
+        (hook) => (hook as string).toLowerCase() === securityHookAddressLower
+      );
+
+      const hasPreUserOpValidationHooks = preUserOpValidationHooks.some(
+        (hook) => (hook as string).toLowerCase() === securityHookAddressLower
+      );
+
+      return {
+        hasPreIsValidSignatureHooks,
+        hasPreUserOpValidationHooks,
+        isInstalled: hasPreIsValidSignatureHooks || hasPreUserOpValidationHooks,
+        securityHookAddress,
+      };
+    } catch (_error) {
+      return {
+        hasPreIsValidSignatureHooks: false,
+        hasPreUserOpValidationHooks: false,
+        isInstalled: false,
+        securityHookAddress,
+      };
+    }
+  }
+
+  /**
+   * Get SecurityHook user data (for checking force uninstall time)
+   * @param securityHookAddress SecurityHook contract address
+   * @param walletAddress Wallet address
+   * @returns User data
+   */
+  public async getSecurityHookUserData(
+    securityHookAddress: Address,
+    walletAddress: Address
+  ): Promise<TSecurityHookUserData | null> {
+    const _client = this._getClient();
+
+    try {
+      const userData = await _client.readContract({
+        address: securityHookAddress,
+        abi: parseAbi(['function userData(address) external view returns (uint64 forceUninstallAfter)']),
+        functionName: 'userData',
+        args: [walletAddress],
+      });
+
+      return {
+        forceUninstallAfter: userData as bigint,
+      };
+    } catch (error) {
+      console.error('Elytro: Failed to get SecurityHook user data.', error);
+      return null;
+    }
+  }
+
+  /**
+   * Check if force uninstall can be executed
+   * @param securityHookAddress SecurityHook contract address
+   * @param walletAddress Wallet address
+   * @returns Whether force uninstall can be executed
+   */
+  public async canForceUninstallSecurityHook(securityHookAddress: Address, walletAddress: Address): Promise<boolean> {
+    const userData = await this.getSecurityHookUserData(securityHookAddress, walletAddress);
+
+    if (!userData) {
+      return false;
+    }
+
+    // forceUninstallAfter being 0 means cannot uninstall
+    if (userData.forceUninstallAfter === 0n) {
+      return false;
+    }
+
+    // Check if current time has exceeded forceUninstallAfter
+    const currentTime = BigInt(Math.floor(Date.now() / 1000));
+    return currentTime >= userData.forceUninstallAfter;
+  }
+
+  /**
+   * Verify user signature is valid for hook
+   * Based on demo.ts getUserOpHookSignature function
+   * @param userOp User operation
+   * @param userSignature User signature (without hook)
+   * @param securityHookAddress SecurityHook contract address
+   * @returns Whether user signature is valid
+   */
+  private async _verifyUserSignatureForHook(
+    userOp: ElytroUserOperation,
+    securityHookAddress: Address
+  ): Promise<boolean> {
+    try {
+      const _client = this._getClient();
+
+      const packedUserOp = UserOpUtils.packUserOp(userOp);
+
+      const callData = encodeFunctionData({
+        abi: ABI_EntryPoint as Abi,
+        functionName: 'handleOps',
+        args: [[packedUserOp], '0x1111111111111111111111111111111111111111' as Address],
+      });
+
+      const stateOverrides = {
+        [securityHookAddress]: {
+          code: '0x00' as Hex,
+        },
+      };
+
+      try {
+        const result = await _client.request({
+          method: 'eth_call',
+          params: [
+            {
+              to: this._config.entryPoint as Address,
+              data: callData,
+            },
+            'latest',
+            stateOverrides,
+          ],
+        });
+
+        // If call succeeds (returns 0x), user signature is valid
+        return result === '0x' || result === null;
+      } catch (error) {
+        // If call fails, user signature is invalid
+        console.error('Elytro: User signature validation failed for hook', error);
+        return false;
+      }
+    } catch (error) {
+      console.error('Elytro: Failed to verify user signature for hook', error);
+      return false;
+    }
   }
 }
 

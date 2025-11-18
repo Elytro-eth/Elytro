@@ -10,7 +10,6 @@ import { ApolloProvider } from '@apollo/client';
 import { routes } from '@/routes';
 import { client } from '@/requests';
 import { TxProvider } from '@/contexts/tx-context';
-import { SecurityHookProvider } from '@/contexts/securityHook-context';
 import { AlerterProvider } from '@/components/ui/alerter';
 import PrivateRecoveryDialog from '@/components/biz/PrivateRecoveryDialog';
 import { initializeSecurity } from '@/utils/security';
@@ -23,17 +22,15 @@ const main = () => {
       <PageContainer>
         <AccountProvider>
           <ApprovalProvider>
-            <SecurityHookProvider>
-              <TxProvider>
-                <TooltipProvider>
-                  <AlerterProvider>
-                    <HashRouter routes={routes} />
-                    <PrivateRecoveryDialog />
-                  </AlerterProvider>
-                  {/* <UserOpConfirmDialog /> */}
-                </TooltipProvider>
-              </TxProvider>
-            </SecurityHookProvider>
+            <TxProvider>
+              <TooltipProvider>
+                <AlerterProvider>
+                  <HashRouter routes={routes} />
+                  <PrivateRecoveryDialog />
+                </AlerterProvider>
+                {/* <UserOpConfirmDialog /> */}
+              </TooltipProvider>
+            </TxProvider>
           </ApprovalProvider>
         </AccountProvider>
       </PageContainer>

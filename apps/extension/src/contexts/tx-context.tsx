@@ -1,8 +1,8 @@
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
 import { navigateTo } from '@/utils/navigation';
-import { DecodeResult } from '@soulwallet/decoder';
-import type { Transaction } from '@soulwallet/sdk';
+import { DecodeResult } from '@elytro/decoder';
+import type { Transaction } from '@elytro/sdk';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { toHex } from 'viem';
 import { SIDE_PANEL_ROUTE_PATHS } from '../routes';
@@ -16,6 +16,7 @@ import { TABS_KEYS } from '@/components/biz/DashboardTabs';
 import { getApproveErc20Tx, hasApprove } from '@/utils/tokenApproval';
 import { TokenQuote } from '@/types/pimlico';
 import { useChain } from './chain-context';
+import { THookError } from '@/types/securityHook';
 
 export enum TxRequestTypeEn {
   DeployWallet = 1,
@@ -41,6 +42,7 @@ type ITxContext = {
   isSending: boolean;
   hasSufficientBalance: boolean;
   errorMsg: Nullable<string>;
+  hookError: Nullable<THookError>;
 
   // UserOp/Tx info
   userOp: Nullable<ElytroUserOperation>;
@@ -58,6 +60,12 @@ type ITxContext = {
   onConfirm: () => void;
   onCancel: () => void;
   onRetry: (noSponsor?: boolean, gasToken?: TokenQuote) => void;
+  requestSecurityOtp: () => Promise<void>;
+  verifySecurityOtp: (otpCode: string) => Promise<{
+    challengeId: string;
+    status: string;
+    verifiedAt: string;
+  }>;
 };
 
 const ConfirmSuccessMessageMap = {
@@ -68,6 +76,7 @@ const ConfirmSuccessMessageMap = {
 };
 
 const TxContext = createContext<ITxContext>({
+  hookError: null,
   requestType: null,
   historyType: null,
   isPacking: true,
@@ -82,10 +91,13 @@ const TxContext = createContext<ITxContext>({
   onConfirm: () => {},
   onCancel: () => {},
   onRetry: () => {},
+  requestSecurityOtp: () => Promise.resolve(),
+  verifySecurityOtp: () => Promise.resolve({ challengeId: '', status: '', verifiedAt: '' }),
 });
 
 export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
+  const [hookError, setHookError] = useState<Nullable<THookError>>(null);
   const { approval, reject, resolve } = useApproval();
   const {
     reloadAccount,
@@ -323,17 +335,26 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const onConfirm = async () => {
     try {
       setIsSending(true);
-      const opHash = await wallet.sendUserOperation(userOpRef.current!);
-      registerOpStatusListener(opHash);
-      wallet.addNewHistory({
-        type: txTypeRef.current!,
-        opHash,
-        from: userOpRef.current!.sender,
-        decodedDetail: decodedDetail!,
-        approvalId: approval?.id,
-      });
-      resolve();
-      handleBack();
+      const userOp = userOpRef.current!;
+
+      const res = await wallet.sendUserOperation(userOp);
+
+      if ((res as SafeAny)?.code) {
+        setHookError(res as THookError);
+      } else {
+        const opHash = res as string;
+        setHookError(null);
+        registerOpStatusListener(opHash);
+        wallet.addNewHistory({
+          type: txTypeRef.current!,
+          opHash,
+          from: userOp.sender,
+          decodedDetail: decodedDetail!,
+          approvalId: approval?.id,
+        });
+        resolve();
+        handleBack();
+      }
     } catch (error) {
       const msg = formatErrorMsg(error);
       setErrorMsg(msg);
@@ -359,6 +380,36 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [approval]);
 
+  const requestSecurityOtp = async () => {
+    try {
+      const res = await wallet.requestSecurityOtp(userOpRef.current!);
+      setHookError({
+        code: 'OTP_REQUIRED',
+        challengeId: res.challengeId,
+        maskedEmail: res.maskedEmail,
+        otpExpiresAt: res.otpExpiresAt,
+      });
+    } catch (error) {
+      console.log('Elytro: requestSecurityOtp failed', error);
+    }
+  };
+
+  const verifySecurityOtp = async (otpCode: string) => {
+    try {
+      if (!hookError?.challengeId) {
+        throw new Error('Challenge ID is required');
+      }
+      const res = await wallet.verifyOTP(hookError.challengeId, otpCode);
+      if (res.status === 'VERIFIED') {
+        onConfirm();
+      }
+      return res;
+    } catch (error) {
+      setHookError(error as THookError);
+      throw error;
+    }
+  };
+
   return (
     <TxContext.Provider
       value={{
@@ -376,6 +427,9 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         onConfirm,
         onCancel,
         onRetry,
+        hookError,
+        requestSecurityOtp,
+        verifySecurityOtp,
       }}
     >
       {children}

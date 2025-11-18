@@ -27,6 +27,7 @@ export enum ApprovalTypeEn {
   Alert = '/alert',
   Sign = '/sign',
   ChainChange = '/chain-change',
+  EIP5792Calls = '/eip5792-calls',
 }
 
 // export enum TxStatusEn {
