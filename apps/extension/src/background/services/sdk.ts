@@ -8,7 +8,7 @@ import {
   GUARDIAN_INFO_KEY,
 } from '@/constants/sdk-config';
 import { formatHex, paddingBytesToEven, paddingZero } from '@/utils/format';
-import { Bundler, SignkeyType, SocialRecovery, ElytroWallet, Transaction, UserOpUtils } from '@elytro/sdk';
+import { Bundler, SignkeyType, SocialRecovery, ElytroWallet, Transaction } from '@elytro/sdk';
 import { DecodeUserOp } from '@elytro/decoder';
 import { canUserOpGetSponsor } from '@/utils/ethRpc/sponsor';
 import keyring from './keyring';
@@ -36,7 +36,7 @@ import {
 } from 'viem';
 import { createAccount } from '@/utils/ethRpc/create-account';
 import { ethErrors } from 'eth-rpc-errors';
-import { ABI_Elytro, ABI_SocialRecoveryModule, ABI_EntryPoint } from '@elytro/abi';
+import { ABI_Elytro, ABI_SocialRecoveryModule } from '@elytro/abi';
 import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 import { ABI_ERC20_BALANCE_OF, ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
@@ -472,53 +472,48 @@ export class SDKService {
     };
   }
 
-  /**
-   * Check if callData is a SecurityHook uninstall operation
-   * @param callData Transaction callData
-   * @returns Whether it is an uninstall operation
-   */
-  private _isUninstallingSecurityHook(callData: string): boolean {
-    if (!callData || callData.length < 10) {
-      return false;
-    }
+  // private _isUninstallingSecurityHook(callData: string): boolean {
+  //   if (!callData || callData.length < 10) {
+  //     return false;
+  //   }
 
-    try {
-      // Calculate function selector using encodeFunctionData
-      // Function selector for uninstallHook(address)
-      const uninstallHookSelector = encodeFunctionData({
-        abi: parseAbi(['function uninstallHook(address)']),
-        functionName: 'uninstallHook',
-        args: ['0x0000000000000000000000000000000000000000'], // Placeholder address
-      }).slice(0, 10);
+  //   try {
+  //     // Calculate function selector using encodeFunctionData
+  //     // Function selector for uninstallHook(address)
+  //     const uninstallHookSelector = encodeFunctionData({
+  //       abi: parseAbi(['function uninstallHook(address)']),
+  //       functionName: 'uninstallHook',
+  //       args: ['0x0000000000000000000000000000000000000000'], // Placeholder address
+  //     }).slice(0, 10);
 
-      // Function selector for forcePreUninstall()
-      const forcePreUninstallSelector = encodeFunctionData({
-        abi: parseAbi(['function forcePreUninstall()']),
-        functionName: 'forcePreUninstall',
-        args: [],
-      }).slice(0, 10);
+  //     // Function selector for forcePreUninstall()
+  //     const forcePreUninstallSelector = encodeFunctionData({
+  //       abi: parseAbi(['function forcePreUninstall()']),
+  //       functionName: 'forcePreUninstall',
+  //       args: [],
+  //     }).slice(0, 10);
 
-      const callDataLower = callData.toLowerCase();
+  //     const callDataLower = callData.toLowerCase();
 
-      // Check if it's an uninstallHook call
-      if (callDataLower.startsWith(uninstallHookSelector.toLowerCase())) {
-        return true;
-      }
+  //     // Check if it's an uninstallHook call
+  //     if (callDataLower.startsWith(uninstallHookSelector.toLowerCase())) {
+  //       return true;
+  //     }
 
-      // Check if it's a forcePreUninstall call
-      if (callDataLower.startsWith(forcePreUninstallSelector.toLowerCase())) {
-        return true;
-      }
+  //     // Check if it's a forcePreUninstall call
+  //     if (callDataLower.startsWith(forcePreUninstallSelector.toLowerCase())) {
+  //       return true;
+  //     }
 
-      // Check if batch transaction contains uninstall operation
-      // If callData contains multiple calls, need to decode and check
-      // Simplified handling: only check single call case
-      return false;
-    } catch (error) {
-      console.error('Elytro: Failed to check if uninstalling SecurityHook', error);
-      return false;
-    }
-  }
+  //     // Check if batch transaction contains uninstall operation
+  //     // If callData contains multiple calls, need to decode and check
+  //     // Simplified handling: only check single call case
+  //     return false;
+  //   } catch (error) {
+  //     console.error('Elytro: Failed to check if uninstalling SecurityHook', error);
+  //     return false;
+  //   }
+  // }
 
   public async getDecodedUserOperation(userOp: ElytroUserOperation) {
     if (userOp.callData?.length <= 2) {
@@ -680,30 +675,30 @@ export class SDKService {
     return maxCostInToken;
   }
 
-  private async _getMockUserOpWithHook(userOp: ElytroUserOperation, securityHookAddress: Address) {
-    const stateOverride: Record<Address, { code: Hex }> = {
-      [userOp.sender]: {
-        balance: toHex(parseEther('1')),
-      },
-      [securityHookAddress]: {
-        code: FAKE_SECURITY_HOOK_BYTECODE,
-      },
-    };
+  // private async _getMockUserOpWithHook(userOp: ElytroUserOperation, securityHookAddress: Address) {
+  //   const stateOverride: Record<Address, { code: Hex }> = {
+  //     [userOp.sender]: {
+  //       balance: toHex(parseEther('1')),
+  //     },
+  //     [securityHookAddress]: {
+  //       code: FAKE_SECURITY_HOOK_BYTECODE,
+  //     },
+  //   };
 
-    const semiValidHookInputData = [
-      {
-        hookAddress: securityHookAddress,
-        inputData:
-          '0x0f66d90c36d1bba494523b6394aaf6e24e53a30e5fa8260268143eee20557c2a54d69f2327f4cf157630e442da5ec9bfc39062bb86be547db86859ea88978a3c1b',
-      },
-    ];
+  //   const semiValidHookInputData = [
+  //     {
+  //       hookAddress: securityHookAddress,
+  //       inputData:
+  //         '0x0f66d90c36d1bba494523b6394aaf6e24e53a30e5fa8260268143eee20557c2a54d69f2327f4cf157630e442da5ec9bfc39062bb86be547db86859ea88978a3c1b',
+  //     },
+  //   ];
 
-    return {
-      ...userOp,
-      stateOverride,
-      semiValidHookInputData,
-    };
-  }
+  //   return {
+  //     ...userOp,
+  //     stateOverride,
+  //     semiValidHookInputData,
+  //   };
+  // }
 
   public async getRechargeAmountForUserOp(
     userOp: ElytroUserOperation,
@@ -1347,60 +1342,52 @@ export class SDKService {
     return currentTime >= userData.forceUninstallAfter;
   }
 
-  /**
-   * Verify user signature is valid for hook
-   * Based on demo.ts getUserOpHookSignature function
-   * @param userOp User operation
-   * @param userSignature User signature (without hook)
-   * @param securityHookAddress SecurityHook contract address
-   * @returns Whether user signature is valid
-   */
-  private async _verifyUserSignatureForHook(
-    userOp: ElytroUserOperation,
-    securityHookAddress: Address
-  ): Promise<boolean> {
-    try {
-      const _client = this._getClient();
+  // private async _verifyUserSignatureForHook(
+  //   userOp: ElytroUserOperation,
+  //   securityHookAddress: Address
+  // ): Promise<boolean> {
+  //   try {
+  //     const _client = this._getClient();
 
-      const packedUserOp = UserOpUtils.packUserOp(userOp);
+  //     const packedUserOp = UserOpUtils.packUserOp(userOp);
 
-      const callData = encodeFunctionData({
-        abi: ABI_EntryPoint as Abi,
-        functionName: 'handleOps',
-        args: [[packedUserOp], '0x1111111111111111111111111111111111111111' as Address],
-      });
+  //     const callData = encodeFunctionData({
+  //       abi: ABI_EntryPoint as Abi,
+  //       functionName: 'handleOps',
+  //       args: [[packedUserOp], '0x1111111111111111111111111111111111111111' as Address],
+  //     });
 
-      const stateOverrides = {
-        [securityHookAddress]: {
-          code: '0x00' as Hex,
-        },
-      };
+  //     const stateOverrides = {
+  //       [securityHookAddress]: {
+  //         code: '0x00' as Hex,
+  //       },
+  //     };
 
-      try {
-        const result = await _client.request({
-          method: 'eth_call',
-          params: [
-            {
-              to: this._config.entryPoint as Address,
-              data: callData,
-            },
-            'latest',
-            stateOverrides,
-          ],
-        });
+  //     try {
+  //       const result = await _client.request({
+  //         method: 'eth_call',
+  //         params: [
+  //           {
+  //             to: this._config.entryPoint as Address,
+  //             data: callData,
+  //           },
+  //           'latest',
+  //           stateOverrides,
+  //         ],
+  //       });
 
-        // If call succeeds (returns 0x), user signature is valid
-        return result === '0x' || result === null;
-      } catch (error) {
-        // If call fails, user signature is invalid
-        console.error('Elytro: User signature validation failed for hook', error);
-        return false;
-      }
-    } catch (error) {
-      console.error('Elytro: Failed to verify user signature for hook', error);
-      return false;
-    }
-  }
+  //       // If call succeeds (returns 0x), user signature is valid
+  //       return result === '0x' || result === null;
+  //     } catch (error) {
+  //       // If call fails, user signature is invalid
+  //       console.error('Elytro: User signature validation failed for hook', error);
+  //       return false;
+  //     }
+  //   } catch (error) {
+  //     console.error('Elytro: Failed to verify user signature for hook', error);
+  //     return false;
+  //   }
+  // }
 }
 
 export const elytroSDK = new SDKService();
