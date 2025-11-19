@@ -114,7 +114,7 @@ export default function Dashboard() {
   };
 
   return (
-    <PageLayout className="w-full h-screen bg-gray-150">
+    <PageLayout className="w-full h-screen bg-fade-green">
       <PageLayout.Header className="p-2">
         <Spin isLoading={loading} />
         <BasicAccountInfo />
@@ -125,7 +125,7 @@ export default function Dashboard() {
             <DashboardTabs loading={loading} onReload={handleReload} />
           </div>
 
-          <div className="absolute bottom-0 rounded-md left-0 right-0 flex justify-center pt-2 bg-white flex-col">
+          <div className="absolute bottom-0 rounded-md left-0 right-0 flex justify-center pt-2 flex-col">
             <div
               className="m-auto mb-2 flex flex-row items-center group cursor-pointer text-gray-450 hover:text-gray-600"
               onClick={() => {

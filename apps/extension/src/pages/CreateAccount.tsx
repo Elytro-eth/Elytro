@@ -56,9 +56,9 @@ const CreateAccount: React.FC = () => {
         <div className="flex flex-col items-center gap-y-2xs">
           <img src={DoorImg} alt="Passcode" width={144} />
 
-          <h1 className="elytro-text-title text-center mt-2">Your wallet is created</h1>
+          <h1 className="elytro-text-title text-center mt-6">Your wallet is created</h1>
 
-          {isLoading ? <Spin isLoading /> : <CurrentAddress className="mt-2" />}
+          {isLoading ? <Spin isLoading /> : <CurrentAddress className="mt-6" />}
         </div>
 
         <Button

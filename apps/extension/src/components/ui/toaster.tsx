@@ -17,13 +17,13 @@ export function Toaster() {
       {toasts.map(function ({ id, title, description, action, variant, ...props }) {
         const icon = variant ? IconsMap[variant] : null;
         return (
-          <Toast key={id} variant={variant} {...props} className="flex">
+          <Toast key={id} variant={variant} {...props}>
             {icon && (
-              <div className="w-5">
+              <div className="w-5 flex-shrink-0">
                 <img src={icon} className="w-5 h-5" />
               </div>
             )}
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && <ToastDescription>{description}</ToastDescription>}
             </div>

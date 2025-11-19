@@ -14,7 +14,7 @@ const ToastViewport = React.forwardRef<
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      'fixed top-0 z-[1000] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]',
+      'fixed bottom-2 left-1/2 -translate-x-1/2 z-[1000] flex max-h-screen w-auto flex-col-reverse p-4',
       className
     )}
     {...props}
@@ -23,14 +23,13 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 
 const toastVariants = cva(
-  'group pointer-events-auto relative flex w-full items-center justify-between space-x-2 overflow-hidden rounded-md py-3 px-4 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-10 data-[state=closed]:slide-out-to-top-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full',
+  'group pointer-events-auto relative flex w-auto max-w-full items-center justify-between space-x-2 overflow-hidden rounded-md py-3 px-4 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-10 data-[state=closed]:slide-out-to-bottom-full data-[state=open]:slide-in-from-bottom-full data-[state=open]:sm:slide-in-from-bottom-full',
   {
     variants: {
       variant: {
-        default: 'bg-dark-blue',
-        constructive: 'bg-dark-blue',
-        destructive:
-          'destructive group border-destructive bg-destructive text-destructive-foreground',
+        default: 'bg-green',
+        constructive: 'bg-green',
+        destructive: 'destructive group border-destructive bg-destructive text-destructive-foreground',
       },
     },
     defaultVariants: {
@@ -41,16 +40,10 @@ const toastVariants = cva(
 
 const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
-    VariantProps<typeof toastVariants>
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> & VariantProps<typeof toastVariants>
 >(({ className, variant, ...props }, ref) => {
   return (
-    <ToastPrimitives.Root
-      ref={ref}
-      className={cn(toastVariants({ variant }), className)}
-      duration={1500}
-      {...props}
-    />
+    <ToastPrimitives.Root ref={ref} className={cn(toastVariants({ variant }), className)} duration={1500} {...props} />
   );
 });
 Toast.displayName = ToastPrimitives.Root.displayName;
@@ -83,7 +76,7 @@ const ToastClose = React.forwardRef<
     toast-close=""
     {...props}
   >
-    <X className="stroke-gray-0 h-4 w-4" />
+    {/* <X className="stroke-gray-0 h-4 w-4" /> */} {/* Remove this icon since we moved the toast to the bottom */}
   </ToastPrimitives.Close>
 ));
 ToastClose.displayName = ToastPrimitives.Close.displayName;
@@ -94,10 +87,7 @@ const ToastTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Title
     ref={ref}
-    className={cn(
-      'text-sm font-bold text-light-green group-[.destructive]:text-light-red',
-      className
-    )}
+    className={cn('text-sm font-bold text-light-green group-[.destructive]:text-light-red', className)}
     {...props}
   />
 ));
@@ -109,10 +99,7 @@ const ToastDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Description
     ref={ref}
-    className={cn(
-      'text-sm break-all text-light-green group-[.destructive]:text-light-red',
-      className
-    )}
+    className={cn('text-sm whitespace-nowrap text-white group-[.destructive]:text-light-red', className)}
     {...props}
   />
 ));

@@ -149,13 +149,15 @@
   }
 
   .elytro-gradient-bg {
-    background: linear-gradient(330deg, #f9fbfb 0%, #f7f3f0 44%, #dfecf3 80%);
-    background-blend-mode: overlay;
+    /* background: linear-gradient(330deg, #f9fbfb 0%, #f7f3f0 44%, #dfecf3 80%);
+    background-blend-mode: overlay; */
+    background-color: #EDF1EA;
   }
 
   .elytro-gradient-bg-2 {
-    background: linear-gradient(319deg, #f9fbfb 0%, #f7f3f0 10%, #f7f3f0 60%, #dfecf3 100%);
-    background-blend-mode: overlay;
+    /* background: linear-gradient(319deg, #f9fbfb 0%, #f7f3f0 10%, #f7f3f0 60%, #dfecf3 100%);
+    background-blend-mode: overlay; */
+    background-color: #EDF1EA;
   }
 
   .elytro-horizontal-gradient-bg {

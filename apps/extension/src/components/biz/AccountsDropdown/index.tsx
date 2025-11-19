@@ -1,12 +1,10 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import AccountOption from './AccountOption';
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getIconByChainId } from '@/constants/chains';
 import { formatAddressToShort } from '@/utils/format';
 import { useMemo, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
-import { ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { useWallet } from '@/contexts/wallet';
@@ -130,9 +128,9 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
         align="start"
         alignOffset={-9}
         sideOffset={10}
-        className="w-[330px] max-w-fit bg-white rounded-md shadow-lg py-lg px-0"
+        className="w-[calc(100vw-32px)] bg-white rounded-md shadow-lg pt-sm pb-0 px-0"
       >
-        <div className="flex items-center justify-between  gap-x-3xl px-lg pb-sm">
+        <div className="flex items-center justify-between gap-x-3xl px-lg pb-sm">
           <span className="elytro-text-small-bold text-gray-900">Your wallets</span>
           <Button variant="outline" size="tiny" className="elytro-text-tiny-body" onClick={handleAddAccount}>
             Add new wallet
@@ -150,6 +148,10 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
               showDelete
             />
           ))}
+        </div>
+
+        <div className="flex flex-col gap-y-sm bg-light-purple px-lg py-sm">
+          <span className="elytro-text-tiny-body text-purple">Different network, different address</span>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
