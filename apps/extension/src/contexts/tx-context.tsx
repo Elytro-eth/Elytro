@@ -30,6 +30,8 @@ type TMyDecodeResult = Pick<DecodeResult, 'method' | 'toInfo' | 'to'>;
 type TTxMeta = {
   // Set when confirming private-mode recovery contacts update
   privateRecovery?: boolean;
+  // no hook sign with 2FA
+  noHookSignWith2FA?: boolean;
 };
 
 type ITxContext = {
@@ -162,6 +164,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     meta?: TTxMeta
   ) => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm);
+    console.log('test: meta', meta);
     txMetaRef.current = meta;
     packUserOp(type, { params, decodedDetail });
   };
@@ -283,6 +286,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     txDecodedDetailRef.current = undefined;
     userOpRef.current = null;
     txMetaRef.current = undefined;
+    console.log('test: resetTxContext');
   };
 
   const handleBack = (isCancel = false) => {
@@ -336,8 +340,8 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setIsSending(true);
       const userOp = userOpRef.current!;
-
-      const res = await wallet.sendUserOperation(userOp);
+      console.log('test: onConfirm txMetaRef.current?.noHookSignWith2FA', txMetaRef.current?.noHookSignWith2FA);
+      const res = await wallet.sendUserOperation(userOp, txMetaRef.current?.noHookSignWith2FA);
 
       if ((res as SafeAny)?.code) {
         setHookError(res as THookError);

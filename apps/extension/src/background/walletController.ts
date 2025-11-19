@@ -133,16 +133,18 @@ class WalletController {
     return await elytroSDK.signUserOperation(userOp);
   }
 
-  public async sendUserOperation(userOp: ElytroUserOperation) {
+  public async sendUserOperation(userOp: ElytroUserOperation, noHookSignWith2FA?: boolean) {
     if (!userOp?.paymaster) {
       await elytroSDK.estimateGas(userOp!);
     }
 
-    const hookStatus = await this.getSecurityHookStatus();
+    console.log('test: noHookSignWith2FA', noHookSignWith2FA);
+
+    const hookStatus = noHookSignWith2FA ? null : await this.getSecurityHookStatus();
     let opHash: string;
     let finalUserOp: ElytroUserOperation;
 
-    if (hookStatus.hasPreUserOpValidationHooks) {
+    if (hookStatus && hookStatus.hasPreUserOpValidationHooks) {
       const preSign = await this.signUserOperation(userOp);
       userOp.signature = preSign.signature;
       const hookSignatureRes = await this.securityHookService.getHookSignature(userOp);
@@ -630,16 +632,10 @@ class WalletController {
 
   // Force uninstall SecurityHook: Step 1
   public async generatePreForceUninstallSecurityHookTxs() {
-    const { securityHookAddress, currentAddress, isInstalled } = await this.getSecurityHookStatus();
+    const { securityHookAddress, isInstalled } = await this.getSecurityHookStatus();
 
     if (!isInstalled) {
       throw new Error('SecurityHook is not installed');
-    }
-
-    const canForceUninstall = await elytroSDK.canForceUninstallSecurityHook(securityHookAddress, currentAddress);
-
-    if (!canForceUninstall) {
-      throw new Error('Cannot force uninstall yet. Please wait for the safety delay period.');
     }
 
     const step1Tx = getForcePreUninstallSecurityHookTx(securityHookAddress);
@@ -655,6 +651,12 @@ class WalletController {
       throw new Error('SecurityHook is not installed');
     }
 
+    const canForceUninstall = await elytroSDK.canForceUninstallSecurityHook(securityHookAddress, currentAddress);
+
+    if (!canForceUninstall) {
+      throw new Error('Cannot force uninstall yet. Please wait for the safety delay period.');
+    }
+
     const step2Tx = getUninstallSecurityHookTx(currentAddress, securityHookAddress);
 
     return [step2Tx];
@@ -667,7 +669,8 @@ class WalletController {
       throw new Error('SecurityHook is not installed');
     }
 
-    return await elytroSDK.canForceUninstallSecurityHook(securityHookAddress, currentAddress);
+    const userData = await elytroSDK.canForceUninstallSecurityHook(securityHookAddress, currentAddress);
+    return userData.canForceUninstall;
   }
 
   public async updateRecoveryStatus(): Promise<boolean> {
@@ -977,7 +980,7 @@ class WalletController {
   /**
    * Change wallet email
    */
-  public async changeWalletEmail(email: string): Promise<TSecurityProfile> {
+  public async changeWalletEmail(email: string) {
     return await this.securityHookService.changeWalletEmail(email);
   }
 }

@@ -3,7 +3,7 @@ import { useAccount } from './account-context';
 import { useWallet } from './wallet';
 import { toast } from '@/hooks/use-toast';
 import { formatErrorMsg } from '@/utils/format';
-import type { TSecurityProfile } from '@/background/services/securityHook';
+import type { TRequestEmailBindingResult, TSecurityProfile } from '@/background/services/securityHook';
 import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 
@@ -34,7 +34,7 @@ type ISecurityHookContext = {
     otpExpiresAt: string;
     resendAvailableAt: string;
   }>;
-  changeWalletEmail: (email: string) => Promise<TSecurityProfile>;
+  changeWalletEmail: (email: string) => Promise<TRequestEmailBindingResult>;
   confirmEmailBinding: (bindingId: string, otpCode: string) => Promise<TSecurityProfile>;
   loadSecurityProfile: () => Promise<void>;
   setDailyLimit: (dailyLimitUsdCents: number) => Promise<void>;
@@ -247,10 +247,11 @@ export const SecurityHookProvider = ({ children }: { children: React.ReactNode }
 
       try {
         const result = await wallet.changeWalletEmail(email);
-        if (result) {
-          setSecurityProfile(result);
+        if (result?.bindingId) {
+          setBindingId(result.bindingId);
+          return result;
         }
-        return result;
+        throw new Error('Failed to change wallet email');
       } catch (error) {
         console.error('Elytro: Change wallet email failed', error);
         toast({

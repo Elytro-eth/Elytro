@@ -15,7 +15,7 @@ export const CAPABILITY_FLAGS = {
 export const DEFAULT_SECURITY_HOOK_CAPABILITY = CAPABILITY_FLAGS.USER_OP_ONLY;
 
 export const DEFAULT_SECURITY_HOOK_CONFIG = {
-  safetyDelay: 7 * 24 * 60 * 60, //default safety delay: 7 days
+  safetyDelay: 2, //7 * 24 * 60 * 60, //default safety delay: 7 days
   capabilityFlags: CAPABILITY_FLAGS.USER_OP_ONLY, //default capability flags: only user operation needs to go through hook
 } as const;
 

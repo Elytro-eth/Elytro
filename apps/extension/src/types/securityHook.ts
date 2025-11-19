@@ -8,14 +8,18 @@ export type THookStatus = {
   hasPreUserOpValidationHooks: boolean;
   isInstalled: boolean;
   securityHookAddress: Address;
+  isStartPreForceUninstall: boolean;
+  canForceUninstall: boolean;
+  forceUninstallAfter: number;
 };
 
 /**
  * SecurityHook 用户数据
  */
 export type TSecurityHookUserData = {
-  forceUninstallAfter: bigint; // 强制卸载时间戳（0 表示不可卸载）
-  // 其他字段根据实际合约定义
+  isInstalled: boolean;
+  safetyDelay: number;
+  forceUninstallAfter: number; // 强制卸载时间戳（0 表示不可卸载）
 };
 
 export type THookError = {

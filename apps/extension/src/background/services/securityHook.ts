@@ -22,6 +22,13 @@ export type TSecurityProfile = {
   updatedAt?: string;
 };
 
+export type TRequestEmailBindingResult = {
+  bindingId: string;
+  maskedEmail: string;
+  otpExpiresAt: string;
+  resendAvailableAt: string;
+};
+
 type SignMessageFn = (message: Hex, saAddress: Address) => Promise<string>;
 type GetCurrentAccountFn = () => { address: string; chainId: number } | null;
 type GetEntryPointFn = () => string | null;
@@ -286,15 +293,7 @@ class SecurityHookService {
   /**
    * Request email binding
    */
-  public async requestEmailBinding(
-    email: string,
-    locale = 'en-US'
-  ): Promise<{
-    bindingId: string;
-    maskedEmail: string;
-    otpExpiresAt: string;
-    resendAvailableAt: string;
-  }> {
+  public async requestEmailBinding(email: string, locale = 'en-US'): Promise<TRequestEmailBindingResult> {
     const currentAccount = this.getCurrentAccount();
     if (!currentAccount?.address || !currentAccount?.chainId) {
       throw new Error('No current account');
@@ -302,12 +301,7 @@ class SecurityHookService {
 
     const sessionId = await this.getAuthSession();
     const result = await mutate<{
-      requestWalletEmailBinding: {
-        bindingId: string;
-        maskedEmail: string;
-        otpExpiresAt: string;
-        resendAvailableAt: string;
-      };
+      requestWalletEmailBinding: TRequestEmailBindingResult;
     }>(mutate_request_wallet_email_binding, {
       input: {
         authSessionId: sessionId,
@@ -592,7 +586,7 @@ class SecurityHookService {
   /**
    * Change wallet email
    */
-  public async changeWalletEmail(email: string): Promise<TSecurityProfile> {
+  public async changeWalletEmail(email: string, locale = 'en-US'): Promise<TRequestEmailBindingResult> {
     const currentAccount = this.getCurrentAccount();
     if (!currentAccount?.address || !currentAccount?.chainId) {
       throw new Error('No current account');
@@ -600,19 +594,20 @@ class SecurityHookService {
 
     const sessionId = await this.getAuthSession();
     const result = await mutate<{
-      changeWalletEmail: TSecurityProfile;
+      requestChangeWalletEmail: TRequestEmailBindingResult;
     }>(mutate_change_email, {
       input: {
         authSessionId: sessionId,
         email,
+        locale,
       },
     });
 
-    if (!result.changeWalletEmail) {
+    if (!result.requestChangeWalletEmail) {
       throw new Error('Failed to change wallet email');
     }
 
-    return result.changeWalletEmail;
+    return result.requestChangeWalletEmail;
   }
 }
 

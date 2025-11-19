@@ -21,6 +21,8 @@ import HelperText from '@/components/ui/HelperText';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import SettingItem from '@/components/ui/SettingItem';
+import ConfirmPreForceUninstallModal from './ConfirmPreForceUninstallModal';
+import ForceInstallInnerPage from './ForceInstallPage';
 
 function SecurityHookSettingsInnerPage() {
   const {
@@ -267,13 +269,13 @@ function SecurityHookSettingsInnerPage() {
     }
     try {
       const result = await changeWalletEmail(email);
-      if (result) {
+      if (result?.bindingId) {
+        setShowOtpInput(true);
         toast({
-          title: 'Email updated',
-          description: `Your email has been successfully updated to ${email}`,
+          title: 'OTP sent',
+          description: `Verification code sent to ${result.maskedEmail || email}`,
         });
       }
-      setIsEditingEmail(false);
     } catch (error) {
       toast({
         title: 'Failed to change wallet email',
@@ -343,6 +345,10 @@ function SecurityHookSettingsInnerPage() {
         </div>
       </SecondaryPageWrapper>
     );
+  }
+
+  if (hookStatus?.isStartPreForceUninstall) {
+    return <ForceInstallInnerPage status={hookStatus} />;
   }
 
   return (
@@ -578,6 +584,8 @@ function SecurityHookSettingsInnerPage() {
             )}
           </>
         )}
+
+        <ConfirmPreForceUninstallModal />
       </div>
     </SecondaryPageWrapper>
   );

@@ -36,7 +36,7 @@ import {
 } from 'viem';
 import { createAccount } from '@/utils/ethRpc/create-account';
 import { ethErrors } from 'eth-rpc-errors';
-import { ABI_Elytro, ABI_SocialRecoveryModule } from '@elytro/abi';
+import { ABI_Elytro, ABI_SocialRecoveryModule, ABI_SecurityHook } from '@elytro/abi';
 import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
 import { ABI_ERC20_BALANCE_OF, ABI_RECOVERY_INFO_RECORDER } from '@/constants/abi';
@@ -1236,6 +1236,9 @@ export class SDKService {
         hasPreUserOpValidationHooks: false,
         isInstalled: false,
         securityHookAddress,
+        isStartPreForceUninstall: false,
+        canForceUninstall: false,
+        forceUninstallAfter: 0,
       };
     }
 
@@ -1274,11 +1277,18 @@ export class SDKService {
         (hook) => (hook as string).toLowerCase() === securityHookAddressLower
       );
 
+      const userData = await this.canForceUninstallSecurityHook(
+        securityHookAddress as Address,
+        walletAddress as Address
+      );
       return {
         hasPreIsValidSignatureHooks,
         hasPreUserOpValidationHooks,
         isInstalled: hasPreIsValidSignatureHooks || hasPreUserOpValidationHooks,
         securityHookAddress,
+        isStartPreForceUninstall: userData?.isStartPreForceUninstall || false,
+        canForceUninstall: userData?.canForceUninstall || false,
+        forceUninstallAfter: userData?.forceUninstallAfter ?? 0,
       };
     } catch (_error) {
       return {
@@ -1286,6 +1296,9 @@ export class SDKService {
         hasPreUserOpValidationHooks: false,
         isInstalled: false,
         securityHookAddress,
+        isStartPreForceUninstall: false,
+        canForceUninstall: false,
+        forceUninstallAfter: 0,
       };
     }
   }
@@ -1305,13 +1318,17 @@ export class SDKService {
     try {
       const userData = await _client.readContract({
         address: securityHookAddress,
-        abi: parseAbi(['function userData(address) external view returns (uint64 forceUninstallAfter)']),
+        abi: ABI_SecurityHook,
         functionName: 'userData',
         args: [walletAddress],
       });
 
+      // [false, 0, 0n]
+      const [isInstalled, safetyDelay, forceUninstallAfter] = userData as [boolean, number, bigint];
       return {
-        forceUninstallAfter: userData as bigint,
+        isInstalled,
+        safetyDelay,
+        forceUninstallAfter: Number(forceUninstallAfter),
       };
     } catch (error) {
       console.error('Elytro: Failed to get SecurityHook user data.', error);
@@ -1325,21 +1342,39 @@ export class SDKService {
    * @param walletAddress Wallet address
    * @returns Whether force uninstall can be executed
    */
-  public async canForceUninstallSecurityHook(securityHookAddress: Address, walletAddress: Address): Promise<boolean> {
+  public async canForceUninstallSecurityHook(
+    securityHookAddress: Address,
+    walletAddress: Address
+  ): Promise<TSecurityHookUserData & { isStartPreForceUninstall: boolean; canForceUninstall: boolean }> {
     const userData = await this.getSecurityHookUserData(securityHookAddress, walletAddress);
+    console.log('test: userData', userData);
 
-    if (!userData) {
-      return false;
+    if (!userData || !userData.isInstalled || userData.forceUninstallAfter === 0) {
+      return {
+        isInstalled: false,
+        safetyDelay: 0,
+        forceUninstallAfter: 0,
+        isStartPreForceUninstall: false,
+        canForceUninstall: false,
+      };
     }
+    const forceUninstallAfter = Number(userData?.forceUninstallAfter ?? 0n);
 
-    // forceUninstallAfter being 0 means cannot uninstall
-    if (userData.forceUninstallAfter === 0n) {
-      return false;
-    }
+    // 用户本机的时间和区块链中的时间不一定一致，也就是 Math.floor(Date.now() / 1000) 这个获取当前时间的当时可能会出问题，在生产环境中需要获取最新的区块高度中记录的时间作为 currentTimestamp 变量
+    const currentTimestamp = await this.getCurrentTimestamp();
+    return {
+      ...userData,
+      forceUninstallAfter: Number(forceUninstallAfter),
+      isStartPreForceUninstall: true,
+      canForceUninstall: currentTimestamp >= forceUninstallAfter,
+    };
+  }
 
-    // Check if current time has exceeded forceUninstallAfter
-    const currentTime = BigInt(Math.floor(Date.now() / 1000));
-    return currentTime >= userData.forceUninstallAfter;
+  public async getCurrentTimestamp() {
+    const _client = this._getClient();
+    const latestBlock = await _client.getBlock({ blockTag: 'latest' });
+    console.log('test: latestBlock', latestBlock);
+    return latestBlock.timestamp;
   }
 
   // private async _verifyUserSignatureForHook(

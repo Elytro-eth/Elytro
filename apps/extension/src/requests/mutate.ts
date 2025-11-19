@@ -176,13 +176,12 @@ export const mutate_get_hook_signature = gql`
 
 // Security Hook - Change Wallet Email
 export const mutate_change_email = gql`
-  mutation ChangeWalletEmail($input: ChangeWalletEmailInput!) {
-    changeWalletEmail(input: $input) {
-      email
-      emailVerified
+  mutation RequestChangeWalletEmail($input: ChangeWalletEmailInput!) {
+    requestChangeWalletEmail(input: $input) {
+      bindingId
       maskedEmail
-      dailyLimitUsdCents
-      updatedAt
+      otpExpiresAt
+      resendAvailableAt
     }
   }
 `;
