@@ -16,11 +16,11 @@ const STEPS = [
   },
   {
     title: 'There’s no seed phrase to remember',
-    img: WalletImg,
+    img: PasscodeImg,
   },
   {
-    title: 'Built entirely on Ethereum mainnet',
-    img: PasscodeImg,
+    title: 'Different network, different address',
+    img: WalletImg,
   },
   {
     title: 'You wallet is recoverable',
@@ -42,13 +42,13 @@ const Education = () => {
   return (
     <FullPageWrapper className="h-full flex flex-col items-center justify-center">
       <div>
-        <img src={STEPS[currentStep].img} alt={STEPS[currentStep].title} className="size-[220px] mb-10" />
+        <img src={STEPS[currentStep].img} alt={STEPS[currentStep].title} className="size-[200px] mb-10" />
 
         {STEPS[currentStep].noDescription ? null : (
-          <div className="w-full text-center text-[#95979C] text-sm font-normal">A new kind of wallet</div>
+          <div className="w-full text-center text-gray-600 text-sm font-normal">A new kind of wallet</div>
         )}
       </div>
-      <h1 className="font-medium text-3xl text-center mt-md">{STEPS[currentStep].title}</h1>
+      <h1 className="font-bold text-3xl text-center mt-md">{STEPS[currentStep].title}</h1>
       <Button className="w-full mt-9 text-lg font-medium" onClick={handleNext}>
         {currentStep < STEPS.length - 1 ? 'Next' : 'Create wallet'}
       </Button>

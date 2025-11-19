@@ -46,8 +46,8 @@ export default function Receive() {
           <div className="flex flex-row items-center gap-2  ">
             <img src={chainIcon} alt={chainName} className="size-8 rounded-full border border-gray-50" />
             <div className="flex flex-col">
-              <div className="elytro-text-bold-body">{chainName}</div>
-              <div className="elytro-text-tiny-body text-gray-600">This wallet only accepts {chainName} tokens.</div>
+              <div className="elytro-text-bold-body">Only accept tokens on {chainName}</div>
+              <div className="elytro-text-tiny-body text-gray-600">Copy and send tokens to below address.</div>
             </div>
           </div>
 
@@ -61,7 +61,7 @@ export default function Receive() {
 
         <div className="flex flex-row items-center gap-2 w-full text-left">
           <CircleAlert className="elytro-icon stroke-gray-600 size-3" />
-          <div className="elytro-text-tiny-body text-gray-600">Copy and share this address to receive tokens.</div>
+          <div className="elytro-text-tiny-body text-gray-600">Tokens sent to other networks will be lost.</div>
         </div>
 
         {/* Copy Address */}
