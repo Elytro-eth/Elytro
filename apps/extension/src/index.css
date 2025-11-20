@@ -113,7 +113,7 @@
   }
 
   .elytro-text-body {
-    @apply text-[1.125rem] font-normal leading-[125%] text-black-blue;
+    @apply text-[1rem] font-normal leading-[125%] text-black-blue;
   }
 
   .elytro-text-bold-body {

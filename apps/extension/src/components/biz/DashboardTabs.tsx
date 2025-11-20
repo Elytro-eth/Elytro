@@ -35,14 +35,14 @@ const TabsConfig = [
     component: <Assets />,
   },
   {
-    key: TABS_KEYS.APPS,
-    label: 'Apps',
-    component: <Apps />,
-  },
-  {
     key: TABS_KEYS.ACTIVITIES,
     label: 'Activity',
     component: <Activities />,
+  },
+  {
+    key: TABS_KEYS.APPS,
+    label: 'Apps',
+    component: <Apps />,
   },
   {
     key: TABS_KEYS.ADD_ONS,

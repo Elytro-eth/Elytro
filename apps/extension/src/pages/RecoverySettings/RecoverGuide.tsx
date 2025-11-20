@@ -45,14 +45,14 @@ export default function RecoverGuide({ onClick }: RecoverGuideProps) {
         <img
           src={STEPS[currentStep].image}
           alt={STEPS[currentStep].title}
-          className={cn('mb-10 mx-auto', currentStep === 0 ? 'size-[180px]' : 'w-[60%]')}
+          className={cn('mb-10 mx-auto', currentStep === 0 ? 'size-[180px]' : 'w-[90%]')}
         />
 
         {currentStep === 0 ? null : (
           <div className="w-full text-center text-[#95979C] text-sm font-normal">How Recovery works</div>
         )}
       </div>
-      <h1 className="font-medium text-3xl text-center mt-md">{STEPS[currentStep].title}</h1>
+      <h1 className="font-bold text-3xl text-center mt-md">{STEPS[currentStep].title}</h1>
       <Button className="w-full mt-9 text-lg font-medium" onClick={handleNext}>
         Next
       </Button>

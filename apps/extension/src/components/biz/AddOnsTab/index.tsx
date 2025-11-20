@@ -33,10 +33,18 @@ const Item = ({ name, logo, url }: { name: string; logo: string; url: string }) 
 
 export default function AddOnsTab() {
   return (
-    <div className="grid grid-cols-3 gap-x-2 gap-y-2 px-lg">
-      {AddOns.map((addOn) => (
-        <Item key={addOn.name} {...addOn} />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-3 gap-x-2 gap-y-2 px-lg">
+        {AddOns.map((addOn) => (
+          <Item key={addOn.name} {...addOn} />
+        ))}
+      </div>
+
+      <div className="elytro-text-tiny-body mt-2xl text-center text-gray-450">
+        <a href="https://t.me/+l9coqJq9QHgyYjI1" target="_blank" rel="noopener noreferrer">
+          Interested in developing new Add-ons?
+        </a>
+      </div>
+    </>
   );
 }

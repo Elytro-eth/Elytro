@@ -65,7 +65,7 @@ export default function SetupTab() {
       icon: ContactsIcon,
       description: 'Set up trusted wallets or friends to help you recover this wallet.',
       action: () => {
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.SecureWallet);
+        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RecoverySetting);
       },
       done: currentAccount.isRecoveryEnabled,
     },
