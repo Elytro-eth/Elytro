@@ -29,8 +29,8 @@ const SIZE_MAP = {
     text: 'elytro-text-bold-body',
   },
   lg: {
-    icon: 'size-8 rounded-full',
-    text: 'elytro-text-bold-body',
+    icon: 'size-6 rounded-full',
+    text: 'text-lg font-bold',
   },
 };
 
@@ -54,10 +54,10 @@ export default function FragmentedAddress({
   const chain = SUPPORTED_CHAINS.find((chain) => chain.id === chainId);
 
   return (
-    <div className={cn('flex items-center gap-sm', className)}>
+    <div className={cn('flex items-center gap-xs', className)}>
       {showChainIcon && chain && <img src={chain.icon} alt={chain.name} className={icon} />}
       <div className={cn('flex', extraLayout === 'row' ? 'flex-row items-center' : 'flex-col')}>
-        <div className={cn('flex items-center gap-sm', text)}>
+        <div className={cn('flex items-center gap-0.5', text)}>
           <span className={size === 'xs' ? 'text-gray-600' : undefined}>{prefix}</span>
           <Tooltip delayDuration={0}>
             <TooltipTrigger>

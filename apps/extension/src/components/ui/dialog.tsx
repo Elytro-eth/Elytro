@@ -37,10 +37,13 @@ const DialogContent = React.forwardRef<
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
+      style={{
+        animationTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+      }}
       className={cn(
-        'fixed z-50 grid w-full rounded-md gap-2 bg-background p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0  data-[state=closed]:slide-out-to-bottom-0  data-[state=open]:slide-in-from-bottom-0',
+        'fixed z-50 grid w-full rounded-md gap-2 bg-background p-4 shadow-lg duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-4 data-[state=open]:slide-in-from-top-full',
         // Elytro Customized Style. PLEASE DO NOT CHANGE IT
-        'bg-white w-[calc(100%-2rem)] top-1/4 left-4 right-4 max-h-[calc(100%-2rem)]',
+        'bg-white w-[calc(100%-2rem)] top-4 left-4 right-4 max-h-[calc(100%-2rem)]',
         className
       )}
       {...props}
