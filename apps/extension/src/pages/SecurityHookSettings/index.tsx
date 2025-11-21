@@ -327,7 +327,7 @@ function SecurityHookSettingsInnerPage() {
 
   if (checking) {
     return (
-      <SecondaryPageWrapper title="Security with 2FA">
+      <SecondaryPageWrapper title="Sign with 2FA">
         <ProcessingTip body="Checking 2FA status..." />
       </SecondaryPageWrapper>
     );
@@ -335,7 +335,7 @@ function SecurityHookSettingsInnerPage() {
 
   if (hookStatus && !hookStatus.securityHookAddress) {
     return (
-      <SecondaryPageWrapper title="Security with 2FA">
+      <SecondaryPageWrapper title="Sign with 2FA">
         <div className="flex flex-col gap-y-md items-center justify-center p-6">
           <AlertCircle className="size-12 text-gray-400 mb-4" />
           <h2 className="text-lg font-semibold text-foreground mb-2">Not Supported</h2>
@@ -353,7 +353,7 @@ function SecurityHookSettingsInnerPage() {
 
   return (
     <SecondaryPageWrapper
-      title="Security with 2FA"
+      title="Sign with 2FA"
       onBack={() => {
         if (showSpendingLimitsConfig) {
           setShowSpendingLimitsConfig(false);
@@ -365,7 +365,7 @@ function SecurityHookSettingsInnerPage() {
       <div className="flex flex-col gap-y-md">
         {/* Your wallet section */}
         <div className="flex flex-row justify-between items-center gap-y-md">
-          <div className="text-[16px] font-semibold">Your wallet</div>
+          <div className="elytro-text-bold-body text-gray-600">Your wallet</div>
           <CurrentAddress className="bg-gray-150 rounded-2xs" />
         </div>
 
@@ -373,7 +373,7 @@ function SecurityHookSettingsInnerPage() {
 
         {showSpendingLimitsConfig ? (
           <>
-            <div className="text-[16px] font-semibold">Daily spending limit</div>
+            <div className="elytro-text-bold-body text-gray-600">Daily spending limit</div>
 
             <Input
               placeholder="Enter daily spending limit (USD)"
@@ -401,7 +401,7 @@ function SecurityHookSettingsInnerPage() {
           </>
         ) : (
           <>
-            <div className="text-[16px] font-semibold">Linked Email</div>
+            <div className="elytro-text-bold-body text-gray-600">Linked Email</div>
 
             {securityProfile?.emailVerified && !isEditingEmail ? (
               <div className="flex flex-col gap-y-2">
@@ -565,7 +565,7 @@ function SecurityHookSettingsInnerPage() {
 
             {hookStatus?.isInstalled && securityProfile?.emailVerified && (
               <>
-                <div className="text-[16px] font-semibold">Security settings</div>
+                <div className="elytro-text-bold-body text-gray-600">Security settings</div>
                 <div>
                   <SettingItem
                     icon={PauseOctagon}

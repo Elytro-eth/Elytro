@@ -98,7 +98,7 @@ export default function ContactList({
           <ShortedAddress address={currentAccount.address} chainId={currentAccount.chainId} />
         </div>
 
-        <HelperText description="Save your address somewhere in case of recovery." />
+        <HelperText description="Take a note of your address in case of recovery." />
 
         {contacts?.length ? (
           <div className="flex flex-col gap-y-sm">

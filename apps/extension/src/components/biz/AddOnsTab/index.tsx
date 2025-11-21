@@ -8,7 +8,7 @@ const AddOns = [
     url: '/recovery-setting' as SidePanelRoutePath,
   },
   {
-    name: 'Security with 2FA',
+    name: 'Sign with 2FA',
     logo: LogoIcon,
     url: '/settings/security-hook' as SidePanelRoutePath,
   },

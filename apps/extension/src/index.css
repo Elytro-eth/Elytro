@@ -109,7 +109,7 @@
   }
 
   .elytro-text-subtitle {
-    @apply text-[1.75rem] font-bold leading-[105%] text-black-blue;
+    @apply text-[1.5rem] font-bold leading-[105%] text-black-blue;
   }
 
   .elytro-text-body {
@@ -121,7 +121,7 @@
   }
 
   .elytro-text-small {
-    @apply text-[1rem] font-normal leading-[130%] text-black-blue;
+    @apply text-[.875rem] font-normal leading-[130%] text-black-blue;
   }
 
   .elytro-text-small-bold {
@@ -129,7 +129,7 @@
   }
 
   .elytro-text-smaller-body {
-    @apply text-[0.875rem] font-normal leading-[135%] text-black-blue;
+    @apply text-[0.75rem] font-normal leading-[135%] text-black-blue;
   }
 
   .elytro-text-smaller-bold-body {
@@ -188,4 +188,31 @@ input {
 * {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+
+/* Page fade transitions */
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pageFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.page-fade-in {
+  animation: pageFadeIn 0.15s ease-in-out forwards;
+}
+
+.page-fade-out {
+  animation: pageFadeOut 0.15s ease-in-out forwards;
 }

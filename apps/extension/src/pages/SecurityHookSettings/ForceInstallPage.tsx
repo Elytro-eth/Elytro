@@ -40,7 +40,7 @@ export default function ForceInstallInnerPage({ status }: ForceInstallInnerPageP
   };
 
   return (
-    <SecondaryPageWrapper title="Security with 2FA">
+    <SecondaryPageWrapper title="Sign with 2FA">
       <div className="flex flex-col gap-y-md items-center justify-center p-6">
         <img src={WalletImg} alt="Wallet" className="size-[9rem] mt-[20%] mx-auto" />
         <div className="text-center flex flex-col gap-y-2xs mb-10">

@@ -38,7 +38,7 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       style={{
-        animationTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+        animationTimingFunction: 'cubic-bezier(0.34, 0.09, 0.55, 1)',
       }}
       className={cn(
         'fixed z-50 grid w-full rounded-md gap-2 bg-background p-4 shadow-lg duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-4 data-[state=open]:slide-in-from-top-full',

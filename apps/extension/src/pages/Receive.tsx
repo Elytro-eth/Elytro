@@ -11,6 +11,27 @@ import { safeClipboard } from '@/utils/clipboard';
 import { formatAddress } from '@/utils/format';
 import { Checkbox } from '@/components/ui/checkbox';
 
+/**
+ * "Don't remind me again" feature:
+ *
+ * This feature allows users to skip the network warning dialog after they've acknowledged it once.
+ *
+ * How it works:
+ * 1. User clicks the Copy button -> dialog shows with a checkbox "Don't remind me again"
+ * 2. If checkbox is UNCHECKED and user clicks "I understand":
+ *    - Address is copied
+ *    - Dialog closes
+ *    - Next time they click Copy, dialog shows again
+ *
+ * 3. If checkbox is CHECKED and user clicks "I understand":
+ *    - Address is copied
+ *    - Preference is saved to localStorage with key 'elytro-receive-dont-remind'
+ *    - skipDialog state is set to true
+ *    - Next time they click Copy, address is copied directly without showing dialog
+ *
+ * 4. The preference persists across browser sessions via localStorage
+ * 5. User can clear localStorage manually to reset this preference
+ */
 const STORAGE_KEY = 'elytro-receive-dont-remind';
 
 export default function Receive() {
@@ -20,10 +41,10 @@ export default function Receive() {
 
   const [showDialog, setShowDialog] = useState(false);
   const [triggerCopy, setTriggerCopy] = useState(0);
-  const [dontRemindAgain, setDontRemindAgain] = useState(false);
-  const [skipDialog, setSkipDialog] = useState(false);
+  const [dontRemindAgain, setDontRemindAgain] = useState(false); // Tracks checkbox state in dialog
+  const [skipDialog, setSkipDialog] = useState(false); // When true, skip dialog and copy directly
 
-  // Load the preference on mount
+  // On component mount, check if user previously selected "Don't remind me again"
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'true') {
@@ -35,24 +56,29 @@ export default function Receive() {
     window.history.back();
   };
 
+  // Called when user clicks the Copy button in the green address box
   const handleCopyClick = useCallback(() => {
     if (skipDialog) {
-      // Skip dialog and copy directly
+      // User has previously checked "Don't remind me again" - copy directly
       safeClipboard(formatAddress(address, chainId), false);
       setTriggerCopy((prev) => prev + 1);
     } else {
+      // Show the warning dialog first
       setShowDialog(true);
     }
   }, [skipDialog, address, chainId]);
 
+  // Called when user clicks "I understand" in the dialog
   const handleUnderstand = useCallback(() => {
     if (dontRemindAgain) {
+      // Save preference to localStorage and update state to skip dialog in future
       localStorage.setItem(STORAGE_KEY, 'true');
       setSkipDialog(true);
     }
+    // Copy the address to clipboard
     safeClipboard(formatAddress(address, chainId), false);
     setShowDialog(false);
-    setTriggerCopy((prev) => prev + 1); // Trigger the "Copied" state
+    setTriggerCopy((prev) => prev + 1); // Trigger the "Copied" state in the button
   }, [address, chainId, dontRemindAgain]);
 
   if (!address) {
