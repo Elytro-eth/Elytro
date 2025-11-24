@@ -38,7 +38,8 @@ export default function ConfirmPreForceUninstallModal() {
           <img src={EnvelopeIcon} alt="envelope" className="size-24" />
           <div className="text-lg font-bold">Reset Sign with 2FA</div>
           <div className="text-sm text-gray-500">
-            You’ve lost access to your verification email. For security, resetting 2FA takes 3 days.
+            You’ve lost access to your verification email. <br />
+            For security, resetting 2FA takes 3 days.
           </div>
         </div>
 
