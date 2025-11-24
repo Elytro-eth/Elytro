@@ -1,9 +1,6 @@
 import Spin from '@/components/ui/Spin';
 import { useAccount } from '@/contexts/account-context';
-import { query, query_has_sponsored } from '@/requests/query';
 import { navigateTo } from '@/utils/navigation';
-import { useEffect, useState } from 'react';
-import { toHex } from 'viem';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import EthereumIcon from '@/assets/ethereum.svg';
 import DoorIcon from '@/assets/door.png';
@@ -12,32 +9,13 @@ import { cn } from '@/utils/shadcn/utils';
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import { Check } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import { useSponsor } from '@/hooks/use-sponsor';
 
 export default function SetupTab() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasSponsored, setHasSponsored] = useState(false);
   const { currentAccount, loading: isAccountLoading } = useAccount();
+  const { canSponsor, isLoading } = useSponsor();
   const { handleTxRequest } = useTx();
   const [_, setHasSetupPassed] = useLocalStorage(`hasSetupPassed_${currentAccount.address}`, false);
-
-  const getLeftSponsoredCount = async () => {
-    setIsLoading(true);
-    try {
-      const res = (await query(query_has_sponsored, {
-        input: { address: currentAccount.address, chainID: toHex(currentAccount.chainId) },
-      })) as SafeAny;
-      setHasSponsored(res.sponsorOpCheck.sponsorCountLeft > 0);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!currentAccount.address || !currentAccount.chainId) return;
-    getLeftSponsoredCount();
-  }, [currentAccount.address, currentAccount.chainId]);
 
   const STEPS = [
     {
@@ -47,13 +25,12 @@ export default function SetupTab() {
       action: () => {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Receive);
       },
-
-      done: hasSponsored || (currentAccount.balance && currentAccount.balance > 1_000_000),
+      done: canSponsor || (currentAccount.balance && currentAccount.balance > 1_000_000),
     },
     {
       title: 'Activate wallet',
       icon: DoorIcon,
-      showTag: hasSponsored,
+      showTag: canSponsor,
       description: 'This unlocks all the wallet features.',
       action: () => {
         handleTxRequest(TxRequestTypeEn.DeployWallet);
@@ -71,7 +48,7 @@ export default function SetupTab() {
     },
   ];
 
-  const realSteps = hasSponsored ? STEPS.slice(1) : STEPS;
+  const realSteps = canSponsor ? STEPS.slice(1) : STEPS;
 
   return (
     <div className="flex flex-col p-4">

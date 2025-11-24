@@ -18,6 +18,7 @@ import { RawData } from '@/components/ui/rawData';
 import { useWallet } from '@/contexts/wallet';
 import { TokenPaymaster } from '@/types/pimlico';
 import { formatAddress } from '@/utils/format';
+import { useSponsor } from '@/hooks/use-sponsor';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -47,8 +48,13 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
     currentAccount: { isDeployed, address },
   } = useAccount();
   const { requestType, calcResult, decodedDetail, onRetry, hasSufficientBalance, useStablecoin, hookError } = useTx();
-  const [gasOption, setGasOption] = useState<string>(useStablecoin || (calcResult?.hasSponsored ? 'sponsor' : 'self'));
+  const { canSponsor } = useSponsor();
+  const [gasOption, setGasOption] = useState<string>('self');
   const [tokenPaymasters, setTokenPaymasters] = useState<TokenPaymaster[]>([]);
+
+  useEffect(() => {
+    setGasOption(useStablecoin || (canSponsor ? 'sponsor' : 'self'));
+  }, [useStablecoin, canSponsor]);
 
   const DetailContent = useMemo(() => {
     switch (requestType) {
