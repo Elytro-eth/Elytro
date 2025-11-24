@@ -43,27 +43,23 @@ export default function ForceInstallInnerPage({ status }: ForceInstallInnerPageP
     <SecondaryPageWrapper title="Sign with 2FA">
       <div className="flex flex-col gap-y-md items-center justify-center p-6">
         <img src={WalletImg} alt="Wallet" className="size-[9rem] mt-[20%] mx-auto" />
-        <div className="text-center flex flex-col gap-y-2xs mb-10">
+        <div className="text-center flex flex-col gap-y-2xs mb-4">
           <h1 className="elytro-text-subtitle mb-2">Reset Sign with 2FA</h1>
-          <p>Resetting Sign with 2FA will take 7 days.</p>
+          <p className="text-gray-600">Resetting Sign with 2FA will take 7 days.</p>
         </div>
 
         {/* Countdown timer */}
         <div className="flex flex-row gap-x-sm">
           <div className="text-title leading-normal text-center ">
-            <div className="text-3xl font-medium bg-gray-150  p-md rounded-sm">{hours.toString().padStart(2, '0')}</div>
+            <div className="text-3xl font-bold bg-gray-150  p-md rounded-sm">{hours.toString().padStart(2, '0')}</div>
             <div className="text-tiny">Hours</div>
           </div>
           <div className="text-title leading-normal text-center ">
-            <div className="text-3xl font-medium bg-gray-150  p-md rounded-sm">
-              {minutes.toString().padStart(2, '0')}
-            </div>
+            <div className="text-3xl font-bold bg-gray-150  p-md rounded-sm">{minutes.toString().padStart(2, '0')}</div>
             <div className="text-tiny">Minutes</div>
           </div>
           <div className="text-title leading-normal text-center ">
-            <div className="text-3xl font-medium bg-gray-150 p-md rounded-sm">
-              {seconds.toString().padStart(2, '0')}
-            </div>
+            <div className="text-3xl font-bold bg-gray-150 p-md rounded-sm">{seconds.toString().padStart(2, '0')}</div>
             <div className="text-tiny">Seconds</div>
           </div>
         </div>

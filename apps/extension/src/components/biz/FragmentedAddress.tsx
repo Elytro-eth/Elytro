@@ -61,7 +61,7 @@ export default function FragmentedAddress({
           <span className={size === 'xs' ? 'text-gray-600' : undefined}>{prefix}</span>
           <Tooltip delayDuration={0}>
             <TooltipTrigger>
-              <span className="px-1 bg-gray-300 rounded-xs" style={{ backgroundColor: dotColor }}>
+              <span className="px-1 bg-gray-150 rounded-xs" style={{ backgroundColor: dotColor }}>
                 …
               </span>
             </TooltipTrigger>
