@@ -1,9 +1,4 @@
-import {
-  keccak256,
-  encodeAbiParameters,
-  AbiParameter,
-  encodePacked,
-} from 'viem';
+import { keccak256, encodeAbiParameters, AbiParameter, encodePacked } from 'viem';
 
 function findTypeDependencies(
   primaryType: string,
@@ -47,20 +42,13 @@ function encodeType(primaryType: string, types: EIP712Type['types']): string {
   return result;
 }
 
-function hashType(
-  primaryType: string,
-  types: EIP712Type['types']
-): `0x${string}` {
+function hashType(primaryType: string, types: EIP712Type['types']): `0x${string}` {
   const encodedType = encodeType(primaryType, types);
   return keccak256(encodePacked(['string'], [encodedType]));
 }
-function encodeData(
-  primaryType: string,
-  data: Record<string, any>,
-  types: EIP712Type['types']
-): `0x${string}` {
+function encodeData(primaryType: string, data: Record<string, SafeAny>, types: EIP712Type['types']): `0x${string}` {
   const encodedTypes: Array<AbiParameter> = [{ type: 'bytes32' }];
-  const encodedValues: Array<any> = [hashType(primaryType, types)];
+  const encodedValues: Array<SafeAny> = [hashType(primaryType, types)];
 
   function getArrayType(baseType: string): string {
     return types[baseType] ? 'bytes32' : baseType;
@@ -79,7 +67,7 @@ function encodeData(
       value = keccak256(
         encodeAbiParameters(
           [{ type: `${getArrayType(baseType)}[]` }],
-          [value.map((item: any) => encodeArrayItem(baseType, item, types))]
+          [value.map((item: SafeAny) => encodeArrayItem(baseType, item, types))]
         )
       );
     } else {
@@ -92,11 +80,7 @@ function encodeData(
   return encodeAbiParameters(encodedTypes, encodedValues);
 }
 
-function encodeArrayItem(
-  baseType: string,
-  item: any,
-  types: EIP712Type['types']
-): any {
+function encodeArrayItem(baseType: string, item: SafeAny, types: EIP712Type['types']): SafeAny {
   if (types[baseType]) {
     return hashStruct(baseType, item, types);
   }
@@ -106,38 +90,26 @@ function encodeArrayItem(
   return item;
 }
 
-function hashStruct(
-  primaryType: string,
-  data: Record<string, any>,
-  types: EIP712Type['types']
-): `0x${string}` {
+function hashStruct(primaryType: string, data: Record<string, SafeAny>, types: EIP712Type['types']): `0x${string}` {
   return keccak256(encodeData(primaryType, data, types));
 }
 
-function hashDomain(
-  domain: EIP712Domain,
-  domainFields: Array<{ name: string; type: string }>
-): `0x${string}` {
-  return hashStruct('EIP712Domain', domain, { EIP712Domain: domainFields });
+function hashDomain(domain: EIP712Domain, domainFields: Array<{ name: string; type: string }>): `0x${string}` {
+  const activeFields = domainFields.filter(
+    (field) =>
+      (domain as Record<string, SafeAny>)[field.name] !== null &&
+      (domain as Record<string, SafeAny>)[field.name] !== undefined
+  );
+  return hashStruct('EIP712Domain', domain, { EIP712Domain: activeFields });
 }
 
 /**
  * Hash EIP712 typed data
  */
-export const hashSignTypedData = ({
-  domain,
-  types,
-  primaryType,
-  message,
-}: EIP712Type): `0x${string}` => {
+export const hashSignTypedData = ({ domain, types, primaryType, message }: EIP712Type): `0x${string}` => {
   const domainSeparator = hashDomain(domain, types.EIP712Domain);
   const structHash = hashStruct(primaryType, message, types);
-  return keccak256(
-    encodePacked(
-      ['bytes2', 'bytes32', 'bytes32'],
-      ['0x1901', domainSeparator, structHash]
-    )
-  );
+  return keccak256(encodePacked(['bytes2', 'bytes32', 'bytes32'], ['0x1901', domainSeparator, structHash]));
 };
 
 /**
@@ -156,7 +128,5 @@ export function hashEarlyTypedData(data: TTypedDataItem[]) {
     }
   }
 
-  return keccak256(
-    encodePacked(Array(encodedData.length).fill('string'), encodedData)
-  );
+  return keccak256(encodePacked(Array(encodedData.length).fill('string'), encodedData));
 }

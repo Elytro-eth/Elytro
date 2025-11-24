@@ -163,8 +163,6 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     decodedDetail?: TMyDecodeResult,
     meta?: TTxMeta
   ) => {
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.TxConfirm);
-    console.log('test: meta', meta);
     txMetaRef.current = meta;
     packUserOp(type, { params, decodedDetail });
   };
@@ -291,7 +289,12 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleBack = (isCancel = false) => {
     const prevType = requestType;
+    const wasExternalRequest = !!approval;
     resetTxContext();
+
+    if (wasExternalRequest) {
+      return;
+    }
 
     let params;
     if (!isCancel) {

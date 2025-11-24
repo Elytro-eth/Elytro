@@ -1,12 +1,10 @@
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useWallet } from '@/contexts/wallet';
-import { ApprovalTypeEn } from '@/constants/operations';
-import { navigateTo } from '@/utils/navigation';
+// import { navigateTo } from '@/utils/navigation';
 import { useInterval } from 'usehooks-ts';
 import { EVENT_TYPES } from '@/constants/events';
 import { RuntimeMessage } from '@/utils/message';
-import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';
 
 type IApprovalContext = {
   approval: Nullable<TApprovalInfo>;
@@ -20,12 +18,9 @@ const ApprovalContext = createContext<IApprovalContext>({
   reject: async () => {},
 });
 
-const APPROVAL_ROUTES = Object.values(ApprovalTypeEn);
-
 export const ApprovalProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
   const [approval, setApproval] = useState<Nullable<TApprovalInfo>>(null);
-  const [pathname] = useEnhancedHashLocation();
   const isProcessingApproval = useRef(false);
 
   const getCurrentApproval = async () => {
@@ -46,29 +41,30 @@ export const ApprovalProvider = ({ children }: { children: React.ReactNode }) =>
     }
   };
 
-  const onApprovalChanged = async () => {
-    if (!approval) {
-      isProcessingApproval.current = false;
+  // const onApprovalChanged = async () => {
+  //   if (!approval) {
+  //     isProcessingApproval.current = false;
 
-      const isApprovalRoute = APPROVAL_ROUTES.includes(pathname as ApprovalTypeEn);
-      const isTxConfirmPage = pathname === SIDE_PANEL_ROUTE_PATHS.TxConfirm;
+  //     // const isApprovalRoute = APPROVAL_ROUTES.includes(pathname as ApprovalTypeEn);
+  //     // // const isTxConfirmPage = pathname === SIDE_PANEL_ROUTE_PATHS.TxConfirm;
 
-      if (isApprovalRoute && !isTxConfirmPage) {
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
-      }
-      return;
-    }
+  //     // if (isApprovalRoute) {
+  //     //   navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
+  //     // }
+  //     // return;
 
-    if (isProcessingApproval.current || approval.type === pathname) {
-      return;
-    }
+  //   }
 
-    navigateTo('side-panel', approval.type);
-  };
+  //   // if (isProcessingApproval.current || approval.type === pathname) {
+  //   //   return;
+  //   // }
 
-  useEffect(() => {
-    onApprovalChanged();
-  }, [approval, pathname]);
+  //   // navigateTo('side-panel', approval.type);
+  // };
+
+  // useEffect(() => {
+  //   onApprovalChanged();
+  // }, [approval, pathname]);
 
   useInterval(() => {
     getCurrentApproval();

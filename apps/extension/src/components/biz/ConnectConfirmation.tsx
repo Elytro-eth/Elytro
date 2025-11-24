@@ -14,7 +14,7 @@ export default function ConnectionConfirmation({ dApp, onConfirm, onCancel }: IP
   const tips = ['Access to your balance and activities', 'Send you requests for transactions'];
 
   return (
-    <Card className="w-full h-full p-6 flex flex-col border-none rounded-none shadow-none">
+    <Card className="w-full h-full p-1 flex flex-col border-none rounded-none shadow-none">
       <div className="flex justify-center mt-10 ">
         <Avatar className="size-5xl left-2 z-10 rounded-full">
           <AvatarImage src={LogoWithCircle} alt="Elytro" />

@@ -13,6 +13,7 @@ import { TxProvider } from '@/contexts/tx-context';
 import { AlerterProvider } from '@/components/ui/alerter';
 import PrivateRecoveryDialog from '@/components/biz/PrivateRecoveryDialog';
 import { initializeSecurity } from '@/utils/security';
+import GlobalApprovalDialog from '@/components/biz/GlobalApprovalDialog';
 
 initializeSecurity({ isUI: true });
 
@@ -29,6 +30,7 @@ const main = () => {
                   <PrivateRecoveryDialog />
                 </AlerterProvider>
                 {/* <UserOpConfirmDialog /> */}
+                <GlobalApprovalDialog />
               </TooltipProvider>
             </TxProvider>
           </ApprovalProvider>
