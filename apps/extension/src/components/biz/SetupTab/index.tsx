@@ -43,7 +43,7 @@ export default function SetupTab() {
     {
       title: 'Deposit ETH',
       icon: EthereumIcon,
-      description: 'Deposit some ETH to activate wallet.',
+      description: 'Deposit ETH to activate wallet.',
       action: () => {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Receive);
       },
@@ -54,7 +54,7 @@ export default function SetupTab() {
       title: 'Activate wallet',
       icon: DoorIcon,
       showTag: hasSponsored,
-      description: 'This unlocks all the wallet features.',
+      description: 'Unlocks all wallet features.',
       action: () => {
         handleTxRequest(TxRequestTypeEn.DeployWallet);
       },
@@ -63,7 +63,7 @@ export default function SetupTab() {
     {
       title: 'Set up Recovery',
       icon: ContactsIcon,
-      description: 'Set up trusted wallets or friends to help you recover this wallet.',
+      description: 'Your friends can help recover.',
       action: () => {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RecoverySetting);
       },

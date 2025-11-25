@@ -11,6 +11,7 @@ import { WalletStatusEn } from '@/background/walletController';
 
 const Create: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
   const { status, wallet } = useWallet();
   const params = useSearchParams();
 
@@ -27,11 +28,15 @@ const Create: React.FC = () => {
       // TODO: check if this is accurate.
 
       console.log('params', params);
-      if (params?.from === 'recover') {
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.YouAreIn, params);
-      } else {
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Education);
-      }
+      setIsFadingOut(true);
+      // Wait for fade-out animation before navigating
+      setTimeout(() => {
+        if (params?.from === 'recover') {
+          navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.YouAreIn, params);
+        } else {
+          navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Education);
+        }
+      }, 150); // Match animation duration
     } catch (error) {
       toast({
         title: 'Oops! Something went wrong. Try again later.',
@@ -43,7 +48,10 @@ const Create: React.FC = () => {
   };
 
   return (
-    <FullPageWrapper className="elytro-gradient-bg-2 h-full" showBack>
+    <FullPageWrapper
+      className={`elytro-gradient-bg-2 h-full page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}
+      showBack
+    >
       <div className="flex flex-col items-center gap-y-2xl flex-1 w-full">
         <div className="flex justify-center mt-10">
           <img src={IconPasscode} alt="Passcode" width={144} />
