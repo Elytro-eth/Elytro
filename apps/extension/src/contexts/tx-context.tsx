@@ -40,8 +40,8 @@ type ITxContext = {
   historyType: Nullable<HistoricalActivityTypeEn>;
 
   // UI
-  isPacking: boolean;
-  isSending: boolean;
+  isPreparing: boolean; // Renamed from isPacking - now just for initial preparation
+  isSending: boolean; // Now covers both pack + send
   hasSufficientBalance: boolean;
   errorMsg: Nullable<string>;
   hookError: Nullable<THookError>;
@@ -51,6 +51,7 @@ type ITxContext = {
   calcResult: Nullable<TUserOperationPreFundResult>;
   decodedDetail: Nullable<DecodeResult[]>;
   useStablecoin?: Nullable<string>;
+  estimatedCost: Nullable<{ gasCostUSD: string; gasCostNative: string }>; // For fast preview
 
   // Actions
   handleTxRequest: (
@@ -81,7 +82,7 @@ const TxContext = createContext<ITxContext>({
   hookError: null,
   requestType: null,
   historyType: null,
-  isPacking: true,
+  isPreparing: false,
   isSending: false,
   hasSufficientBalance: false,
   errorMsg: null,
@@ -89,6 +90,7 @@ const TxContext = createContext<ITxContext>({
   calcResult: null,
   decodedDetail: null,
   useStablecoin: null,
+  estimatedCost: null,
   handleTxRequest: () => {},
   onConfirm: () => {},
   onCancel: () => {},
@@ -114,7 +116,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const txMetaRef = useRef<TTxMeta>();
 
   const [requestType, setRequestType] = useState<Nullable<TxRequestTypeEn>>(null);
-  const [isPacking, setIsPacking] = useState(true);
+  const [isPreparing, setIsPreparing] = useState(false); // Changed from isPacking
   const [isSending, setIsSending] = useState(false);
   const [errorMsg, setErrorMsg] = useState<Nullable<string>>(null);
 
@@ -122,6 +124,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const [hasSufficientBalance, setHasSufficientBalance] = useState(false);
   const [calcResult, setCalcResult] = useState<Nullable<TUserOperationPreFundResult>>(null);
   const [useStablecoin, setUseStablecoin] = useState<Nullable<string>>('0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238');
+  const [estimatedCost, setEstimatedCost] = useState<Nullable<{ gasCostUSD: string; gasCostNative: string }>>(null);
 
   const registerOpStatusListener = useCallback(
     (opHash: string) => {
@@ -163,8 +166,10 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     decodedDetail?: TMyDecodeResult,
     meta?: TTxMeta
   ) => {
+    console.log('test: meta', meta);
     txMetaRef.current = meta;
-    packUserOp(type, { params, decodedDetail });
+    // Use prepare for fast preview (estimation only)
+    prepareUserOp(type, { params, decodedDetail });
   };
 
   const getTxType = (type: TxRequestTypeEn) => {
@@ -191,6 +196,57 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     return await wallet.createTxUserOp(txParamsRef.current);
   };
 
+  const prepareUserOp = async (
+    type: TxRequestTypeEn,
+    {
+      params,
+      decodedDetail,
+    }: {
+      params?: Transaction[];
+      decodedDetail?: TMyDecodeResult;
+    }
+  ) => {
+    try {
+      setIsPreparing(true);
+      setRequestType(type);
+      txDecodedDetailRef.current = decodedDetail;
+      txParamsRef.current = params;
+      txTypeRef.current = getTxType(type);
+
+      if (type === TxRequestTypeEn.DeployWallet) {
+        setDecodedDetail([]);
+        setEstimatedCost({
+          gasCostUSD: '~0.50',
+          gasCostNative: '~0.0001',
+        });
+        setHasSufficientBalance(true);
+      } else {
+        const { decodedDetail: decoded, estimatedCost } = await wallet.prepareUserOpEstimate(params!);
+
+        if (txDecodedDetailRef.current) {
+          decoded[decoded.length - 1] = {
+            ...decoded[decoded.length - 1],
+            ...txDecodedDetailRef.current,
+          };
+        }
+
+        setDecodedDetail(decoded);
+        setEstimatedCost(estimatedCost);
+        setHasSufficientBalance(true);
+      }
+    } catch (err) {
+      const msg = formatErrorMsg(err);
+      setErrorMsg(msg);
+      toast({
+        title: 'Failed to prepare transaction',
+        variant: 'destructive',
+        description: msg,
+      });
+    } finally {
+      setIsPreparing(false);
+    }
+  };
+
   const packUserOp = async (
     type: TxRequestTypeEn,
     {
@@ -206,7 +262,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     }
   ) => {
     try {
-      setIsPacking(true);
+      setIsSending(true);
       setRequestType(type);
       setUseStablecoin(gasToken ? gasToken.token : null);
       txDecodedDetailRef.current = decodedDetail;
@@ -264,7 +320,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         description: msg,
       });
     } finally {
-      setIsPacking(false);
+      setIsPreparing(false);
     }
   };
 
@@ -276,9 +332,10 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     setRequestType(null);
     setDecodedDetail(null);
     setHasSufficientBalance(false);
-    setIsPacking(true);
+    setIsPreparing(false); // Reset to false
     setCalcResult(null);
     setErrorMsg(null);
+    setEstimatedCost(null);
     txTypeRef.current = null;
     txParamsRef.current = null;
     txDecodedDetailRef.current = undefined;
@@ -342,7 +399,39 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const onConfirm = async () => {
     try {
       setIsSending(true);
-      const userOp = userOpRef.current!;
+
+      let currentUserOp: ElytroUserOperation;
+      let transferAmount = 0n;
+
+      if (requestType === TxRequestTypeEn.DeployWallet) {
+        currentUserOp = await generateDeployUserOp();
+      } else {
+        currentUserOp = await generateTxUserOp();
+        let decodeRes = await wallet.decodeUserOp(currentUserOp);
+        if (!decodeRes || decodeRes.length === 0) {
+          throw new Error('Failed to decode user operation');
+        }
+
+        transferAmount = decodeRes.reduce((acc: bigint, curr: DecodeResult) => acc + BigInt(curr.value), 0n);
+
+        // Update decoded detail if needed (for SendTransaction type)
+        if (requestType === TxRequestTypeEn.SendTransaction && txDecodedDetailRef.current) {
+          decodeRes = [
+            {
+              ...decodeRes[decodeRes.length - 1],
+              ...txDecodedDetailRef.current,
+            },
+          ];
+        }
+
+        setDecodedDetail(decodeRes);
+      }
+
+      const packedUserOp = await wallet.packUserOp(currentUserOp, toHex(transferAmount), false);
+      const userOp = packedUserOp.userOp;
+      userOpRef.current = userOp;
+      setCalcResult(packedUserOp.calcResult);
+
       console.log('test: onConfirm txMetaRef.current?.noHookSignWith2FA', txMetaRef.current?.noHookSignWith2FA);
       const res = await wallet.sendUserOperation(userOp, txMetaRef.current?.noHookSignWith2FA);
 
@@ -383,7 +472,8 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
           ? TxRequestTypeEn.SendTransaction
           : TxRequestTypeEn.ApproveTransaction;
 
-      packUserOp(type, { params: txInfo });
+      // Use prepare for fast preview (same as internal flow)
+      prepareUserOp(type, { params: txInfo });
     }
   }, [approval]);
 
@@ -423,13 +513,14 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         userOp: userOpRef.current,
         historyType: txTypeRef.current,
         requestType,
-        isPacking,
+        isPreparing,
         isSending,
         hasSufficientBalance,
         errorMsg,
         calcResult,
         decodedDetail,
         useStablecoin,
+        estimatedCost,
         handleTxRequest,
         onConfirm,
         onCancel,

@@ -19,7 +19,7 @@ const UserOpTitleMap: Record<TxRequestTypeEn, string> = {
 export default function Tx() {
   const {
     requestType,
-    isPacking,
+    isPreparing,
     isSending,
     errorMsg,
     userOp,
@@ -70,8 +70,9 @@ export default function Tx() {
     };
   }, [remainingTime]);
 
-  if (isPacking || isSending) {
-    return <ProcessingTip body={isSending ? 'Confirming...' : 'Preparing...'} />;
+  if (isPreparing || isSending) {
+    const message = isPreparing ? 'Preparing...' : 'Sending...';
+    return <ProcessingTip body={message} />;
   }
 
   if (errorMsg || !requestType) {

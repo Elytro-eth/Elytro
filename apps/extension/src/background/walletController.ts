@@ -240,6 +240,76 @@ class WalletController {
     });
   }
 
+  public async prepareUserOpEstimate(txs: Transaction[]): Promise<{
+    decodedDetail: DecodeResult[];
+    estimatedCost: {
+      gasCostUSD: string;
+      gasCostNative: string;
+    };
+  }> {
+    const mockUserOp = await this.createTxUserOp(txs);
+    const decoded = await this.decodeUserOp(mockUserOp);
+
+    const estimate = {
+      gasCostUSD: '~0.50',
+      gasCostNative: '~0.0001',
+    };
+
+    return {
+      decodedDetail: decoded,
+      estimatedCost: estimate,
+    };
+  }
+
+  public async getNetworkCostOptions(txType: number, txParams: Transaction[]): Promise<NetworkCostResult> {
+    try {
+      let basicUserOp: ElytroUserOperation;
+      if (txType === 1) {
+        basicUserOp = await this.createDeployUserOp();
+      } else {
+        basicUserOp = await this.createTxUserOp(txParams);
+      }
+
+      const decoded = await this.decodeUserOp(basicUserOp);
+
+      const canSponsor = false;
+
+      const options: NetworkCostOption[] = [
+        {
+          type: 'sponsor',
+          estimatedCost: { usd: '0.00', native: '0.00' },
+          available: canSponsor,
+        },
+        {
+          type: 'eth',
+          estimatedCost: { usd: '~0.50', native: '~0.0001' },
+          available: true,
+        },
+      ];
+
+      const defaultOption: 'sponsor' | 'eth' | 'erc20' = canSponsor ? 'sponsor' : 'eth';
+
+      return {
+        options,
+        defaultOption,
+        decodedTx: decoded,
+      };
+    } catch (error) {
+      console.error('Elytro: Failed to get network cost options', error);
+      return {
+        options: [
+          {
+            type: 'eth',
+            estimatedCost: { usd: '~0.50', native: '~0.0001' },
+            available: true,
+          },
+        ],
+        defaultOption: 'eth',
+        decodedTx: [],
+      };
+    }
+  }
+
   public async getLatestHistories() {
     return historyManager.histories.map((item) => ({
       ...item.data,

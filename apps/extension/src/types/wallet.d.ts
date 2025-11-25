@@ -7,6 +7,24 @@ type TUserOperationPreFundResult = {
   gasUsed: string;
 };
 
+// Network cost option types
+type NetworkCostOption = {
+  type: 'sponsor' | 'eth' | 'erc20';
+  token?: string; // For ERC20 payment
+  paymaster?: string; // For ERC20 payment
+  estimatedCost: {
+    usd: string;
+    native: string;
+  };
+  available: boolean;
+};
+
+type NetworkCostResult = {
+  options: NetworkCostOption[];
+  defaultOption: 'sponsor' | 'eth' | 'erc20';
+  decodedTx: DecodeResult[];
+};
+
 type TAccountInfo = {
   address: Address;
   chainId: number;

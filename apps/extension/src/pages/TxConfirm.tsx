@@ -21,7 +21,7 @@ function TxConfirm() {
   const { wallet: _wallet } = useWallet();
   const {
     requestType,
-    isPacking,
+    isPreparing,
     isSending,
     errorMsg,
     userOp,
@@ -72,8 +72,9 @@ function TxConfirm() {
     };
   }, [remainingTime]);
 
-  if (isPacking || isSending) {
-    return <ProcessingTip body={isSending ? 'Confirming...' : 'Preparing...'} />;
+  if (isPreparing || isSending) {
+    const message = isPreparing ? 'Loading transaction details...' : 'Preparing and sending transaction...';
+    return <ProcessingTip body={message} />;
   }
 
   if (errorMsg || !requestType) {
