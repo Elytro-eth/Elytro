@@ -22,7 +22,7 @@ export default function Tx() {
     isPreparing,
     isSending,
     errorMsg,
-    userOp,
+    decodedDetail,
     onConfirm,
     onCancel,
     onRetry,
@@ -52,7 +52,7 @@ export default function Tx() {
     }
   };
 
-  const remainingTime = hookError?.otpExpiresAt ? new Date(hookError.otpExpiresAt).getTime() - Date.now() : 0;
+  const remainingTime = hookError?.otpExpiresAt ? new Date(hookError.otpExpiresAt).getTime() / 1000 - Date.now() : 0;
 
   const [countdown, setCountdown] = useState(remainingTime);
 
@@ -98,7 +98,7 @@ export default function Tx() {
       <div className="flex flex-col w-full items-center justify-center">
         <div className="flex flex-col items-center justify-center gap-y-sm">
           <AlertTriangle className="size-24 fill-[#C4C077] text-white stroke-white" />
-          <div className="elytro-text-title text-lg">Spending limit exceeded</div>
+          <div className="elytro-text-title text-lg"> {hookError?.message || 'OTP Required'}</div>
           <div className="text-sm text-gray-600">Enter the code we sent to your email to continue</div>
         </div>
         <div className="flex flex-col items-center justify-center gap-y-sm my-2xl">
@@ -120,7 +120,7 @@ export default function Tx() {
           </span>
         </div>
 
-        <DialogFooter className="flex w-full gap-x-sm [&>button]:flex-1 mt-2xl">
+        <DialogFooter className="flex flex-row w-full gap-x-sm [&>button]:flex-1 mt-2xl ">
           {hookError?.code === 'LIMIT_EXCEEDED' ? (
             <Button variant="ghost" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
               Close
@@ -141,6 +141,7 @@ export default function Tx() {
       </div>
     );
   }
+
   return (
     <>
       <DialogHeader>
@@ -148,7 +149,7 @@ export default function Tx() {
       </DialogHeader>
       {/* Content */}
       <div className="flex flex-col gap-y-md">
-        <UserOpDetail chainId={chainId!} from={userOp?.sender} />
+        <UserOpDetail chainId={chainId!} from={decodedDetail?.[0]?.from} />
       </div>
 
       {/* Footer */}
@@ -158,7 +159,7 @@ export default function Tx() {
             Close
           </Button>
         ) : (
-          <>
+          <div className="grid grid-cols-2 gap-x-sm">
             <Button variant="ghost" onClick={onCancel} disabled={isSending}>
               Cancel
             </Button>
@@ -167,7 +168,7 @@ export default function Tx() {
               <Box className="size-4 mr-sm" color="#cce1ea" />
               Confirm
             </Button>
-          </>
+          </div>
         )}
       </DialogFooter>
     </>

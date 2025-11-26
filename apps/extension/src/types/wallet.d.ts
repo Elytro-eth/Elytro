@@ -7,6 +7,38 @@ type TUserOperationPreFundResult = {
   gasUsed: string;
 };
 
+// Gas 支付选项
+type GasPaymentOption =
+  | { type: 'sponsor' }
+  | { type: 'self' }
+  | { type: 'erc20'; token: import('@/types/pimlico').TokenQuote };
+
+// 单个 gas 支付选项的预估结果
+type GasOptionEstimate = {
+  option: GasPaymentOption;
+  gasUsed: string;
+  needDeposit: boolean;
+  hasSufficientBalance: boolean;
+  balance?: bigint;
+};
+
+// OTP 预检查结果
+type OtpPrecheckResult = {
+  otpRequired: boolean;
+  requirementReason?: string;
+  dailyLimitUsdCents?: number;
+  currentSpendUsdCents?: number;
+  projectedSpendUsdCents?: number;
+};
+
+// Prepare 阶段返回结果
+type PrepareUserOpResult = {
+  decodedRes: import('@elytro/decoder').DecodeResult[];
+  gasOptions: GasOptionEstimate[]; // 所有 gas 支付选项的预估结果
+  defaultOption: GasPaymentOption; // 默认选项（基于 canSponsor）
+  otpPrecheck?: OtpPrecheckResult; // OTP 预检查结果
+};
+
 // Network cost option types
 type NetworkCostOption = {
   type: 'sponsor' | 'eth' | 'erc20';

@@ -3,7 +3,6 @@ import ProcessingTip from '@/components/ui/ProcessingTip';
 import { Button } from '@/components/ui/button';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { UserOpDetail } from '@/components/biz/UserOpDetail';
-import { useAccount } from '@/contexts/account-context';
 import { AlertCircle, AlertTriangle, Box } from 'lucide-react';
 import { InputOTPGroup, InputOTP, InputOTPSlot } from '@/components/ui/input-otp';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
@@ -24,7 +23,6 @@ function TxConfirm() {
     isPreparing,
     isSending,
     errorMsg,
-    userOp,
     onConfirm,
     onCancel,
     onRetry,
@@ -33,9 +31,6 @@ function TxConfirm() {
     requestSecurityOtp,
     verifySecurityOtp,
   } = useTx();
-  const {
-    currentAccount: { chainId },
-  } = useAccount();
 
   const [otpCode, setOtpCode] = useState<string>('');
 
@@ -148,7 +143,7 @@ function TxConfirm() {
     <>
       {/* Content */}
       <div className="flex flex-col gap-y-md">
-        <UserOpDetail chainId={chainId!} from={userOp?.sender} />
+        <UserOpDetail />
       </div>
 
       {/* Footer */}

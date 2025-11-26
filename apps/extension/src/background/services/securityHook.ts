@@ -489,6 +489,7 @@ class SecurityHookService {
     maskedEmail?: string;
     otpExpiresAt?: string;
     projectedSpendUsdCents?: number;
+    message?: string;
   }> {
     const currentAccount = this.getCurrentAccount();
     if (!currentAccount?.address || !currentAccount?.chainId) {
@@ -553,6 +554,7 @@ class SecurityHookService {
             otpExpiresAt: string;
             projectedSpendUsdCents: number;
           };
+          message?: string;
         }>(mutate_authorize_user_operation, {
           input: {
             authSessionId: sessionId,
@@ -566,7 +568,7 @@ class SecurityHookService {
 
         if (result?.extensions) {
           console.log('test: getHookSignature result.extensions', result.extensions);
-          return result.extensions;
+          return { ...result.extensions, message: result?.message };
         }
 
         if (result?.authorizeUserOperation?.signature) {

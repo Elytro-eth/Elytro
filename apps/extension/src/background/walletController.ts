@@ -34,6 +34,8 @@ import {
 } from '@/utils/contracts/securityHook';
 import SecurityHookService from './services/securityHook';
 import type { TSecurityProfile } from './services/securityHook';
+import { canUserOpGetSponsor } from '@/utils/ethRpc/sponsor';
+import type { THookError } from '@/types/securityHook';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -173,6 +175,46 @@ class WalletController {
     return opHash;
   }
 
+  public async sendPackedUserOperation(
+    userOp: ElytroUserOperation,
+    noHookSignWith2FA?: boolean
+  ): Promise<string | (THookError & { userOp: ElytroUserOperation })> {
+    const hookStatus = noHookSignWith2FA ? null : await this.getSecurityHookStatus();
+    let opHash: string;
+    let finalUserOp: ElytroUserOperation;
+
+    if (hookStatus && hookStatus.hasPreUserOpValidationHooks) {
+      const preSign = await this.signUserOperation(userOp);
+      userOp.signature = preSign.signature;
+
+      const hookSignatureRes = await this.securityHookService.getHookSignature(userOp);
+      if (!hookSignatureRes?.signature) {
+        return {
+          code: hookSignatureRes?.code,
+          challengeId: hookSignatureRes?.challengeId,
+          currentSpendUsdCents: hookSignatureRes?.currentSpendUsdCents,
+          dailyLimitUsdCents: hookSignatureRes?.dailyLimitUsdCents,
+          maskedEmail: hookSignatureRes?.maskedEmail,
+          otpExpiresAt: hookSignatureRes?.otpExpiresAt,
+          projectedSpendUsdCents: hookSignatureRes?.projectedSpendUsdCents,
+          userOp,
+        };
+      }
+
+      userOp.signature = hookSignatureRes?.signature;
+      const { userOp: userOpRes, opHash: opHashRes } = await elytroSDK.signUserOperationWithHook(userOp, preSign);
+      finalUserOp = userOpRes;
+      opHash = opHashRes;
+    } else {
+      const { userOp: userOpRes, opHash: opHashRes } = await elytroSDK.signUserOperation(userOp);
+      finalUserOp = userOpRes;
+      opHash = opHashRes;
+    }
+
+    await elytroSDK.sendUserOperation(finalUserOp);
+    return opHash;
+  }
+
   public async signMessage(message: string) {
     if (!accountManager.currentAccount?.address) {
       throw ethErrors.rpc.internal();
@@ -238,6 +280,127 @@ class WalletController {
       ...tokenInfo,
       approvalId,
     });
+  }
+
+  public async prepareUserOp({ params }: { params?: Transaction[] }): Promise<PrepareUserOpResult> {
+    const { address, chainId, isDeployed } = accountManager.currentAccount || {};
+
+    if (!address || !chainId) {
+      throw new Error('Elytro: No current account');
+    }
+
+    const currentOwnerAddress = keyring.currentOwner?.address;
+    if (!currentOwnerAddress) {
+      throw new Error('Elytro: No current owner');
+    }
+
+    // Create temporary UserOp for estimation (not saved)
+    let tempUserOp: ElytroUserOperation;
+    if (!isDeployed) {
+      const txOpCallData = params ? await elytroSDK.createUserOpFromTxs(address, params) : { callData: '0x' };
+      tempUserOp = await elytroSDK.createUnsignedDeployWalletUserOp(
+        currentOwnerAddress,
+        txOpCallData.callData as `0x${string}`
+      );
+    } else if (params) {
+      tempUserOp = await elytroSDK.createUserOpFromTxs(address, params);
+    } else {
+      throw new Error('Elytro: No params');
+    }
+
+    const decodedRes = await this.decodeUserOp(tempUserOp);
+    const transferAmount = decodedRes
+      ? decodedRes?.reduce((acc: bigint, curr: DecodeResult) => acc + BigInt(curr.value), 0n)
+      : 0n;
+
+    await elytroSDK.estimateGas(tempUserOp);
+
+    const [hookStatus, entryPoint, availableTokens] = await Promise.all([
+      this.getSecurityHookStatus(),
+      this.getEntryPoint(),
+      elytroSDK.getTokenPaymaster(),
+    ]);
+
+    const canSponsor = await canUserOpGetSponsor(tempUserOp, chainId, entryPoint, hookStatus);
+
+    const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 10000): Promise<T> => {
+      return Promise.race([
+        promise,
+        new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Request timeout')), timeoutMs)),
+      ]);
+    };
+
+    const estimations = await Promise.allSettled([
+      canSponsor
+        ? withTimeout(elytroSDK.estimateUserOpCost(tempUserOp, transferAmount, false))
+        : Promise.reject(new Error('Sponsor not available')),
+      withTimeout(elytroSDK.estimateUserOpCost(tempUserOp, transferAmount, true)),
+
+      // ERC20 options (parallel for all tokens with timeout)
+      ...availableTokens.map((token) =>
+        withTimeout(
+          elytroSDK.estimateUserOpCost(tempUserOp, transferAmount, true, token).then((result) => ({ token, result }))
+        )
+      ),
+    ]);
+
+    const gasOptions: GasOptionEstimate[] = [];
+
+    if (estimations[0].status === 'fulfilled') {
+      const sponsorCost = estimations[0].value;
+      const needDeposit = sponsorCost.missAmount > 0n;
+      gasOptions.push({
+        option: { type: 'sponsor' },
+        gasUsed: sponsorCost.gasUsed,
+        needDeposit,
+        hasSufficientBalance: !needDeposit,
+      });
+    } else if (canSponsor) {
+      console.warn('Failed to estimate sponsor cost:', estimations[0].reason);
+    }
+
+    if (estimations[1].status === 'fulfilled') {
+      const ethCost = estimations[1].value;
+      const needDeposit = ethCost.missAmount > 0n;
+      gasOptions.push({
+        option: { type: 'self' },
+        gasUsed: ethCost.gasUsed,
+        needDeposit,
+        hasSufficientBalance: !needDeposit,
+        balance: ethCost.balance,
+      });
+    } else {
+      console.error('Failed to estimate ETH cost:', estimations[1].reason);
+    }
+
+    for (let i = 2; i < estimations.length; i++) {
+      if (estimations[i].status === 'fulfilled') {
+        const { token, result: tokenCost } = estimations[i].value as { token: TokenQuote; result: SafeAny };
+        const needDeposit = tokenCost.missAmount > 0n;
+        gasOptions.push({
+          option: { type: 'erc20', token },
+          gasUsed: tokenCost.gasUsed,
+          needDeposit,
+          hasSufficientBalance: !needDeposit,
+          balance: tokenCost.balance,
+        });
+      } else {
+        const token = availableTokens[i - 2];
+        console.warn(`Failed to estimate gas for token ${token?.name}:`, estimations[i].reason);
+      }
+    }
+
+    if (gasOptions.length === 0) {
+      throw new Error('Failed to estimate any gas payment options');
+    }
+    const otpPrecheck: OtpPrecheckResult | undefined = undefined;
+
+    return {
+      decodedRes: formatObjectWithBigInt(decodedRes),
+      gasOptions: formatObjectWithBigInt(gasOptions),
+      defaultOption: canSponsor ? { type: 'sponsor' } : { type: 'self' },
+      otpPrecheck,
+    };
   }
 
   public async prepareUserOpEstimate(txs: Transaction[]): Promise<{
@@ -1052,6 +1215,69 @@ class WalletController {
    */
   public async changeWalletEmail(email: string) {
     return await this.securityHookService.changeWalletEmail(email);
+  }
+
+  /**
+   * Build and send UserOp from txParams with selected gas payment option
+   */
+  public async buildAndSendUserOp(
+    params: Transaction[],
+    option: GasPaymentOption,
+    noHookSignWith2FA?: boolean
+  ): Promise<string | THookError> {
+    const { address, chainId, isDeployed } = accountManager.currentAccount || {};
+    const currentOwnerAddress = keyring.currentOwner?.address;
+
+    if (!address || !chainId || !currentOwnerAddress) {
+      throw new Error('Elytro: No current account or owner');
+    }
+
+    // Determine gas payment parameters
+    let noSponsor = false;
+    let gasToken: TokenQuote | undefined;
+    if (option.type === 'sponsor') {
+      noSponsor = false;
+    } else if (option.type === 'self') {
+      noSponsor = true;
+    } else if (option.type === 'erc20') {
+      noSponsor = true;
+      gasToken = option.token;
+    }
+
+    // If using ERC20 token for gas, prepend approval transaction
+    let finalParams = params;
+    if (gasToken) {
+      const { getApproveErc20Tx } = await import('@/utils/tokenApproval');
+      const approvalTx = getApproveErc20Tx(gasToken.token as `0x${string}`, gasToken.paymaster as `0x${string}`);
+      finalParams = params.length ? [approvalTx, ...params] : [approvalTx];
+    }
+
+    // 1. Create UserOp from txParams (including approval if needed)
+    let userOp: ElytroUserOperation;
+    if (!isDeployed) {
+      const txOpCallData = finalParams.length ? await elytroSDK.createUserOpFromTxs(address, finalParams) : undefined;
+      userOp = await elytroSDK.createUnsignedDeployWalletUserOp(
+        currentOwnerAddress,
+        txOpCallData?.callData as `0x${string}`
+      );
+      userOp = await elytroSDK.estimateGas(userOp);
+    } else {
+      userOp = await elytroSDK.createUserOpFromTxs(address, finalParams);
+    }
+
+    // 2. Pack based on gas option
+    const decodedRes = await elytroSDK.getDecodedUserOperation(userOp);
+    const transferAmount = decodedRes?.reduce((acc: bigint, curr: DecodeResult) => acc + BigInt(curr.value), 0n);
+
+    const { userOp: packedUserOp } = await elytroSDK.getRechargeAmountForUserOp(
+      userOp,
+      transferAmount,
+      noSponsor,
+      gasToken
+    );
+
+    // 3. Send packed UserOp (use new method that doesn't re-estimate)
+    return await this.sendPackedUserOperation(packedUserOp, noHookSignWith2FA);
   }
 }
 

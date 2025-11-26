@@ -12,7 +12,7 @@ export default function ConfirmPreForceUninstallModal() {
   const handlePreForceUninstall = async () => {
     try {
       const txs = await wallet.generatePreForceUninstallSecurityHookTxs();
-      handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs as SafeAny, undefined, { noHookSignWith2FA: true });
+      handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs as SafeAny, { noHookSignWith2FA: true });
       setOpen(false);
     } catch (error) {
       console.error('Pre force uninstall SecurityHook failed:', error);

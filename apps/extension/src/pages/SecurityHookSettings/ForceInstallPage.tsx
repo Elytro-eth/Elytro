@@ -33,7 +33,7 @@ export default function ForceInstallInnerPage({ status }: ForceInstallInnerPageP
     console.log('Confirm Reset');
     try {
       const txs = await wallet.generateForceUninstallSecurityHookTxs();
-      handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs as SafeAny, undefined, { noHookSignWith2FA: true });
+      handleTxRequest(TxRequestTypeEn.ApproveTransaction, txs as SafeAny, { noHookSignWith2FA: true });
     } catch (error) {
       console.error('Confirm Reset failed:', error);
     }

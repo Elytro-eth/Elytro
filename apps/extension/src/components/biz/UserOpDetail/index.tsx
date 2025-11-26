@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import ActivateDetail from './ActivationDetail';
 import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
-import { ChevronUp, ChevronDown, Copy, RefreshCw, AlertCircle } from 'lucide-react';
+import { ChevronUp, ChevronDown, Copy, AlertCircle } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -22,12 +22,6 @@ import { useSponsor } from '@/hooks/use-sponsor';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
-interface IUserOpDetailProps {
-  session?: TDAppInfo;
-  chainId: number;
-  from?: string;
-}
-
 const formatGasUsed = (gasUsed?: string) => {
   const gasUsedNumber = gasUsed ? BigInt(gasUsed) : 0n;
   const tempRes = formatBalance(formatEther(gasUsedNumber), {
@@ -40,21 +34,40 @@ const formatGasUsed = (gasUsed?: string) => {
   return tempRes;
 };
 
-export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
+export function UserOpDetail() {
   const { wallet } = useWallet();
   const [expandSponsorSelector, setExpandSponsorSelector] = useState(false);
   const {
     tokenInfo: { tokenPrices, tokens: currentAccountTokens },
-    currentAccount: { isDeployed, address },
+    currentAccount: { isDeployed, address, chainId },
   } = useAccount();
-  const { requestType, calcResult, decodedDetail, onRetry, hasSufficientBalance, useStablecoin, hookError } = useTx();
+  const {
+    requestType,
+    costResult,
+    decodedDetail,
+    hasSufficientBalance,
+    chosenGasToken,
+    hookError,
+    gasPaymentOption,
+    onGasOptionChange,
+  } = useTx();
   const { canSponsor } = useSponsor();
-  const [gasOption, setGasOption] = useState<string>('self');
   const [tokenPaymasters, setTokenPaymasters] = useState<TokenPaymaster[]>([]);
 
-  useEffect(() => {
-    setGasOption(useStablecoin || (canSponsor ? 'sponsor' : 'self'));
-  }, [useStablecoin, canSponsor]);
+  // Compute current selected gas option for UI
+  const gasOption =
+    gasPaymentOption.type === 'sponsor'
+      ? 'sponsor'
+      : gasPaymentOption.type === 'self'
+        ? 'self'
+        : gasPaymentOption.type === 'erc20'
+          ? gasPaymentOption.token.token
+          : 'self';
+
+  // No longer sync gas option from chosenGasToken - managed by context
+  // useEffect(() => {
+  //   setGasOption(chosenGasToken?.token || (canSponsor ? 'sponsor' : 'self'));
+  // }, [chosenGasToken, canSponsor]);
 
   const DetailContent = useMemo(() => {
     switch (requestType) {
@@ -72,18 +85,18 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   }, [requestType, decodedDetail]);
 
   const [gasInETH, gasInDollar] = useMemo(() => {
-    if (!calcResult?.gasUsed) {
+    if (!costResult?.gasUsed) {
       return ['--', '--'];
     }
 
-    const gasInETH = formatGasUsed(calcResult?.gasUsed);
+    const gasInETH = formatGasUsed(costResult?.gasUsed);
     const gasInDollar = formatDollarBalance(tokenPrices, {
       balance: Number(gasInETH?.replace('<', '')),
       symbol: 'ETH',
     })?.replace('$', '');
 
     return [gasInETH, gasInDollar];
-  }, [calcResult?.gasUsed, tokenPrices, tokenPaymasters]);
+  }, [costResult?.gasUsed, tokenPrices, tokenPaymasters]);
 
   const getTokenPaymaster = async () => {
     try {
@@ -107,7 +120,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
     const defaultDisplay = `Pay gas with ${paymaster.name}`;
     try {
       const { exchangeRate } = paymaster;
-      const gasUsed = BigInt(calcResult?.gasUsed || 0);
+      const gasUsed = BigInt(costResult?.gasUsed || 0);
       const gasInToken =
         selectedGasToken?.token === paymaster.token ? gasUsed : (gasUsed * BigInt(exchangeRate)) / BigInt(1e18);
 
@@ -120,20 +133,24 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
   };
 
   const handleGasOptionChange = (value: string) => {
-    setGasOption(value);
     if (value === 'sponsor') {
-      onRetry(false);
+      onGasOptionChange({ type: 'sponsor' });
     } else if (value === 'self') {
-      onRetry(true);
+      onGasOptionChange({ type: 'self' });
     } else {
-      onRetry(
-        true,
-        tokenPaymasters.find((paymaster) => paymaster.token === value)
-      );
+      // ERC20 token
+      const tokenPaymaster = tokenPaymasters.find((paymaster) => paymaster.token === value);
+      if (tokenPaymaster) {
+        onGasOptionChange({ type: 'erc20', token: tokenPaymaster });
+      }
     }
   };
 
-  const selectedGasToken = tokenPaymasters?.find((paymaster) => paymaster?.token === useStablecoin) || null;
+  const selectedGasToken = tokenPaymasters?.find((paymaster) => paymaster?.token === chosenGasToken?.token) || null;
+
+  if (!costResult || !decodedDetail) {
+    return null;
+  }
 
   if (hookError) {
     return (
@@ -150,7 +167,7 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
 
       {/* UserOp Pay Info */}
       <InfoCardList>
-        <InfoCardItem label="From wallet" content={<FragmentedAddress address={from} chainId={chainId} />} />
+        <InfoCardItem label="From wallet" content={<FragmentedAddress address={address} chainId={chainId} />} />
 
         {/* Network cost: unit ETH */}
         <InfoCardItem
@@ -175,9 +192,9 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                   )}
                 </span>
               )}
-              {useStablecoin && (
+              {gasOption.startsWith('0x') && (
                 <span className="px-xs text-xs text-gray-750">
-                  {formatUnits(BigInt(calcResult?.gasUsed || 0), selectedGasToken?.decimals || 18)}
+                  {formatUnits(BigInt(costResult?.gasUsed || 0), selectedGasToken?.decimals || 18)}
                   <span className="elytro-text-small-body text-gray-750 ml-2xs">{selectedGasToken?.name}</span>
                 </span>
               )}
@@ -194,15 +211,17 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
               }}
               className="flex flex-col gap-y-2"
             >
-              <div className="flex items-center space-x-2 cursor-pointer">
-                <RadioGroupItem value="sponsor" id="gas-fee-by-sponsor" />
-                <Label
-                  htmlFor="gas-fee-by-sponsor"
-                  className="flex items-center elytro-text-smaller-body text-gray-750 truncate cursor-pointer"
-                >
-                  Sponsored by Elytro
-                </Label>
-              </div>
+              {canSponsor && (
+                <div className="flex items-center space-x-2 cursor-pointer">
+                  <RadioGroupItem value="sponsor" id="gas-fee-by-sponsor" />
+                  <Label
+                    htmlFor="gas-fee-by-sponsor"
+                    className="flex items-center elytro-text-smaller-body text-gray-750 truncate cursor-pointer"
+                  >
+                    Sponsored by Elytro
+                  </Label>
+                </div>
+              )}
               <div className="flex items-center space-x-2 cursor-pointer">
                 <RadioGroupItem value="self" id="gas-fee-by-self" />
                 <Label
@@ -252,13 +271,6 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
                 <ShortedAddress address={address} chainId={chainId} className="bg-white" />
                 <Copy className="size-3 stroke-gray-600" />
               </div>
-              <div
-                className="flex flex-row items-center text-black-blue px-2 py-1 rounded-xs  hover:text-primary hover:bg-primary/10"
-                onClick={() => onRetry()}
-              >
-                <RefreshCw className="size-3 mr-1" />
-                Check
-              </div>
             </div>
           </div>
         )}
@@ -268,7 +280,6 @@ export function UserOpDetail({ chainId, from }: IUserOpDetailProps) {
         <HelperText description="Wallet activation included with a one-time cost" />
       )}
 
-      {/* Transaction Raw Data: Only show for approve transaction */}
       {(requestType === TxRequestTypeEn.ApproveTransaction || requestType === TxRequestTypeEn.UpgradeContract) && (
         <RawData>{formatRawData(decodedDetail)}</RawData>
       )}

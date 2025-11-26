@@ -30,4 +30,5 @@ export type THookError = {
   maskedEmail?: string;
   otpExpiresAt?: string;
   projectedSpendUsdCents?: number;
+  message?: string;
 };

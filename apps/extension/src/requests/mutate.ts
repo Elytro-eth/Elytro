@@ -185,3 +185,15 @@ export const mutate_change_email = gql`
     }
   }
 `;
+
+export const mutate_precheck_security_otp = gql`
+  mutation PrecheckSecurityOtp($input: AuthorizeUserOperationInput!) {
+    precheckSecurityOtp(input: $input) {
+      otpRequired
+      requirementReason
+      dailyLimitUsdCents
+      currentSpendUsdCents
+      projectedSpendUsdCents
+    }
+  }
+`;

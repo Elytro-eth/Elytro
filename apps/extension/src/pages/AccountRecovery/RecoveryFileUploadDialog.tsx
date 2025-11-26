@@ -131,7 +131,7 @@ export default function RecoveryFileUploadDialog({ open, onOpenChange, onFileUpl
           <input ref={fileInputRef} type="file" accept=".json,.txt" className="hidden" onChange={handleFileChange} />
         </div>
 
-        <DialogFooter className="grid grid-cols-2 gap-2">
+        <DialogFooter className="grid grid-cols-2 gap-x-sm">
           <Button variant="outline" onClick={handleCancel} className="flex-1">
             Cancel
           </Button>

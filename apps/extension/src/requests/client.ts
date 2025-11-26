@@ -18,6 +18,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
         observer.next({
           data: {
             extensions: errorWithExtensions.extensions,
+            message: errorWithExtensions.message,
           },
           errors: undefined,
         });

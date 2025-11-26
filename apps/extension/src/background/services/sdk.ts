@@ -675,34 +675,251 @@ export class SDKService {
     return maxCostInToken;
   }
 
-  // private async _getMockUserOpWithHook(userOp: ElytroUserOperation, securityHookAddress: Address) {
-  //   const stateOverride: Record<Address, { code: Hex }> = {
-  //     [userOp.sender]: {
-  //       balance: toHex(parseEther('1')),
-  //     },
-  //     [securityHookAddress]: {
-  //       code: FAKE_SECURITY_HOOK_BYTECODE,
-  //     },
-  //   };
+  public async estimateERC20Gas(userOp: ElytroUserOperation, token: TokenQuote) {
+    const pimlicoRpc = this._getPimlicoRpc();
+    if (!pimlicoRpc) {
+      throw new Error('You need to use a pimlico bundler to pay network cost with ERC20 token.');
+    }
 
-  //   const semiValidHookInputData = [
-  //     {
-  //       hookAddress: securityHookAddress,
-  //       inputData:
-  //         '0x0f66d90c36d1bba494523b6394aaf6e24e53a30e5fa8260268143eee20557c2a54d69f2327f4cf157630e442da5ec9bfc39062bb86be547db86859ea88978a3c1b',
-  //     },
-  //   ];
+    userOp.factoryData = paddingBytesToEven(userOp.factoryData);
+    const paymasterData: SafeAny = await pimlicoRpc.request({
+      method: 'pm_getPaymasterStubData' as SafeAny,
+      id: 4337,
+      params: [
+        {
+          sender: userOp.sender as `0x${string}`,
+          nonce: toHex(userOp.nonce),
+          factory: userOp.factory,
+          factoryData: userOp.factoryData,
+          callData: userOp.callData,
+          callGasLimit: userOp.callGasLimit,
+          verificationGasLimit: userOp.verificationGasLimit,
+          preVerificationGas: userOp.preVerificationGas,
+          maxPriorityFeePerGas: toHex(userOp.maxPriorityFeePerGas),
+          maxFeePerGas: toHex(userOp.maxFeePerGas),
+        },
+        this._config.entryPoint as `0x${string}`,
+        toHex(this._config.id),
+        {
+          token: token?.token,
+        },
+      ] as SafeAny,
+    });
 
-  //   return {
-  //     ...userOp,
-  //     stateOverride,
-  //     semiValidHookInputData,
-  //   };
-  // }
+    if (paymasterData) {
+      userOp.paymaster = paymasterData.paymaster as `0x${string}`;
+      userOp.paymasterData = paymasterData.paymasterData as `0x${string}`;
+      userOp.paymasterPostOpGasLimit = paymasterData.paymasterPostOpGasLimit ?? '0x0';
+      userOp.paymasterVerificationGasLimit = paymasterData.paymasterVerificationGasLimit ?? '0x0';
+    } else {
+      throw new Error('Failed to get paymaster data, Please try again.');
+    }
+
+    await this.estimateGas(userOp, false);
+
+    const newPaymasterData = (await pimlicoRpc.request({
+      method: 'pm_getPaymasterData' as SafeAny,
+      id: 4337,
+      params: [
+        {
+          sender: userOp.sender as `0x${string}`,
+          nonce: formatHex(userOp.nonce),
+          factory: userOp.factory,
+          factoryData: userOp.factoryData,
+          callData: userOp.callData,
+          callGasLimit: formatHex(userOp.callGasLimit),
+          verificationGasLimit: formatHex(userOp.verificationGasLimit),
+          preVerificationGas: formatHex(userOp.preVerificationGas),
+          maxPriorityFeePerGas: formatHex(userOp.maxPriorityFeePerGas) as `0x${string}`,
+          maxFeePerGas: formatHex(userOp.maxFeePerGas) as `0x${string}`,
+          paymaster: userOp.paymaster,
+          paymasterVerificationGasLimit: formatHex(userOp.paymasterVerificationGasLimit ?? '0x0'),
+          paymasterPostOpGasLimit: formatHex(userOp.paymasterPostOpGasLimit ?? '0x0'),
+          paymasterData: userOp.paymasterData,
+          signature:
+            '0xea50a2874df3eEC9E0365425ba948989cd63FED6000000620100005f5e0fff000fffffffff0000000000000000000000000000000000000000b91467e570a6466aa9e9876cbcd013baba02900b8979d43fe208a4a4f339f5fd6007e74cd82e037b800186422fc2da167c747ef045e5d18a5f5d4300f8e1a0291c',
+          // '0x162485941ba1faf21013656dab1e60e9d7226dc0000000620100005f5e0fff000fffffffff0000000000000000000000000000000000000000b91467e570a6466aa9e9876cbcd013baba02900b8979d43fe208a4a4f339f5fd6007e74cd82e037b800186422fc2da167c747ef045e5d18a5f5d4300f8e1a0291c',
+        },
+        this._config.entryPoint as `0x${string}`,
+        formatHex(this._config.id),
+        {
+          token,
+        },
+      ] as SafeAny,
+    })) as SafeAny;
+
+    if (newPaymasterData) {
+      userOp.paymaster = newPaymasterData.paymaster as `0x${string}`;
+      userOp.paymasterData = newPaymasterData.paymasterData as `0x${string}`;
+    } else {
+      throw new Error('Failed to get paymaster data, Please try again.');
+    }
+
+    const maxCostInToken = await this.getMaxCostInToken(userOp, token);
+
+    const _client = this._getClient();
+    const gasBalance = await _client.readContract({
+      address: token.token as Address,
+      abi: ABI_ERC20_BALANCE_OF as Abi,
+      functionName: 'balanceOf',
+      args: [userOp.sender],
+    });
+
+    const missAmount = maxCostInToken - ((gasBalance as bigint) || 0n);
+
+    return {
+      userOp,
+      calcResult: {
+        balance: gasBalance as bigint, // user balance
+        gasUsed: toHex(maxCostInToken),
+        hasSponsored: false, // for this userOp, can get sponsored or not
+        missAmount: missAmount > 0n ? missAmount : 0n, // for this userOp, how much it needs to deposit
+        needDeposit: missAmount > 0n, // need to deposit or not
+        suspiciousOp: false, // if missAmount is too large, it may considered suspicious
+      } as TUserOperationPreFundResult,
+    };
+  }
+
+  public async estimateUserOpCost(
+    userOp: ElytroUserOperation,
+    transferValue: bigint,
+    noSponsor = false,
+    token?: TokenQuote
+  ) {
+    if (noSponsor) {
+      if (token) {
+        const pimlicoRpc = this._getPimlicoRpc();
+        if (!pimlicoRpc) {
+          throw new Error('You need to use a pimlico bundler to pay network cost with ERC20 token.');
+        }
+
+        userOp.factoryData = paddingBytesToEven(userOp.factoryData);
+        const paymasterData: SafeAny = await pimlicoRpc.request({
+          method: 'pm_getPaymasterStubData' as SafeAny,
+          id: 4337,
+          params: [
+            {
+              sender: userOp.sender as `0x${string}`,
+              nonce: toHex(userOp.nonce),
+              factory: userOp.factory,
+              factoryData: userOp.factoryData,
+              callData: userOp.callData,
+              callGasLimit: formatHex(userOp.callGasLimit),
+              verificationGasLimit: formatHex(userOp.verificationGasLimit),
+              preVerificationGas: formatHex(userOp.preVerificationGas),
+              maxPriorityFeePerGas: toHex(userOp.maxPriorityFeePerGas),
+              maxFeePerGas: toHex(userOp.maxFeePerGas),
+            },
+            this._config.entryPoint as `0x${string}`,
+            toHex(this._config.id),
+            {
+              token: token?.token,
+            },
+          ] as SafeAny,
+        });
+
+        if (paymasterData) {
+          userOp.paymaster = paymasterData.paymaster as `0x${string}`;
+          userOp.paymasterData = paymasterData.paymasterData as `0x${string}`;
+          userOp.paymasterPostOpGasLimit = paymasterData.paymasterPostOpGasLimit ?? '0x0';
+          userOp.paymasterVerificationGasLimit = paymasterData.paymasterVerificationGasLimit ?? '0x0';
+        } else {
+          throw new Error('Failed to get paymaster data, Please try again.');
+        }
+
+        await this.estimateGas(userOp, false);
+
+        const newPaymasterData = (await pimlicoRpc.request({
+          method: 'pm_getPaymasterData' as SafeAny,
+          id: 4337,
+          params: [
+            {
+              sender: userOp.sender as `0x${string}`,
+              nonce: formatHex(userOp.nonce),
+              factory: userOp.factory,
+              factoryData: userOp.factoryData,
+              callData: userOp.callData,
+              callGasLimit: formatHex(userOp.callGasLimit),
+              verificationGasLimit: formatHex(userOp.verificationGasLimit),
+              preVerificationGas: formatHex(userOp.preVerificationGas),
+              maxPriorityFeePerGas: formatHex(userOp.maxPriorityFeePerGas) as `0x${string}`,
+              maxFeePerGas: formatHex(userOp.maxFeePerGas) as `0x${string}`,
+              paymaster: userOp.paymaster,
+              paymasterVerificationGasLimit: formatHex(userOp.paymasterVerificationGasLimit ?? '0x0'),
+              paymasterPostOpGasLimit: formatHex(userOp.paymasterPostOpGasLimit ?? '0x0'),
+              paymasterData: userOp.paymasterData,
+              signature:
+                '0xea50a2874df3eEC9E0365425ba948989cd63FED6000000620100005f5e0fff000fffffffff0000000000000000000000000000000000000000b91467e570a6466aa9e9876cbcd013baba02900b8979d43fe208a4a4f339f5fd6007e74cd82e037b800186422fc2da167c747ef045e5d18a5f5d4300f8e1a0291c',
+              // '0x162485941ba1faf21013656dab1e60e9d7226dc0000000620100005f5e0fff000fffffffff0000000000000000000000000000000000000000b91467e570a6466aa9e9876cbcd013baba02900b8979d43fe208a4a4f339f5fd6007e74cd82e037b800186422fc2da167c747ef045e5d18a5f5d4300f8e1a0291c',
+            },
+            this._config.entryPoint as `0x${string}`,
+            formatHex(this._config.id),
+            {
+              token,
+            },
+          ] as SafeAny,
+        })) as SafeAny;
+
+        if (newPaymasterData) {
+          userOp.paymaster = newPaymasterData.paymaster as `0x${string}`;
+          userOp.paymasterData = newPaymasterData.paymasterData as `0x${string}`;
+        } else {
+          throw new Error('Failed to get paymaster data, Please try again.');
+        }
+
+        const maxCostInToken = await this.getMaxCostInToken(userOp, token);
+
+        const _client = this._getClient();
+        const gasBalance = await _client.readContract({
+          address: token.token as Address,
+          abi: ABI_ERC20_BALANCE_OF as Abi,
+          functionName: 'balanceOf',
+          args: [userOp.sender],
+        });
+
+        const missAmount = maxCostInToken - ((gasBalance as bigint) || 0n);
+
+        return {
+          balance: gasBalance as bigint, // user balance
+          gasUsed: toHex(maxCostInToken),
+          hasSponsored: false, // for this userOp, can get sponsored or not
+          missAmount: missAmount > 0n ? missAmount : 0n, // for this userOp, how much it needs to deposit
+          needDeposit: missAmount > 0n, // need to deposit or not
+          suspiciousOp: false, // if missAmount is too large, it may considered suspicious
+        };
+      } else {
+        await this.estimateGas(userOp);
+      }
+    }
+
+    const res = await this._sdk.preFund(userOp);
+
+    if (res.isErr()) {
+      throw res.ERR;
+    } else {
+      const {
+        missfund,
+        prefund,
+        //deposit, prefund
+      } = res.OK;
+      const balance = await this._sdk.provider.getBalance(userOp.sender);
+
+      const missAmount = noSponsor ? BigInt(missfund) + transferValue - balance : transferValue - balance; // why transferValue is not accurate? missfund is wrong during preFund?
+
+      return {
+        balance, // user balance
+        gasUsed: prefund,
+        hasSponsored: !noSponsor, // for this userOp, can get sponsored or not
+        missAmount: missAmount > 0n ? missAmount : 0n, // for this userOp, how much it needs to deposit
+        needDeposit: missAmount > 0n, // need to deposit or not
+        suspiciousOp: missAmount > parseEther('0.001'), // if missAmount is too large, it may considered suspicious
+      };
+    }
+  }
 
   public async getRechargeAmountForUserOp(
     userOp: ElytroUserOperation,
-    transferValue: bigint,
+    transferValue: bigint = 0n,
     noSponsor = false,
     token?: TokenQuote
   ) {
