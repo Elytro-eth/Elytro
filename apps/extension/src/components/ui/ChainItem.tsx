@@ -7,11 +7,7 @@ interface IChainItemProps {
   isSelected?: boolean; // TODO: remove this
 }
 
-export default function ChainItem({
-  chain,
-  onClick,
-  isSelected = false,
-}: IChainItemProps) {
+export default function ChainItem({ chain, onClick, isSelected = false }: IChainItemProps) {
   const handleClick = () => {
     onClick?.();
   };
@@ -26,12 +22,8 @@ export default function ChainItem({
         chain.disabled && 'cursor-not-allowed opacity-50'
       )}
     >
-      <img
-        src={chain?.icon}
-        alt={chain?.name}
-        className="size-8 rounded-full"
-      />
-      <div className="elytro-text-small-bold">{chain?.name}</div>
+      <img src={chain?.icon} alt={chain?.name} className="size-8 rounded-full" />
+      <div className="elytro-text-bold-body">{chain?.name}</div>
     </div>
   );
 }

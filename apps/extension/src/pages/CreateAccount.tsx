@@ -19,6 +19,7 @@ const CreateAccount: React.FC = () => {
   const { wallet } = useWallet();
   const [selectedChain, setSelectedChain] = useState<TChainItem | null>(null);
   const [isCreated, setIsCreated] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
   const { reloadAccount, loading: isLoading } = useAccount();
 
   useEffect(() => {
@@ -50,9 +51,19 @@ const CreateAccount: React.FC = () => {
     setSelectedChain(chain);
   };
 
+  const handleStart = () => {
+    setIsFadingOut(true);
+    // Wait for fade-out animation before navigating
+    setTimeout(() => {
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+    }, 150); // Match animation duration
+  };
+
   if (isCreated) {
     return (
-      <FullPageWrapper className="h-full flex flex-col items-center justify-center">
+      <FullPageWrapper
+        className={`h-full flex flex-col items-center justify-center page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}
+      >
         <div className="flex flex-col items-center gap-y-2xs">
           <img src={DoorImg} alt="Passcode" width={144} />
 
@@ -61,10 +72,7 @@ const CreateAccount: React.FC = () => {
           {isLoading ? <Spin isLoading /> : <CurrentAddress className="mt-6" />}
         </div>
 
-        <Button
-          className="w-full mt-4 text-lg font-medium"
-          onClick={() => navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard)}
-        >
+        <Button className="w-full mt-4 text-lg font-medium" onClick={handleStart}>
           Start
         </Button>
       </FullPageWrapper>
