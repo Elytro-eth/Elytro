@@ -29,7 +29,7 @@ const Unlock = () => {
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
     } catch (error) {
       toast({
-        title: 'Failed to unlock wallet',
+        // title: 'Failed to unlock wallet',
         description: error instanceof Error ? error.message : 'Please try again',
         variant: 'destructive',
       });
@@ -63,7 +63,7 @@ const Unlock = () => {
             disabled={isLoading}
             autoFocus
           />
-          <Button size="large" onClick={handleUnlock} disabled={!password || password.length < 7 || isLoading}>
+          <Button onClick={handleUnlock} disabled={!password || password.length < 7 || isLoading}>
             {isLoading ? 'Unlocking...' : 'Unlock'}
           </Button>
         </div>

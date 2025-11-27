@@ -138,7 +138,7 @@ const HeaderSection = () => {
             </label>
 
             {/* Action Button */}
-            <Button variant="default" size="large" className="w-full" onClick={handleUnderstand}>
+            <Button variant="default" className="w-full" onClick={handleUnderstand}>
               I understand
             </Button>
           </div>

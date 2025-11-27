@@ -388,7 +388,6 @@ function SecurityHookSettingsInnerPage() {
             />
             <Button
               variant="secondary"
-              size="large"
               className="w-full"
               disabled={dailyLimitUsd * 100 === securityProfile?.dailyLimitUsdCents || isSettingDailyLimit}
               onClick={async () => {
@@ -429,7 +428,7 @@ function SecurityHookSettingsInnerPage() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="bg-white rounded-md p-4 border border-gray-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-x-3">
                       <img src={GuardianIcon} alt="Guardian" className="size-5" />
@@ -516,7 +515,6 @@ function SecurityHookSettingsInnerPage() {
                     </div>
                     <Button
                       variant="secondary"
-                      size="large"
                       className="w-full"
                       disabled={isBindingEmail || otpCode.length !== 6}
                       onClick={handleConfirmEmailBinding}
@@ -532,7 +530,6 @@ function SecurityHookSettingsInnerPage() {
                     </Button>
                     <Button
                       variant="ghost"
-                      size="medium"
                       className="w-full"
                       disabled={isBindingEmail}
                       onClick={handleCancelEditEmail}
@@ -543,7 +540,6 @@ function SecurityHookSettingsInnerPage() {
                 ) : (
                   <Button
                     variant="secondary"
-                    size="large"
                     className="w-full"
                     disabled={isBindingEmail || !isValidEmail(email)}
                     onClick={isEditingEmail ? handleChangeWalletEmail : handleRequestEmailBinding}

@@ -67,7 +67,7 @@ export default function Settings() {
 
       <div className="flex flex-col space-y-2 w-full mt-8 mb-4">
         <Button variant="secondary" onClick={handleLock}>
-          <LockKeyholeIcon className="w-4 h-4 mr-2 duration-100 group-hover:stroke-white" />
+          <LockKeyholeIcon className="w-4 h-4 mr-2 duration-100 stroke-dark-blue group-hover:stroke-white" />
           Lock Elytro
         </Button>
 

@@ -32,7 +32,7 @@ export default function CreateNewAddress() {
     <SecondaryPageWrapper title="Create wallet">
       <NetworkSelection selectedChain={selectedChain} handleSelectChain={handleChange} />
 
-      <Button size="large" className="w-full mt-4" onClick={handleCreate} disabled={!selectedChain}>
+      <Button className="w-full mt-4" onClick={handleCreate} disabled={!selectedChain}>
         <Box className="size-4 mr-sm" color="#cce1ea" />
         Create a wallet
       </Button>

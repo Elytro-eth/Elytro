@@ -299,13 +299,7 @@ export default function SendTx() {
         </Form>
 
         {/* Continue button */}
-        <Button
-          variant="secondary"
-          size="large"
-          className="w-full gap-xl"
-          disabled={!isFormValid}
-          onClick={handleContinue}
-        >
+        <Button variant="secondary" className="w-full gap-xl" disabled={!isFormValid} onClick={handleContinue}>
           {isPreparing ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -330,12 +324,10 @@ export default function SendTx() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2 mt-xl">
-            <Button variant="outline" size="medium" onClick={() => setOpenToContractConfirmModal(false)}>
+            <Button variant="outline" onClick={() => setOpenToContractConfirmModal(false)}>
               Back
             </Button>
-            <Button size="medium" onClick={handleOpenTx}>
-              I understand
-            </Button>
+            <Button onClick={handleOpenTx}>I understand</Button>
           </div>
         </DialogContent>
       </Dialog>

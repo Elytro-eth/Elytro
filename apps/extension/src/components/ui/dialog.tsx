@@ -37,11 +37,13 @@ const DialogContent = React.forwardRef<
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
-      style={{
-        animationTimingFunction: 'cubic-bezier(0.34, 0.09, 0.55, 1)',
-      }}
+      style={
+        {
+          // animationTimingFunction: 'cubic-bezier( 0.6, -0.28, 0.735, 0.045 )',
+        }
+      }
       className={cn(
-        'fixed z-50 grid w-full rounded-md gap-2 bg-background p-4 shadow-lg duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-4 data-[state=open]:slide-in-from-top-full',
+        'fixed z-50 grid w-full rounded-sm gap-2 bg-background p-4 shadow-lg duration-1500 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-4 data-[state=open]:slide-in-from-top-full',
         // Elytro Customized Style. PLEASE DO NOT CHANGE IT
         'bg-white w-[calc(100%-2rem)] top-4 left-4 right-4 max-h-[calc(100%-2rem)]',
         className
@@ -75,7 +77,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('text-base font-bold leading-none text-center', className)}
+    className={cn('text-base font-bold leading-none text-center mb-4', className)}
     {...props}
   />
 ));

@@ -8,7 +8,7 @@ interface ActionButtonProps extends ButtonProps {
 
 export default function ActionButton({ icon, label, ...props }: ActionButtonProps) {
   return (
-    <Button key={label} {...props} variant="secondary" size="large">
+    <Button key={label} {...props} variant="secondary">
       {icon}
       {label}
     </Button>

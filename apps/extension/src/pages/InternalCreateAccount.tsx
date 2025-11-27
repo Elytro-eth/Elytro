@@ -13,7 +13,6 @@ export default function InternalCreateAccount() {
       </div>
       <div className="flex flex-col gap-y-md w-full">
         <Button
-          size="large"
           onClick={() => {
             navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreateNewAddress);
           }}
@@ -21,7 +20,6 @@ export default function InternalCreateAccount() {
           Create new wallet
         </Button>
         <Button
-          size="large"
           variant="secondary"
           onClick={() => navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.InternalImportBackup)}
         >

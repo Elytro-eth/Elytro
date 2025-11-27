@@ -21,7 +21,7 @@ const Item = ({ name, logo, url }: { name: string; logo: string; url: string }) 
       onClick={() => navigateTo('side-panel', url as SidePanelRoutePath)}
     >
       <div className="flex flex-row">
-        <img src={logo} alt={name} className="size-10 rounded-full border border-gray-300 p-2" />
+        <img src={logo} alt={name} className="size-10 rounded-full border border-gray-300 p-1 bg-white" />
       </div>
 
       <div className="flex flex-col gap-y-2">
