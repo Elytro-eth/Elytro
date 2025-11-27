@@ -378,7 +378,7 @@ function SecurityHookSettingsInnerPage() {
             <Input
               placeholder="Enter daily spending limit (USD)"
               value={dailyLimitUsd > 0 ? `$ ${dailyLimitUsd}` : 'No limit'}
-              className="bg-gray-150 rounded-md h-16"
+              className="bg-gray-150 rounded-md py-6"
               onChange={(e) => {
                 // limit to numbers only
                 const value = e.target.value.replace(/[^0-9]/g, '');
@@ -405,11 +405,11 @@ function SecurityHookSettingsInnerPage() {
             {securityProfile?.emailVerified && !isEditingEmail ? (
               <div className="flex flex-col gap-y-2">
                 <div className="flex flex-row items-center justify-between border-gray-300 border rounded-md p-lg h-16 bg-gray-50">
-                  <div className="flex flex-row items-center gap-x-2">
-                    <Mail className="size-6 text-gray-600" />
+                  <div className="flex flex-row items-center gap-x-3">
+                    <Mail className="size-5 text-gray-600" />
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-900">{securityProfile.email}</span>
-                      <span className="text-xs text-gray-500">Verified</span>
+                      <span className="text-sm font-bold text-gray-600 mb-0">{securityProfile.email}</span>
+                      <span className="text-xs text-gray-400">Verified</span>
                     </div>
                   </div>
                   <div className="flex flex-row items-center gap-x-2">
@@ -567,9 +567,7 @@ function SecurityHookSettingsInnerPage() {
                     icon={PauseOctagon}
                     label="Spending limits"
                     value={
-                      securityProfile?.dailyLimitUsdCents
-                        ? `${securityProfile?.dailyLimitUsdCents / 100} USD`
-                        : 'No limit'
+                      securityProfile?.dailyLimitUsdCents ? `$${securityProfile?.dailyLimitUsdCents / 100}` : 'No limit'
                     }
                     onClick={() => {
                       setShowSpendingLimitsConfig(true);
