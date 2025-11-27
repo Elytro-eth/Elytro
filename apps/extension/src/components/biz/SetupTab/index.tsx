@@ -31,7 +31,7 @@ export default function SetupTab() {
       title: 'Activate wallet',
       icon: DoorIcon,
       showTag: canSponsor,
-      description: 'Unlocks all wallet features.',
+      description: 'Unlock all wallet features.',
       action: () => {
         handleTxRequest(TxRequestTypeEn.DeployWallet);
       },
@@ -70,6 +70,8 @@ export default function SetupTab() {
                 filter: index === 0 || realSteps[index - 1]?.done || step.done ? 'none' : 'grayscale(100%)',
                 opacity: index === 0 || realSteps[index - 1]?.done || step.done ? '1' : '.5',
                 cursor: isDisabled ? 'not-allowed' : 'pointer',
+                pointerEvents: isDisabled ? 'none' : 'auto',
+                backgroundColor: isDisabled ? '#f5f5f5' : '',
               }}
               onClick={() => {
                 if (!isDisabled) {
@@ -83,7 +85,7 @@ export default function SetupTab() {
                   {step.done ? (
                     <Check className="size-5 p-1 bg-light-green rounded-full flex-shrink-0" />
                   ) : (
-                    <span className="font-medium text-white bg-black-blue rounded-full size-4 text-sm flex items-center justify-center flex-shrink-0">
+                    <span className="font-medium text-white bg-black-blue rounded-full size-5 text-sm flex items-center justify-center flex-shrink-0 p-1">
                       {index + 1}
                     </span>
                   )}

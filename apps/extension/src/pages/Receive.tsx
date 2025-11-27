@@ -133,7 +133,7 @@ export default function Receive() {
             <img src={chainIcon} alt={chainName} className="size-20 rounded-full" />
 
             {/* Title */}
-            <div className="elytro-text-bold-body text-center">This account only accepts tokens on {chainName}</div>
+            <div className="elytro-text-bold-body text-center">This wallet only accepts tokens on {chainName}</div>
 
             {/* Subtitle */}
             <div className="elytro-text-smaller-body text-gray-600 text-center">

@@ -229,7 +229,7 @@ export default function SendTx() {
         )}
 
         <Form {...form}>
-          <div className="bg-light-green rounded-sm pb-4 mb-4">
+          <div className="bg-light-green rounded-md pb-4 mb-4">
             <h3 className="text-lg font-bold px-4 pt-3">Sending</h3>
             {/* Token selector */}
             <FormField
@@ -276,7 +276,7 @@ export default function SendTx() {
             />
           </div>
 
-          <div className="bg-light-blue p-4 pt-3 rounded-sm mb-4">
+          <div className="bg-light-blue p-4 pt-3 rounded-md mb-4">
             <h3 className="text-lg font-bold mb-3">To</h3>
             {/* Address input */}
             <FormField
@@ -291,7 +291,7 @@ export default function SendTx() {
                   <FormControl>
                     <AddressInput field={field} chainId={chainId} />
                   </FormControl>
-                  <FormMessage className="pb-2" />
+                  <FormMessage />
                 </FormItem>
               )}
             />

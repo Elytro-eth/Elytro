@@ -86,8 +86,7 @@ export default function DashboardTabs({ loading, onReload }: DashboardTabsProps)
         ))}
         <div className="absolute right-4 mt-1">
           <RefreshCcw
-            className={`elytro-clickable-icon ${loading ? 'animate-spin' : ''}`}
-            color="gray"
+            className={`elytro-clickable-icon stroke-gray-300 ${loading ? 'animate-spin' : ''}`}
             onClick={onReload}
             aria-label="Refresh account data"
           />
