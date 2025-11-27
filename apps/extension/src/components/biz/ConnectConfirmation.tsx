@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import LogoWithCircle from '@/assets/logoWithCircle.svg';
+import LogoWithCircle from '@/assets/logo_full.svg';
 import { CheckIcon } from 'lucide-react';
 
 interface IProps {
@@ -16,23 +16,23 @@ export default function ConnectionConfirmation({ dApp, onConfirm, onCancel }: IP
   return (
     <Card className="w-full h-full p-1 flex flex-col border-none rounded-none shadow-none">
       <div className="flex justify-center mt-10 ">
-        <Avatar className="size-5xl left-2 z-10 rounded-full">
-          <AvatarImage src={LogoWithCircle} alt="Elytro" />
+        <Avatar className="size-5xl left-2 rounded-full border border-1 border-gray-300 bg-white">
+          <AvatarImage src={LogoWithCircle} alt="Elytro" className="size-[60%]" />
           <AvatarFallback>Elytro</AvatarFallback>
         </Avatar>
-        <Avatar className="size-5xl z-0 rounded-full mr-4">
-          <AvatarImage src={dApp.icon} alt={`${dApp.name} icon`} />
+        <Avatar className="size-5xl z-0 rounded-full mr-4 border border-1 border-gray-300 bg-white">
+          <AvatarImage src={dApp.icon} alt={`${dApp.name} icon`} className="size-[60%]" />
           <AvatarFallback>{dApp.name}</AvatarFallback>
         </Avatar>
       </div>
 
       <div className="text-center my-8">
-        <h2 title={dApp.name} className="elytro-text-bold-body truncate w-[300px] mx-auto text-ellipsis">
+        <h2 title={dApp.name} className="elytro-text-bold-body mx-auto text-ellipsis">
           Connect to {dApp.name}
         </h2>
         <p
           title={dApp.origin ? dApp.origin.replace(/^https:\/\//, '') : ''}
-          className="elytro-text-small mt-sm text-gray-600 truncate max-w-full px-4"
+          className="elytro-text-small mt-sm text-gray-600 max-w-full px-4"
         >
           {dApp.origin ? dApp.origin.replace(/^https:\/\//, '') : ''}
         </p>
@@ -49,7 +49,7 @@ export default function ConnectionConfirmation({ dApp, onConfirm, onCancel }: IP
         </ul>
       </div>
 
-      <div className="flex space-x-4">
+      <div className="flex space-x-2">
         <Button variant="outline" className="flex-1" onClick={onCancel}>
           Cancel
         </Button>

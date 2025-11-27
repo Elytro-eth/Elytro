@@ -10,7 +10,7 @@ import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useTx, TxRequestTypeEn } from '@/contexts/tx-context';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import LogoWithCircle from '@/assets/logoWithCircle.svg';
+import LogoWithCircle from '@/assets/logo_full.svg';
 
 export default function Sign() {
   const {
@@ -53,7 +53,9 @@ export default function Sign() {
           </Avatar>
           <span className="elytro-text-bold-body">You’re almost ready</span>
           <p className="text-sm text-gray-600 -mt-4">
-            Activating confirms your wallet<br />onchain and make it ready to use.
+            Activating confirms your wallet
+            <br />
+            onchain and make it ready to use.
           </p>
           <Button onClick={activateNow} disabled={isSending} className="w-full rounded-md">
             Activate now

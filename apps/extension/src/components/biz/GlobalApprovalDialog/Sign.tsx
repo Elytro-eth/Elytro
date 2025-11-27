@@ -7,7 +7,7 @@ import { useAccount } from '@/contexts/account-context';
 import { useTx, TxRequestTypeEn } from '@/contexts/tx-context';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import LogoWithCircle from '@/assets/logoWithCircle.svg';
+import LogoWithCircle from '@/assets/logo_full.svg';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export default function Sign() {

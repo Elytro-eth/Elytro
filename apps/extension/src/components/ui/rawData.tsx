@@ -18,7 +18,13 @@ export function RawData({ children, defaultExpand = false }: IRawDataProps) {
         {showRawData ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       </button>
       <div className={`${showRawData ? 'table' : 'hidden'} w-full table-fixed`}>
-        <pre className="elytro-text-code-body text-gray-500 px-lg py-md bg-gray-150 rounded-2xs user-select-text whitespace-pre-wrap break-all overflow-x-auto w-full table-cell">
+        <pre
+          className="elytro-text-code-body text-gray-500 px-lg py-md bg-gray-150 rounded-2xs select-text cursor-text whitespace-pre-wrap break-all overflow-x-auto w-full table-cell"
+          style={{
+            userSelect: 'text',
+            WebkitUserSelect: 'text',
+          }}
+        >
           {children}
         </pre>
       </div>

@@ -20,22 +20,15 @@ export default function DAppDetail({ dapp, chainId }: IDAppDetail) {
 
         <Avatar className="h-6 w-6 absolute -bottom-2 -right-2 bg-white rounded-full">
           <AvatarImage src={chainLogo} alt={`${chainName} logo`} />
-          <AvatarFallback>
-            {chainName?.slice(0, 2)?.toUpperCase()}
-          </AvatarFallback>
+          <AvatarFallback>{chainName?.slice(0, 2)?.toUpperCase()}</AvatarFallback>
         </Avatar>
       </div>
 
       {/* DApp Name & Origin */}
       <div className="flex flex-col">
-        <h2 className="text-lg font-bold">{dapp.name}</h2>
+        <h2 className="text-lg font-bold leading-tight">{dapp.name}</h2>
         {dapp.origin && (
-          <a
-            href={dapp.origin}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-gray-500 hover:underline"
-          >
+          <a href={dapp.origin} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600">
             {dapp.origin}
           </a>
         )}

@@ -8,7 +8,7 @@ interface IInfoCardItemProps {
 function InfoCardItem({ label, content }: IInfoCardItemProps) {
   return (
     <div className="flex flex-row justify-between items-center gap-x-sm">
-      <span className="elytro-text-smaller-bold-body text-gray-750 text-nowrap">{label}</span>
+      <span className="text-xs text-gray-600 text-nowrap">{label}</span>
       {content}
     </div>
   );
