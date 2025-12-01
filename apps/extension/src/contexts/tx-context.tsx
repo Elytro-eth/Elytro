@@ -27,6 +27,7 @@ type TMyDecodeResult = Pick<DecodeResult, 'method' | 'toInfo' | 'to'>;
 type TTxMeta = {
   privateRecovery?: boolean;
   noHookSignWith2FA?: boolean;
+  data?: Record<string, SafeAny>;
 };
 
 type ITxContext = {
@@ -233,11 +234,9 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // Handle gas option change (UI only, no API calls)
   const handleGasOptionChange = (option: GasPaymentOption) => {
     setGasPaymentOption(option);
 
-    // Find corresponding estimate from cached options
     const estimate = gasOptions.find((opt) => JSON.stringify(opt.option) === JSON.stringify(option));
 
     if (estimate) {
@@ -250,7 +249,6 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       });
       setHasSufficientBalance(estimate.hasSufficientBalance);
 
-      // Update chosenGasToken if ERC20
       if (estimate.option.type === 'erc20') {
         setChosenGasToken(estimate.option.token);
       } else {

@@ -7,17 +7,15 @@ import { useEffect, useState } from 'react';
 export default function Launch() {
   const [isFadingOut, setIsFadingOut] = useState(false);
 
-  // clear all search params in url
   useEffect(() => {
     window.history.replaceState({}, '', window.location.pathname);
   }, []);
 
   const handleNavigate = (path: string) => {
     setIsFadingOut(true);
-    // Wait for fade-out animation before navigating
     setTimeout(() => {
-      navigateTo('side-panel', path);
-    }, 150); // Match animation duration
+      navigateTo('side-panel', path as SIDE_PANEL_ROUTE_PATHS);
+    }, 150);
   };
 
   return (

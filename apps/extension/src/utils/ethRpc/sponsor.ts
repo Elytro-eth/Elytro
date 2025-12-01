@@ -40,6 +40,12 @@ export const canUserOpGetSponsor = async (
         },
       },
     });
+
+    if (!res || !(res as SafeAny).sponsorOp) {
+      console.warn('Elytro: Sponsor not available - no sponsorOp in response');
+      return false;
+    }
+
     const {
       paymaster,
       paymasterData,
@@ -50,6 +56,11 @@ export const canUserOpGetSponsor = async (
       paymasterPostOpGasLimit,
       // @ts-ignore
     } = (res as SafeAny).sponsorOp; // TODO: add type definition
+
+    if (!paymaster) {
+      console.warn('Elytro: Sponsor not available - missing paymaster address');
+      return false;
+    }
 
     Object.assign(userOp, {
       paymaster,

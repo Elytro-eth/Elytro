@@ -157,12 +157,14 @@ export default function SendTx() {
 
     saveRecentAddress(to);
     handleTxRequest(TxRequestTypeEn.SendTransaction, [txParams], {
-      to,
-      method: {
-        name: 'transfer',
-        params: [to, parsedAmount],
-      } as SafeAny,
-      toInfo: { ...token } as SafeAny,
+      data: {
+        to,
+        method: {
+          name: 'transfer',
+          params: [to, parsedAmount],
+        } as SafeAny,
+        toInfo: { ...token } as SafeAny,
+      },
     });
   }, [form]);
 

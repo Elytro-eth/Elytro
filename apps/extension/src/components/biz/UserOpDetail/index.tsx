@@ -3,7 +3,7 @@ import InfoCard from '@/components/biz/InfoCard';
 import { formatEther, formatUnits } from 'viem';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';
 import { formatBalance, formatDollarBalance, formatRawData } from '@/utils/format';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import ActivateDetail from './ActivationDetail';
 import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
@@ -15,10 +15,7 @@ import HelperText from '@/components/ui/HelperText';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { safeClipboard } from '@/utils/clipboard';
 import { RawData } from '@/components/ui/rawData';
-import { useWallet } from '@/contexts/wallet';
-import { TokenPaymaster } from '@/types/pimlico';
 import { formatAddress } from '@/utils/format';
-import { useSponsor } from '@/hooks/use-sponsor';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -35,10 +32,9 @@ const formatGasUsed = (gasUsed?: string) => {
 };
 
 export function UserOpDetail() {
-  const { wallet } = useWallet();
   const [expandSponsorSelector, setExpandSponsorSelector] = useState(false);
   const {
-    tokenInfo: { tokenPrices, tokens: currentAccountTokens },
+    tokenInfo: { tokenPrices },
     currentAccount: { isDeployed, address, chainId },
   } = useAccount();
   const {
@@ -46,15 +42,12 @@ export function UserOpDetail() {
     costResult,
     decodedDetail,
     hasSufficientBalance,
-    chosenGasToken,
     hookError,
     gasPaymentOption,
+    gasOptions,
     onGasOptionChange,
   } = useTx();
-  const { canSponsor } = useSponsor();
-  const [tokenPaymasters, setTokenPaymasters] = useState<TokenPaymaster[]>([]);
 
-  // Compute current selected gas option for UI
   const gasOption =
     gasPaymentOption.type === 'sponsor'
       ? 'sponsor'
@@ -63,11 +56,6 @@ export function UserOpDetail() {
         : gasPaymentOption.type === 'erc20'
           ? gasPaymentOption.token.token
           : 'self';
-
-  // No longer sync gas option from chosenGasToken - managed by context
-  // useEffect(() => {
-  //   setGasOption(chosenGasToken?.token || (canSponsor ? 'sponsor' : 'self'));
-  // }, [chosenGasToken, canSponsor]);
 
   const DetailContent = useMemo(() => {
     switch (requestType) {
@@ -96,59 +84,41 @@ export function UserOpDetail() {
     })?.replace('$', '');
 
     return [gasInETH, gasInDollar];
-  }, [costResult?.gasUsed, tokenPrices, tokenPaymasters]);
+  }, [costResult?.gasUsed, tokenPrices]);
 
-  const getTokenPaymaster = async () => {
-    try {
-      const res = await wallet.getTokenPaymaster();
-      const filteredTokens = res.filter((token) =>
-        currentAccountTokens.some((t) => t.address.toLowerCase() === token.token.toLowerCase())
-      );
-      setTokenPaymasters(filteredTokens);
-    } catch (error) {
-      console.error('Elytro: Failed to get token paymaster.', error);
-      setTokenPaymasters([]);
+  const getOptionLabel = (option: GasOptionEstimate) => {
+    if (option.option.type === 'sponsor') {
+      return 'Sponsored by Elytro';
+    } else if (option.option.type === 'self') {
+      return `${formatGasUsed(option.gasUsed)} ETH${gasInDollar ? ` ($${Number(gasInDollar).toFixed(4)})` : ''}`;
+    } else if (option.option.type === 'erc20') {
+      const token = option.option.token;
+      const gasUsed = BigInt(option.gasUsed);
+      const gasInToken = gasUsed;
+      return `${formatUnits(gasInToken, token.decimals)} ${token.symbol.toUpperCase()}`;
     }
+    return 'Unknown option';
   };
 
-  useEffect(() => {
-    getTokenPaymaster();
-  }, []);
-
-  const calcGasInTokenByPrice = (paymaster: TokenPaymaster) => {
-    console.log('Elytro: calcGasInTokenByPrice', paymaster);
-    const defaultDisplay = `Pay gas with ${paymaster.name}`;
-    try {
-      const { exchangeRate } = paymaster;
-      const gasUsed = BigInt(costResult?.gasUsed || 0);
-      const gasInToken =
-        selectedGasToken?.token === paymaster.token ? gasUsed : (gasUsed * BigInt(exchangeRate)) / BigInt(1e18);
-
-      return gasInToken && gasInToken > 0n
-        ? `${formatUnits(gasInToken, paymaster.decimals)} ${paymaster.name}`
-        : defaultDisplay;
-    } catch {
-      return defaultDisplay;
-    }
+  const getOptionValue = (option: GasOptionEstimate) => {
+    if (option.option.type === 'sponsor') return 'sponsor';
+    if (option.option.type === 'self') return 'self';
+    return option.option.token.token; // ERC20 token address
   };
 
   const handleGasOptionChange = (value: string) => {
-    if (value === 'sponsor') {
-      onGasOptionChange({ type: 'sponsor' });
-    } else if (value === 'self') {
-      onGasOptionChange({ type: 'self' });
-    } else {
-      // ERC20 token
-      const tokenPaymaster = tokenPaymasters.find((paymaster) => paymaster.token === value);
-      if (tokenPaymaster) {
-        onGasOptionChange({ type: 'erc20', token: tokenPaymaster });
-      }
+    const matchedOption = gasOptions.find((opt) => {
+      if (value === 'sponsor') return opt.option.type === 'sponsor';
+      if (value === 'self') return opt.option.type === 'self';
+      return opt.option.type === 'erc20' && opt.option.token.token === value;
+    });
+
+    if (matchedOption) {
+      onGasOptionChange(matchedOption.option);
     }
   };
 
-  const selectedGasToken = tokenPaymasters?.find((paymaster) => paymaster?.token === chosenGasToken?.token) || null;
-
-  if (!costResult || !decodedDetail) {
+  if (!costResult) {
     return null;
   }
 
@@ -194,8 +164,14 @@ export function UserOpDetail() {
               )}
               {gasOption.startsWith('0x') && (
                 <span className="px-xs text-xs text-gray-750">
-                  {formatUnits(BigInt(costResult?.gasUsed || 0), selectedGasToken?.decimals || 18)}
-                  <span className="elytro-text-small-body text-gray-750 ml-2xs">{selectedGasToken?.name}</span>
+                  {(() => {
+                    const erc20Option = gasOptions.find(
+                      (opt) => opt.option.type === 'erc20' && opt.option.token.token === gasOption
+                    );
+                    if (!erc20Option || erc20Option.option.type !== 'erc20') return '';
+                    const token = erc20Option.option.token;
+                    return `${formatUnits(BigInt(erc20Option.gasUsed), token.decimals)} ${token.symbol.toUpperCase()}`;
+                  })()}
                 </span>
               )}
               {expandSponsorSelector ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -211,47 +187,22 @@ export function UserOpDetail() {
               }}
               className="flex flex-col gap-y-2"
             >
-              {canSponsor && (
-                <div className="flex items-center space-x-2 cursor-pointer">
-                  <RadioGroupItem value="sponsor" id="gas-fee-by-sponsor" />
-                  <Label
-                    htmlFor="gas-fee-by-sponsor"
-                    className="flex items-center elytro-text-smaller-body text-gray-750 truncate cursor-pointer"
-                  >
-                    Sponsored by Elytro
-                  </Label>
-                </div>
-              )}
-              <div className="flex items-center space-x-2 cursor-pointer">
-                <RadioGroupItem value="self" id="gas-fee-by-self" />
-                <Label
-                  htmlFor="gas-fee-by-self"
-                  className="flex items-center elytro-text-smaller-body text-gray-750 truncate cursor-pointer"
-                >
-                  <span className="text-gray-750">
-                    {/* <span className="text-gray-750 mr-2xs">Pay with</span>  */}
-                    {gasInETH} ETH
-                    {gasInDollar && (
-                      <span className="elytro-text-small-body text-gray-600 ml-2xs">
-                        (${Number(gasInDollar).toFixed(4)})
-                      </span>
-                    )}
-                  </span>
-                </Label>
-              </div>
+              {gasOptions.map((option, index) => {
+                const value = getOptionValue(option);
+                const label = getOptionLabel(option);
 
-              {tokenPaymasters.length > 0 &&
-                tokenPaymasters.map((paymaster) => (
-                  <div key={paymaster.token} className="flex items-center space-x-2 ">
-                    <RadioGroupItem value={paymaster.token} id={paymaster.token} />
+                return (
+                  <div key={`${option.option.type}-${index}`} className="flex items-center space-x-2 cursor-pointer">
+                    <RadioGroupItem value={value} id={`gas-fee-${value}`} />
                     <Label
-                      htmlFor={paymaster.token}
-                      className="flex items-center elytro-text-small-body text-gray-750 truncate"
+                      htmlFor={`gas-fee-${value}`}
+                      className="flex items-center elytro-text-smaller-body text-gray-750 truncate cursor-pointer"
                     >
-                      <span className="elytro-text-small-body">{calcGasInTokenByPrice(paymaster)}</span>
+                      <span className="text-gray-750">{label}</span>
                     </Label>
                   </div>
-                ))}
+                );
+              })}
             </RadioGroup>
           </div>
         )}

@@ -283,124 +283,211 @@ class WalletController {
   }
 
   public async prepareUserOp({ params }: { params?: Transaction[] }): Promise<PrepareUserOpResult> {
-    const { address, chainId, isDeployed } = accountManager.currentAccount || {};
+    try {
+      const { address, chainId, isDeployed } = accountManager.currentAccount || {};
 
-    if (!address || !chainId) {
-      throw new Error('Elytro: No current account');
-    }
+      if (!address || !chainId) {
+        throw new Error('Elytro: No current account');
+      }
 
-    const currentOwnerAddress = keyring.currentOwner?.address;
-    if (!currentOwnerAddress) {
-      throw new Error('Elytro: No current owner');
-    }
+      const currentOwnerAddress = keyring.currentOwner?.address;
+      if (!currentOwnerAddress) {
+        throw new Error('Elytro: No current owner');
+      }
 
-    // Create temporary UserOp for estimation (not saved)
-    let tempUserOp: ElytroUserOperation;
-    if (!isDeployed) {
-      const txOpCallData = params ? await elytroSDK.createUserOpFromTxs(address, params) : { callData: '0x' };
-      tempUserOp = await elytroSDK.createUnsignedDeployWalletUserOp(
-        currentOwnerAddress,
-        txOpCallData.callData as `0x${string}`
-      );
-    } else if (params) {
-      tempUserOp = await elytroSDK.createUserOpFromTxs(address, params);
-    } else {
-      throw new Error('Elytro: No params');
-    }
+      // Create temporary UserOp for estimation (not saved)
+      let tempUserOp: ElytroUserOperation;
+      if (!isDeployed) {
+        const txOpCallData = params ? await elytroSDK.createUserOpFromTxs(address, params) : { callData: '0x' };
+        tempUserOp = await elytroSDK.createUnsignedDeployWalletUserOp(
+          currentOwnerAddress,
+          txOpCallData.callData as `0x${string}`
+        );
+      } else if (params) {
+        tempUserOp = await elytroSDK.createUserOpFromTxs(address, params);
+      } else {
+        throw new Error('Elytro: No params');
+      }
 
-    const decodedRes = await this.decodeUserOp(tempUserOp);
-    const transferAmount = decodedRes
-      ? decodedRes?.reduce((acc: bigint, curr: DecodeResult) => acc + BigInt(curr.value), 0n)
-      : 0n;
+      const decodedRes = await this.decodeUserOp(tempUserOp);
+      const transferAmount = decodedRes
+        ? decodedRes?.reduce((acc: bigint, curr: DecodeResult) => acc + BigInt(curr.value), 0n)
+        : 0n;
 
-    await elytroSDK.estimateGas(tempUserOp);
+      await elytroSDK.estimateGas(tempUserOp);
 
-    const [hookStatus, entryPoint, availableTokens] = await Promise.all([
-      this.getSecurityHookStatus(),
-      this.getEntryPoint(),
-      elytroSDK.getTokenPaymaster(),
-    ]);
-
-    const canSponsor = await canUserOpGetSponsor(tempUserOp, chainId, entryPoint, hookStatus);
-
-    const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 10000): Promise<T> => {
-      return Promise.race([
-        promise,
-        new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Request timeout')), timeoutMs)),
+      const [hookStatus, entryPoint, availableTokens] = await Promise.all([
+        this.getSecurityHookStatus(),
+        this.getEntryPoint(),
+        elytroSDK.getTokenPaymaster(),
       ]);
-    };
 
-    const estimations = await Promise.allSettled([
-      canSponsor
-        ? withTimeout(elytroSDK.estimateUserOpCost(tempUserOp, transferAmount, false))
-        : Promise.reject(new Error('Sponsor not available')),
-      withTimeout(elytroSDK.estimateUserOpCost(tempUserOp, transferAmount, true)),
+      const canSponsor = await canUserOpGetSponsor(tempUserOp, chainId, entryPoint, hookStatus);
 
-      // ERC20 options (parallel for all tokens with timeout)
-      ...availableTokens.map((token) =>
+      // Wrapper to ensure each estimation is isolated and has timeout protection
+      const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 10000): Promise<T> => {
+        return Promise.race([
+          promise.catch((error) => {
+            // Catch and re-throw to prevent error propagation between promises
+            throw error;
+          }),
+          new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Request timeout')), timeoutMs)),
+        ]);
+      };
+
+      // Run all estimations independently with proper error isolation
+      const estimations = await Promise.allSettled([
+        // Sponsor estimation
+        canSponsor
+          ? withTimeout(
+              elytroSDK.estimateUserOpCost(tempUserOp, transferAmount, false).catch((error) => {
+                console.warn('Sponsor estimation error:', error);
+                throw error;
+              })
+            )
+          : Promise.resolve(null),
+
+        // ETH estimation
         withTimeout(
-          elytroSDK.estimateUserOpCost(tempUserOp, transferAmount, true, token).then((result) => ({ token, result }))
-        )
-      ),
-    ]);
+          elytroSDK.estimateUserOpCost(tempUserOp, transferAmount, true).catch((error) => {
+            console.error('ETH estimation error:', error);
+            throw error;
+          })
+        ),
 
-    const gasOptions: GasOptionEstimate[] = [];
+        // ERC20 options (parallel for all tokens with timeout and error isolation)
+        ...availableTokens.map((token) =>
+          withTimeout(
+            elytroSDK
+              .estimateUserOpCost(tempUserOp, transferAmount, true, token)
+              .then((result) => ({ token, result }))
+              .catch((error) => {
+                console.warn(`Token ${token?.name} estimation error:`, error);
+                throw error;
+              })
+          )
+        ),
+      ]);
 
-    if (estimations[0].status === 'fulfilled') {
-      const sponsorCost = estimations[0].value;
-      const needDeposit = sponsorCost.missAmount > 0n;
-      gasOptions.push({
-        option: { type: 'sponsor' },
-        gasUsed: sponsorCost.gasUsed,
-        needDeposit,
-        hasSufficientBalance: !needDeposit,
-      });
-    } else if (canSponsor) {
-      console.warn('Failed to estimate sponsor cost:', estimations[0].reason);
-    }
+      const gasOptions: GasOptionEstimate[] = [];
 
-    if (estimations[1].status === 'fulfilled') {
-      const ethCost = estimations[1].value;
-      const needDeposit = ethCost.missAmount > 0n;
-      gasOptions.push({
-        option: { type: 'self' },
-        gasUsed: ethCost.gasUsed,
-        needDeposit,
-        hasSufficientBalance: !needDeposit,
-        balance: ethCost.balance,
-      });
-    } else {
-      console.error('Failed to estimate ETH cost:', estimations[1].reason);
-    }
-
-    for (let i = 2; i < estimations.length; i++) {
-      if (estimations[i].status === 'fulfilled') {
-        const { token, result: tokenCost } = estimations[i].value as { token: TokenQuote; result: SafeAny };
-        const needDeposit = tokenCost.missAmount > 0n;
+      // Process sponsor estimation
+      if (estimations[0].status === 'fulfilled' && estimations[0].value) {
+        const sponsorCost = estimations[0].value;
+        const needDeposit = (sponsorCost.missAmount ?? 0n) > 0n;
         gasOptions.push({
-          option: { type: 'erc20', token },
-          gasUsed: tokenCost.gasUsed,
+          option: { type: 'sponsor' },
+          gasUsed: String(sponsorCost.gasUsed ?? 0n),
           needDeposit,
           hasSufficientBalance: !needDeposit,
-          balance: tokenCost.balance,
         });
-      } else {
-        const token = availableTokens[i - 2];
-        console.warn(`Failed to estimate gas for token ${token?.name}:`, estimations[i].reason);
+      } else if (canSponsor && estimations[0].status === 'rejected') {
+        console.warn('Failed to estimate sponsor cost:', estimations[0].reason);
       }
-    }
 
-    if (gasOptions.length === 0) {
-      throw new Error('Failed to estimate any gas payment options');
-    }
-    const otpPrecheck: OtpPrecheckResult | undefined = undefined;
+      // Process ETH estimation
+      if (estimations[1].status === 'fulfilled') {
+        try {
+          const ethCost = estimations[1].value;
+          if (!ethCost || typeof ethCost !== 'object') {
+            throw new Error('Invalid estimation result format');
+          }
+          const needDeposit = (ethCost.missAmount ?? 0n) > 0n;
+          gasOptions.push({
+            option: { type: 'self' },
+            gasUsed: String(ethCost.gasUsed ?? 0n),
+            needDeposit,
+            hasSufficientBalance: !needDeposit,
+            balance: ethCost.balance ?? 0n,
+          });
+        } catch (error) {
+          console.error('Failed to process ETH estimation result:', error, 'Raw result:', estimations[1].value);
+        }
+      } else {
+        console.error('Failed to estimate ETH cost:', estimations[1].reason);
+      }
 
-    return {
-      decodedRes: formatObjectWithBigInt(decodedRes),
-      gasOptions: formatObjectWithBigInt(gasOptions),
-      defaultOption: canSponsor ? { type: 'sponsor' } : { type: 'self' },
-      otpPrecheck,
-    };
+      // Process ERC20 token estimations
+      for (let i = 2; i < estimations.length; i++) {
+        const estimation = estimations[i];
+        const token = availableTokens[i - 2];
+
+        if (estimation.status === 'fulfilled') {
+          try {
+            const estimationValue = estimation.value as SafeAny;
+            if (!estimationValue || typeof estimationValue !== 'object') {
+              throw new Error('Invalid estimation result format');
+            }
+            const { token: tokenFromResult, result: tokenCost } = estimationValue;
+            if (!tokenCost || typeof tokenCost !== 'object') {
+              throw new Error('Invalid token cost result format');
+            }
+            const needDeposit = (tokenCost.missAmount ?? 0n) > 0n;
+            gasOptions.push({
+              option: { type: 'erc20', token: tokenFromResult },
+              gasUsed: String(tokenCost.gasUsed ?? 0n),
+              needDeposit,
+              hasSufficientBalance: !needDeposit,
+              balance: tokenCost.balance ?? 0n,
+            });
+          } catch (error) {
+            console.warn(
+              `Failed to process token ${token?.name} estimation result:`,
+              error,
+              'Raw result:',
+              estimation.value
+            );
+          }
+        } else {
+          console.warn(`Failed to estimate gas for token ${token?.name}:`, estimation.reason);
+        }
+      }
+
+      // Fallback: If no options available, provide a basic ETH option
+      if (gasOptions.length === 0) {
+        console.warn('All gas estimations failed, providing fallback ETH option');
+        gasOptions.push({
+          option: { type: 'self' },
+          gasUsed: String(tempUserOp.callGasLimit ?? 0n),
+          needDeposit: true, // Conservative: assume deposit needed
+          hasSufficientBalance: false, // Conservative: assume insufficient balance
+          balance: 0n,
+        });
+      }
+
+      const otpPrecheck: OtpPrecheckResult | undefined = undefined;
+
+      // Determine default option: prefer sponsor if available and has sufficient balance
+      const defaultOption = gasOptions.find((opt) => opt.option.type === 'sponsor' && opt.hasSufficientBalance)
+        ? { type: 'sponsor' as const }
+        : gasOptions.find((opt) => opt.option.type === 'self')
+          ? { type: 'self' as const }
+          : gasOptions[0].option;
+
+      return {
+        decodedRes: formatObjectWithBigInt(decodedRes),
+        gasOptions: formatObjectWithBigInt(gasOptions),
+        defaultOption,
+        otpPrecheck,
+      };
+    } catch (error) {
+      console.error('Elytro: prepareUserOp failed with error:', error);
+      // Return a minimal fallback result to prevent UI from being blank
+      return {
+        decodedRes: [],
+        gasOptions: [
+          {
+            option: { type: 'self' },
+            gasUsed: '100000', // Default fallback gas estimate
+            needDeposit: true,
+            hasSufficientBalance: false,
+            balance: 0n,
+          },
+        ],
+        defaultOption: { type: 'self' },
+        otpPrecheck: undefined,
+      };
+    }
   }
 
   public async prepareUserOpEstimate(txs: Transaction[]): Promise<{

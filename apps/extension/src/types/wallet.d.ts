@@ -7,13 +7,11 @@ type TUserOperationPreFundResult = {
   gasUsed: string;
 };
 
-// Gas 支付选项
 type GasPaymentOption =
   | { type: 'sponsor' }
   | { type: 'self' }
-  | { type: 'erc20'; token: import('@/types/pimlico').TokenQuote };
+  | { type: 'erc20'; token: import('@/types/pimlico').TokenPaymaster };
 
-// 单个 gas 支付选项的预估结果
 type GasOptionEstimate = {
   option: GasPaymentOption;
   gasUsed: string;
@@ -22,7 +20,6 @@ type GasOptionEstimate = {
   balance?: bigint;
 };
 
-// OTP 预检查结果
 type OtpPrecheckResult = {
   otpRequired: boolean;
   requirementReason?: string;
@@ -31,7 +28,6 @@ type OtpPrecheckResult = {
   projectedSpendUsdCents?: number;
 };
 
-// Prepare 阶段返回结果
 type PrepareUserOpResult = {
   decodedRes: import('@elytro/decoder').DecodeResult[];
   gasOptions: GasOptionEstimate[]; // 所有 gas 支付选项的预估结果

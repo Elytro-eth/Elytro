@@ -2,7 +2,6 @@ import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import ProcessingTip from '@/components/ui/ProcessingTip';
 import { Button } from '@/components/ui/button';
 import { UserOpDetail } from '@/components/biz/UserOpDetail';
-import { useAccount } from '@/contexts/account-context';
 import { AlertCircle, AlertTriangle, Box } from 'lucide-react';
 import { InputOTPGroup, InputOTP, InputOTPSlot } from '@/components/ui/input-otp';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
@@ -22,7 +21,6 @@ export default function Tx() {
     isPreparing,
     isSending,
     errorMsg,
-    decodedDetail,
     onConfirm,
     onCancel,
     onRetry,
@@ -31,9 +29,6 @@ export default function Tx() {
     requestSecurityOtp,
     verifySecurityOtp,
   } = useTx();
-  const {
-    currentAccount: { chainId },
-  } = useAccount();
 
   const [otpCode, setOtpCode] = useState<string>('');
 
@@ -149,17 +144,17 @@ export default function Tx() {
       </DialogHeader>
       {/* Content */}
       <div className="flex flex-col gap-y-md">
-        <UserOpDetail chainId={chainId!} from={decodedDetail?.[0]?.from} />
+        <UserOpDetail />
       </div>
 
       {/* Footer */}
-      <DialogFooter className="flex w-full gap-x-sm [&>button]:flex-1 mt-2xl">
+      <DialogFooter className="w-full gap-x-sm [&>button]:flex-1 mt-2xl">
         {isSending ? (
           <Button variant="ghost" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
             Close
           </Button>
         ) : (
-          <div className="grid grid-cols-2 gap-x-sm">
+          <div className="w-full grid grid-cols-2 gap-x-sm">
             <Button variant="ghost" onClick={onCancel} disabled={isSending}>
               Cancel
             </Button>
