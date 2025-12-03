@@ -12,6 +12,38 @@ export function formatAddress(address?: string, chainId?: number) {
   return chainPrefix ? `${chainPrefix}:${address}` : address;
 }
 
+export function parseEIP3770Address(input: string): {
+  address: string;
+  chainId: number | null;
+  prefix: string;
+  isValidFormat: boolean;
+  prefixExists: boolean;
+  addressValid: boolean;
+} | null {
+  const parts = input.split(':');
+  if (parts.length !== 2) {
+    return null;
+  }
+
+  const [prefix, address] = parts;
+  const prefixLower = prefix.toLowerCase();
+
+  const chainIdEntry = Object.entries(EIP3770_CHAIN_PREFIX_MAP).find(([_, chainPrefix]) => chainPrefix === prefixLower);
+
+  const prefixExists = !!chainIdEntry;
+  const chainId = chainIdEntry ? Number(chainIdEntry[0]) : null;
+  const addressValid = isAddress(address);
+
+  return {
+    address,
+    chainId,
+    prefix: prefixLower,
+    isValidFormat: true,
+    prefixExists,
+    addressValid,
+  };
+}
+
 export function paddingZero(value: string | number | bigint, bytesLen?: number): string {
   const hexString =
     typeof value === 'string'

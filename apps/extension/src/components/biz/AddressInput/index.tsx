@@ -1,6 +1,6 @@
 import { Input } from '@/components/ui/input';
 import { useEffect, useState, useRef } from 'react';
-import { FieldValues } from 'react-hook-form';
+import { FieldValues, useFormContext } from 'react-hook-form';
 import { isAddress } from 'viem';
 import { useWallet } from '@/contexts/wallet';
 import { debounce } from 'lodash';
@@ -8,6 +8,9 @@ import ENSSearchResults from './EnsSearch';
 import RecentAddressesList from './RecentAddress';
 import InputDisplay from './InputDisplay';
 import { getRecentAddresses } from '@/utils/recentAddresses';
+import { parseEIP3770Address } from '@/utils/format';
+import { getChainNameByChainId } from '@/constants/chains';
+import { useFormField } from '@/components/ui/form';
 
 interface IAddressInputProps {
   field: FieldValues;
@@ -16,6 +19,8 @@ interface IAddressInputProps {
 
 const AddressInput = ({ field, chainId }: IAddressInputProps) => {
   const { wallet } = useWallet();
+  const form = useFormContext();
+  const { name } = useFormField();
   const [displayLabel, setDisplayLabel] = useState<string>('');
   const [value, setValue] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -23,6 +28,7 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [isClosing, setIsClosing] = useState<boolean>(false);
   const [recentAddresses, setRecentAddresses] = useState<TRecentAddress[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -78,6 +84,50 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
     const newValue = e.target.value;
     setValue(newValue);
 
+    const eip3770Parsed = parseEIP3770Address(newValue);
+    if (eip3770Parsed) {
+      if (!eip3770Parsed.prefixExists) {
+        const errorMsg = `Chain prefix "${eip3770Parsed.prefix}" is not supported`;
+        setErrorMessage(errorMsg);
+        form.setError(name, { message: errorMsg });
+        setDisplayLabel('');
+        setEnsInfo(null);
+        return;
+      }
+
+      if (!eip3770Parsed.addressValid) {
+        const errorMsg = 'Invalid address format';
+        setErrorMessage(errorMsg);
+        form.setError(name, { message: errorMsg });
+        setDisplayLabel('');
+        setEnsInfo(null);
+        return;
+      }
+
+      if (eip3770Parsed.chainId !== null && eip3770Parsed.chainId !== chainId) {
+        const inputChainName = getChainNameByChainId(eip3770Parsed.chainId) || `Chain ${eip3770Parsed.chainId}`;
+        const currentChainName = getChainNameByChainId(chainId) || `Chain ${chainId}`;
+        const errorMsg = `Address is for ${inputChainName}, but current chain is ${currentChainName}`;
+        setErrorMessage(errorMsg);
+        form.setError(name, { message: errorMsg });
+        setDisplayLabel('');
+        setEnsInfo(null);
+        return;
+      }
+
+      setErrorMessage('');
+      form.clearErrors(name);
+      setDisplayLabel(eip3770Parsed.address);
+      setEnsInfo(null);
+      field.onChange(eip3770Parsed.address);
+      inputRef.current?.blur();
+      return;
+    }
+
+    // Not EIP-3770 format, clear error
+    setErrorMessage('');
+    form.clearErrors(name);
+
     if (isAddress(newValue)) {
       setDisplayLabel(newValue);
       setEnsInfo(null);
@@ -94,6 +144,21 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
 
   const handleBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
+
+    const eip3770Parsed = parseEIP3770Address(newValue);
+    if (eip3770Parsed) {
+      if (eip3770Parsed.prefixExists && eip3770Parsed.addressValid && eip3770Parsed.chainId === chainId) {
+        setDisplayLabel(eip3770Parsed.address);
+        field.onChange(eip3770Parsed.address);
+      }
+      setIsClosing(true);
+      setTimeout(() => {
+        setIsFocused(false);
+        setIsClosing(false);
+      }, 150);
+      return;
+    }
+
     const isAddr = isAddress(newValue);
 
     if (isAddr) {
@@ -106,7 +171,6 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
       field.onChange(newValue);
     }
 
-    // Trigger close animation
     setIsClosing(true);
     setTimeout(() => {
       setIsFocused(false);
@@ -117,6 +181,7 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
   const handleFocus = () => {
     setIsClosing(false);
     setIsFocused(true);
+    setErrorMessage('');
   };
 
   const handleSelectENS = (ens?: TRecentAddress) => {
@@ -199,7 +264,9 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
             onSelectAddress={handleSelectRecentAddress}
           />
 
-          {!loading && !ensInfo && !recentAddresses.length && !value.endsWith('.eth') && (
+          {errorMessage && <div className="p-4 text-red-500 text-sm border-t border-gray-200">{errorMessage}</div>}
+
+          {!loading && !ensInfo && !recentAddresses.length && !value.endsWith('.eth') && !errorMessage && (
             <div className="p-4 text-gray-500">Enter an address or ENS name.</div>
           )}
         </div>
