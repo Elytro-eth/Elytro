@@ -41,6 +41,7 @@ const tips = [
 export default function ExportBackupPage() {
   const { accounts, getAccounts } = useAccount();
   const [isGuiding, setIsGuiding] = useState(true);
+  const [isFadingOut, setIsFadingOut] = useState(false);
   const [pwd, setPwd] = useState('');
   const [isPwdPassed, setIsPwdPassed] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -49,7 +50,12 @@ export default function ExportBackupPage() {
   const [isTermTwoChecked, setIsTermTwoChecked] = useState(false);
   const [isTermThreeChecked, setIsTermThreeChecked] = useState(false);
   const handleGuiding = () => {
-    setIsGuiding(false);
+    setIsFadingOut(true);
+    // Wait for fade-out animation before switching view
+    setTimeout(() => {
+      setIsGuiding(false);
+      setIsFadingOut(false);
+    }, 150); // Match animation duration
   };
   const [exportedAccounts, setExportedAccounts] = useState<string[]>(accounts.map((account) => account.address));
 
@@ -123,12 +129,21 @@ export default function ExportBackupPage() {
   return (
     <SecondaryPageWrapper title="Export wallets">
       {isGuiding ? (
-        <Guide title="How backup works" action="Start backup" onAction={handleGuiding} tips={tips} imgSrc={WalletImg} />
+        <div className={`page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}>
+          <Guide
+            title="How backup works"
+            action="Start backup"
+            onAction={handleGuiding}
+            tips={tips}
+            imgSrc={WalletImg}
+          />
+        </div>
       ) : (
-        <div className="flex flex-col gap-y-lg items-center h-full justify-between">
+        <div
+          className={`flex flex-col gap-y-lg items-center h-full justify-between page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}
+        >
           <div className="flex flex-col w-full">
             <div className="elytro-text-bold-body">Create a backup</div>
-            <div className="elytro-text-smaller-body text-gray-600">Select which wallets to backup</div>
           </div>
 
           <div className="w-full max-h-32 overflow-y-scroll flex flex-col rounded-md bg-gray-150 p-md">

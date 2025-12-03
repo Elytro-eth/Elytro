@@ -15,6 +15,7 @@ const NetworkConfiguration: React.FC = () => {
   const { getChains } = useChain();
   const [selectedChain, setSelectedChain] = useState<TChainItem | null>(null);
   const [pageState, setPageState] = useState<NetworkConfigPageState>(NetworkConfigPageState.LIST);
+  const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
     getChains();
@@ -22,12 +23,22 @@ const NetworkConfiguration: React.FC = () => {
 
   const onSelectChain = useCallback((chain: TChainItem) => {
     setSelectedChain(chain);
-    setPageState(NetworkConfigPageState.EDIT);
+    setIsFadingOut(true);
+    // Wait for fade-out animation before switching view
+    setTimeout(() => {
+      setPageState(NetworkConfigPageState.EDIT);
+      setIsFadingOut(false);
+    }, 150); // Match animation duration
   }, []);
 
   const onPageBack = useCallback(() => {
     if (pageState !== NetworkConfigPageState.LIST) {
-      setPageState(NetworkConfigPageState.LIST);
+      setIsFadingOut(true);
+      // Wait for fade-out animation before switching view
+      setTimeout(() => {
+        setPageState(NetworkConfigPageState.LIST);
+        setIsFadingOut(false);
+      }, 150);
       return;
     }
     history.back();
@@ -35,20 +46,28 @@ const NetworkConfiguration: React.FC = () => {
 
   const onChainConfigChanged = useCallback(() => {
     getChains();
-    setPageState(NetworkConfigPageState.LIST);
-  }, []);
+    setIsFadingOut(true);
+    setTimeout(() => {
+      setPageState(NetworkConfigPageState.LIST);
+      setIsFadingOut(false);
+    }, 150);
+  }, [getChains]);
 
   return (
     <SecondaryPageWrapper title="Networks" onBack={onPageBack}>
       {pageState === NetworkConfigPageState.LIST && (
-        <NetworkSelection
-          selectedChain={selectedChain}
-          disabledChainsWhichHasExistAccount={false}
-          handleSelectChain={onSelectChain}
-        />
+        <div className={`page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}>
+          <NetworkSelection
+            selectedChain={selectedChain}
+            disabledChainsWhichHasExistAccount={false}
+            handleSelectChain={onSelectChain}
+          />
+        </div>
       )}
       {pageState === NetworkConfigPageState.EDIT && (
-        <NetworkEditor chain={selectedChain!} onChanged={onChainConfigChanged} />
+        <div className={`page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}>
+          <NetworkEditor chain={selectedChain!} onChanged={onChainConfigChanged} />
+        </div>
       )}
     </SecondaryPageWrapper>
   );

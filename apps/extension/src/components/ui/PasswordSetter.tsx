@@ -104,12 +104,7 @@ export function PasswordSetter({ onSubmit, loading }: PasswordSetterProps) {
           />
         </div>
 
-        <Button
-          type="submit"
-          className="w-full rounded-full h-14"
-          disabled={loading || !form.formState.isValid}
-          size="large"
-        >
+        <Button type="submit" className="w-full rounded-full h-14" disabled={loading || !form.formState.isValid}>
           {loading ? 'Creating...' : 'Continue'}
         </Button>
       </form>

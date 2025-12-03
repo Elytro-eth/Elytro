@@ -27,10 +27,8 @@ export default function Launch() {
         <h1 className="elytro-text-headline text-center">Your recoverable Ethereum wallet</h1>
         <div className="flex flex-col w-full">
           <div className="flex flex-col gap-y-3">
-            <Button size="large" onClick={() => handleNavigate(SIDE_PANEL_ROUTE_PATHS.CreatePasscode)}>
-              Create a new wallet
-            </Button>
-            <Button size="large" variant="secondary" onClick={() => handleNavigate(SIDE_PANEL_ROUTE_PATHS.Transfer)}>
+            <Button onClick={() => handleNavigate(SIDE_PANEL_ROUTE_PATHS.CreatePasscode)}>Create a new wallet</Button>
+            <Button variant="secondary" onClick={() => handleNavigate(SIDE_PANEL_ROUTE_PATHS.Transfer)}>
               Already have a wallet
             </Button>
           </div>

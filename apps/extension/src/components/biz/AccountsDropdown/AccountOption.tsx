@@ -49,7 +49,7 @@ export default function AccountOption({
   return (
     <div
       className={cn(
-        'flex items-center gap-x-xl justify-between px-lg py-md cursor-pointer hover:bg-gray-300',
+        'flex items-center gap-x-xl justify-between px-lg py-md cursor-pointer hover:bg-gray-150',
         isSelected && 'bg-gray-150'
       )}
       onClick={onSelect}
@@ -108,7 +108,7 @@ export default function AccountOption({
               variant="destructive"
               size="small"
             >
-              CONFIRM DELETE
+              DELETE
             </Button>
           </div>
         </DialogContent>

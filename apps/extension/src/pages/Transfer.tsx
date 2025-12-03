@@ -17,7 +17,6 @@ export default function Transfer() {
       </div>
       <div className="flex flex-col gap-y-md w-full">
         <Button
-          size="large"
           onClick={() => {
             navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreatePasscode, {
               from: 'recover',
@@ -26,11 +25,7 @@ export default function Transfer() {
         >
           Recover a wallet
         </Button>
-        <Button
-          size="large"
-          variant="secondary"
-          onClick={() => navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportBackup)}
-        >
+        <Button variant="secondary" onClick={() => navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportBackup)}>
           Import all wallets
         </Button>
       </div>

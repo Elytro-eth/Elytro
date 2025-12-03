@@ -130,7 +130,7 @@ export default function NetworkEditor({ chain, onChanged }: { chain: TChainItem;
     <div className="space-y-4">
       <div className="flex flex-row items-center mb-4">
         <img src={chain?.icon} alt={chain?.name} className="size-8 rounded-full" />
-        <div className="elytro-text-small-bold ml-4 text-bold">{chain?.name}</div>
+        <div className="elytro-text-bold-body ml-2 text-bold">{chain?.name}</div>
       </div>
 
       <Form {...form}>

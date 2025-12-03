@@ -231,7 +231,7 @@ export default function SendTx() {
         )}
 
         <Form {...form}>
-          <div className="bg-light-green rounded-sm pb-4 mb-4">
+          <div className="bg-light-green rounded-md pb-4 mb-4">
             <h3 className="text-lg font-bold px-4 pt-3">Sending</h3>
             {/* Token selector */}
             <FormField
@@ -278,7 +278,7 @@ export default function SendTx() {
             />
           </div>
 
-          <div className="bg-light-blue p-4 pt-3 rounded-sm mb-4">
+          <div className="bg-light-blue p-4 pt-3 rounded-md mb-4">
             <h3 className="text-lg font-bold mb-3">To</h3>
             {/* Address input */}
             <FormField
@@ -293,7 +293,7 @@ export default function SendTx() {
                   <FormControl>
                     <AddressInput field={field} chainId={chainId} />
                   </FormControl>
-                  <FormMessage className="pb-2" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -301,13 +301,7 @@ export default function SendTx() {
         </Form>
 
         {/* Continue button */}
-        <Button
-          variant="secondary"
-          size="large"
-          className="w-full gap-xl"
-          disabled={!isFormValid}
-          onClick={handleContinue}
-        >
+        <Button variant="secondary" className="w-full gap-xl" disabled={!isFormValid} onClick={handleContinue}>
           {isPreparing ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -332,12 +326,10 @@ export default function SendTx() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2 mt-xl">
-            <Button variant="outline" size="medium" onClick={() => setOpenToContractConfirmModal(false)}>
+            <Button variant="outline" onClick={() => setOpenToContractConfirmModal(false)}>
               Back
             </Button>
-            <Button size="medium" onClick={handleOpenTx}>
-              I understand
-            </Button>
+            <Button onClick={handleOpenTx}>I understand</Button>
           </div>
         </DialogContent>
       </Dialog>

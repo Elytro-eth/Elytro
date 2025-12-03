@@ -83,7 +83,7 @@ const CreateAccount: React.FC = () => {
     <SecondaryPageWrapper title="Create wallet">
       <NetworkSelection selectedChain={selectedChain} handleSelectChain={handleSelectChain} />
 
-      <Button type="submit" className="w-full rounded-full mt-10" size="large" onClick={handleCreateAccount}>
+      <Button type="submit" className="w-full rounded-full mt-10" onClick={handleCreateAccount}>
         Continue
       </Button>
     </SecondaryPageWrapper>

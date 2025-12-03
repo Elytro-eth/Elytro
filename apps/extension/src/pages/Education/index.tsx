@@ -10,7 +10,7 @@ import DoorImg from '@/assets/door.png';
 
 const STEPS = [
   {
-    title: 'Elytro is a new kind of wallet',
+    title: 'A new kind of wallet',
     img: DoorImg,
     noDescription: true,
   },

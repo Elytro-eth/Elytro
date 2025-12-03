@@ -120,8 +120,8 @@ export default function Receive() {
         </div>
 
         {/* Close Button */}
-        <Button variant="secondary" size="large" className="w-full" onClick={handleClose}>
-          I&apos;m done
+        <Button variant="secondary" className="w-full" onClick={handleClose}>
+          I’m done
         </Button>
       </div>
 
@@ -133,7 +133,7 @@ export default function Receive() {
             <img src={chainIcon} alt={chainName} className="size-20 rounded-full" />
 
             {/* Title */}
-            <div className="elytro-text-bold-body text-center">This account only accepts tokens on {chainName}</div>
+            <div className="elytro-text-bold-body text-center">This wallet only accepts tokens on {chainName}</div>
 
             {/* Subtitle */}
             <div className="elytro-text-smaller-body text-gray-600 text-center">
@@ -147,7 +147,7 @@ export default function Receive() {
             </label>
 
             {/* Action Button */}
-            <Button variant="default" size="large" className="w-full" onClick={handleUnderstand}>
+            <Button variant="default" className="w-full" onClick={handleUnderstand}>
               I understand
             </Button>
           </div>

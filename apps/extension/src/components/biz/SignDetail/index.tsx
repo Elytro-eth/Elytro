@@ -61,11 +61,13 @@ export default function SignDetail({ onConfirm, onCancel, dapp, chainId, signDat
 
           <pre
             className={cn(
-              'w-full max-w-full whitespace-pre-wrap break-all bg-gray-150 rounded-2xl p-4 text-xs text-gray-500 min-h-40 max-h-[calc(100vh-400px)] !overflow-auto ',
+              'w-full max-w-full whitespace-pre-wrap break-all bg-gray-150 rounded-2xl p-4 elytro-text-code-body text-gray-500 min-h-40 max-h-[calc(100vh-400px)] !overflow-auto select-text cursor-text',
               signMethod === 'signMessage' ? '[word-break:break-word]' : ''
             )}
             style={{
               scrollbarColor: 'transparent transparent',
+              userSelect: 'text',
+              WebkitUserSelect: 'text',
             }}
           >
             {format(params)}
@@ -75,7 +77,7 @@ export default function SignDetail({ onConfirm, onCancel, dapp, chainId, signDat
 
       <div className="flex flex-col gap-y-4">
         <div className="text-xs text-gray-300 my-4 border-gray-200">
-          <div className="">
+          <div className="text-gray-600">
             By confirming, you will allow the smart contract to access your fund and make transactions.
           </div>
         </div>

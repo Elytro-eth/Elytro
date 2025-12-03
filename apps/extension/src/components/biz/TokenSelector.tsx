@@ -98,7 +98,7 @@ export default function TokenSelector({
         <SelectedToken token={selectedToken as TTokenInfo} />
       </SelectTrigger>
       <SelectContent
-        className="rounded-3xl bg-white overflow-hidden w-full"
+        className="bg-white rounded-md overflow-hidden w-[calc(100%-2rem)] left-4 right-4 max-h-[calc(100%-2rem)] max-w-[calc(100%-2rem)]"
         onPointerDownOutside={handleClose}
         onEscapeKeyDown={handleClose}
       >

@@ -62,7 +62,7 @@ const YouAreIn: React.FC = () => {
           <h2 className="elytro-text-smaller-body text-muted-foreground text-center">{description}</h2>
         </div>
 
-        <Button className="w-full rounded-full h-14" size="large" onClick={handleNavigate}>
+        <Button className="w-full rounded-full h-14" onClick={handleNavigate}>
           {action}
         </Button>
       </div>

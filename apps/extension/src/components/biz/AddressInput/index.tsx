@@ -21,6 +21,7 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [ensInfo, setEnsInfo] = useState<TRecentAddress | null>(null);
   const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [isClosing, setIsClosing] = useState<boolean>(false);
   const [recentAddresses, setRecentAddresses] = useState<TRecentAddress[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -105,10 +106,16 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
       field.onChange(newValue);
     }
 
-    setTimeout(() => setIsFocused(false), 200);
+    // Trigger close animation
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsFocused(false);
+      setIsClosing(false);
+    }, 150); // Match animation duration
   };
 
   const handleFocus = () => {
+    setIsClosing(false);
     setIsFocused(true);
   };
 
@@ -125,7 +132,12 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
       field.onChange(ensInfo.address);
     }
 
-    setIsFocused(false);
+    // Trigger close animation
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsFocused(false);
+      setIsClosing(false);
+    }, 150);
   };
 
   const handleSelectRecentAddress = (item: TRecentAddress) => {
@@ -135,7 +147,13 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
       setDisplayLabel(item.address);
       setValue(item.address);
       field.onChange(item.address);
-      setIsFocused(false);
+
+      // Trigger close animation
+      setIsClosing(true);
+      setTimeout(() => {
+        setIsFocused(false);
+        setIsClosing(false);
+      }, 150);
     }
   };
 
@@ -146,8 +164,8 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
   }, [value]);
 
   return (
-    <div className="bg-white rounded-md flex flex-col relative">
-      <div className="flex items-center relative">
+    <div className="bg-white rounded-md flex flex-col relative -mx-4">
+      <div className="flex items-center relative px-4">
         <Input
           ref={inputRef}
           className="text-lg border-none bg-white focus-visible:outline-none pl-0"
@@ -168,7 +186,11 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
       </div>
 
       {isFocused && (
-        <div className="absolute top-full left-0 right-0 bg-white shadow-md rounded-md mt-1 z-10 overflow-hidden max-h-80 overflow-y-auto">
+        <div
+          className={`absolute top-full left-0 right-0 bg-white shadow-md rounded-md mt-1 z-10 overflow-hidden max-h-80 overflow-y-auto border ${
+            isClosing ? 'animate-out fade-out-0 slide-out-to-top-2' : 'animate-in fade-in-0 slide-in-from-top-2'
+          }`}
+        >
           <ENSSearchResults value={value} ensInfo={ensInfo} loading={loading} onSelectENS={() => handleSelectENS()} />
 
           <RecentAddressesList

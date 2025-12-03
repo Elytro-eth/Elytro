@@ -5,6 +5,14 @@ interface IDomainDetail {
   message: string;
 }
 
+const labelMap: Record<string, string> = {
+  name: 'Name',
+  version: 'Version',
+  chainId: 'Chain ID',
+  verifyingContract: 'Verifying Contract',
+  salt: 'Salt',
+};
+
 const FieldRender = ({ label, value }: { label: string; value: string }) => {
   let renderValue;
 
@@ -15,15 +23,15 @@ const FieldRender = ({ label, value }: { label: string; value: string }) => {
       renderValue = value || '--';
       break;
     case 'verifyingContract':
-      renderValue = (
-        <div title={value}>{formatAddressToShort(value as string)}</div>
-      );
+      renderValue = <div title={value}>{formatAddressToShort(value as string)}</div>;
       break;
     default:
       renderValue = value || '--';
   }
 
-  return <LabelValue label={label} value={renderValue} />;
+  const displayLabel = labelMap[label] || label;
+
+  return <LabelValue label={displayLabel} value={renderValue} />;
 };
 
 export default function DomainDetail({ message }: IDomainDetail) {

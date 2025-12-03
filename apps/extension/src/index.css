@@ -92,7 +92,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-variant-ligatures: no-contextual;
-    font-variant-ligatures: no-contextual;
   }
 }
 
@@ -175,7 +174,7 @@
   }
 }
 
-input {
+* {
   font-variant-ligatures: no-contextual;
 }
 

@@ -239,7 +239,7 @@ const initUIMessage = (port: chrome.runtime.Port) => {
       return res;
     }
 
-    throw new Error(`Method ${method} not found on ElytroWalletClient`);
+    throw new Error(`Method ${method} not found.`);
   }
 
   async function handleUIRequestWithCache({ method, params }: TUIRequest) {

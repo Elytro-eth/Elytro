@@ -118,7 +118,7 @@ function TxConfirm() {
           </span>
         </div>
 
-        <div className="flex w-full gap-x-sm [&>button]:flex-1 mt-2xl">
+        <div className="flex w-full gap-x-sm [&>button]:flex-1 mt-xl">
           {hookError?.code === 'LIMIT_EXCEEDED' ? (
             <Button variant="ghost" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
               Close
@@ -147,7 +147,7 @@ function TxConfirm() {
       </div>
 
       {/* Footer */}
-      <div className="flex w-full gap-x-sm [&>button]:flex-1 mt-2xl">
+      <div className="flex w-full gap-x-sm [&>button]:flex-1 mt-xl">
         {isSending ? (
           <Button variant="ghost" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
             Close

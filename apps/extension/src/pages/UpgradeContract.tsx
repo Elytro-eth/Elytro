@@ -68,7 +68,7 @@ export default function UpgradeContract() {
         </div>
         <div className="flex text-gray-750 text-center">You may need to complete the update to access funds.</div>
 
-        <Button variant="secondary" size="large" className="w-full gap-xl" onClick={handleStartUpgrade}>
+        <Button variant="secondary" className="w-full gap-xl" onClick={handleStartUpgrade}>
           Start update
         </Button>
       </div>
