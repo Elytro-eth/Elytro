@@ -1,6 +1,7 @@
 import { TTxDetail } from '@/constants/operations';
 import { SimulationResult } from './ethRpc/simulate';
 import { Hex, toHex, size as getSize, pad, Block, BlockTag, isAddress } from 'viem';
+import { EIP3770_CHAIN_PREFIX_MAP } from '@/constants/chains';
 // import { EIP3770_CHAIN_PREFIX_MAP } from '@/constants/chains';
 
 export function formatAddress(address?: string, chainId?: number) {

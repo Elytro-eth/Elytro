@@ -205,7 +205,7 @@ export default function FastSigningSettings() {
         {/* Update button */}
         <Button
           variant="secondary"
-          size="large"
+          size="regular"
           className="w-full mt-4"
           onClick={handleUpdate}
           disabled={!fastSigningEnabled || !hasChanges || updating}
