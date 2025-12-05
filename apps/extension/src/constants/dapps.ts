@@ -57,3 +57,24 @@ export const ELYTRO_APP_DATA: TDAppInfo = {
   origin: 'https://elytro.com',
   icon: logo,
 };
+
+export const FAST_SIGNING_DAPPS = [
+  {
+    name: 'Aave',
+    label: 'Lend',
+    url: 'https://app.aave.com/',
+    icon: aave,
+  },
+  {
+    name: 'CoW Swap',
+    label: 'Swap',
+    url: 'https://swap.cow.fi/',
+    icon: cowswap,
+  },
+  {
+    name: 'Relay',
+    label: 'Bridge',
+    url: 'https://www.relay.link/bridge',
+    icon: relay,
+  },
+];

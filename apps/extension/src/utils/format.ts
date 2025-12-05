@@ -1,15 +1,16 @@
 import { TTxDetail } from '@/constants/operations';
 import { SimulationResult } from './ethRpc/simulate';
 import { Hex, toHex, size as getSize, pad, Block, BlockTag, isAddress } from 'viem';
-import { EIP3770_CHAIN_PREFIX_MAP } from '@/constants/chains';
+// import { EIP3770_CHAIN_PREFIX_MAP } from '@/constants/chains';
 
 export function formatAddress(address?: string, chainId?: number) {
   if (!address || !chainId) {
     return '--';
   }
 
-  const chainPrefix = EIP3770_CHAIN_PREFIX_MAP[chainId];
-  return chainPrefix ? `${chainPrefix}:${address}` : address;
+  // const chainPrefix = EIP3770_CHAIN_PREFIX_MAP[chainId];
+  // return chainPrefix ? `${chainPrefix}:${address}` : address;
+  return address;
 }
 
 export function parseEIP3770Address(input: string): {

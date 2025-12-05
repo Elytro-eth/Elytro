@@ -172,7 +172,7 @@ class KeyringService {
     }
   }
 
-  private async _verifyPassword(password?: string) {
+  private async _verifyPassword(password?: string, currentOwnerAddress?: Address) {
     if (!this._encryptData) {
       this._locked = true;
       return;
@@ -188,7 +188,7 @@ class KeyringService {
       this._owners = owners;
 
       if (this._owners.length > 0) {
-        let ownerKey = this._owners.find((owner) => owner.id === currentOwnerId)?.key;
+        let ownerKey = this._owners.find((owner) => owner.id === (currentOwnerAddress || currentOwnerId))?.key;
         if (!ownerKey) {
           ownerKey = this._owners[0].key;
         }
@@ -216,11 +216,10 @@ class KeyringService {
     this._owners = [];
   }
 
-  public async tryUnlock(callback?: () => void) {
+  public async tryUnlock(currentOwnerAddress?: Address) {
     if (this._locked) {
-      await this._verifyPassword();
+      await this._verifyPassword(undefined, currentOwnerAddress);
     }
-    callback?.();
   }
 
   public async changePassword(oldPassword: string, newPassword: string) {

@@ -137,7 +137,7 @@ const initContentScriptAndPageProviderMessage = (port: chrome.runtime.Port) => {
     sessionManager.createSession(tab.id, origin, providerPortManager);
 
     if (connectionManager.isConnected(origin)) {
-      await keyring.tryUnlock();
+      await keyring.tryUnlock(accountManager?.currentAccount?.owner);
 
       // wait 500ms to ensure the session is ready
       setTimeout(() => {

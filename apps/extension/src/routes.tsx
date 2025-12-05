@@ -32,6 +32,7 @@ import Education from './pages/Education';
 import CreateAccount from './pages/CreateAccount';
 import SecureWallet from './pages/SecureWallet';
 import SecurityHookSettings from './pages/SecurityHookSettings';
+import FastSigningSettings from './pages/FastSigningSettings';
 
 export enum SIDE_PANEL_ROUTE_PATHS {
   Home = '/',
@@ -69,6 +70,7 @@ export enum SIDE_PANEL_ROUTE_PATHS {
   CreateAccount = '/create-account',
   SecureWallet = '/secure-wallet',
   SecurityHookSettings = '/settings/security-hook',
+  FastSigningSettings = '/settings/fast-signing',
 }
 
 export const routes: TRoute[] = [
@@ -208,5 +210,9 @@ export const routes: TRoute[] = [
   {
     path: SIDE_PANEL_ROUTE_PATHS.SecurityHookSettings,
     component: SecurityHookSettings,
+  },
+  {
+    path: SIDE_PANEL_ROUTE_PATHS.FastSigningSettings,
+    component: FastSigningSettings,
   },
 ];

@@ -12,6 +12,11 @@ const AddOns = [
     logo: LogoIcon,
     url: '/settings/security-hook' as SidePanelRoutePath,
   },
+  {
+    name: 'Fast Signing',
+    logo: LogoIcon,
+    url: '/settings/fast-signing' as SidePanelRoutePath,
+  },
 ];
 
 const Item = ({ name, logo, url }: { name: string; logo: string; url: string }) => {
