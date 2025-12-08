@@ -44,6 +44,7 @@ export default function GlobalApprovalDialog() {
           return <Tx />;
         case ApprovalTypeEn.Alert:
           return <Alert />;
+
         default:
           return <div>Unknown approval type: {type}</div>;
       }

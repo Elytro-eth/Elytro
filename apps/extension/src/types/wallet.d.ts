@@ -130,6 +130,8 @@ type TApprovalData = {
     blockExplorerUrls: string[];
     iconUrls: string[];
   };
+  calls?: import('@/types/eip5792').EIP5792Call[];
+  callId?: string;
 };
 
 type TApprovalInfo = {

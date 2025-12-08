@@ -1,188 +1,240 @@
-// import { approvalService, ApprovalTypeEn } from '@/background/services/approval';
-// import callManager from '@/background/services/callManager';
-// import { EIP5792Call } from '@/types/eip5792';
-// import type { TFlowMiddleWareFn } from '@/utils/asyncTaskFlow';
-// import { ethErrors } from 'eth-rpc-errors';
+import { approvalService, ApprovalTypeEn } from '@/background/services/approval';
+import callManager from '@/background/services/callManager';
+import { EIP5792Call, EIP5792CallsStatus, EIP5792Capabilities } from '@/types/eip5792';
+import type { TFlowMiddleWareFn } from '@/utils/asyncTaskFlow';
+import { ethErrors } from 'eth-rpc-errors';
+import { elytroSDK } from '@/background/services/sdk';
+import accountManager from '@/background/services/account';
+import type { TProviderRequest } from './index';
+import type { Transaction } from '@elytro/sdk';
+import type { Address } from 'viem';
 
-// const EIP5792_METHODS: ProviderMethodType[] = [
-//   'wallet_sendCalls',
-//   'wallet_getCallsStatus',
-//   'wallet_showCallsStatus',
-//   'wallet_getCapabilities',
-// ];
+const EIP5792_METHODS: ProviderMethodType[] = [
+  'wallet_sendCalls',
+  'wallet_getCallsStatus',
+  'wallet_showCallsStatus',
+  'wallet_getCapabilities',
+];
 
-// /**
-//  * EIP-5792 Calls Middleware
-//  * Handles batched calls according to EIP-5792 specification
-//  */
-// export const eip5792Calls: TFlowMiddleWareFn = async (ctx, next) => {
-//   const { rpcReq, dApp } = ctx.request;
-//   const { method, params } = rpcReq;
+export const eip5792Calls: TFlowMiddleWareFn = async (ctx, next) => {
+  const { rpcReq, dApp } = ctx.request;
+  const { method, params } = rpcReq;
 
-//   // Only handle EIP-5792 methods
-//   if (!EIP5792_METHODS.includes(method)) {
-//     return next();
-//   }
+  // Only handle EIP-5792 methods
+  if (!EIP5792_METHODS.includes(method)) {
+    return next();
+  }
 
-//   switch (method) {
-//     case 'wallet_sendCalls':
-//       return await handleSendCalls(params, dApp);
+  switch (method) {
+    case 'wallet_sendCalls':
+      return await handleSendCalls(params, dApp);
 
-//     case 'wallet_getCallsStatus':
-//       return await handleGetCallsStatus(params);
+    case 'wallet_getCallsStatus':
+      return await handleGetCallsStatus(params);
 
-//     case 'wallet_showCallsStatus':
-//       return await handleShowCallsStatus(params);
+    case 'wallet_showCallsStatus':
+      return await handleShowCallsStatus(params);
 
-//     case 'wallet_getCapabilities':
-//       return await handleGetCapabilities();
+    case 'wallet_getCapabilities':
+      return await handleGetCapabilities(ctx.request);
 
-//     default:
-//       return next();
-//   }
-// };
+    default:
+      return next();
+  }
+};
 
-// /**
-//  * Handle wallet_sendCalls method
-//  */
-// async function handleSendCalls(params: SafeAny, dApp: TDAppInfo): Promise<string> {
-//   if (!params || !Array.isArray(params) || params.length === 0) {
-//     throw ethErrors.rpc.invalidParams('Invalid calls parameter');
-//   }
+async function handleSendCalls(params: SafeAny, dApp: TDAppInfo): Promise<{ id: string }> {
+  if (!params || !Array.isArray(params) || params.length === 0) {
+    throw ethErrors.rpc.invalidParams('Invalid calls parameter');
+  }
 
-//   const calls: EIP5792Call[] = params[0]?.calls || params;
+  const calls: EIP5792Call[] = params[0]?.calls || params;
 
-//   if (!Array.isArray(calls) || calls.length === 0) {
-//     throw ethErrors.rpc.invalidParams('Calls must be a non-empty array');
-//   }
+  if (!Array.isArray(calls) || calls.length === 0) {
+    throw ethErrors.rpc.invalidParams('Calls must be a non-empty array');
+  }
 
-//   try {
-//     // Validate calls
-//     callManager.validateCalls(calls);
+  try {
+    callManager.validateCalls(calls);
 
-//     // Create call tracking
-//     const callId = callManager.createCalls(calls);
+    const callId = callManager.createCalls(calls);
 
-//     // Request approval for the batched calls
-//     await approvalService.request(ApprovalTypeEn.EIP5792Calls, {
-//       dApp,
-//       calls,
-//       callId,
-//     });
+    const transactions: Transaction[] = calls.map((call) => ({
+      to: call.to as Address,
+      data: call.data as `0x${string}`,
+      value: call.value || '0x0',
+      gasLimit: call.gas,
+    }));
 
-//     return callId;
-//   } catch (error) {
-//     console.error('[EIP-5792] Error in handleSendCalls:', error);
-//     throw ethErrors.rpc.internal('Failed to process calls');
-//   }
-// }
+    await approvalService.request(ApprovalTypeEn.TxConfirm, {
+      dApp,
+      tx: transactions as SafeAny, // Convert to TTransactionInfo[] format
+      callId, // Store callId for EIP-5792 tracking
+    });
 
-// /**
-//  * Handle wallet_getCallsStatus method
-//  */
-// async function handleGetCallsStatus(params: SafeAny): Promise<SafeAny> {
-//   if (!params || !Array.isArray(params) || params.length === 0) {
-//     throw ethErrors.rpc.invalidParams('Call ID is required');
-//   }
+    return { id: callId };
+  } catch (error) {
+    console.error('[EIP-5792] Error in handleSendCalls:', error);
+    throw ethErrors.rpc.internal('Failed to process calls');
+  }
+}
 
-//   const callId = params[0];
+async function handleGetCallsStatus(params: SafeAny): Promise<EIP5792CallsStatus> {
+  if (!params || !Array.isArray(params) || params.length === 0) {
+    throw ethErrors.rpc.invalidParams('Call ID is required');
+  }
 
-//   if (typeof callId !== 'string') {
-//     throw ethErrors.rpc.invalidParams('Call ID must be a string');
-//   }
+  const callId = params[0];
+  if (typeof callId !== 'string') {
+    throw ethErrors.rpc.invalidParams('Call ID must be a string');
+  }
 
-//   try {
-//     return callManager.getCallsStatus(callId);
-//   } catch (error) {
-//     console.error('[EIP-5792] Error in handleGetCallsStatus:', error);
-//     throw ethErrors.rpc.internal('Failed to get calls status');
-//   }
-// }
+  try {
+    const tracking = callManager.getCallTracking(callId);
+    if (!tracking) {
+      throw new Error('Call not found');
+    }
 
-// /**
-//  * Handle wallet_showCallsStatus method
-//  */
-// async function handleShowCallsStatus(params: SafeAny): Promise<null> {
-//   if (!params || !Array.isArray(params) || params.length === 0) {
-//     throw ethErrors.rpc.invalidParams('Call ID is required');
-//   }
+    if (!tracking.userOpHash) {
+      return {
+        status: 100, // Pending
+        atomic: true,
+        id: callId,
+      };
+    }
 
-//   const callId = params[0];
+    try {
+      const receiptResult = await elytroSDK.getUserOperationReceiptFull(tracking.userOpHash);
 
-//   if (typeof callId !== 'string') {
-//     throw ethErrors.rpc.invalidParams('Call ID must be a string');
-//   }
+      if (!receiptResult) {
+        // No receipt yet - still pending
+        return {
+          status: 100, // Pending
+          atomic: true,
+          id: callId,
+        };
+      }
 
-//   try {
-//     const status = callManager.getCallsStatus(callId);
-//     const tracking = callManager.getCallTracking(callId);
+      if ((receiptResult as SafeAny).error) {
+        return {
+          status: 400, // Failed offchain
+          atomic: true,
+          id: callId,
+        };
+      }
 
-//     console.log(`[EIP-5792] Showing calls status for ${callId}:`, {
-//       status: status.status,
-//       results: status.results,
-//       error: status.error,
-//       userOpHash: tracking?.userOpHash,
-//       txHash: tracking?.txHash,
-//     });
+      const userOpReceipt = receiptResult as SafeAny;
+      const isSuccess = userOpReceipt.success;
 
-//     // This method is for UI display, return null as per spec
-//     return null;
-//   } catch (error) {
-//     console.error('[EIP-5792] Error in handleShowCallsStatus:', error);
-//     throw ethErrors.rpc.internal('Failed to show calls status');
-//   }
-// }
+      if (tracking.status === 'pending') {
+        const results = tracking.calls.map(() => ({
+          status: (isSuccess ? 'success' : 'failure') as 'success' | 'failure',
+          returnData: '0x' as `0x${string}`, // Would need to extract from receipt logs
+        }));
 
-// /**
-//  * Handle wallet_getCapabilities method
-//  */
-// async function handleGetCapabilities(): Promise<SafeAny> {
-//   // Return capabilities for supported chains
-//   return {
-//     '0x1': {
-//       // Ethereum mainnet
-//       atomic: {
-//         status: 'ready',
-//       },
-//       atomicBatch: {
-//         supported: true,
-//       },
-//       auxiliaryFunds: {
-//         supported: true,
-//       },
-//       paymasterService: {
-//         supported: true,
-//       },
-//     },
-//     '0xa': {
-//       // Optimism
-//       atomic: {
-//         status: 'ready',
-//       },
-//       atomicBatch: {
-//         supported: true,
-//       },
-//       auxiliaryFunds: {
-//         supported: true,
-//       },
-//       paymasterService: {
-//         supported: true,
-//       },
-//     },
-//     '0xa4b1': {
-//       // Arbitrum
-//       atomic: {
-//         status: 'ready',
-//       },
-//       atomicBatch: {
-//         supported: true,
-//       },
-//       auxiliaryFunds: {
-//         supported: true,
-//       },
-//       paymasterService: {
-//         supported: true,
-//       },
-//     },
-//   };
-// }
+        callManager.completeCalls(callId, results, tracking.userOpHash, userOpReceipt.receipt?.transactionHash);
+      }
+
+      return {
+        status: isSuccess ? 200 : 500, // 200 = Confirmed, 500 = Reverted
+        atomic: true,
+        id: callId,
+        receipts: [
+          {
+            logs: userOpReceipt.logs || [],
+            status: isSuccess ? ('0x1' as `0x${string}`) : ('0x0' as `0x${string}`),
+            blockHash: userOpReceipt.receipt?.blockHash,
+            blockNumber: userOpReceipt.receipt?.blockNumber?.toString(),
+            gasUsed: userOpReceipt.actualGasUsed?.toString(),
+            transactionHash: userOpReceipt.receipt?.transactionHash,
+          },
+        ],
+      };
+    } catch (error) {
+      console.error('[EIP-5792] Error getting receipt:', error);
+      if (tracking.status === 'completed') {
+        const receipt = await elytroSDK.getUserOperationReceipt(tracking.userOpHash);
+        if (receipt) {
+          return {
+            status: receipt.success ? 200 : 500,
+            atomic: true,
+            id: callId,
+            receipts: [
+              {
+                logs: (receipt as SafeAny).logs || [],
+                status: receipt.success ? ('0x1' as `0x${string}`) : ('0x0' as `0x${string}`),
+                blockHash: (receipt as SafeAny).blockHash,
+                blockNumber: (receipt as SafeAny).blockNumber?.toString(),
+                gasUsed: (receipt as SafeAny).gasUsed?.toString(),
+                transactionHash: (receipt as SafeAny).transactionHash,
+              },
+            ],
+          };
+        }
+      }
+
+      return {
+        status: 100, // Pending
+        atomic: true,
+        id: callId,
+      };
+    }
+  } catch (error) {
+    console.error('[EIP-5792] Error in handleGetCallsStatus:', error);
+    throw ethErrors.rpc.internal('Failed to get calls status');
+  }
+}
+
+async function handleShowCallsStatus(params: SafeAny): Promise<null> {
+  if (!params || !Array.isArray(params) || params.length === 0) {
+    throw ethErrors.rpc.invalidParams('Call ID is required');
+  }
+
+  const callId = params[0];
+  if (typeof callId !== 'string') {
+    throw ethErrors.rpc.invalidParams('Call ID must be a string');
+  }
+
+  try {
+    const status = callManager.getCallsStatus(callId);
+    const tracking = callManager.getCallTracking(callId);
+
+    console.log(`[EIP-5792] Showing calls status for ${callId}:`, {
+      status: status.status,
+      results: status.results,
+      error: status.error,
+      userOpHash: tracking?.userOpHash,
+      txHash: tracking?.txHash,
+    });
+
+    return null;
+  } catch (error) {
+    console.error('[EIP-5792] Error in handleShowCallsStatus:', error);
+    throw ethErrors.rpc.internal('Failed to show calls status');
+  }
+}
+
+async function handleGetCapabilities(_request: TProviderRequest): Promise<Record<string, EIP5792Capabilities>> {
+  const chainId = accountManager.currentAccount?.chainId;
+  const chainIdHex = chainId ? `0x${chainId.toString(16)}` : '0x0';
+
+  const capabilities: EIP5792Capabilities = {
+    atomic: {
+      status: 'ready',
+    },
+    atomicBatch: {
+      supported: true,
+    },
+    auxiliaryFunds: {
+      supported: true,
+    },
+    paymasterService: {
+      supported: true,
+    },
+  };
+
+  return {
+    '0x0': capabilities,
+    [chainIdHex]: capabilities,
+  };
+}

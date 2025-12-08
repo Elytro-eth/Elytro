@@ -54,7 +54,6 @@ export enum SIDE_PANEL_ROUTE_PATHS {
   CreateNewAddress = '/create-new-address',
   Connection = '/connection',
   ChainChange = ApprovalTypeEn.ChainChange,
-  EIP5792Calls = ApprovalTypeEn.EIP5792Calls,
   RecoverySetting = '/recovery-setting',
   AccountRecovery = '/account-recovery',
   RetrieveContacts = '/retrieve-contacts',

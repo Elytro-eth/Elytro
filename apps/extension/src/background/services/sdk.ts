@@ -355,6 +355,25 @@ export class SDKService {
     }
   }
 
+  public async getUserOperationReceiptFull(userOpHash: string) {
+    try {
+      if (!this._bundler) {
+        return null;
+      }
+      const res = await this._bundler.eth_getUserOperationReceipt(userOpHash);
+
+      if (res?.isErr()) {
+        return { error: res.ERR };
+      } else if (res?.OK) {
+        return res.OK;
+      }
+      return null;
+    } catch (error) {
+      console.error('Elytro: Failed to get user operation receipt.', error);
+      return { error };
+    }
+  }
+
   // private async _getPackedUserOpHash(userOp: ElytroUserOperation) {
   //   const opHash = await this._sdk.userOpHash(userOp);
 
@@ -906,6 +925,14 @@ export class SDKService {
 
       const missAmount = noSponsor ? BigInt(missfund) + transferValue - balance : transferValue - balance; // why transferValue is not accurate? missfund is wrong during preFund?
 
+      console.log('test: estimateUserOpCost', {
+        balance,
+        gasUsed: prefund,
+        hasSponsored: !noSponsor,
+        missAmount: missAmount > 0n ? missAmount : 0n,
+        needDeposit: missAmount > 0n,
+        suspiciousOp: missAmount > parseEther('0.001'),
+      });
       return {
         balance, // user balance
         gasUsed: prefund,

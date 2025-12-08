@@ -417,6 +417,13 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         setHookError(null);
         registerOpStatusListener(opHash);
 
+        const callId = approval?.data?.callId as string | undefined;
+        if (callId) {
+          wallet.updateEIP5792CallWithUserOpHash(callId, opHash).catch((error) => {
+            console.error(`[EIP-5792] Error updating call ${callId}:`, error);
+          });
+        }
+
         wallet.addNewHistory({
           type: txTypeRef.current!,
           opHash,
@@ -427,9 +434,19 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         resolve();
         handleBack();
       }
+      setErrorMsg(null);
     } catch (error) {
+      console.log('test: onConfirm error', error);
       const msg = formatErrorMsg(error);
       setErrorMsg(msg);
+
+      const callId = approval?.data?.callId as string | undefined;
+      if (callId) {
+        wallet.failEIP5792Call(callId, msg).catch((error) => {
+          console.error(`[EIP-5792] Error failing call ${callId}:`, error);
+        });
+      }
+
       toast({
         title: 'Failed to send transaction',
         description: msg,
