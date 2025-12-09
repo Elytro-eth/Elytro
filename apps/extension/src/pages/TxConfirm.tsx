@@ -72,7 +72,7 @@ function TxConfirm() {
     return <ProcessingTip body={message} />;
   }
 
-  if (errorMsg || !requestType) {
+  if (errorMsg) {
     return (
       <div className="flex flex-col w-full items-center justify-center  p-6">
         <AlertCircle className="size-12 text-destructive animate-pulse mb-md" />
@@ -88,6 +88,10 @@ function TxConfirm() {
         </Button>
       </div>
     );
+  }
+
+  if (!requestType) {
+    return null;
   }
 
   if (hookError) {
