@@ -15,7 +15,6 @@ import HelperText from '@/components/ui/HelperText';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { safeClipboard } from '@/utils/clipboard';
 import { RawData } from '@/components/ui/rawData';
-import { formatAddress } from '@/utils/format';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -73,18 +72,22 @@ export function UserOpDetail() {
   }, [requestType, decodedDetail]);
 
   const [gasInETH, gasInDollar] = useMemo(() => {
-    if (!costResult?.gasUsed) {
+    // const gasInETH = formatGasUsed(costResult?.gasUsed);
+    const self = gasOptions.find((opt) => opt.option.type === 'self');
+
+    console.log('gasOptions', gasOptions);
+    if (!self) {
       return ['--', '--'];
     }
 
-    const gasInETH = formatGasUsed(costResult?.gasUsed);
+    const gasInETH = formatGasUsed(self?.gasUsed);
     const gasInDollar = formatDollarBalance(tokenPrices, {
       balance: Number(gasInETH?.replace('<', '')),
       symbol: 'ETH',
     })?.replace('$', '');
 
     return [gasInETH, gasInDollar];
-  }, [costResult?.gasUsed, tokenPrices]);
+  }, [gasOptions, tokenPrices]);
 
   const getOptionLabel = (option: GasOptionEstimate) => {
     if (option.option.type === 'sponsor') {
@@ -215,10 +218,7 @@ export function UserOpDetail() {
               <span className="elytro-text-small-body text-dark-red">Not enough for network cost, deposit first</span>
             </div>
             <div className="bg-white rounded-sm px-2 py-1 flex items-center justify-between">
-              <div
-                className="flex items-center 1 cursor-pointer"
-                onClick={() => safeClipboard(formatAddress(address, chainId))}
-              >
+              <div className="flex items-center 1 cursor-pointer" onClick={() => safeClipboard(address)}>
                 <ShortedAddress address={address} chainId={chainId} className="bg-white" />
                 <Copy className="size-3 stroke-gray-600" />
               </div>

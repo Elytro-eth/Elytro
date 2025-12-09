@@ -8,7 +8,6 @@ import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useState, useCallback, useEffect } from 'react';
 import { safeClipboard } from '@/utils/clipboard';
-import { formatAddress } from '@/utils/format';
 import { Checkbox } from '@/components/ui/checkbox';
 
 /**
@@ -60,7 +59,7 @@ export default function Receive() {
   const handleCopyClick = useCallback(() => {
     if (skipDialog) {
       // User has previously checked "Don't remind me again" - copy directly
-      safeClipboard(formatAddress(address, chainId), false);
+      safeClipboard(address, false);
       setTriggerCopy((prev) => prev + 1);
     } else {
       // Show the warning dialog first
@@ -76,10 +75,10 @@ export default function Receive() {
       setSkipDialog(true);
     }
     // Copy the address to clipboard
-    safeClipboard(formatAddress(address, chainId), false);
+    safeClipboard(address, false);
     setShowDialog(false);
     setTriggerCopy((prev) => prev + 1); // Trigger the "Copied" state in the button
-  }, [address, chainId, dontRemindAgain]);
+  }, [address, dontRemindAgain]);
 
   if (!address) {
     return <Spin isLoading />;

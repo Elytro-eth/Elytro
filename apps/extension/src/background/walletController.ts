@@ -310,9 +310,18 @@ class WalletController {
       }
 
       const decodedRes = await this.decodeUserOp(tempUserOp);
-      const transferAmount = decodedRes
-        ? decodedRes?.reduce((acc: bigint, curr: DecodeResult) => acc + BigInt(curr.value), 0n)
-        : 0n;
+      let transferAmount = 0n;
+
+      if (params) {
+        transferAmount = params.reduce((acc, tx) => {
+          const value = tx.value ? BigInt(tx.value) : 0n;
+          return acc + value;
+        }, 0n);
+      } else if (decodedRes) {
+        transferAmount = decodedRes.reduce((acc: bigint, curr: DecodeResult) => acc + BigInt(curr.value), 0n);
+      }
+
+      console.log('Elytro: prepareUserOp transferAmount:', transferAmount);
 
       await elytroSDK.estimateGas(tempUserOp);
 
@@ -337,7 +346,7 @@ class WalletController {
       const estimations = await Promise.allSettled([
         canSponsor
           ? withTimeout(
-              elytroSDK.estimateUserOpCost(tempUserOp, transferAmount, false).catch((error) => {
+              elytroSDK.estimateUserOpCost({ ...tempUserOp }, transferAmount, false).catch((error) => {
                 console.warn('Sponsor estimation error:', error);
                 throw error;
               })
@@ -345,7 +354,7 @@ class WalletController {
           : Promise.resolve(null),
 
         withTimeout(
-          elytroSDK.estimateUserOpCost(tempUserOp, transferAmount, true).catch((error) => {
+          elytroSDK.estimateUserOpCost({ ...tempUserOp }, transferAmount, true).catch((error) => {
             console.error('ETH estimation error:', error);
             throw error;
           })
@@ -354,7 +363,7 @@ class WalletController {
         ...availableTokens.map((token) =>
           withTimeout(
             elytroSDK
-              .estimateUserOpCost(tempUserOp, transferAmount, true, token)
+              .estimateUserOpCost({ ...tempUserOp }, transferAmount, true, token)
               .then((result) => ({ token, result }))
               .catch((error) => {
                 console.warn(`Token ${token?.name} estimation error:`, error);

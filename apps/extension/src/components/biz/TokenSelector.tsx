@@ -45,7 +45,6 @@ export default function TokenSelector({
   onTokenChange?: (token: TTokenInfo) => void;
 }) {
   const [open, setOpen] = useState(false);
-  console.log('tokens', tokens);
 
   const defaultToken = useCallback(() => {
     const token = tokens.find((token) => token.balance !== undefined && Number(token.balance) > 0) || tokens[0] || null;

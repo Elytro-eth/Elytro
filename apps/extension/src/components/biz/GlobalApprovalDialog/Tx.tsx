@@ -2,7 +2,7 @@ import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import ProcessingTip from '@/components/ui/ProcessingTip';
 import { Button } from '@/components/ui/button';
 import { UserOpDetail } from '@/components/biz/UserOpDetail';
-import { AlertCircle, AlertTriangle, Box } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Box, InfoIcon } from 'lucide-react';
 import { InputOTPGroup, InputOTP, InputOTPSlot } from '@/components/ui/input-otp';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { useEffect, useState } from 'react';
@@ -70,7 +70,7 @@ export default function Tx() {
     return <ProcessingTip body={message} />;
   }
 
-  if (errorMsg || !requestType) {
+  if (errorMsg) {
     return (
       <div className="flex flex-col w-full items-center justify-center">
         <AlertCircle className="size-12 text-destructive animate-pulse mb-md" />
@@ -84,6 +84,19 @@ export default function Tx() {
         <Button onClick={() => onRetry()} className="w-full">
           Retry
         </Button>
+      </div>
+    );
+  }
+
+  if (!requestType) {
+    return (
+      <div className="flex flex-col w-full items-center justify-center">
+        <InfoIcon className="size-12 text-destructive animate-pulse mb-md" />
+        <h2 className="text-lg font-semibold text-foreground mb-xs">Transaction Processing</h2>
+
+        <div className="text-center text-muted-foreground text-sm mb-6 max-w-[17.5rem]">
+          Your transaction is being processed, please wait...
+        </div>
       </div>
     );
   }

@@ -72,6 +72,7 @@ function TxConfirm() {
     return <ProcessingTip body={message} />;
   }
 
+  console.log('Elytro: errorMsg', errorMsg, !!errorMsg);
   if (errorMsg) {
     return (
       <div className="flex flex-col w-full items-center justify-center  p-6">

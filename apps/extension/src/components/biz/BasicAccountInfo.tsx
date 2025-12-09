@@ -5,7 +5,6 @@ import ActionButton from './ActionButton';
 import { useAccount } from '@/contexts/account-context';
 import AccountsDropdown from './AccountsDropdown';
 import { RedDot } from '@/components/ui/RedDot';
-import { formatAddress } from '@/utils/format';
 import { Copy as IconCopy, Check as IconCheck } from 'lucide-react';
 import { safeClipboard } from '@/utils/clipboard';
 import { useState, useCallback, useEffect } from 'react';
@@ -74,12 +73,12 @@ const HeaderSection = () => {
   const handleCopyClick = useCallback(() => {
     if (skipDialog) {
       // User has previously checked "Don't remind me again" - copy directly
-      safeClipboard(formatAddress(currentAccount.address, currentAccount.chainId), false, onCopied);
+      safeClipboard(currentAccount.address, false, onCopied);
     } else {
       // Show the warning dialog first
       setShowDialog(true);
     }
-  }, [skipDialog, currentAccount.address, currentAccount.chainId, onCopied]);
+  }, [skipDialog, currentAccount.address, onCopied]);
 
   // Called when user clicks "I understand" in the dialog
   const handleUnderstand = useCallback(() => {
@@ -89,7 +88,8 @@ const HeaderSection = () => {
       setSkipDialog(true);
     }
     // Copy the address to clipboard (onCopied callback will show "Copied" state)
-    safeClipboard(formatAddress(currentAccount.address, currentAccount.chainId), false, onCopied);
+    // safeClipboard(formatAddress(currentAccount.address, currentAccount.chainId), false, onCopied);
+    safeClipboard(currentAccount.address, false, onCopied);
     setShowDialog(false);
   }, [currentAccount.address, currentAccount.chainId, dontRemindAgain, onCopied]);
 

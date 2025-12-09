@@ -41,8 +41,7 @@ const copyWithExecCommand = (text: string): Promise<void> =>
  * @returns boolean
  */
 const isClipboardAPISupported = (): boolean =>
-  navigator.clipboard !== undefined &&
-  navigator.clipboard.writeText !== undefined;
+  navigator.clipboard !== undefined && navigator.clipboard.writeText !== undefined;
 
 /**
  * Safe clipboard operation function
