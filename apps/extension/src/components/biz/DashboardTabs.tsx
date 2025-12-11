@@ -84,13 +84,18 @@ export default function DashboardTabs({ loading, onReload }: DashboardTabsProps)
             {tab.label}
           </TabsTrigger>
         ))}
-        <div className="absolute right-4 mt-1">
+        <button
+          type="button"
+          className="absolute right-4 mt-1 p-1 rounded-md hover:bg-gray-100 transition-colors"
+          onClick={onReload}
+          aria-label="Refresh account data"
+          disabled={loading}
+        >
           <RefreshCcw
             className={`elytro-clickable-icon stroke-gray-300 ${loading ? 'animate-spin' : ''}`}
-            onClick={onReload}
-            aria-label="Refresh account data"
+            aria-hidden="true"
           />
-        </div>
+        </button>
       </TabsList>
       <div className="flex flex-col flex-1 h-full overflow-auto box-border scrollbar-thin">
         {tabs.map((tab) => (

@@ -33,9 +33,7 @@ class ConnectionManager {
 
   public async switchAccount(account: TAccountInfo | null) {
     if (!account || !account.address || !account.chainId) {
-      console.log(
-        'Elytro::ConnectionManager:: switchAccount failed, no wallet.'
-      );
+      console.log('Elytro::ConnectionManager:: switchAccount failed, no wallet.');
       return;
     }
 
@@ -43,17 +41,15 @@ class ConnectionManager {
     this._connectedSites.clear();
 
     const prevAccountState =
-      (
-        (await localStorage.get(
-          CONNECTION_STORAGE_KEY
-        )) as TConnectionManagerState
-      )?.[this._accountKey] || [];
+      ((await localStorage.get(CONNECTION_STORAGE_KEY)) as TConnectionManagerState)?.[this._accountKey] || [];
 
     prevAccountState?.forEach((site: TConnectedDAppInfo) => {
       if (site.origin) {
         this._connectedSites.set(site.origin, site);
       }
     });
+
+    eventBus.emit(EVENT_TYPES.UI.CONNECTED_SITES_UPDATED);
   }
 
   public connect(dApp: TDAppInfo) {
@@ -72,12 +68,16 @@ class ConnectionManager {
         },
       ],
     });
+
+    eventBus.emit(EVENT_TYPES.UI.CONNECTED_SITES_UPDATED);
   }
 
   public disconnect(origin: string) {
     this._connectedSites.delete(String(origin));
     this._syncToStorage();
     sessionManager.broadcastMessageToDApp(origin, 'accountsChanged', []);
+
+    eventBus.emit(EVENT_TYPES.UI.CONNECTED_SITES_UPDATED);
   }
   public getSite(origin: string) {
     return this._connectedSites.get(String(origin));
@@ -94,10 +94,7 @@ class ConnectionManager {
   }
 
   // maybe turn isConnected to false a while later
-  public updateConnectSite(
-    origin: string,
-    updates: Omit<TConnectedDAppInfo, 'origin'>
-  ) {
+  public updateConnectSite(origin: string, updates: Omit<TConnectedDAppInfo, 'origin'>) {
     const siteInfo = this._connectedSites.get(origin);
 
     if (siteInfo) {
@@ -114,10 +111,7 @@ class ConnectionManager {
     return this._connectedSites.get(origin)?.permissions || [];
   }
 
-  public requestPermissions(
-    origin: string,
-    permissions: WalletPermission[]
-  ): boolean {
+  public requestPermissions(origin: string, permissions: WalletPermission[]): boolean {
     const site = this._connectedSites.get(origin);
     if (!site) return false;
 
@@ -126,16 +120,12 @@ class ConnectionManager {
     return true;
   }
 
-  public revokePermissions(
-    origin: string,
-    permissions: WalletPermission[]
-  ): void {
+  public revokePermissions(origin: string, permissions: WalletPermission[]): void {
     const site = this._connectedSites.get(origin);
     if (!site) return;
 
     site.permissions = site.permissions.filter(
-      ({ parentCapability }) =>
-        !permissions.some((p) => p.parentCapability === parentCapability)
+      ({ parentCapability }) => !permissions.some((p) => p.parentCapability === parentCapability)
     );
     this._syncToStorage();
   }

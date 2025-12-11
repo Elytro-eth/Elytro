@@ -20,6 +20,7 @@ export const EVENT_TYPES = {
   },
   UI: {
     PRIVATE_RECOVERY_READY: 'privateRecoveryReady',
+    CONNECTED_SITES_UPDATED: 'connectedSitesUpdated',
   },
   EIP5792: {
     CALLS_CREATED: 'eip5792CallsCreated',

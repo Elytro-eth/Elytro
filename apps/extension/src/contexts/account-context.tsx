@@ -131,24 +131,30 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
     }
   };
 
-  const updateTokens = async () => {
+  const updateTokens = async (silent = false) => {
     if (isTokensLoading) {
       return;
     }
 
     try {
-      setIsTokensLoading(true);
+      if (!silent) {
+        setIsTokensLoading(true);
+      }
       const tokens = (await wallet.getCurrentAccountTokens()) as TTokenInfo[];
       setTokens(tokens);
       updateTokenPrices(tokens);
     } catch {
-      toast({
-        title: 'Failed to get tokens, please try again',
-        // description: 'Please try again',
-        variant: 'destructive',
-      });
+      if (!silent) {
+        toast({
+          title: 'Failed to get tokens, please try again',
+          // description: 'Please try again',
+          variant: 'destructive',
+        });
+      }
     } finally {
-      setIsTokensLoading(false);
+      if (!silent) {
+        setIsTokensLoading(false);
+      }
     }
   };
 
@@ -210,9 +216,9 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
     }
   }, [pathname]);
 
-  const onHistoryUpdated = () => {
+  const onHistoryUpdated = (silent = false) => {
     updateHistory();
-    updateTokens();
+    updateTokens(silent);
   };
 
   useEffect(() => {
@@ -220,10 +226,15 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
       updateHistory();
       updateTokens();
 
-      RuntimeMessage.onMessage(EVENT_TYPES.HISTORY.ITEMS_UPDATED, onHistoryUpdated);
+      const handleHistoryUpdated = () => {
+        updateHistory();
+        updateTokens(true);
+      };
+
+      RuntimeMessage.onMessage(EVENT_TYPES.HISTORY.ITEMS_UPDATED, handleHistoryUpdated);
 
       return () => {
-        RuntimeMessage.offMessage(onHistoryUpdated);
+        RuntimeMessage.offMessage(handleHistoryUpdated);
       };
     }
   }, [currentAccount.address]);
@@ -244,7 +255,7 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
   }, 300);
 
   useInterval(() => {
-    onHistoryUpdated();
+    onHistoryUpdated(true);
   }, 20_000);
 
   const contextValue = useMemo(

@@ -7,28 +7,18 @@ interface IProcessingTipProps {
   className?: string;
 }
 
-const ProcessingTip = ({
-  body = 'Preparing...',
-  subBody = '',
-  className,
-}: IProcessingTipProps) => (
+const ProcessingTip = ({ body = 'Preparing...', subBody = '', className }: IProcessingTipProps) => (
   <div
-    className={cn(
-      'flex flex-col items-center justify-center gap-y-sm h-48 my-16',
-      className
-    )}
+    className={cn('flex flex-col items-center justify-center gap-y-sm h-48 my-16', className)}
+    role="status"
+    aria-live="polite"
+    aria-label={body}
   >
     <div className="bg-blue rounded-pill p-md">
-      <LoaderCircle
-        className="size-12 animate-spin"
-        stroke="#fff"
-        strokeOpacity={0.9}
-      />
+      <LoaderCircle className="size-12 animate-spin " stroke="#fff" strokeOpacity={0.9} aria-hidden="true" />
     </div>
     <div className="elytro-text-bold-body">{body}</div>
-    {subBody ? (
-      <div className="elytro-text-tiny-body text-gray-600">{subBody}</div>
-    ) : null}
+    {subBody ? <div className="elytro-text-tiny-body text-gray-600">{subBody}</div> : null}
   </div>
 );
 

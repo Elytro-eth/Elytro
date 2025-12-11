@@ -1,10 +1,12 @@
 import { ENCOURAGE_DAPPS } from '@/constants/dapps';
 import { safeOpen } from '@/utils/safeOpen';
 import { SquareArrowOutUpRight, Unlink } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useWallet } from '@/contexts/wallet';
 import { getHostname } from '@/utils/format';
 import { toast } from '@/hooks/use-toast';
+import RuntimeMessage from '@/utils/message/runtimeMessage';
+import { EVENT_TYPES } from '@/constants/events';
 
 export default function Apps() {
   const { wallet } = useWallet();
@@ -14,18 +16,28 @@ export default function Apps() {
     safeOpen(url);
   };
 
-  const fetchConnectedSites = async () => {
+  const fetchConnectedSites = useCallback(async () => {
     try {
       const sites = await wallet.getConnectedSites();
       setConnectedSites(sites);
     } catch {
       setConnectedSites([]);
     }
-  };
+  }, [wallet]);
 
   useEffect(() => {
     fetchConnectedSites();
-  }, []);
+
+    const handleConnectedSitesUpdated = () => {
+      fetchConnectedSites();
+    };
+
+    RuntimeMessage.onMessage(EVENT_TYPES.UI.CONNECTED_SITES_UPDATED, handleConnectedSitesUpdated);
+
+    return () => {
+      RuntimeMessage.offMessage(handleConnectedSitesUpdated);
+    };
+  }, [fetchConnectedSites]);
 
   const handleDisconnect = async (origin: string | undefined) => {
     if (!origin) return;

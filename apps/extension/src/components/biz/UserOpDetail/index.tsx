@@ -7,7 +7,7 @@ import { useMemo, useState } from 'react';
 import ActivateDetail from './ActivationDetail';
 import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
-import { ChevronUp, ChevronDown, Copy, AlertCircle } from 'lucide-react';
+import { ChevronUp, Copy, AlertCircle } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -15,6 +15,7 @@ import HelperText from '@/components/ui/HelperText';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { safeClipboard } from '@/utils/clipboard';
 import { RawData } from '@/components/ui/rawData';
+import { cn } from '@/utils/shadcn/utils';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -146,11 +147,14 @@ export function UserOpDetail() {
         <InfoCardItem
           label="Network cost"
           content={
-            <span
-              className="flex items-center elytro-text-small truncate cursor-pointer"
+            <button
+              type="button"
+              className="flex items-center elytro-text-small truncate cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => {
                 setExpandSponsorSelector((prev) => !prev);
               }}
+              aria-label={expandSponsorSelector ? 'Collapse gas payment options' : 'Expand gas payment options'}
+              aria-expanded={expandSponsorSelector}
             >
               {gasOption === 'sponsor' && (
                 <span className="px-xs py-3xs bg-light-green elytro-text-tiny-body rounded-xs">Sponsored</span>
@@ -177,12 +181,16 @@ export function UserOpDetail() {
                   })()}
                 </span>
               )}
-              {expandSponsorSelector ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </span>
+              <ChevronUp
+                size={16}
+                aria-hidden="true"
+                className={cn(expandSponsorSelector && 'rotate-180 duration-200 ease-in-out transition-all')}
+              />
+            </button>
           }
         />
         {expandSponsorSelector && (
-          <div>
+          <div role="radiogroup" aria-label="Gas payment options">
             <RadioGroup
               value={gasOption}
               onValueChange={(value: string) => {
@@ -218,10 +226,15 @@ export function UserOpDetail() {
               <span className="elytro-text-small-body text-dark-red">Not enough for network cost, deposit first</span>
             </div>
             <div className="bg-white rounded-sm px-2 py-1 flex items-center justify-between">
-              <div className="flex items-center 1 cursor-pointer" onClick={() => safeClipboard(address)}>
+              <button
+                type="button"
+                className="flex items-center gap-1 cursor-pointer hover:opacity-70 transition-opacity"
+                onClick={() => safeClipboard(address)}
+                aria-label="Copy wallet address"
+              >
                 <ShortedAddress address={address} chainId={chainId} className="bg-white" />
-                <Copy className="size-3 stroke-gray-600" />
-              </div>
+                <Copy className="size-3 stroke-gray-600" aria-hidden="true" />
+              </button>
             </div>
           </div>
         )}

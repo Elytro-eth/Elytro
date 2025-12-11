@@ -150,13 +150,13 @@
   .elytro-gradient-bg {
     /* background: linear-gradient(330deg, #f9fbfb 0%, #f7f3f0 44%, #dfecf3 80%);
     background-blend-mode: overlay; */
-    background-color: #EDF1EA;
+    background-color: #edf1ea;
   }
 
   .elytro-gradient-bg-2 {
     /* background: linear-gradient(319deg, #f9fbfb 0%, #f7f3f0 10%, #f7f3f0 60%, #dfecf3 100%);
     background-blend-mode: overlay; */
-    background-color: #EDF1EA;
+    background-color: #edf1ea;
   }
 
   .elytro-horizontal-gradient-bg {
@@ -214,4 +214,40 @@
 
 .page-fade-out {
   animation: pageFadeOut 0.15s ease-in-out forwards;
+}
+
+*:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+button,
+a,
+[role='button'] {
+  transition: all 0.2s ease-in-out;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.loading-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(to right, #f0f0f0 0%, #e0e0e0 20%, #f0f0f0 40%, #f0f0f0 100%);
+  background-size: 1000px 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

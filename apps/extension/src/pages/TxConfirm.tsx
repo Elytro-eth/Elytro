@@ -75,8 +75,8 @@ function TxConfirm() {
   console.log('Elytro: errorMsg', errorMsg, !!errorMsg);
   if (errorMsg) {
     return (
-      <div className="flex flex-col w-full items-center justify-center  p-6">
-        <AlertCircle className="size-12 text-destructive animate-pulse mb-md" />
+      <div className="flex flex-col w-full items-center justify-center p-6" role="alert" aria-live="assertive">
+        <AlertCircle className="size-12 text-destructive animate-pulse mb-md" aria-hidden="true" />
 
         <h2 className="text-lg font-semibold text-foreground mb-xs">Transaction Failed</h2>
 
@@ -84,7 +84,7 @@ function TxConfirm() {
           {errorMsg || 'Please try again or contact support'}
         </div>
 
-        <Button onClick={() => onRetry()} className="w-full">
+        <Button onClick={() => onRetry()} className="w-full" aria-label="Retry transaction">
           Retry
         </Button>
       </div>
@@ -97,14 +97,20 @@ function TxConfirm() {
 
   if (hookError) {
     return (
-      <div className="flex flex-col w-full items-center justify-center  p-6">
+      <div className="flex flex-col w-full items-center justify-center p-6" role="alert" aria-live="polite">
         <div className="flex flex-col items-center justify-center gap-y-sm">
-          <AlertTriangle className="size-24 fill-[#C4C077] text-white stroke-white" />
+          <AlertTriangle className="size-24 fill-[#C4C077] text-white stroke-white" aria-hidden="true" />
           <div className="elytro-text-title text-lg">Spending limit exceeded</div>
           <div className="text-sm text-gray-600">Enter the code we sent to your email to continue</div>
         </div>
         <div className="flex flex-col items-center justify-center gap-y-sm my-2xl">
-          <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS} value={otpCode} onChange={handleOtpChange}>
+          <InputOTP
+            maxLength={6}
+            pattern={REGEXP_ONLY_DIGITS}
+            value={otpCode}
+            onChange={handleOtpChange}
+            aria-label="Enter 6-digit verification code"
+          >
             <InputOTPGroup className="flex flex-row items-center justify-center gap-x-sm">
               <InputOTPSlot index={0} className="w-10 h-10 border-none bg-gray-150 !rounded-2xs" />
               <InputOTPSlot index={1} className="w-10 h-10 border-none bg-gray-150 !rounded-2xs" />
@@ -115,12 +121,15 @@ function TxConfirm() {
             </InputOTPGroup>
           </InputOTP>
           {/* TODO: Resend OTP ?*/}
-          <span
+          <button
+            type="button"
             onClick={() => requestSecurityOtp()}
-            className={`text-sm text-gray-600 ${countdown > 0 ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+            disabled={countdown > 0}
+            className={`text-sm text-gray-600 ${countdown > 0 ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:text-gray-800'} transition-colors`}
+            aria-label={countdown > 0 ? `Resend code in ${countdown} seconds` : 'Resend verification code'}
           >
             Resend code {countdown > 0 ? ` in ${countdown} seconds` : ''}
-          </span>
+          </button>
         </div>
 
         <div className="flex w-full gap-x-sm [&>button]:flex-1 mt-xl">
@@ -134,8 +143,13 @@ function TxConfirm() {
                 Cancel
               </Button>
 
-              <Button onClick={handleConfirmOTP} className="flex-1 rounded-md" disabled={otpCode.length !== 6}>
-                <Box className="size-4 mr-sm" color="#cce1ea" />
+              <Button
+                onClick={handleConfirmOTP}
+                className="flex-1 rounded-md"
+                disabled={otpCode.length !== 6}
+                aria-label="Confirm verification code"
+              >
+                <Box className="size-4 mr-sm" color="#cce1ea" aria-hidden="true" />
                 Confirm
               </Button>
             </>
@@ -163,8 +177,13 @@ function TxConfirm() {
               Cancel
             </Button>
 
-            <Button onClick={onConfirm} className="flex-1 rounded-md" disabled={isSending || !hasSufficientBalance}>
-              <Box className="size-4 mr-sm" color="#cce1ea" />
+            <Button
+              onClick={onConfirm}
+              className="flex-1 rounded-md"
+              disabled={isSending || !hasSufficientBalance}
+              aria-label={!hasSufficientBalance ? 'Insufficient balance for transaction' : 'Confirm transaction'}
+            >
+              <Box className="size-4 mr-sm" color="#cce1ea" aria-hidden="true" />
               Confirm
             </Button>
           </>

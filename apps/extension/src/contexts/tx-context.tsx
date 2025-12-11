@@ -222,6 +222,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         setHasSufficientBalance(defaultEstimate.hasSufficientBalance);
       }
     } catch (err) {
+      console.log('test: prepareUserOp error', err);
       const msg = formatErrorMsg(err);
       setErrorMsg(msg);
       toast({

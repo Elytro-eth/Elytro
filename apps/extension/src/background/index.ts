@@ -292,6 +292,10 @@ const initBackgroundMessage = () => {
       status,
     });
   });
+
+  eventBus.on(EVENT_TYPES.UI.CONNECTED_SITES_UPDATED, () => {
+    RuntimeMessage.sendMessage(EVENT_TYPES.UI.CONNECTED_SITES_UPDATED);
+  });
 };
 
 initBackgroundMessage();
