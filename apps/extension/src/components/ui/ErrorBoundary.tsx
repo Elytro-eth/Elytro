@@ -31,7 +31,7 @@ class ErrorBoundary<P extends ErrorBoundaryProps> extends Component<P, ErrorBoun
     if (this.state.hasError) {
       return (
         <div
-          className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-2xl"
+          className="flex flex-col items-center justify-center min-h-screen bg-gray-150 p-2xl"
           role="alert"
           aria-live="assertive"
         >

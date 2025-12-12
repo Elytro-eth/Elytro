@@ -12,9 +12,9 @@ export default function HelperText({
   className,
 }: IHelperTextProps) {
   return (
-    <div className={cn('flex flex-col rounded-xs bg-light-purple py-sm px-md w-full text-purple', className)}>
-      {/* <h2 className="elytro-text-small-bold text-purple">{title}</h2> */}
-      <p className="elytro-text-tiny-body text-purple">{description}</p>
+    <div className={cn('flex flex-col rounded-xs bg-light-brown py-sm px-md w-full text-brown', className)}>
+      {/* <h2 className="elytro-text-small-bold text-brown">{title}</h2> */}
+      <p className="elytro-text-tiny-body text-brown">{description}</p>
     </div>
   );
 }

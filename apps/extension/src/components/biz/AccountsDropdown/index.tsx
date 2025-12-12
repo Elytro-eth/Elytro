@@ -99,7 +99,7 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
       <div onClick={() => handleOpenChange(!open)}>
         <div
           className={cn(
-            'max-w-fit cursor-pointer flex items-center gap-x-sm border border-gray-200 rounded-[8px] bg-white px-sm py-xs text-gray-750 hover:bg-gray-100',
+            'max-w-fit cursor-pointer flex items-center gap-x-sm border border-gray-200 rounded-[8px] bg-white px-sm py-xs text-gray-750 hover:bg-gray-150',
             className
           )}
         >
@@ -116,7 +116,7 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
             {currentAccount?.address ? (
               formatAddressToShort(currentAccount.address)
             ) : (
-              <Skeleton className="w-[90px] h-[18px] rounded-[8px] bg-gray-100" />
+              <Skeleton className="w-[90px] h-[18px] rounded-[8px] bg-gray-50" />
             )}
           </span>
 
@@ -150,8 +150,8 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
           ))}
         </div>
 
-        <div className="flex flex-col gap-y-sm bg-light-purple px-lg py-sm">
-          <span className="elytro-text-tiny-body text-purple">Different network, different address</span>
+        <div className="flex flex-col gap-y-sm bg-light-brown px-lg py-sm">
+          <span className="elytro-text-tiny-body text-brown">Different network, different address</span>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

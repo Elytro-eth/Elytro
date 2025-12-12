@@ -86,7 +86,7 @@ export default function DashboardTabs({ loading, onReload }: DashboardTabsProps)
         ))}
         <button
           type="button"
-          className="absolute right-4 mt-1 p-1 rounded-md hover:bg-gray-100 transition-colors"
+          className="absolute right-4 mt-1 p-1 rounded-md hover:bg-gray-150 transition-colors"
           onClick={onReload}
           aria-label="Refresh account data"
           disabled={loading}

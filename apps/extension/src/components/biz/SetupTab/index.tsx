@@ -62,9 +62,7 @@ export default function SetupTab() {
           return (
             <div
               key={step.title}
-              className={cn(
-                'flex items-center gap-x-2 px-4 py-5 rounded-lg border border-gray-300 bg-white hover:bg-gray-150'
-              )}
+              className={cn('flex items-center gap-x-2 px-4 py-2 rounded-md bg-gray-150 hover:bg-gray-300')}
               // make it all grey when it's not done
               style={{
                 filter: index === 0 || realSteps[index - 1]?.done || step.done ? 'none' : 'grayscale(100%)',
@@ -79,13 +77,13 @@ export default function SetupTab() {
                 }
               }}
             >
-              <img src={step.icon} alt={step.title} className="size-[70px]" />
+              <img src={step.icon} alt={step.title} className="size-[60px]" />
               <div className="flex flex-col gap-y-0 flex-1 min-w-0">
                 <div className="flex items-center gap-x-2 min-w-0">
                   {step.done ? (
                     <Check className="size-5 p-1 bg-light-green rounded-full flex-shrink-0" />
                   ) : (
-                    <span className="font-medium text-white bg-black-blue rounded-full size-5 text-sm flex items-center justify-center flex-shrink-0 p-1">
+                    <span className="font-bold text-white bg-black-blue rounded-full size-4 text-sm flex items-center justify-center flex-shrink-0 p-1">
                       {index + 1}
                     </span>
                   )}

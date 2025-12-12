@@ -84,6 +84,14 @@
       url('/src/assets/fonts/soehne-kraftig.woff') format('woff');
     font-weight: 700;
   }
+  @font-face {
+    font-family: 'ElytroSoehne';
+    font-family: 'ElytroSoehne';
+    src:
+      url('/src/assets/fonts/soehne-halbfett.woff2') format('woff2'),
+      url('/src/assets/fonts/soehne-halbfett.woff') format('woff');
+    font-weight: 900;
+  }
   body {
     @apply bg-background text-foreground;
     user-select: none;
@@ -165,7 +173,7 @@
   }
 
   .elytro-rounded-border-item-wrapper {
-    @apply p-lg rounded-md border elytro-text-bold-body border-gray-300 bg-white cursor-pointer;
+    @apply p-lg rounded-md bg-gray-50 elytro-text-bold-body cursor-pointer;
   }
 
   .elytro-select-content {
