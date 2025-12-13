@@ -33,11 +33,13 @@ export const canUserOpGetSponsor = async (
           maxPriorityFeePerGas: formatHex(userOp.maxPriorityFeePerGas),
           signature: signatureToUse,
         },
-        stateOverrides: {
-          [hookStatus!.securityHookAddress]: {
-            code: FAKE_SECURITY_HOOK_BYTECODE,
-          },
-        },
+        stateOverrides: hookStatus?.securityHookAddress
+          ? {
+              [hookStatus.securityHookAddress]: {
+                code: FAKE_SECURITY_HOOK_BYTECODE,
+              },
+            }
+          : undefined,
       },
     });
 
