@@ -167,7 +167,7 @@ const ActionButtons = () => {
     return (
       <>
         <ActionButton
-          className="bg-light-green hover:bg-green hover:stroke-white"
+          className="bg-[#BFE7A7] hover:bg-green hover:stroke-white" /* darker light-gren */
           icon={
             <ArrowDownLeft className="size-5 mr-1 stroke-dark-blue duration-100 transition-all group-hover:stroke-white" />
           }
@@ -175,9 +175,9 @@ const ActionButtons = () => {
           onClick={handleClickReceive}
         />
         <ActionButton
-          className="hover:stroke-white"
+          className="bg-[#C5DCE8] hover:bg-blue hover:stroke-white" /* darker blue */
           icon={
-            <ArrowUpRight className="size-5 mr-1 stroke-dark-blue duration-100 transition-all group-hover:stroke-white" />
+            <ArrowUpRight className="size-5 mr-1 stroke-dark-blue duration-100 transition-all group-hover:stroke-white" /> /* darker blue */
           }
           label="Send"
           onClick={handleClickSend}

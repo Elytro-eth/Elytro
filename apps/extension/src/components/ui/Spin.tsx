@@ -1,28 +1,45 @@
-import { Skeleton } from './skeleton';
+import { cn } from '@/utils/shadcn/utils';
 
 interface ISpinProps {
   size?: 'sm' | 'md' | 'lg';
   color?: string;
   isLoading?: boolean;
-  showSkeleton?: boolean;
+  inline?: boolean;
+  className?: string;
 }
 
 export default function Spin({
   size = 'md',
   color = 'text-blue-600',
   isLoading = false,
-  showSkeleton = false,
+  inline = false,
+  className,
 }: ISpinProps) {
   const sizeClasses = {
-    sm: 'w-4 h-4 border-2',
-    md: 'w-8 h-8 border-4',
-    lg: 'w-12 h-12 border-5',
+    sm: 'w-8 h-8 border-1',
+    md: 'w-12 h-12 border-2',
+    lg: 'w-20 h-20 border-4',
   };
 
   if (!isLoading) return null;
 
-  if (showSkeleton) {
-    return <Skeleton className={sizeClasses[size]} />;
+  const spinner = (
+    <div className={cn('relative inline-flex items-center justify-center', className)} aria-hidden="true">
+      {/* Background ring */}
+      <div className={cn(`${sizeClasses[size]} rounded-full border-solid border-light-blue absolute`)} />
+      {/* Animated ring */}
+      <div
+        className={cn(
+          `${sizeClasses[size]} ${color} animate-spin rounded-full border-solid border-blue border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]`
+        )}
+      >
+        <span className="sr-only">Loading...</span>
+      </div>
+    </div>
+  );
+
+  if (inline) {
+    return spinner;
   }
 
   return (
@@ -32,14 +49,7 @@ export default function Spin({
       aria-live="polite"
       aria-label="Loading"
     >
-      <div className="inline-block">
-        <div
-          className={`${sizeClasses[size]} ${color} animate-spin rounded-full border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]`}
-          aria-hidden="true"
-        >
-          <span className="sr-only">Loading...</span>
-        </div>
-      </div>
+      <div className="inline-block">{spinner}</div>
     </div>
   );
 }

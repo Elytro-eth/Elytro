@@ -2,7 +2,7 @@ import Spin from '@/components/ui/Spin';
 import { useAccount } from '@/contexts/account-context';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
-import EthereumIcon from '@/assets/ethereum.svg';
+import EthereumIcon from '@/assets/coin_eth.png';
 import DoorIcon from '@/assets/door.png';
 import ContactsIcon from '@/assets/contacts.png';
 import { cn } from '@/utils/shadcn/utils';
@@ -69,7 +69,7 @@ export default function SetupTab() {
                 opacity: index === 0 || realSteps[index - 1]?.done || step.done ? '1' : '.5',
                 cursor: isDisabled ? 'not-allowed' : 'pointer',
                 pointerEvents: isDisabled ? 'none' : 'auto',
-                backgroundColor: isDisabled ? '#f5f5f5' : '',
+                backgroundColor: isDisabled ? '#F8F9FA' : '',
               }}
               onClick={() => {
                 if (!isDisabled) {

@@ -9,7 +9,8 @@ import { toast } from '@/hooks/use-toast';
 import { formatErrorMsg } from '@/utils/format';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import ProcessingTip from '@/components/ui/ProcessingTip';
-import { AlertCircle, Mail, Loader2, PauseOctagon, Edit2, X } from 'lucide-react';
+import { AlertCircle, Mail, PauseOctagon, Edit2, X } from 'lucide-react';
+import Spin from '@/components/ui/Spin';
 import GuardianIcon from '@/assets/icons/guardian.svg';
 import { getChainNameByChainId } from '@/constants/chains';
 import { THookStatus } from '@/types/securityHook';
@@ -20,7 +21,7 @@ import CurrentAddress from '@/components/biz/CurrentAddress';
 import HelperText from '@/components/ui/HelperText';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import SettingItem from '@/components/ui/SettingItem';
+import NavItem from '@/components/ui/NavItem';
 import ConfirmPreForceUninstallModal from './ConfirmPreForceUninstallModal';
 import ForceInstallInnerPage from './ForceInstallPage';
 
@@ -395,7 +396,7 @@ function SecurityHookSettingsInnerPage() {
                 setShowSpendingLimitsConfig(false);
               }}
             >
-              {isSettingDailyLimit ? <Loader2 className="size-4 animate-spin mr-2" /> : 'Save'}
+              {isSettingDailyLimit ? <Spin size="sm" isLoading inline className="mr-2" /> : 'Save'}
             </Button>
           </>
         ) : (
@@ -521,7 +522,7 @@ function SecurityHookSettingsInnerPage() {
                     >
                       {isBindingEmail ? (
                         <>
-                          <Loader2 className="size-4 animate-spin mr-2" />
+                          <Spin size="sm" isLoading inline className="mr-2" />
                           Verifying...
                         </>
                       ) : (
@@ -546,7 +547,7 @@ function SecurityHookSettingsInnerPage() {
                   >
                     {isBindingEmail ? (
                       <>
-                        <Loader2 className="size-4 animate-spin mr-2" />
+                        <Spin size="sm" isLoading inline className="mr-2" />
                         Sending...
                       </>
                     ) : isEditingEmail ? (
@@ -562,8 +563,8 @@ function SecurityHookSettingsInnerPage() {
             {hookStatus?.isInstalled && securityProfile?.emailVerified && (
               <>
                 <div className="elytro-text-bold-body text-gray-600">Security settings</div>
-                <div>
-                  <SettingItem
+                <div className="rounded-md overflow-hidden shadow-sm">
+                  <NavItem
                     icon={PauseOctagon}
                     label="Spending limits"
                     value={

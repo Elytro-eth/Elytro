@@ -1,5 +1,5 @@
 import { cn } from '@/utils/shadcn/utils';
-import { LoaderCircle } from 'lucide-react';
+import Spin from './Spin';
 
 interface IProcessingTipProps {
   body?: string;
@@ -14,8 +14,8 @@ const ProcessingTip = ({ body = 'Preparing...', subBody = '', className }: IProc
     aria-live="polite"
     aria-label={body}
   >
-    <div className="bg-blue rounded-pill p-md">
-      <LoaderCircle className="size-12 animate-spin " stroke="#fff" strokeOpacity={0.9} aria-hidden="true" />
+    <div className="rounded-pill p-md">
+      <Spin size="lg" color="text-white" isLoading inline className="opacity-90" />
     </div>
     <div className="elytro-text-bold-body">{body}</div>
     {subBody ? <div className="elytro-text-tiny-body text-gray-600">{subBody}</div> : null}

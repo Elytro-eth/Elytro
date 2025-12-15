@@ -1,12 +1,14 @@
 import { useAccount } from '@/contexts/account-context';
 import EmptyAsset from '@/components/ui/EmptyAsset';
-import { Skeleton } from '@/components/ui/skeleton';
+import Spin from '@/components/ui/Spin';
 import TokenItem from '@/components/ui/TokenItem';
 
 const LoadingSkeleton = () => (
   <div className="space-y-4 px-4 mt-3">
     {Array.from({ length: 3 }).map((_, index) => (
-      <Skeleton key={index} className="w-full h-10" />
+      <div key={index} className="w-full h-10 flex items-center">
+        <Spin size="sm" color="text-gray-300" isLoading inline />
+      </div>
     ))}
   </div>
 );
