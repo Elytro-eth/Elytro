@@ -2,7 +2,7 @@ import Spin from '@/components/ui/Spin';
 import { useAccount } from '@/contexts/account-context';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
-import EthereumIcon from '@/assets/ethereum.svg';
+import EthereumIcon from '@/assets/coin_eth.png';
 import DoorIcon from '@/assets/door.png';
 import ContactsIcon from '@/assets/contacts.png';
 import { cn } from '@/utils/shadcn/utils';
@@ -62,16 +62,14 @@ export default function SetupTab() {
           return (
             <div
               key={step.title}
-              className={cn(
-                'flex items-center gap-x-2 px-4 py-5 rounded-lg border border-gray-300 bg-white hover:bg-gray-150'
-              )}
+              className={cn('flex items-center gap-x-2 px-4 py-2 rounded-md bg-gray-150 hover:bg-gray-300')}
               // make it all grey when it's not done
               style={{
                 filter: index === 0 || realSteps[index - 1]?.done || step.done ? 'none' : 'grayscale(100%)',
                 opacity: index === 0 || realSteps[index - 1]?.done || step.done ? '1' : '.5',
                 cursor: isDisabled ? 'not-allowed' : 'pointer',
                 pointerEvents: isDisabled ? 'none' : 'auto',
-                backgroundColor: isDisabled ? '#f5f5f5' : '',
+                backgroundColor: isDisabled ? '#F8F9FA' : '',
               }}
               onClick={() => {
                 if (!isDisabled) {
@@ -79,13 +77,13 @@ export default function SetupTab() {
                 }
               }}
             >
-              <img src={step.icon} alt={step.title} className="size-[70px]" />
+              <img src={step.icon} alt={step.title} className="size-[60px]" />
               <div className="flex flex-col gap-y-0 flex-1 min-w-0">
                 <div className="flex items-center gap-x-2 min-w-0">
                   {step.done ? (
                     <Check className="size-5 p-1 bg-light-green rounded-full flex-shrink-0" />
                   ) : (
-                    <span className="font-medium text-white bg-black-blue rounded-full size-5 text-sm flex items-center justify-center flex-shrink-0 p-1">
+                    <span className="font-bold text-white bg-black-blue rounded-full size-4 text-sm flex items-center justify-center flex-shrink-0 p-1">
                       {index + 1}
                     </span>
                   )}

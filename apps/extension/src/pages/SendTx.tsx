@@ -2,7 +2,8 @@ import { encodeFunctionData, isAddress, parseUnits, zeroAddress } from 'viem';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import Spin from '@/components/ui/Spin';
 import { Transaction } from '@elytro/sdk';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
@@ -304,7 +305,7 @@ export default function SendTx() {
         <Button variant="secondary" className="w-full gap-xl" disabled={!isFormValid} onClick={handleContinue}>
           {isPreparing ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Spin size="sm" isLoading inline className="mr-2" />
               Preparing...
             </>
           ) : (

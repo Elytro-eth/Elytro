@@ -16,8 +16,8 @@ export default function ChainItem({ chain, onClick, isSelected = false }: IChain
     <div
       onClick={chain.disabled ? undefined : handleClick}
       className={cn(
-        'flex flex-row items-center gap-md px-lg py-md rounded-sm bg-white hover:bg-gray-100 border border-gray-300 cursor-pointer',
-        isSelected && 'bg-gray-100',
+        'flex flex-row items-center gap-md px-lg py-md rounded-sm bg-gray-50 hover:bg-gray-150 border-gray-300 cursor-pointer',
+        isSelected && 'bg-gray-150',
         onClick && 'cursor-pointer',
         chain.disabled && 'cursor-not-allowed opacity-50'
       )}

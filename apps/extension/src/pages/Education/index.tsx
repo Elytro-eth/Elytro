@@ -15,7 +15,7 @@ const STEPS = [
     noDescription: true,
   },
   {
-    title: 'There’s no seed phrase to remember',
+    title: 'No seed phrase to remember',
     img: PasscodeImg,
   },
   {
@@ -58,16 +58,16 @@ const Education = () => {
         <img src={STEPS[currentStep].img} alt={STEPS[currentStep].title} className="size-[200px] mb-10" />
 
         {STEPS[currentStep].noDescription ? null : (
-          <div className="w-full text-center text-gray-600 text-sm font-normal">A new kind of wallet</div>
+          <div className="w-full text-left text-gray-600 text-sm font-normal">A new kind of wallet</div>
         )}
       </div>
       <h1
         key={`title-${currentStep}`}
-        className={`font-bold text-3xl text-center mt-md page-fade-in ${isStepFading ? 'page-fade-out' : ''}`}
+        className={`font-bolder text-4xl text-left mt-md page-fade-in ${isStepFading ? 'page-fade-out' : ''}`}
       >
         {STEPS[currentStep].title}
       </h1>
-      <Button className="w-full mt-9 text-lg font-medium" onClick={handleNext}>
+      <Button className="w-full mt-9 text-lg font-bold" onClick={handleNext}>
         {currentStep < STEPS.length - 1 ? 'Next' : 'Create wallet'}
       </Button>
     </FullPageWrapper>

@@ -9,7 +9,6 @@ import { ChevronDown } from 'lucide-react';
 import { ChevronUp } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
 import Spin from '@/components/ui/Spin';
-import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/utils/shadcn/utils';
 
 interface IAccountsDropdownProps {
@@ -69,7 +68,7 @@ export default function ChainAccountsDropdown({
       <div onClick={() => handleOpenChange(!open)}>
         <div
           className={cn(
-            'max-w-fit cursor-pointer flex items-center gap-x-sm border border-gray-200 rounded-[8px] bg-white px-sm py-xs text-gray-750 hover:bg-gray-100',
+            'max-w-fit cursor-pointer flex items-center gap-x-sm border border-gray-200 rounded-[8px] bg-white px-sm py-xs text-gray-750 hover:bg-gray-150',
             className
           )}
         >
@@ -77,7 +76,7 @@ export default function ChainAccountsDropdown({
             <Avatar className="size-4">
               <AvatarImage src={getIconByChainId(chainId)} />
               <AvatarFallback>
-                <Skeleton className="size-4" />
+                <Spin size="sm" color="text-gray-300" isLoading inline />
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
@@ -86,7 +85,7 @@ export default function ChainAccountsDropdown({
             {showAccount?.address ? (
               formatAddressToShort(showAccount.address)
             ) : (
-              <Skeleton className="w-[90px] h-[18px] rounded-[8px] bg-gray-100" />
+              <Spin size="sm" color="text-gray-300" isLoading inline />
             )}
           </span>
 

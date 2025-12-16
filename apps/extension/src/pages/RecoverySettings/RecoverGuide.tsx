@@ -53,7 +53,7 @@ export default function RecoverGuide({ onClick }: RecoverGuideProps) {
         )}
       </div>
       <h1 className="font-bold text-3xl text-center mt-md">{STEPS[currentStep].title}</h1>
-      <Button className="w-full mt-9 text-lg font-medium" onClick={handleNext}>
+      <Button className="w-full mt-9 text-lg font-bold" onClick={handleNext}>
         Next
       </Button>
     </div>

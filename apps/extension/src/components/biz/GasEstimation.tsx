@@ -1,16 +1,9 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Loader } from 'lucide-react';
+import Spin from '@/components/ui/Spin';
 import { useInterval } from 'usehooks-ts';
 
 const INTERVAL_TIME = 15000; // TODO: see if this value is fine
@@ -29,8 +22,7 @@ interface IGasEstimationProps {
 const GasEstimation = ({ onGasChange }: IGasEstimationProps) => {
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [currGasEstimation, setSelectedEstimate] =
-    useState<TGasEstimate | null>(null);
+  const [currGasEstimation, setSelectedEstimate] = useState<TGasEstimate | null>(null);
 
   useEffect(() => {
     fetchGasEstimates();
@@ -39,9 +31,7 @@ const GasEstimation = ({ onGasChange }: IGasEstimationProps) => {
   const fetchGasEstimates = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        'https://api.blocknative.com/gasprices/blockprices'
-      );
+      const response = await axios.get('https://api.blocknative.com/gasprices/blockprices');
 
       const estimate = response.data.blockPrices[0].estimatedPrices?.[0];
       setSelectedEstimate(estimate);
@@ -64,7 +54,7 @@ const GasEstimation = ({ onGasChange }: IGasEstimationProps) => {
         <CardTitle className="text-sm font-bold">Gas Estimation</CardTitle>
         <Badge variant="outline" className="ml-2">
           {loading ? (
-            <Loader className="mr-2 h-4 w-4 animate-spin" />
+            <Spin size="sm" isLoading inline className="mr-2" />
           ) : (
             `Last updated: ${lastUpdated?.toLocaleTimeString() || 'N/A'}`
           )}

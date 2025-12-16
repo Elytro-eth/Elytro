@@ -11,7 +11,7 @@ import {
   UserRoundIcon,
 } from 'lucide-react';
 import { useWallet } from '@/contexts/wallet';
-import SettingItem from '@/components/ui/SettingItem';
+import NavItem from '@/components/ui/NavItem';
 import { useAccount } from '@/contexts/account-context';
 import HelperText from '@/components/ui/HelperText';
 import { useState } from 'react';
@@ -39,24 +39,24 @@ export default function Settings() {
   return (
     <SecondaryPageWrapper title="Settings" className={isFadingOut ? 'page-fade-out' : ''}>
       <HelperText description="We are in public beta, please keep deposits small" className="mb-4" />
-      <div className="space-y-2">
-        <SettingItem
+      <div className="rounded-md overflow-hidden shadow-sm">
+        <NavItem
           icon={UserRoundIcon}
           label="Change passcode"
           onClick={() => handleNavigate(SIDE_PANEL_ROUTE_PATHS.ChangePassword)}
         />
-        <SettingItem
+        <NavItem
           icon={Settings2Icon}
           label="Networks"
           onClick={() => handleNavigate(SIDE_PANEL_ROUTE_PATHS.NetworkConfiguration)}
         />
-        <SettingItem
+        <NavItem
           icon={WalletCardsIcon}
           label="Backup accounts"
           onClick={() => handleNavigate(SIDE_PANEL_ROUTE_PATHS.ExportBackup)}
         />
         {needUpgrade && (
-          <SettingItem
+          <NavItem
             icon={RefreshCcw}
             label="Update contract"
             onClick={() => handleNavigate(SIDE_PANEL_ROUTE_PATHS.UpgradeContract)}
