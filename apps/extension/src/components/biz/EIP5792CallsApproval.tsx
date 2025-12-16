@@ -157,7 +157,7 @@
 //       </Card>
 
 //       <div className="flex gap-3">
-//         <Button variant="outline" onClick={handleReject} className="flex-1">
+//         <Button variant="tertiary" onClick={handleReject} className="flex-1">
 //           <XCircle className="h-4 w-4 mr-2" />
 //           Reject
 //         </Button>

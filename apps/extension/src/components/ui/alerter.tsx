@@ -23,11 +23,7 @@ const AlerterContext = createContext<IAlerterContext>({
   elytroAlert: ({}) => {},
 });
 
-export const AlerterProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const AlerterProvider = ({ children }: { children: React.ReactNode }) => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -48,12 +44,7 @@ export const AlerterProvider = ({
     onConfirmRef.current?.();
     reset();
   };
-  const elytroAlert = ({
-    title,
-    description,
-    onCancel,
-    onConfirm,
-  }: ElytroAlertProps) => {
+  const elytroAlert = ({ title, description, onCancel, onConfirm }: ElytroAlertProps) => {
     setOpen(true);
     setTitle(title);
     setDescription(description || '');
@@ -74,19 +65,10 @@ export const AlerterProvider = ({
               <AlertDialogDescription>{description}</AlertDialogDescription>
             </AlertDialogHeader>
             <div className="flex gap-2 justify-between mt-2">
-              <Button
-                className="flex-1"
-                size="small"
-                variant="outline"
-                onClick={handleCancel}
-              >
+              <Button className="flex-1" size="small" variant="tertiary" onClick={handleCancel}>
                 Cancel
               </Button>
-              <Button 
-                className="flex-1" 
-                size="small"
-                onClick={handleConfirm}
-              >
+              <Button className="flex-1" size="small" onClick={handleConfirm}>
                 Confirm
               </Button>
             </div>

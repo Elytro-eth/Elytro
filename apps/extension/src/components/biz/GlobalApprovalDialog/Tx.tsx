@@ -130,12 +130,12 @@ export default function Tx() {
 
         <DialogFooter className="flex flex-row w-full gap-x-sm [&>button]:flex-1 mt-2xl ">
           {hookError?.code === 'LIMIT_EXCEEDED' ? (
-            <Button variant="ghost" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
+            <Button variant="tertiary" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
               Close
             </Button>
           ) : (
             <>
-              <Button variant="ghost" onClick={onCancel} disabled={isSending}>
+              <Button variant="tertiary" onClick={onCancel} disabled={isSending}>
                 Cancel
               </Button>
 
@@ -163,12 +163,12 @@ export default function Tx() {
       {/* Footer */}
       <DialogFooter className="w-full gap-x-sm [&>button]:flex-1 mt-2xl">
         {isSending ? (
-          <Button variant="ghost" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
+          <Button variant="tertiary" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
             Close
           </Button>
         ) : (
           <div className="w-full grid grid-cols-2 gap-x-sm">
-            <Button variant="ghost" onClick={onCancel} disabled={isSending}>
+            <Button variant="tertiary" onClick={onCancel} disabled={isSending}>
               Cancel
             </Button>
 

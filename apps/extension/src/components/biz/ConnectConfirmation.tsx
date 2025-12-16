@@ -50,7 +50,7 @@ export default function ConnectionConfirmation({ dApp, onConfirm, onCancel }: IP
       </div>
 
       <div className="flex space-x-2">
-        <Button variant="outline" className="flex-1" onClick={onCancel}>
+        <Button variant="tertiary" className="flex-1" onClick={onCancel}>
           Cancel
         </Button>
         <Button className="flex-1" onClick={onConfirm}>

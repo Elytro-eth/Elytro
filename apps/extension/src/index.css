@@ -14,7 +14,7 @@
     --primary-foreground: 199, 42%, 86%;
     --secondary: 199, 42%, 86%;
     --secondary-foreground: 200, 44%, 24%;
-    --tertiary: 222, 8%, 76%;
+    --tertiary: 0, 0%, 89%; /* Gray-300 */
     --tertiary-foreground: 223, 42%, 15%;
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;

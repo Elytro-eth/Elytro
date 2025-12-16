@@ -80,7 +80,7 @@ export default function EIP5792Calls() {
             <Button onClick={handleApprove} className="flex-1">
               批准
             </Button>
-            <Button onClick={handleReject} variant="outline" className="flex-1">
+            <Button onClick={handleReject} variant="tertiary" className="flex-1">
               拒绝
             </Button>
           </div>

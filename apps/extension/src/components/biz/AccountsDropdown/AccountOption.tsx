@@ -97,7 +97,7 @@ export default function AccountOption({
           </div>
 
           <div className="grid grid-cols-2 gap-x-sm">
-            <Button variant="outline" className="w-full" onClick={() => setIsOpen(false)} size="small">
+            <Button variant="tertiary" className="w-full" onClick={() => setIsOpen(false)} size="small">
               Cancel
             </Button>
 

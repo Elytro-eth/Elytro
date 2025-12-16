@@ -82,7 +82,7 @@ export default function SignDetail({ onConfirm, onCancel, dapp, chainId, signDat
           </div>
         </div>
         <div className="flex w-full justify-between gap-x-2">
-          <Button variant="ghost" onClick={handleCancel} className="flex-1 rounded-md border border-gray-200">
+          <Button variant="tertiary" onClick={handleCancel} className="flex-1 rounded-md border border-gray-200">
             Cancel
           </Button>
           <Button onClick={handleConfirm} className="flex-1 rounded-md">

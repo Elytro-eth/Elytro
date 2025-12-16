@@ -131,7 +131,7 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
       >
         <div className="flex items-center justify-between gap-x-3xl px-lg pb-sm">
           <span className="elytro-text-small-bold text-gray-900">Your wallets</span>
-          <Button variant="outline" size="tiny" className="elytro-text-tiny-body" onClick={handleAddAccount}>
+          <Button variant="tertiary" size="tiny" className="elytro-text-tiny-body" onClick={handleAddAccount}>
             Add new wallet
           </Button>
         </div>
