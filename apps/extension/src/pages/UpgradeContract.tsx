@@ -55,7 +55,7 @@ export default function UpgradeContract() {
   return (
     <SecondaryPageWrapper title="Update contract">
       <div className="flex flex-col gap-y-md">
-        <h2 className="elytro-text-small-bold text-gray-600 mt-4">Your are updating</h2>
+        <h2 className="elytro-text-small text-gray-600 mt-4">Your are updating</h2>
         <div className="flex flex-row justify-between">
           <FragmentedAddress address={address} chainId={chainId} className="p-xs rounded-2xs bg-gray-150" />
         </div>

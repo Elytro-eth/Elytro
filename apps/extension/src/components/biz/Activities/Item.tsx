@@ -23,19 +23,19 @@ const ActivityTypeMap = {
   [HistoricalActivityTypeEn.ActivateAccount]: {
     name: 'Activate Wallet',
     IconComponent: Check,
-    bg: 'bg-gray-300',
+    bg: 'bg-light-brown',
   },
   [HistoricalActivityTypeEn.ContractInteract]: {
     name: 'Contract Interact',
     IconComponent: ChevronsLeftRight,
-    bg: 'bg-gray-300',
+    bg: 'bg-light-brown',
   },
 };
 
 const UnknownActivity = {
   name: 'Unknown Activity',
   IconComponent: ShieldQuestion,
-  bg: 'bg-gray-300',
+  bg: 'bg-light-brown',
 };
 
 const ActivityStatusMap = {
@@ -85,7 +85,7 @@ export default function ActivityItem({
   const { label, style } = ActivityStatusMap[latestStatus];
   return (
     <div
-      className="flex items-center w-full justify-between px-lg cursor-pointer py-md hover:bg-gray-150 gap-x-sm min-w-0"
+      className="flex items-center w-full justify-between px-lg cursor-pointer py-md hover:bg-gray-50 gap-x-sm min-w-0"
       onClick={() => openExplorer({ txHash, opHash })}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">

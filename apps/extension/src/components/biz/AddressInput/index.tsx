@@ -233,7 +233,7 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
       <div className="flex items-center relative px-4">
         <Input
           ref={inputRef}
-          className="text-lg border-none bg-white focus-visible:outline-none pl-0"
+          className="text-lg border-none bg-white focus-visible:outline-0 pl-0"
           placeholder={!isFocused && !(displayLabel || ensInfo) ? 'Recipient address / ENS' : ''}
           value={isFocused ? value : displayLabel || ensInfo ? '' : value}
           onBlur={handleBlur}

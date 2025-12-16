@@ -49,7 +49,7 @@ function ApprovalDetailItem({ decodedResult, defaultExpanded = false }: IApprova
     <div className="w-full">
       <InfoCardList>
         <InfoCardItem
-          label={<span className="text-black-blue">Contract Interact</span>}
+          label={<span className="text-black-blue font-bold">Contract Interact</span>}
           content={
             <button
               onClick={() => setIsExpanded(!isExpanded)}

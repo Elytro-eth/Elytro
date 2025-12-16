@@ -66,12 +66,12 @@ export default function Apps() {
           <div
             key={dapp.name}
             onClick={() => handleOpenDapp(dapp.url)}
-            className="relative flex flex-row gap-x-sm flex-1 cursor-pointer group hover:bg-gray-150 p-lg rounded-md border border-gray-200"
+            className="relative flex flex-row gap-x-sm flex-1 cursor-pointer group bg-gray-50 hover:bg-gray-150 p-lg rounded-md"
           >
             <img src={dapp.icon} alt={dapp.name} className="size-10" />
             <div className="flex flex-col flex-1">
-              <div className="elytro-text-small-bold">{dapp.label}</div>
-              <div className="elytro-text-tiny-body text-gray-500">{dapp.name}</div>
+              <div className="elytro-text-bold-body">{dapp.label}</div>
+              <div className="elytro-text-tiny-body text-gray-600">{dapp.name}</div>
             </div>
             <SquareArrowOutUpRight className="hidden group-hover:block absolute right-4 size-3 stroke-gray-600" />
           </div>
@@ -80,11 +80,11 @@ export default function Apps() {
 
       {connectedSites?.length > 0 && (
         <div className="flex flex-col gap-y-sm">
-          <h3 className="elytro-text-small-bold text-gray-600">Connected apps</h3>
+          <h3 className="elytro-text-small text-gray-600">Connected apps</h3>
           {connectedSites.map((site) => (
             <div
               key={site.origin}
-              className="flex flex-row justify-between items-center gap-sm p-lg rounded-md border border-gray-300"
+              className="flex flex-row justify-between items-center gap-sm p-lg rounded-md bg-gray-50 hover:bg-gray-150"
             >
               <div className="flex flex-row items-center gap-x-sm">
                 <img src={site.icon} alt={site.name} className="size-8 rounded-full" />

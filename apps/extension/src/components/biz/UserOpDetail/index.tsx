@@ -207,7 +207,7 @@ export function UserOpDetail() {
                     <RadioGroupItem value={value} id={`gas-fee-${value}`} />
                     <Label
                       htmlFor={`gas-fee-${value}`}
-                      className="flex items-center elytro-text-smaller-body text-gray-750 truncate cursor-pointer"
+                      className="flex items-center elytro-text-small text-gray-750 truncate cursor-pointer"
                     >
                       <span className="text-gray-750">{label}</span>
                     </Label>

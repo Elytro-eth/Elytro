@@ -122,7 +122,7 @@ export default function Dashboard() {
       <PageLayout.Body className="px-2 py-2">
         <div className="rounded-xl bg-white h-full flex flex-col relative">
           <div className="flex-1 overflow-auto pb-[52px]">
-            <DashboardTabs loading={loading} onReload={handleReload} />
+            <DashboardTabs onReload={handleReload} />
           </div>
 
           <div className="absolute bottom-0 rounded-md left-0 right-0 flex justify-center pt-2 flex-col">

@@ -11,7 +11,6 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import AddOnsTab from './AddOnsTab';
 
 interface DashboardTabsProps {
-  loading: boolean;
   onReload: () => void;
 }
 
@@ -54,7 +53,7 @@ const TabsConfig = [
 const UNDEPLOY_TABS_KEYS = [TABS_KEYS.SETUP, TABS_KEYS.ASSETS, TABS_KEYS.ACTIVITIES];
 const DEPLOYED_TABS_KEYS = [TABS_KEYS.APPS, TABS_KEYS.ACTIVITIES, TABS_KEYS.ASSETS, TABS_KEYS.ADD_ONS];
 
-export default function DashboardTabs({ loading, onReload }: DashboardTabsProps) {
+export default function DashboardTabs({ onReload }: DashboardTabsProps) {
   const searchParams = useSearchParams();
   const { currentAccount } = useAccount();
 
@@ -63,6 +62,13 @@ export default function DashboardTabs({ loading, onReload }: DashboardTabsProps)
   const tabs = TabsConfig.filter((tab) => tabKeys.includes(tab.key));
 
   const [activeTab, setActiveTab] = useState(searchParams.tab || TABS_KEYS.ASSETS);
+  const [loading, setLoading] = useState(false);
+
+  const handleReload = () => {
+    setLoading(true);
+    onReload();
+    setTimeout(() => setLoading(false), 500);
+  };
 
   useEffect(() => {
     setActiveTab(searchParams.tab || tabKeys[0]);
@@ -78,22 +84,19 @@ export default function DashboardTabs({ loading, onReload }: DashboardTabsProps)
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="flex flex-col flex-1 h-full box-border">
-      <TabsList className="pl-5 pr-6 relative">
+      <TabsList className="pl-4 pr-4 relative">
         {tabs.map((tab) => (
           <TabsTrigger key={tab.key} value={tab.key}>
             {tab.label}
           </TabsTrigger>
         ))}
-        <button
-          type="button"
-          className="absolute right-4 mt-1 p-1 rounded-md hover:bg-gray-150 transition-colors"
-          onClick={onReload}
-          aria-label="Refresh account data"
-          disabled={loading}
-        >
+        <button type="button" onClick={handleReload} aria-label="Refresh account data" disabled={loading}>
           <RefreshCcw
-            className={`elytro-clickable-icon stroke-gray-300 ${loading ? 'animate-spin' : ''}`}
+            className="elytro-clickable-icon stroke-gray-450"
             aria-hidden="true"
+            style={{
+              animation: loading ? 'spin 1s linear infinite' : 'none',
+            }}
           />
         </button>
       </TabsList>

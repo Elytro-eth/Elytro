@@ -14,7 +14,7 @@ export default function HelperText({
   return (
     <div className={cn('flex flex-col rounded-sm bg-light-brown py-sm px-md w-full text-brown', className)}>
       {/* <h2 className="elytro-text-small-bold text-brown">{title}</h2> */}
-      <p className="elytro-text-tiny-body text-brown">{description}</p>
+      <p className="elytro-text-tiny-body text-dark-brown">{description}</p>
     </div>
   );
 }
