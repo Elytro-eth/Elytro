@@ -15,24 +15,24 @@ import { navigateTo } from '@/utils/navigation';
 import dayjs from 'dayjs';
 import { LaptopMinimal, DownloadIcon, LockKeyhole, WalletCards } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import WalletImg from '@/assets/wallet.png';
+import WalletImg from '@/assets/bg-images/wallet-bg-top.png';
 import { useAccount } from '@/contexts/account-context';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { formatEther } from 'viem';
 
 const tips = [
   {
-    title: '1. You can backup multiple wallets',
+    title: 'You can backup multiple wallets',
     description: '',
     Icon: WalletCards,
   },
   {
-    title: '2. Backup locked by passcode',
+    title: 'Backup locked by passcode',
     description: '',
     Icon: LockKeyhole,
   },
   {
-    title: '3. You can import on a new device',
+    title: 'You can import on a new device',
     description: '',
     Icon: LaptopMinimal,
   },
@@ -127,7 +127,7 @@ export default function ExportBackupPage() {
   }, [accounts]);
 
   return (
-    <SecondaryPageWrapper title="Export wallets">
+    <SecondaryPageWrapper title="Export wallets" isGuide={true} overlayHeader={true}>
       {isGuiding ? (
         <div className={`page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}>
           <Guide

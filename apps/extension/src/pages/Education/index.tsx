@@ -1,16 +1,16 @@
-import WalletImg from '@/assets/wallet.png';
-import ContactsImg from '@/assets/contacts.png';
-import PasscodeImg from '@/assets/passcode.png';
+import WalletImg from '@/assets/bg-images/wallet-bg-lg.png';
+import ContactsImg from '@/assets/bg-images/guardian-bg-lg.png';
+import PasscodeImg from '@/assets/bg-images/key-bg-lg.png';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
-import DoorImg from '@/assets/door.png';
+import DoorImg from '@/assets/bg-images/wallet-bg-lg.png';
 
 const STEPS = [
   {
-    title: 'A new kind of wallet',
+    title: 'Elytro is a new kind of wallet',
     img: DoorImg,
     noDescription: true,
   },
@@ -55,15 +55,15 @@ const Education = () => {
       className={`h-full flex flex-col items-center justify-center page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}
     >
       <div key={currentStep} className={`page-fade-in ${isStepFading ? 'page-fade-out' : ''}`}>
-        <img src={STEPS[currentStep].img} alt={STEPS[currentStep].title} className="size-[200px] mb-10" />
+        <img src={STEPS[currentStep].img} alt={STEPS[currentStep].title} className="mb-10" />
 
         {STEPS[currentStep].noDescription ? null : (
-          <div className="w-full text-left text-gray-600 text-sm font-normal">A new kind of wallet</div>
+          <div className="w-full text-left text-gray-600 text-base font-normal">A new kind of wallet</div>
         )}
       </div>
       <h1
         key={`title-${currentStep}`}
-        className={`font-bolder text-4xl text-left mt-md page-fade-in ${isStepFading ? 'page-fade-out' : ''}`}
+        className={`font-bold text-4xl text-left mt-md page-fade-in ${isStepFading ? 'page-fade-out' : ''}`}
       >
         {STEPS[currentStep].title}
       </h1>

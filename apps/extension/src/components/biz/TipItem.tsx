@@ -7,17 +7,13 @@ interface ITipItemProps {
   index?: number;
 }
 
-export default function TipItem({ title, description, Icon, index }: ITipItemProps) {
+export default function TipItem({ title, description: _description, Icon, index: _index }: ITipItemProps) {
   return (
-    <div className="flex flex-row gap-x-2xs py-xs px-lg items-start">
-      <Icon className="size-5 mt-1 flex-shrink-0 stroke-dark-blue" />
-
-      <div className="flex flex-col gap-y-3xs leading-none ml-md">
-        <span className="elytro-text-small text-dark-blue mt-1">
-          {index ? index : ''} {title}
-        </span>
-        <span className="elytro-text-tiny-body text-gray-600">{description}</span>
+    <div className="flex items-center gap-x-4">
+      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-light-brown flex items-center justify-center">
+        <Icon className="w-4 h-4 stroke-gray-700" strokeWidth={2} />
       </div>
+      <span className="text-base text-gray-750">{title}</span>
     </div>
   );
 }

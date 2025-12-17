@@ -24,7 +24,7 @@ export default function Launch() {
     >
       <div className="flex flex-col items-center gap-y-3xl flex-1">
         <img src={LaunchImg} alt="Launch" className="size-[8rem] mt-20" />
-        <h1 className="elytro-text-headline text-center">Your recoverable Ethereum wallet</h1>
+        <h1 className="elytro-text-headline">Your next-gen Ethereum wallet</h1>
         <div className="flex flex-col w-full">
           <div className="flex flex-col gap-y-3">
             <Button onClick={() => handleNavigate(SIDE_PANEL_ROUTE_PATHS.CreatePasscode)}>Create a new wallet</Button>

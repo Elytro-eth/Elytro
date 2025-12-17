@@ -6,9 +6,7 @@ interface ISessionCard {
   session?: TDAppInfo;
 }
 
-export default function SessionCard({
-  session = ELYTRO_APP_DATA,
-}: ISessionCard) {
+export default function SessionCard({ session = ELYTRO_APP_DATA }: ISessionCard) {
   const { icon, name, origin } = session;
 
   return (
@@ -22,9 +20,7 @@ export default function SessionCard({
         <span className="elytro-text-bold-body truncate">{name}</span>
       </span>
 
-      <span className="elytro-text-smaller-bold-body text-gray-600 flex-shrink-0">
-        {getHostname(origin)}
-      </span>
+      <span className="elytro-text-small text-gray-600 flex-shrink-0">{getHostname(origin)}</span>
     </div>
   );
 }

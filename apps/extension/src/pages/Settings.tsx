@@ -105,7 +105,7 @@ export default function Settings() {
           >
             Privacy
           </a>
-          <span className="ml-3 text-gray-450">V0.0.1 (Beta)</span>
+          <span className="ml-3 text-gray-450">V0.1.1 (Beta)</span>
         </p>
       </div>
     </SecondaryPageWrapper>

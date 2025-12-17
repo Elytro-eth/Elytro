@@ -9,7 +9,7 @@ import { useChain } from '@/contexts/chain-context';
 import { useWallet } from '@/contexts/wallet';
 import NetworkSelection from '@/components/biz/NetworkSelection';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
-import DoorImg from '@/assets/door.png';
+import DoorImg from '@/assets/bg-images/wallet-bg-lg.png';
 import { useAccount } from '@/contexts/account-context';
 import Spin from '@/components/ui/Spin';
 import CurrentAddress from '@/components/biz/CurrentAddress';
@@ -65,7 +65,7 @@ const CreateAccount: React.FC = () => {
         className={`h-full flex flex-col items-center justify-center page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}
       >
         <div className="flex flex-col items-center gap-y-2xs">
-          <img src={DoorImg} alt="Passcode" width={144} />
+          <img src={DoorImg} alt="Passcode" width={200} />
 
           <h1 className="elytro-text-title text-center mt-6">Your wallet is created</h1>
 

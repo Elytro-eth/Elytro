@@ -19,6 +19,16 @@ interface ISecondaryPageWrapperProps extends PropsWithChildren {
    * @default true
    */
   fadeIn?: boolean;
+  /**
+   * Enable Guide mode (removes padding, overlays header for full-bleed background)
+   * @default false
+   */
+  isGuide?: boolean;
+  /**
+   * Overlay header on top of content (useful for headers over background images)
+   * @default false
+   */
+  overlayHeader?: boolean;
 }
 
 export default function SecondaryPageWrapper({
@@ -31,6 +41,8 @@ export default function SecondaryPageWrapper({
   onBack,
   className,
   fadeIn = true,
+  isGuide = false,
+  overlayHeader = false,
 }: ISecondaryPageWrapperProps) {
   const [animationClass, setAnimationClass] = useState('');
 
@@ -61,18 +73,40 @@ export default function SecondaryPageWrapper({
 
   return (
     <div className={cn('w-full min-h-full bg-fade-green p-sm', animationClass, className)} style={initialStyle}>
-      <div className="flex flex-col flex-grow w-full min-h-full bg-white p-lg rounded-sm pb-2xl">
+      <div
+        className={cn(
+          'flex flex-col flex-grow w-full min-h-full bg-white rounded-sm pb-2xl',
+          isGuide ? '' : 'p-lg',
+          overlayHeader ? 'relative' : ''
+        )}
+      >
         {/* Header: back button, title, close button */}
-        <div className="flex flex-row items-center justify-center relative pb-lg mb-sm">
-          {showBack && <ArrowLeft className="elytro-clickable-icon absolute left-0" onClick={handleBack} />}
+        <div
+          className={cn(
+            'flex flex-row items-center justify-center relative pb-lg mb-sm',
+            isGuide ? 'pt-lg px-lg' : '',
+            overlayHeader ? 'absolute top-0 left-0 right-0 z-10 mb-0' : ''
+          )}
+        >
+          {showBack && (
+            <ArrowLeft
+              className={cn('elytro-clickable-icon absolute', isGuide ? 'left-lg' : 'left-0')}
+              onClick={handleBack}
+            />
+          )}
           <h3 className="elytro-text-bold-body">{title}</h3>
-          {closeable && <X className="elytro-clickable-icon absolute right-0" onClick={handleClose} />}
+          {closeable && (
+            <X
+              className={cn('elytro-clickable-icon absolute', isGuide ? 'right-lg' : 'right-0')}
+              onClick={handleClose}
+            />
+          )}
         </div>
 
         {children}
 
         {/* Footer: fixed to bottom */}
-        {footer && <div className="flex w-full mt-auto mb-md">{footer}</div>}
+        {footer && <div className={cn('flex w-full mt-auto mb-md', isGuide ? 'px-lg' : '')}>{footer}</div>}
       </div>
     </div>
   );
