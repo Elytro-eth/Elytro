@@ -121,7 +121,7 @@ export default function AccountRecovery() {
       >
         <NetworkSelection selectedChain={selectedChain} handleSelectChain={handleSelectChain} />
         <div className="w-full grid grid-cols-2 gap-x-sm mt-10">
-          <Button variant="outline" onClick={() => setChecked(false)}>
+          <Button variant="tertiary" onClick={() => setChecked(false)}>
             Cancel
           </Button>
           <Button disabled={!selectedChain} onClick={handleNext}>

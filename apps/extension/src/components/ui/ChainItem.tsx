@@ -22,7 +22,7 @@ export default function ChainItem({ chain, onClick, isSelected = false }: IChain
         chain.disabled && 'cursor-not-allowed opacity-50'
       )}
     >
-      <img src={chain?.icon} alt={chain?.name} className="size-8 rounded-full" />
+      <img src={chain?.icon} alt={chain?.name} className="size-7 rounded-full" />
       <div className="elytro-text-bold-body">{chain?.name}</div>
     </div>
   );

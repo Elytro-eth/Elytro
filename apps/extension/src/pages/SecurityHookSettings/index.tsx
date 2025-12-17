@@ -530,7 +530,7 @@ function SecurityHookSettingsInnerPage() {
                       )}
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="tertiary"
                       className="w-full"
                       disabled={isBindingEmail}
                       onClick={handleCancelEditEmail}

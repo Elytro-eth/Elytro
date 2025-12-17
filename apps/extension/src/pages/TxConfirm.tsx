@@ -134,12 +134,12 @@ function TxConfirm() {
 
         <div className="flex w-full gap-x-sm [&>button]:flex-1 mt-xl">
           {hookError?.code === 'LIMIT_EXCEEDED' ? (
-            <Button variant="ghost" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
+            <Button variant="tertiary" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
               Close
             </Button>
           ) : (
             <>
-              <Button variant="ghost" onClick={onCancel} disabled={isSending}>
+              <Button variant="tertiary" onClick={onCancel} disabled={isSending}>
                 Cancel
               </Button>
 
@@ -168,12 +168,12 @@ function TxConfirm() {
       {/* Footer */}
       <div className="flex w-full gap-x-sm [&>button]:flex-1 mt-xl">
         {isSending ? (
-          <Button variant="ghost" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
+          <Button variant="tertiary" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
             Close
           </Button>
         ) : (
           <>
-            <Button variant="ghost" onClick={onCancel} disabled={isSending}>
+            <Button variant="tertiary" onClick={onCancel} disabled={isSending}>
               Cancel
             </Button>
 

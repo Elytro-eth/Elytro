@@ -50,7 +50,7 @@ export default function AccountOption({
     <div
       className={cn(
         'flex items-center gap-x-xl justify-between px-lg py-md cursor-pointer hover:bg-gray-150',
-        isSelected && 'bg-gray-150'
+        isSelected && 'bg-gray-50'
       )}
       onClick={onSelect}
     >
@@ -97,7 +97,7 @@ export default function AccountOption({
           </div>
 
           <div className="grid grid-cols-2 gap-x-sm">
-            <Button variant="outline" className="w-full" onClick={() => setIsOpen(false)} size="small">
+            <Button variant="tertiary" className="w-full" onClick={() => setIsOpen(false)} size="small">
               Cancel
             </Button>
 

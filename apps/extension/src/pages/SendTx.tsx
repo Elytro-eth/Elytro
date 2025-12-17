@@ -327,7 +327,7 @@ export default function SendTx() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2 mt-xl">
-            <Button variant="outline" onClick={() => setOpenToContractConfirmModal(false)}>
+            <Button variant="tertiary" onClick={() => setOpenToContractConfirmModal(false)}>
               Back
             </Button>
             <Button onClick={handleOpenTx}>I understand</Button>

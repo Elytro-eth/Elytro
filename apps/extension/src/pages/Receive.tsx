@@ -132,17 +132,20 @@ export default function Receive() {
             <img src={chainIcon} alt={chainName} className="size-20 rounded-full" />
 
             {/* Title */}
-            <div className="elytro-text-bold-body text-center">This wallet only accepts tokens on {chainName}</div>
+            <div className="elytro-text-bold-body text-center">
+              This wallet only accepts tokens on
+              <br /> {chainName}
+            </div>
 
             {/* Subtitle */}
-            <div className="elytro-text-smaller-body text-gray-600 text-center">
+            <div className="elytro-text-smaller-body text-gray-600 text-center -mt-2">
               Different network, different address
             </div>
 
             {/* Checkbox */}
             <label className="flex items-center gap-2 cursor-pointer">
               <Checkbox checked={dontRemindAgain} onCheckedChange={(checked) => setDontRemindAgain(checked === true)} />
-              <span className="elytro-text-smaller-body text-gray-600">Don&apos;t remind me again</span>
+              <span className="elytro-text-smaller-body text-gray-750">Don&apos;t remind me again</span>
             </label>
 
             {/* Action Button */}

@@ -14,9 +14,9 @@ interface INavItemProps {
 const NavItem = ({ icon: Icon, label, path, onClick, showRedDot, value }: INavItemProps) => (
   <div
     onClick={onClick ?? (path ? () => navigateTo('side-panel', path as SidePanelRoutePath) : undefined)}
-    className="flex text-base font-normal items-center justify-between bg-gray-50 hover:bg-gray-150 relative cursor-pointer p-lg border-b border-gray-150 last:border-b-0 first:rounded-t-md last:rounded-b-md"
+    className="flex text-base font-normal items-center justify-between bg-gray-50 hover:bg-gray-150 relative cursor-pointer p-lg border-b border-gray-300 last:border-b-0 first:rounded-t-md last:rounded-b-md"
   >
-    <div className="flex flex-row items-center">
+    <div className="flex flex-row items-center hover:text-black-blue ">
       <Icon className="size-5 mr-3" />
       {label}
     </div>

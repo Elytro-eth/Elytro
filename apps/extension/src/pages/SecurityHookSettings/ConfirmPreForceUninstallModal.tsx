@@ -44,7 +44,7 @@ export default function ConfirmPreForceUninstallModal() {
         </div>
 
         <DialogFooter className="grid grid-cols-2 gap-2">
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button variant="tertiary" onClick={() => setOpen(false)}>
             Cancel
           </Button>
           <Button variant="default" onClick={handlePreForceUninstall}>

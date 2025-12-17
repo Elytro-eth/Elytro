@@ -132,7 +132,7 @@ export default function RecoveryFileUploadDialog({ open, onOpenChange, onFileUpl
         </div>
 
         <DialogFooter className="grid grid-cols-2 gap-x-sm">
-          <Button variant="outline" onClick={handleCancel} className="flex-1">
+          <Button variant="tertiary" onClick={handleCancel} className="flex-1">
             Cancel
           </Button>
           <Button
