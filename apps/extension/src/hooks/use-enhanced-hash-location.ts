@@ -1,30 +1,26 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
+
+const subscribe = (callback: () => void) => {
+  window.addEventListener('hashchange', callback);
+  window.addEventListener('popstate', callback);
+  return () => {
+    window.removeEventListener('hashchange', callback);
+    window.removeEventListener('popstate', callback);
+  };
+};
+
+const getSnapshot = () => {
+  return window.location.hash.replace(/^#/, '') || '/';
+};
+
+const getServerSnapshot = () => '/';
 
 function useEnhancedHashLocation() {
-  const getHash = () => window.location.hash.replace(/^#/, '') || '/';
-
-  const [hash, setHash] = useState(getHash());
+  const hash = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const navigate = useCallback((to: string) => {
     window.location.hash = to;
   }, []);
-
-  useEffect(() => {
-    const handleHashChange = () => {
-      const newHash = getHash();
-      if (newHash !== hash) {
-        setHash(newHash);
-      }
-    };
-
-    window.addEventListener('hashchange', handleHashChange);
-    window.addEventListener('popstate', handleHashChange);
-
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-      window.removeEventListener('popstate', handleHashChange);
-    };
-  }, [hash]);
 
   return [hash, navigate] as [string, (to: string) => void];
 }

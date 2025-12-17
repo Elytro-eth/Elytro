@@ -19,7 +19,7 @@ const CreateAccount: React.FC = () => {
   const { wallet } = useWallet();
   const [selectedChain, setSelectedChain] = useState<TChainItem | null>(null);
   const [isCreated, setIsCreated] = useState(false);
-  const [isFadingOut, setIsFadingOut] = useState(false);
+
   const { reloadAccount, loading: isLoading } = useAccount();
 
   useEffect(() => {
@@ -52,18 +52,12 @@ const CreateAccount: React.FC = () => {
   };
 
   const handleStart = () => {
-    setIsFadingOut(true);
-    // Wait for fade-out animation before navigating
-    setTimeout(() => {
-      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
-    }, 150); // Match animation duration
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
   };
 
   if (isCreated) {
     return (
-      <FullPageWrapper
-        className={`h-full flex flex-col items-center justify-center page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}
-      >
+      <FullPageWrapper className={`h-full flex flex-col items-center justify-center page-fade-in`}>
         <div className="flex flex-col items-center gap-y-2xs">
           <img src={DoorImg} alt="Passcode" width={144} />
 

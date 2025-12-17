@@ -156,6 +156,8 @@ export default function SendTx() {
       throw new Error('Invalid token address');
     }
 
+    setOpenToContractConfirmModal(false);
+
     saveRecentAddress(to);
     handleTxRequest(TxRequestTypeEn.SendTransaction, [txParams], {
       data: {
@@ -239,7 +241,7 @@ export default function SendTx() {
               control={form.control}
               name="token"
               render={() => (
-                <div className="relative py-2">
+                <div className="relative py-2 px-4">
                   <FormItem>
                     <FormControl>
                       <TokenSelector className="h-16 px-4" tokens={filteredTokens} onTokenChange={handleTokenSelect} />
@@ -248,7 +250,7 @@ export default function SendTx() {
 
                     <Button
                       disabled={!form.getValues('token')}
-                      className="absolute right-4 top-4 bg-green !text-white !py-2"
+                      className="absolute right-8 top-4 bg-green !text-white !py-2"
                       size="tiny"
                       onClick={handleFillMax}
                     >

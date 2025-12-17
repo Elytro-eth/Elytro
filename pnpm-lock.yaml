@@ -277,8 +277,8 @@ importers:
         specifier: ^2.31.7
         version: 2.31.7(bufferutil@4.0.9)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.24.1)
       wouter:
-        specifier: ^3.3.5
-        version: 3.3.5(react@18.3.1)
+        specifier: ^3.8.1
+        version: 3.8.1(react@18.3.1)
       zod:
         specifier: ^3.23.8
         version: 3.24.1
@@ -8644,8 +8644,8 @@ packages:
   wordwrap@1.0.0:
     resolution: {integrity: sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q==}
 
-  wouter@3.3.5:
-    resolution: {integrity: sha512-bx3fLQAMn+EhYbBdY3W1gw9ZfO/uchudxYMwOIBzF3HVgqNEEIT199vEoh7FLTC0Vz5+rpMO6NdFsOkGX1QQCw==}
+  wouter@3.8.1:
+    resolution: {integrity: sha512-4rIFV23qZqFMfiZ2jrLPsABULZGyogmU8TRWN3jJoPa+8izkQcWQ6zV5ZJFp/Ky9D6Zpt1mOHOqL9FHbOO3DNA==}
     peerDependencies:
       react: '>=16.8.0'
 
@@ -19117,7 +19117,7 @@ snapshots:
 
   wordwrap@1.0.0: {}
 
-  wouter@3.3.5(react@18.3.1):
+  wouter@3.8.1(react@18.3.1):
     dependencies:
       mitt: 3.0.1
       react: 18.3.1

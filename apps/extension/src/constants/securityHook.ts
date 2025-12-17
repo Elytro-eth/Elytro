@@ -1,9 +1,12 @@
 import { Address } from 'viem';
-import { optimismSepolia, sepolia } from 'viem/chains';
+import { arbitrum, mainnet, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
 export const SECURITY_HOOK_ADDRESS_MAP: Record<number, Address> = {
   [optimismSepolia.id]: '0xd4e23c76e56532c0620f0b80e62918cc7ca9d442' as Address,
   [sepolia.id]: '0xd4e23c76e56532c0620f0b80e62918cc7ca9d442' as Address,
+  [arbitrum.id]: '0xd4e23c76e56532c0620f0b80e62918cc7ca9d442',
+  [mainnet.id]: '0xd4e23c76e56532c0620f0b80e62918cc7ca9d442',
+  [optimism.id]: '0xd4e23c76e56532c0620f0b80e62918cc7ca9d442',
 };
 
 export const CAPABILITY_FLAGS = {

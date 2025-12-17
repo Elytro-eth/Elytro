@@ -125,9 +125,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
     getWalletStatus();
   }, [walletControllerProxy, pathname]);
 
-  useInterval(() => {
-    getWalletStatus();
-  }, 15_000);
+  useInterval(getWalletStatus, 20_000);
 
   return (
     <WalletContext.Provider value={{ wallet: walletControllerProxy, status }}>

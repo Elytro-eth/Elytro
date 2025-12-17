@@ -1,7 +1,7 @@
 import { X, ArrowLeft } from 'lucide-react';
 import { navigateTo } from '@/utils/navigation';
 import { cn } from '@/utils/shadcn/utils';
-import React, { PropsWithChildren, useEffect, useState } from 'react';
+import React, { PropsWithChildren } from 'react';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 
 interface ISecondaryPageWrapperProps extends PropsWithChildren {
@@ -32,20 +32,6 @@ export default function SecondaryPageWrapper({
   className,
   fadeIn = true,
 }: ISecondaryPageWrapperProps) {
-  const [animationClass, setAnimationClass] = useState('');
-
-  useEffect(() => {
-    if (fadeIn) {
-      // Small delay to ensure the animation plays
-      requestAnimationFrame(() => {
-        setAnimationClass('page-fade-in');
-      });
-    }
-  }, [fadeIn]);
-
-  // If fadeIn is enabled, start with opacity 0 to prevent flash
-  const initialStyle = fadeIn && !animationClass ? { opacity: 0 } : undefined;
-
   const handleClose = () => {
     onClose?.();
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
@@ -60,7 +46,7 @@ export default function SecondaryPageWrapper({
   };
 
   return (
-    <div className={cn('w-full min-h-full bg-fade-green p-sm', animationClass, className)} style={initialStyle}>
+    <div className={cn('w-full min-h-full bg-fade-green p-sm', fadeIn && 'page-fade-in', className)}>
       <div className="flex flex-col flex-grow w-full min-h-full bg-white p-lg rounded-sm pb-2xl">
         {/* Header: back button, title, close button */}
         <div className="flex flex-row items-center justify-center relative pb-lg mb-sm">

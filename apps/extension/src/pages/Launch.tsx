@@ -2,26 +2,19 @@ import LaunchImg from '@/assets/launch.png';
 import { Button } from '@/components/ui/button';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export default function Launch() {
-  const [isFadingOut, setIsFadingOut] = useState(false);
-
   useEffect(() => {
     window.history.replaceState({}, '', window.location.pathname);
   }, []);
 
   const handleNavigate = (path: string) => {
-    setIsFadingOut(true);
-    setTimeout(() => {
-      navigateTo('side-panel', path as SIDE_PANEL_ROUTE_PATHS);
-    }, 150);
+    navigateTo('side-panel', path as SIDE_PANEL_ROUTE_PATHS);
   };
 
   return (
-    <div
-      className={`elytro-gradient-bg flex flex-1 flex-col items-center px-xl min-h-screen pt-10 page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}
-    >
+    <div className={`elytro-gradient-bg flex flex-1 flex-col items-center px-xl min-h-screen pt-10 page-fade-in`}>
       <div className="flex flex-col items-center gap-y-3xl flex-1">
         <img src={LaunchImg} alt="Launch" className="size-[8rem] mt-20" />
         <h1 className="elytro-text-headline text-center">Your recoverable Ethereum wallet</h1>

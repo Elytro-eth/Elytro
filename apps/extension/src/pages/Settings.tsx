@@ -14,11 +14,9 @@ import { useWallet } from '@/contexts/wallet';
 import NavItem from '@/components/ui/NavItem';
 import { useAccount } from '@/contexts/account-context';
 import HelperText from '@/components/ui/HelperText';
-import { useState } from 'react';
 
 export default function Settings() {
   const { wallet } = useWallet();
-  const [isFadingOut, setIsFadingOut] = useState(false);
 
   const handleLock = async () => {
     await wallet.lock();
@@ -29,15 +27,11 @@ export default function Settings() {
   } = useAccount();
 
   const handleNavigate = (path: SidePanelRoutePath) => {
-    setIsFadingOut(true);
-    // Wait for fade-out animation before navigating
-    setTimeout(() => {
-      navigateTo('side-panel', path);
-    }, 150); // Match animation duration
+    navigateTo('side-panel', path);
   };
 
   return (
-    <SecondaryPageWrapper title="Settings" className={isFadingOut ? 'page-fade-out' : ''}>
+    <SecondaryPageWrapper title="Settings">
       <HelperText description="We are in public beta, please keep deposits small" className="mb-4" />
       <div className="rounded-md overflow-hidden shadow-sm">
         <NavItem

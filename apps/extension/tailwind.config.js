@@ -84,7 +84,7 @@ module.exports = {
         overlay: 'rgba(22, 42, 54, 0.26)',
 
         // Start of Selection
-        background: 'var(--background)',
+        background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
           DEFAULT: 'hsl(var(--card))',

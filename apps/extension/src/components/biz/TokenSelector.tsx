@@ -96,11 +96,7 @@ export default function TokenSelector({
       <SelectTrigger needDropdown={false} onClick={toggleDropdown} className={cn('border-0', className)}>
         <SelectedToken token={selectedToken as TTokenInfo} />
       </SelectTrigger>
-      <SelectContent
-        className="bg-white rounded-md overflow-hidden w-[calc(100%-2rem)] left-4 right-4 max-h-[calc(100%-2rem)] max-w-[calc(100%-2rem)]"
-        onPointerDownOutside={handleClose}
-        onEscapeKeyDown={handleClose}
-      >
+      <SelectContent onPointerDownOutside={handleClose} onEscapeKeyDown={handleClose}>
         {tokens.length === 0 ? (
           <div className="p-4 text-center text-gray-500">No tokens available</div>
         ) : (

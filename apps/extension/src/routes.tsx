@@ -103,10 +103,6 @@ export const routes: TRoute[] = [
     path: SIDE_PANEL_ROUTE_PATHS.ChangePassword,
     component: ChangePassword,
   },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.NetworkConfiguration,
-    component: NetworkConfiguration,
-  },
 
   {
     path: SIDE_PANEL_ROUTE_PATHS.Receive,
@@ -164,10 +160,7 @@ export const routes: TRoute[] = [
     path: SIDE_PANEL_ROUTE_PATHS.AccountRecovery,
     component: AccountRecovery,
   },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.RetrieveContacts,
-    component: RetrieveContacts,
-  },
+
   {
     path: SIDE_PANEL_ROUTE_PATHS.ImportToken,
     component: ImportToken,

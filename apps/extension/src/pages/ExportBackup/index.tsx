@@ -41,7 +41,7 @@ const tips = [
 export default function ExportBackupPage() {
   const { accounts, getAccounts } = useAccount();
   const [isGuiding, setIsGuiding] = useState(true);
-  const [isFadingOut, setIsFadingOut] = useState(false);
+
   const [pwd, setPwd] = useState('');
   const [isPwdPassed, setIsPwdPassed] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -50,12 +50,7 @@ export default function ExportBackupPage() {
   const [isTermTwoChecked, setIsTermTwoChecked] = useState(false);
   const [isTermThreeChecked, setIsTermThreeChecked] = useState(false);
   const handleGuiding = () => {
-    setIsFadingOut(true);
-    // Wait for fade-out animation before switching view
-    setTimeout(() => {
-      setIsGuiding(false);
-      setIsFadingOut(false);
-    }, 150); // Match animation duration
+    setIsGuiding(false);
   };
   const [exportedAccounts, setExportedAccounts] = useState<string[]>(accounts.map((account) => account.address));
 
@@ -129,7 +124,7 @@ export default function ExportBackupPage() {
   return (
     <SecondaryPageWrapper title="Export wallets">
       {isGuiding ? (
-        <div className={`page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}>
+        <div className="page-fade-in">
           <Guide
             title="How backup works"
             action="Start backup"
@@ -139,9 +134,7 @@ export default function ExportBackupPage() {
           />
         </div>
       ) : (
-        <div
-          className={`flex flex-col gap-y-lg items-center h-full justify-between page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}
-        >
+        <div className="flex flex-col gap-y-lg items-center h-full justify-between page-fade-in">
           <div className="flex flex-col w-full">
             <div className="elytro-text-bold-body">Create a backup</div>
           </div>

@@ -1,7 +1,28 @@
+type PortMessageListener = {
+  type: string;
+  listener: (data: SafeObject) => void;
+  once: boolean;
+};
+
 class PortMessage {
   private _port: chrome.runtime.Port;
-  private _listeners: Array<{ type: string; listener: (data: SafeObject) => void }> = [];
+  private _listeners: PortMessageListener[] = [];
   private _isReconnecting = false;
+  private _handleMessage = ({ type: msgType, data }: { type: string; data: SafeObject }) => {
+    if (!msgType) {
+      return;
+    }
+
+    const listeners = [...this._listeners];
+    listeners.forEach((entry) => {
+      if (entry.type === msgType) {
+        entry.listener(data);
+        if (entry.once) {
+          this._removeListener(entry);
+        }
+      }
+    });
+  };
 
   constructor(private _name: string) {
     this._port = chrome.runtime.connect({ name: this._name });
@@ -13,13 +34,7 @@ class PortMessage {
       console.warn(`[Elytro][PortMessage] Port disconnected, attempting to reconnect...`);
       this._reconnect();
     });
-    this._listeners.forEach(({ type, listener }) => {
-      this._port.onMessage.addListener(({ type: msgType, data }) => {
-        if (msgType === type) {
-          listener(data);
-        }
-      });
-    });
+    this._port.onMessage.addListener(this._handleMessage);
   }
 
   private _reconnect() {
@@ -49,12 +64,22 @@ class PortMessage {
   }
 
   public onMessage(targetType: string, listener: (data: SafeObject) => void) {
-    this._listeners.push({ type: targetType, listener });
-    this._port.onMessage.addListener(({ type, data }) => {
-      if (type === targetType) {
-        listener(data);
-      }
-    });
+    const entry: PortMessageListener = { type: targetType, listener, once: false };
+    this._listeners.push(entry);
+    return () => this._removeListener(entry);
+  }
+
+  public onMessageOnce(targetType: string, listener: (data: SafeObject) => void) {
+    const entry: PortMessageListener = { type: targetType, listener, once: true };
+    this._listeners.push(entry);
+    return () => this._removeListener(entry);
+  }
+
+  private _removeListener(entry: PortMessageListener) {
+    const index = this._listeners.indexOf(entry);
+    if (index !== -1) {
+      this._listeners.splice(index, 1);
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import IconSuccess from '@/assets/door.png';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
@@ -12,7 +12,6 @@ const YouAreIn: React.FC = () => {
   const params = useSearchParams();
   const isFromRecover = params.from === 'recover';
   const { wallet } = useWallet();
-  const [isFadingOut, setIsFadingOut] = useState(false);
 
   const { title, description, action, actionPath, beforeAction } = isFromRecover
     ? {
@@ -38,16 +37,12 @@ const YouAreIn: React.FC = () => {
 
   const handleNavigate = async () => {
     await beforeAction?.();
-    setIsFadingOut(true);
-    // Wait for fade-out animation before navigating
-    setTimeout(() => {
-      navigateTo('side-panel', actionPath);
-    }, 150); // Match animation duration
+    navigateTo('side-panel', actionPath);
   };
 
   return (
     <FullPageWrapper
-      className={`h-full page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}
+      className={`h-full page-fade-in`}
       onBack={() => {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Home);
       }}

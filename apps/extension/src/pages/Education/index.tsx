@@ -30,41 +30,25 @@ const STEPS = [
 
 const Education = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isFadingOut, setIsFadingOut] = useState(false);
-  const [isStepFading, setIsStepFading] = useState(false);
 
   const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
-      setIsStepFading(true);
-      // Wait for fade-out animation before changing step
-      setTimeout(() => {
-        setCurrentStep(currentStep + 1);
-        setIsStepFading(false);
-      }, 150); // Match animation duration
+      setCurrentStep(currentStep + 1);
     } else {
-      setIsFadingOut(true);
-      // Wait for fade-out animation before navigating
-      setTimeout(() => {
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreateAccount);
-      }, 150); // Match animation duration
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreateAccount);
     }
   };
 
   return (
-    <FullPageWrapper
-      className={`h-full flex flex-col items-center justify-center page-fade-in ${isFadingOut ? 'page-fade-out' : ''}`}
-    >
-      <div key={currentStep} className={`page-fade-in ${isStepFading ? 'page-fade-out' : ''}`}>
+    <FullPageWrapper className={`h-full flex flex-col items-center justify-center page-fade-in`}>
+      <div key={currentStep} className="page-fade-in">
         <img src={STEPS[currentStep].img} alt={STEPS[currentStep].title} className="size-[200px] mb-10" />
 
         {STEPS[currentStep].noDescription ? null : (
           <div className="w-full text-left text-gray-600 text-sm font-normal">A new kind of wallet</div>
         )}
       </div>
-      <h1
-        key={`title-${currentStep}`}
-        className={`font-bolder text-4xl text-left mt-md page-fade-in ${isStepFading ? 'page-fade-out' : ''}`}
-      >
+      <h1 key={`title-${currentStep}`} className="font-bolder text-4xl text-left mt-md page-fade-in">
         {STEPS[currentStep].title}
       </h1>
       <Button className="w-full mt-9 text-lg font-bold" onClick={handleNext}>
