@@ -221,14 +221,14 @@ export function UserOpDetail() {
         {/* Insufficient Balance Warning */}
         {!hasSufficientBalance && (
           <div className="bg-light-blue rounded-sm p-3">
-            <div className="flex flex-row items-center gap-1 text-red mb-1">
+            <div className="flex flex-row items-center gap-1 text-red mb-2">
               <AlertCircle className="size-4 text-red stroke-dark-red" />
               <span className="elytro-text-small-body text-dark-red">Not enough for network cost, deposit first</span>
             </div>
             <div className="bg-white rounded-sm px-2 py-1 flex items-center justify-between">
               <button
                 type="button"
-                className="flex items-center gap-1 cursor-pointer hover:opacity-70 transition-opacity"
+                className="flex items-center gap-1 cursor-pointer hover:opacity-100 transition-opacity"
                 onClick={() => safeClipboard(address)}
                 aria-label="Copy wallet address"
               >

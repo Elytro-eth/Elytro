@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PasswordSetter } from '@/components/ui/PasswordSetter';
-import IconPasscode from '@/assets/passcode.png';
+import IconPasscode from '@/assets/bg-images/key-bg-sm.png';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
@@ -47,7 +47,7 @@ const Create: React.FC = () => {
     <FullPageWrapper className={`elytro-gradient-bg-2 h-full page-fade-in`} showBack>
       <div className="flex flex-col items-center gap-y-2xl flex-1 w-full">
         <div className="flex justify-center mt-10">
-          <img src={IconPasscode} alt="Passcode" width={144} />
+          <img src={IconPasscode} alt="Passcode" width={200} />
         </div>
         <h1 className="elytro-text-title text-center">Set your passcode</h1>
         <h2 className="text-sm text-muted-foreground text-center -mt-4">

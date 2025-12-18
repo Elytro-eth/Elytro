@@ -82,9 +82,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
   {
     ...optimism,
     icon: 'https://icons.llamao.fi/icons/chains/rsz_optimism',
-    endpoint:
-      optimism.rpcUrls.default.http[0] ||
-      `https://opt-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
+    endpoint: 'https://1rpc.io/op', //|| `https://opt-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
     bundler: `https://api.pimlico.io/v2/10/rpc?apikey=${import.meta.env.VITE_PIMLICO_API_KEY}`,
     opExplorer: 'https://explorer.optimism.io/op/',
     stablecoins: [

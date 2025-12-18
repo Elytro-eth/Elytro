@@ -164,6 +164,8 @@ export default function RecoverySettings() {
           history.back();
         }
       }}
+      isGuide={showType === ShowType.Guide}
+      overlayHeader={showType === ShowType.Guide}
     >
       {loading ? (
         <>

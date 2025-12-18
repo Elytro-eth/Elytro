@@ -2,7 +2,7 @@ import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
 import { formatErrorMsg } from '@/utils/format';
 import { ArrowLeft } from 'lucide-react';
-import IconPasscode from '@/assets/passcode.png';
+import IconPasscode from '@/assets/bg-images/key-bg-sm.png';
 import { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -89,7 +89,7 @@ export default function InternalImportBackup() {
       </div>
 
       <div className="flex flex-col gap-y-2xl">
-        <img src={IconPasscode} alt="Passcode" width={144} className="mx-auto" />
+        <img src={IconPasscode} alt="Passcode" width={200} className="mx-auto" />
         <h1 className="elytro-text-title text-center">Import all wallets</h1>
 
         <div className="flex flex-col gap-y-sm w-full max-w-full min-w-full">

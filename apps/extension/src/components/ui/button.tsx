@@ -11,7 +11,7 @@ const buttonVariants = cva(
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-black-blue hover:text-white',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-hover-secondary hover:text-white',
-        tertiary: 'bg-tertiary text-tertiary-foreground hover:bg-hover-tertiary hover:text-hover-tertiary-foreground',
+        tertiary: 'bg-gray-150 text-gray-900 hover:bg-gray-300 hover:text-hover-tertiary-foreground ',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         // outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
         // ghost: 'hover:bg-accent hover:text-accent-foreground border border-gray-450',
@@ -19,7 +19,7 @@ const buttonVariants = cva(
       },
       size: {
         regular: 'px-2xl py-lg elytro-text-bold-body',
-        small: 'px-lg py-sm elytro-text-smaller-body',
+        small: 'px-lg py-sm elytro-text-smaller-body font-bold',
         tiny: 'px-md py-2xs elytro-text-tiny-body',
       },
     },

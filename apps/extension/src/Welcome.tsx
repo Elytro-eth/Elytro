@@ -32,7 +32,7 @@ const Welcome = () => (
     </div>
     <main className="rounded-sm p-4xl bg-white w-[30rem]">
       <h1 className="elytro-text-headline mb-lg ">Welcome to Elytro</h1>
-      <p className="elytro-text-body text-gray-600">Your recoverable Ethereum wallet</p>
+      <p className="elytro-text-body text-gray-600">Your next-gen Ethereum wallet</p>
 
       <Button
         className="w-full mt-2xl"
