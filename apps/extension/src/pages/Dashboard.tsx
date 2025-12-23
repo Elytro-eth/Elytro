@@ -6,7 +6,7 @@ import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { useState, useEffect } from 'react';
 import PageLayout from '@/components/ui/PageLayout';
-import DashboardTabs from '@/components/biz/DashboardTabs';
+import DashboardTabs, { TABS_KEYS } from '@/components/biz/DashboardTabs';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { getLocalContactsSetting } from '@/utils/contacts';
 import { useWallet } from '@/contexts/wallet';
@@ -19,6 +19,7 @@ export default function Dashboard() {
   const [isPrivacyMode] = useLocalStorage('isPrivacyMode', false);
   const { wallet } = useWallet();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState(TABS_KEYS.ASSETS);
   const [recoveryStatus, setRecoveryStatus] = useState<{
     /* Recovery setup detection */ isEnabled: boolean;
     hasLocalSettings: boolean;
@@ -122,24 +123,26 @@ export default function Dashboard() {
       <PageLayout.Body className="px-2 py-2">
         <div className="rounded-xl bg-white h-full flex flex-col relative">
           <div className="flex-1 overflow-auto pb-[52px]">
-            <DashboardTabs onReload={handleReload} />
+            <DashboardTabs onReload={handleReload} onTabChange={setActiveTab} />
           </div>
 
           <div className="absolute bottom-0 rounded-md left-0 right-0 flex justify-center pt-2 flex-col">
-            <button
-              type="button"
-              className="m-auto mb-2 flex flex-row items-center group cursor-pointer text-gray-450 hover:text-gray-600 transition-colors"
-              onClick={() => {
-                navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportToken);
-              }}
-              aria-label="Import token"
-            >
-              <Plus
-                className="w-3 h-3 mr-1 duration-100 stroke-gray-450 group-hover:stroke-gray-600"
-                aria-hidden="true"
-              />
-              Import token
-            </button>
+            {activeTab === TABS_KEYS.ASSETS && (
+              <button
+                type="button"
+                className="m-auto mb-2 flex flex-row items-center group cursor-pointer text-gray-450 hover:text-gray-600 transition-colors"
+                onClick={() => {
+                  navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportToken);
+                }}
+                aria-label="Import token"
+              >
+                <Plus
+                  className="w-3 h-3 mr-1 duration-100 stroke-gray-450 group-hover:stroke-gray-600"
+                  aria-hidden="true"
+                />
+                Import token
+              </button>
+            )}
 
             {/* Recovery Status */}
             {
@@ -153,7 +156,7 @@ export default function Dashboard() {
                 aria-expanded={isExpanded}
               >
                 {isExpanded ? (
-                  <div className="px-4 py-2 flex items-center w-full">
+                  <div className="px-4 py-2 flex items-center w-full animate-in fade-in duration-150 delay-200 fill-mode-backwards">
                     <div className="flex flex-row justify-between items-center w-full">
                       <div className="flex flex-row items-center">
                         {recoveryStatus.isEnabled ? (

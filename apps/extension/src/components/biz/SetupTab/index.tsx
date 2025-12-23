@@ -1,4 +1,3 @@
-import Spin from '@/components/ui/Spin';
 import { useAccount } from '@/contexts/account-context';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
@@ -12,8 +11,8 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useSponsor } from '@/hooks/use-sponsor';
 
 export default function SetupTab() {
-  const { currentAccount, loading: isAccountLoading } = useAccount();
-  const { canSponsor, isLoading } = useSponsor();
+  const { currentAccount } = useAccount();
+  const { canSponsor } = useSponsor();
   const { handleTxRequest } = useTx();
   const [_, setHasSetupPassed] = useLocalStorage(`hasSetupPassed_${currentAccount.address}`, false);
 
@@ -55,7 +54,6 @@ export default function SetupTab() {
       <h1 className="font-bold w-full text-center text-3xl text-black-blue">Welcome</h1>
       <p className="mb-xl text-sm w-full text-center text-gray-600">Complete setup to enable all features</p>
 
-      <Spin isLoading={isLoading || isAccountLoading} />
       <div className="flex flex-col gap-y-md">
         {realSteps.map((step, index) => {
           const isDisabled = step.done || (index > 0 && !realSteps[index - 1]?.done);
@@ -105,7 +103,7 @@ export default function SetupTab() {
 
       {currentAccount.isDeployed && (
         <div
-          className="w-full text-center mt-10 text-sm text-gray-600 cursor-pointer"
+          className="w-full text-center mt-10 text-xs text-gray-450 hover:text-gray-600 cursor-pointer"
           onClick={() => setHasSetupPassed(true)}
         >
           Remind me later

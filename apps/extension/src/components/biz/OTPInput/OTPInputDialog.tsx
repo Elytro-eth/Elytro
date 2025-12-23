@@ -18,7 +18,7 @@ export function OTPInputDialog({ open, onOpenChange, hookError, ...otpProps }: O
       <DialogContent
         showCloseButton={false}
         onInteractOutside={(e) => e.preventDefault()}
-        className="!fixed !top-4 !left-4 !right-4 !w-auto !max-w-none !translate-x-0 !translate-y-0 h-auto max-h-[80vh] overflow-y-auto data-[state=open]:!slide-in-from-top-[5%] data-[state=open]:!slide-in-from-left-0"
+        className="!fixed !top-4 !left-4 !right-4 !w-auto !max-w-none !translate-x-0 !translate-y-0 h-auto max-h-[80vh] overflow-y-auto"
       >
         <OTPInputContent hookError={hookError} {...otpProps} />
       </DialogContent>

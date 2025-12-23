@@ -164,7 +164,7 @@ export default function RecoverySettings() {
           history.back();
         }
       }}
-      isGuide={showType === ShowType.Guide}
+      isGuide={!loading && showType === ShowType.Guide}
     >
       {loading ? (
         <>

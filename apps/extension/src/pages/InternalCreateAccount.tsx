@@ -9,7 +9,7 @@ export default function InternalCreateAccount() {
     <SecondaryPageWrapper title="Create wallet" className="w-full h-screen flex flex-col items-center justify-center">
       <img src={WalletImg} alt="Wallet" className="size-[200px] mt-[20%] mx-auto mb-2xl" />
       <div className="text-center flex flex-col gap-y-2xs mb-10">
-        <h1 className="elytro-text-subtitle font-bolder b-2">Add a new wallet</h1>
+        <h1 className="elytro-text-subtitle font-bold b-2">Add a new wallet</h1>
       </div>
       <div className="flex flex-col gap-y-md w-full">
         <Button

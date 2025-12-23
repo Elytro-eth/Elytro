@@ -12,6 +12,7 @@ import AddOnsTab from './AddOnsTab';
 
 interface DashboardTabsProps {
   onReload: () => void;
+  onTabChange?: (tab: string) => void;
 }
 
 export const TABS_KEYS = {
@@ -53,7 +54,7 @@ const TabsConfig = [
 const UNDEPLOY_TABS_KEYS = [TABS_KEYS.SETUP, TABS_KEYS.ASSETS, TABS_KEYS.ACTIVITIES];
 const DEPLOYED_TABS_KEYS = [TABS_KEYS.APPS, TABS_KEYS.ACTIVITIES, TABS_KEYS.ASSETS, TABS_KEYS.ADD_ONS];
 
-export default function DashboardTabs({ onReload }: DashboardTabsProps) {
+export default function DashboardTabs({ onReload, onTabChange }: DashboardTabsProps) {
   const searchParams = useSearchParams();
   const { currentAccount } = useAccount();
 
@@ -71,11 +72,14 @@ export default function DashboardTabs({ onReload }: DashboardTabsProps) {
   };
 
   useEffect(() => {
-    setActiveTab(searchParams.tab || tabKeys[0]);
+    const newTab = searchParams.tab || tabKeys[0];
+    setActiveTab(newTab);
+    onTabChange?.(newTab);
   }, [searchParams.tab, tabKeys.length]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
+    onTabChange?.(value);
     // Silently update URL without triggering a page reload
     const newUrl = new URL(window.location.href);
     newUrl.search = '';

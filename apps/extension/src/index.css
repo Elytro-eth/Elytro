@@ -70,14 +70,12 @@
   }
   @font-face {
     font-family: 'ElytroSoehne';
-    font-family: 'ElytroSoehne';
     src:
       url('/src/assets/fonts/soehne-buch.woff2') format('woff2'),
       url('/src/assets/fonts/soehne-buch.woff') format('woff');
     font-weight: 400;
   }
   @font-face {
-    font-family: 'ElytroSoehne';
     font-family: 'ElytroSoehne';
     src:
       url('/src/assets/fonts/soehne-kraftig.woff2') format('woff2'),
@@ -86,17 +84,16 @@
   }
   @font-face {
     font-family: 'ElytroSoehne';
-    font-family: 'ElytroSoehne';
     src:
       url('/src/assets/fonts/soehne-halbfett.woff2') format('woff2'),
       url('/src/assets/fonts/soehne-halbfett.woff') format('woff');
-    font-weight: 900;
+    font-weight: 800;
   }
   body {
     @apply bg-background text-foreground;
     user-select: none;
     font-family: ElytroSoehne;
-    font-family: ElytroSoehne;
+    font-weight: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-variant-ligatures: no-contextual;

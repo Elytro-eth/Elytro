@@ -234,7 +234,7 @@ export default function SendTx() {
         )}
 
         <Form {...form}>
-          <div className="bg-light-green rounded-md pb-4 mb-4">
+          <div className="bg-light-green rounded-md mb-4">
             <h3 className="text-lg font-bold px-4 pt-3">Sending</h3>
             {/* Token selector */}
             <FormField
@@ -244,13 +244,17 @@ export default function SendTx() {
                 <div className="relative py-2 px-4">
                   <FormItem>
                     <FormControl>
-                      <TokenSelector className="h-16 px-4" tokens={filteredTokens} onTokenChange={handleTokenSelect} />
+                      <TokenSelector
+                        className="h-16 bg-light-green"
+                        tokens={filteredTokens}
+                        onTokenChange={handleTokenSelect}
+                      />
                     </FormControl>
                     <FormMessage />
 
                     <Button
                       disabled={!form.getValues('token')}
-                      className="absolute right-8 top-4 bg-green !text-white !py-2"
+                      className="absolute right-4 top-4 bg-green !text-white !py-2"
                       size="tiny"
                       onClick={handleFillMax}
                     >
@@ -265,18 +269,16 @@ export default function SendTx() {
               control={form.control}
               name="amount"
               render={({ field }) => (
-                <div className="">
-                  <FormItem className=" px-4">
-                    <FormControl>
-                      <AmountInput
-                        field={field}
-                        isDisabled={filteredTokens.length < 1}
-                        token={form.getValues('token') as TTokenInfo}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                </div>
+                <FormItem className="px-4 pb-4">
+                  <FormControl>
+                    <AmountInput
+                      field={field}
+                      isDisabled={filteredTokens.length < 1}
+                      token={form.getValues('token') as TTokenInfo}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
           </div>

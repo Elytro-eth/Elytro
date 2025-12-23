@@ -42,13 +42,13 @@ const Education = () => {
   return (
     <FullPageWrapper className={`h-full flex flex-col items-center justify-center page-fade-in`}>
       <div key={currentStep} className="page-fade-in">
-        <img src={STEPS[currentStep].img} alt={STEPS[currentStep].title} className="size-[200px] mb-10" />
+        <img src={STEPS[currentStep].img} alt={STEPS[currentStep].title} className="width-full mb-10" />
 
         {STEPS[currentStep].noDescription ? null : (
           <div className="w-full text-left text-gray-600 text-base font-normal">A new kind of wallet</div>
         )}
       </div>
-      <h1 key={`title-${currentStep}`} className="font-bolder text-4xl text-left mt-md page-fade-in">
+      <h1 key={`title-${currentStep}`} className="font-extrabold text-4xl text-left mt-md page-fade-in">
         {STEPS[currentStep].title}
       </h1>
       <Button className="w-full mt-9 text-lg font-bold" onClick={handleNext}>

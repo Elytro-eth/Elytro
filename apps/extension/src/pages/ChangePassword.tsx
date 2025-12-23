@@ -104,8 +104,10 @@ const ChangePassword: React.FC = () => {
   return (
     <SecondaryPageWrapper title="Change passcode">
       <Form {...form}>
-        <form className="space-y-3xl mt-4">
+        <form className="space-y-3xl">
           <div className="space-y-sm">
+            <HelperText description="Your other devices are not affected" className="my-sm" />
+
             <FormField
               control={form.control}
               name="oldPassword"
@@ -145,8 +147,6 @@ const ChangePassword: React.FC = () => {
           </div>
         </form>
       </Form>
-
-      <HelperText description="Your other devices are not affected" className="my-sm" />
 
       <div className="w-full flex justify-between gap-lg mt-lg">
         {/*<Button

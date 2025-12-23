@@ -64,7 +64,7 @@ export default function Guide({
   return (
     <div className="flex flex-col h-full">
       {/* Full-bleed image section */}
-      <div className="w-full rounded-t-xl overflow-hidden">
+      <div className="w-full">
         <img src={displayImg} className={displayImgClassName} />
       </div>
 

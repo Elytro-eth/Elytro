@@ -53,9 +53,18 @@ export default function SecondaryPageWrapper({
 
   return (
     <div className={cn('w-full min-h-full bg-fade-green p-sm', fadeIn && 'page-fade-in', className)}>
-      <div className="flex flex-col flex-grow w-full min-h-full bg-white p-lg rounded-sm pb-2xl">
+      <div
+        className={cn(
+          'flex flex-col flex-grow w-full min-h-full bg-white rounded-sm pb-2xl relative overflow-hidden',
+          isGuide ? '' : 'p-lg'
+        )}
+      >
+        {/* Header - absolutely positioned over content when isGuide */}
         <div
-          className={cn('flex flex-row items-center justify-center relative pb-lg mb-sm', isGuide ? 'pt-lg px-lg' : '')}
+          className={cn(
+            'flex flex-row items-center justify-center relative pb-lg mb-sm',
+            isGuide ? 'absolute top-sm left-sm right-sm z-10 pt-lg px-lg' : ''
+          )}
         >
           {showBack && (
             <ArrowLeft
