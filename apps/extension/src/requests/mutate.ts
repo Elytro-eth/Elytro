@@ -121,11 +121,27 @@ export const mutate_confirm_wallet_email_binding = gql`
 `;
 
 // Security Hook - Daily Limit
+// authSessionId:
+// String!
+// dailyLimitUsdCents:
+// Int!
+// otpCode:
+// String!
 export const mutate_set_wallet_daily_limit = gql`
   mutation SetWalletDailyLimit($input: SetWalletDailyLimitInput!) {
     setWalletDailyLimit(input: $input) {
       dailyLimitUsdCents
       updatedAt
+    }
+  }
+`;
+
+export const mutate_request_daily_limit_otp = gql`
+  mutation RequestChangeWalletDailyLimit($input: RequestWalletDailyLimitInput!) {
+    requestChangeWalletDailyLimit(input: $input) {
+      maskedEmail
+      otpExpiresAt
+      resendAvailableAt
     }
   }
 `;

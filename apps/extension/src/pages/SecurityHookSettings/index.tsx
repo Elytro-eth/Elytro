@@ -22,6 +22,7 @@ import HelperText from '@/components/ui/HelperText';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import NavItem from '@/components/ui/NavItem';
+import { OTPInputDialog, useOTPInput } from '@/components/biz/OTPInput';
 import ConfirmPreForceUninstallModal from './ConfirmPreForceUninstallModal';
 import ForceInstallInnerPage from './ForceInstallPage';
 
@@ -42,6 +43,7 @@ function SecurityHookSettingsInnerPage() {
     loadSecurityProfile,
     isSettingDailyLimit,
     changeWalletEmail,
+    requestDailyLimitOtp,
   } = useSecurityHook();
   const [showSpendingLimitsConfig, setShowSpendingLimitsConfig] = useState(false);
   const [dailyLimitUsd, setDailyLimitUsd] = useState(
@@ -53,10 +55,22 @@ function SecurityHookSettingsInnerPage() {
   const isCheckingRef = useRef(false);
 
   const [email, setEmail] = useState('');
-  const [otpCode, setOtpCode] = useState('');
-  const [showOtpInput, setShowOtpInput] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const { open: otpDialogOpen, hookError: otpHookError, showOTP, hideOTP } = useOTPInput();
+  const {
+    open: limitOtpDialogOpen,
+    hookError: limitOtpHookError,
+    showOTP: showLimitOTP,
+    hideOTP: hideLimitOTP,
+  } = useOTPInput();
+  const [pendingDailyLimitUsdCents, setPendingDailyLimitUsdCents] = useState<number | null>(null);
+  const [originalDailyLimitUsd, setOriginalDailyLimitUsd] = useState<number | null>(null);
+
+  // 调试：追踪状态变化
+  useEffect(() => {
+    console.log('Elytro: limitOtpDialogOpen changed', limitOtpDialogOpen, 'limitOtpHookError:', limitOtpHookError);
+  }, [limitOtpDialogOpen, limitOtpHookError]);
 
   // Check Hook status
   const checkStatus = useCallback(async () => {
@@ -98,11 +112,10 @@ function SecurityHookSettingsInnerPage() {
 
   // Reset editing state when email is verified
   useEffect(() => {
-    if (securityProfile?.emailVerified && !isBindingEmail && !showOtpInput) {
+    if (securityProfile?.emailVerified && !isBindingEmail && !otpDialogOpen) {
       setIsEditingEmail(false);
-      setOtpCode('');
     }
-  }, [securityProfile?.emailVerified, isBindingEmail, showOtpInput]);
+  }, [securityProfile?.emailVerified, isBindingEmail, otpDialogOpen]);
 
   // Initial check
   useEffect(() => {
@@ -247,7 +260,14 @@ function SecurityHookSettingsInnerPage() {
     try {
       const result = await requestEmailBinding(email);
       if (result) {
-        setShowOtpInput(true);
+        // 显示 OTP 弹窗
+        showOTP({
+          code: 'OTP_REQUIRED',
+          challengeId: result.bindingId,
+          maskedEmail: result.maskedEmail,
+          otpExpiresAt: result.otpExpiresAt,
+          message: 'Enter the code we sent to your email to verify',
+        });
         toast({
           title: 'OTP sent',
           description: `Verification code sent to ${result.maskedEmail || email}`,
@@ -271,7 +291,14 @@ function SecurityHookSettingsInnerPage() {
     try {
       const result = await changeWalletEmail(email);
       if (result?.bindingId) {
-        setShowOtpInput(true);
+        // 显示 OTP 弹窗
+        showOTP({
+          code: 'OTP_REQUIRED',
+          challengeId: result.bindingId,
+          maskedEmail: result.maskedEmail,
+          otpExpiresAt: result.otpExpiresAt,
+          message: 'Enter the code we sent to your email to verify',
+        });
         toast({
           title: 'OTP sent',
           description: `Verification code sent to ${result.maskedEmail || email}`,
@@ -286,8 +313,11 @@ function SecurityHookSettingsInnerPage() {
     }
   };
 
-  const handleConfirmEmailBinding = async () => {
-    if (!bindingId || !otpCode || otpCode.length !== 6) {
+  const handleConfirmEmailBinding = async (otpCode: string) => {
+    // 从 hookError 中获取 challengeId（即 bindingId）
+    const currentBindingId = otpHookError?.challengeId || bindingId;
+
+    if (!currentBindingId || !otpCode || otpCode.length !== 6) {
       toast({
         title: 'Invalid OTP',
         description: 'Please enter a valid 6-digit OTP code',
@@ -299,9 +329,8 @@ function SecurityHookSettingsInnerPage() {
     const wasEditing = isEditingEmail;
 
     try {
-      await confirmEmailBinding(bindingId, otpCode);
-      setShowOtpInput(false);
-      setOtpCode('');
+      await confirmEmailBinding(currentBindingId, otpCode);
+      hideOTP();
       setIsEditingEmail(false);
       toast({
         title: 'Email verified',
@@ -317,8 +346,7 @@ function SecurityHookSettingsInnerPage() {
 
   const handleCancelEditEmail = () => {
     setIsEditingEmail(false);
-    setShowOtpInput(false);
-    setOtpCode('');
+    hideOTP();
     setEmailError(null);
     // Reset email to original value
     if (securityProfile?.email) {
@@ -392,8 +420,34 @@ function SecurityHookSettingsInnerPage() {
               className="w-full"
               disabled={dailyLimitUsd * 100 === securityProfile?.dailyLimitUsdCents || isSettingDailyLimit}
               onClick={async () => {
-                await setDailyLimit(dailyLimitUsd * 100);
-                setShowSpendingLimitsConfig(false);
+                const newLimitUsdCents = dailyLimitUsd * 100;
+                try {
+                  // 保存当前的 limit 值作为原始值，用于取消时恢复
+                  setOriginalDailyLimitUsd(dailyLimitUsd);
+
+                  await requestDailyLimitOtp(newLimitUsdCents);
+
+                  setPendingDailyLimitUsdCents(newLimitUsdCents);
+
+                  showLimitOTP({
+                    code: 'OTP_REQUIRED',
+                    challengeId: '',
+                    maskedEmail: '',
+                    otpExpiresAt: '',
+                    message: 'Enter the code we sent to your email to confirm the daily limit change',
+                  });
+                  console.log('Elytro: After showLimitOTP called');
+
+                  toast({
+                    title: 'OTP sent',
+                    description: `Verification code sent`,
+                  });
+                } catch (error) {
+                  console.error('Elytro: Request daily limit OTP failed', error);
+                  // Error is already handled in context
+                  // 如果请求失败，清除保存的原始值
+                  setOriginalDailyLimitUsd(null);
+                }
               }}
             >
               {isSettingDailyLimit ? <Spin size="sm" isLoading inline className="mr-2" /> : 'Save'}
@@ -480,10 +534,10 @@ function SecurityHookSettingsInnerPage() {
                           setEmailError(null);
                         }
                       }}
-                      disabled={isBindingEmail || showOtpInput}
+                      disabled={isBindingEmail}
                       type="email"
                     />
-                    {isEditingEmail && !showOtpInput && (
+                    {isEditingEmail && (
                       <button
                         onClick={handleCancelEditEmail}
                         className="p-1 hover:bg-gray-200 rounded transition-colors ml-2"
@@ -497,66 +551,23 @@ function SecurityHookSettingsInnerPage() {
                   {emailError && <p className="text-xs text-red-500 px-1">{emailError}</p>}
                 </div>
 
-                {showOtpInput ? (
-                  <>
-                    <div className="flex flex-row items-center border-gray-300 border rounded-md p-lg h-16 text-gray-900">
-                      <Mail className="size-6 text-gray-600" />
-                      <Input
-                        className="bg-transparent !border-none !ring-0 !ring-offset-0 !outline-none flex-1"
-                        placeholder="Enter 6-digit OTP code"
-                        value={otpCode}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                          setOtpCode(value);
-                        }}
-                        disabled={isBindingEmail}
-                        type="text"
-                        maxLength={6}
-                      />
-                    </div>
-                    <Button
-                      variant="secondary"
-                      className="w-full"
-                      disabled={isBindingEmail || otpCode.length !== 6}
-                      onClick={handleConfirmEmailBinding}
-                    >
-                      {isBindingEmail ? (
-                        <>
-                          <Spin size="sm" isLoading inline className="mr-2" />
-                          Verifying...
-                        </>
-                      ) : (
-                        'Verify OTP'
-                      )}
-                    </Button>
-                    <Button
-                      variant="tertiary"
-                      className="w-full"
-                      disabled={isBindingEmail}
-                      onClick={handleCancelEditEmail}
-                    >
-                      Cancel
-                    </Button>
-                  </>
-                ) : (
-                  <Button
-                    variant="secondary"
-                    className="w-full"
-                    disabled={isBindingEmail || !isValidEmail(email)}
-                    onClick={isEditingEmail ? handleChangeWalletEmail : handleRequestEmailBinding}
-                  >
-                    {isBindingEmail ? (
-                      <>
-                        <Spin size="sm" isLoading inline className="mr-2" />
-                        Sending...
-                      </>
-                    ) : isEditingEmail ? (
-                      'Update Email'
-                    ) : (
-                      'Link Email'
-                    )}
-                  </Button>
-                )}
+                <Button
+                  variant="secondary"
+                  className="w-full"
+                  disabled={isBindingEmail || !isValidEmail(email)}
+                  onClick={isEditingEmail ? handleChangeWalletEmail : handleRequestEmailBinding}
+                >
+                  {isBindingEmail ? (
+                    <>
+                      <Spin size="sm" isLoading inline className="mr-2" />
+                      Sending...
+                    </>
+                  ) : isEditingEmail ? (
+                    'Update Email'
+                  ) : (
+                    'Link Email'
+                  )}
+                </Button>
               </>
             )}
 
@@ -581,6 +592,89 @@ function SecurityHookSettingsInnerPage() {
         )}
 
         <ConfirmPreForceUninstallModal />
+
+        {/* 邮箱修改 OTP 输入弹窗 */}
+        <OTPInputDialog
+          open={otpDialogOpen}
+          hookError={otpHookError}
+          isVerifying={isBindingEmail}
+          onOpenChange={(open: boolean) => {
+            if (!open) {
+              hideOTP();
+              handleCancelEditEmail();
+            }
+          }}
+          onConfirm={handleConfirmEmailBinding}
+          onCancel={() => {
+            hideOTP();
+            handleCancelEditEmail();
+          }}
+          confirmButtonText="Verify OTP"
+          cancelButtonText="Cancel"
+          showResend={false}
+        />
+
+        {/* 每日限额设置 OTP 输入弹窗 */}
+        <OTPInputDialog
+          open={limitOtpDialogOpen}
+          hookError={limitOtpHookError}
+          isVerifying={isSettingDailyLimit}
+          onOpenChange={(open: boolean) => {
+            console.log(
+              'Elytro: limitOtpDialogOpen onOpenChange',
+              open,
+              'limitOtpDialogOpen:',
+              limitOtpDialogOpen,
+              'hookError:',
+              limitOtpHookError
+            );
+            if (!open) {
+              hideLimitOTP();
+              setPendingDailyLimitUsdCents(null);
+              // 恢复 limit 输入框为原始值
+              if (originalDailyLimitUsd !== null) {
+                setDailyLimitUsd(originalDailyLimitUsd);
+                setOriginalDailyLimitUsd(null);
+              }
+            }
+          }}
+          onConfirm={async (otpCode: string) => {
+            if (!pendingDailyLimitUsdCents) {
+              toast({
+                title: 'Error',
+                description: 'No pending limit to set',
+                variant: 'destructive',
+              });
+              return;
+            }
+            try {
+              await setDailyLimit(pendingDailyLimitUsdCents, otpCode);
+              hideLimitOTP();
+              setPendingDailyLimitUsdCents(null);
+              setOriginalDailyLimitUsd(null); // 清除保存的原始值
+              setShowSpendingLimitsConfig(false);
+              toast({
+                title: 'Daily limit updated',
+                description: 'Your daily spending limit has been successfully updated',
+              });
+            } catch (error) {
+              console.error('Set daily limit failed:', error);
+              // Error is already handled in context
+            }
+          }}
+          onCancel={() => {
+            hideLimitOTP();
+            setPendingDailyLimitUsdCents(null);
+            // 恢复 limit 输入框为原始值
+            if (originalDailyLimitUsd !== null) {
+              setDailyLimitUsd(originalDailyLimitUsd);
+              setOriginalDailyLimitUsd(null);
+            }
+          }}
+          confirmButtonText="Confirm"
+          cancelButtonText="Cancel"
+          showResend={false}
+        />
       </div>
     </SecondaryPageWrapper>
   );

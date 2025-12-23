@@ -489,15 +489,43 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       if (!hookError?.challengeId) {
         throw new Error('Challenge ID is required');
       }
+      setIsSending(true);
       const res = await wallet.verifyOTP(hookError.challengeId, otpCode);
       if (res.status === 'VERIFIED') {
-        // onConfirm();
-        await wallet.sendUserOperation(userOpRef.current!);
+        setHookError(null);
+        const sendRes = await wallet.sendUserOperation(userOpRef.current!);
+
+        if ((sendRes as SafeAny)?.code) {
+          setHookError(sendRes as THookError);
+        } else {
+          const opHash = sendRes as string;
+          setHookError(null);
+          registerOpStatusListener(opHash);
+
+          const callId = approval?.data?.callId as string | undefined;
+          if (callId) {
+            wallet.updateEIP5792CallWithUserOpHash(callId, opHash).catch((error) => {
+              console.error(`[EIP-5792] Error updating call ${callId}:`, error);
+            });
+          }
+
+          wallet.addNewHistory({
+            type: txTypeRef.current!,
+            opHash,
+            from: decodedDetail?.[0]?.from || address,
+            decodedDetail: decodedDetail!,
+            approvalId: approval?.id,
+          });
+          resolve();
+          handleBack();
+        }
       }
       return res;
     } catch (error) {
       setHookError(error as THookError);
       throw error;
+    } finally {
+      setIsSending(false);
     }
   };
 

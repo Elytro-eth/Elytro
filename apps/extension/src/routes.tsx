@@ -2,11 +2,7 @@ import { TRoute } from '@/types/route';
 import Dashboard from './pages/Dashboard';
 import Receive from './pages/Receive';
 import Settings from './pages/Settings';
-import Connect from './pages/Connect';
 import SendTx from './pages/SendTx';
-import Alert from './pages/Alert';
-import Sign from './pages/Sign';
-import TxConfirm from './pages/TxConfirm';
 import Create from './pages/CreatePasscode';
 import YouAreIn from './pages/YouAreIn';
 import CreateNewAddress from './pages/CreateNewAddress';
@@ -109,24 +105,8 @@ export const routes: TRoute[] = [
     component: Receive,
   },
   {
-    path: SIDE_PANEL_ROUTE_PATHS.Connect,
-    component: Connect,
-  },
-  {
     path: SIDE_PANEL_ROUTE_PATHS.SendTx,
     component: SendTx,
-  },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.Alert,
-    component: Alert,
-  },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.Sign,
-    component: Sign,
-  },
-  {
-    path: SIDE_PANEL_ROUTE_PATHS.TxConfirm,
-    component: TxConfirm,
   },
   {
     path: SIDE_PANEL_ROUTE_PATHS.CreatePasscode,

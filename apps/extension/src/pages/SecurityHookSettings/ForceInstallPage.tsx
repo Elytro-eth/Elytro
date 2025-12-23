@@ -16,7 +16,7 @@ export default function ForceInstallInnerPage({ status }: ForceInstallInnerPageP
   const { handleTxRequest } = useTx();
 
   const currentTimestamp = Math.ceil(Date.now() / 1000);
-  const leftTime = canForceUninstall ? 0 : forceUninstallAfter - currentTimestamp;
+  const leftTime = canForceUninstall ? 0 : Math.min(forceUninstallAfter - currentTimestamp, 0);
 
   // forceUninstallAfter is a timestamp in Date
   // countdown is the difference between forceUninstallAfter and the current time

@@ -8,6 +8,7 @@ import {
   mutate_set_wallet_daily_limit,
   mutate_request_security_otp,
   mutate_verify_security_otp,
+  mutate_request_daily_limit_otp,
 } from '@/requests/mutate';
 import { query_wallet_security_profile } from '@/requests/query';
 import { toHex, Hex, Address } from 'viem';
@@ -351,14 +352,14 @@ class SecurityHookService {
   /**
    * Set daily limit for current account
    */
-  public async setDailyLimit(dailyLimitUsdCents: number): Promise<void> {
+  public async setDailyLimit(dailyLimitUsdCents: number, otpCode?: string): Promise<void> {
     const currentAccount = this.getCurrentAccount();
     if (!currentAccount?.address || !currentAccount?.chainId) {
       throw new Error('No current account');
     }
 
     const sessionId = await this.getAuthSession();
-    await mutate<{
+    const res = await mutate<{
       setWalletDailyLimit: {
         dailyLimitUsdCents: number;
         updatedAt: string;
@@ -367,8 +368,43 @@ class SecurityHookService {
       input: {
         authSessionId: sessionId,
         dailyLimitUsdCents,
+        otpCode,
       },
     });
+    console.log('Elytro: Set daily limit result', res);
+    if ((res as SafeAny)?.extensions?.code) {
+      throw new Error((res as SafeAny).extensions.code);
+    }
+  }
+
+  /**
+   * Request OTP for setting daily limit
+   */
+  public async requestDailyLimitOtp(dailyLimitUsdCents: number): Promise<{
+    challengeId: string;
+    maskedEmail: string;
+    otpExpiresAt: string;
+  }> {
+    const currentAccount = this.getCurrentAccount();
+    if (!currentAccount?.address || !currentAccount?.chainId) {
+      throw new Error('No current account');
+    }
+
+    const sessionId = await this.getAuthSession();
+    const result = await mutate<{
+      requestSetWalletDailyLimit: {
+        challengeId: string;
+        maskedEmail: string;
+        otpExpiresAt: string;
+      };
+    }>(mutate_request_daily_limit_otp, {
+      input: {
+        authSessionId: sessionId,
+        dailyLimitUsdCents,
+      },
+    });
+
+    return result.requestSetWalletDailyLimit;
   }
 
   /**

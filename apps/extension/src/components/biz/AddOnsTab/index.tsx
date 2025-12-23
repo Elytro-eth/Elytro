@@ -1,5 +1,9 @@
 import { navigateTo, SidePanelRoutePath } from '@/utils/navigation';
 import LogoIcon from '@/assets/logo.svg';
+import CheckedIcon from '@/assets/icons/checked.svg';
+import { useAccount } from '@/contexts/account-context';
+import { useEffect, useState } from 'react';
+import { useWallet } from '@/contexts/wallet';
 
 const AddOns = [
   {
@@ -14,14 +18,15 @@ const AddOns = [
   },
 ];
 
-const Item = ({ name, logo, url }: { name: string; logo: string; url: string }) => {
+const Item = ({ name, logo, url, installed }: { name: string; logo: string; url: string; installed?: boolean }) => {
   return (
     <div
       className="flex flex-col gap-y-2 cursor-pointer bg-gray-50 rounded-md p-lg hover:bg-gray-150"
       onClick={() => navigateTo('side-panel', url as SidePanelRoutePath)}
     >
-      <div className="flex flex-row">
+      <div className="flex flex-row items-center justify-between">
         <img src={logo} alt={name} className="size-10 rounded-full p-1 bg-white" />
+        {installed && <img src={CheckedIcon} alt="checked" className="size-6" />}
       </div>
 
       <div className="flex flex-col gap-y-2">
@@ -32,10 +37,52 @@ const Item = ({ name, logo, url }: { name: string; logo: string; url: string }) 
 };
 
 export default function AddOnsTab() {
+  const { currentAccount } = useAccount();
+  const { wallet } = useWallet();
+  const [is2FAInstalled, setIs2FAInstalled] = useState(false);
+  const [isRecoveryInstalled, setIsRecoveryInstalled] = useState(false);
+
+  useEffect(() => {
+    wallet
+      .getSecurityHookStatus()
+      .then((status) => {
+        setIs2FAInstalled(status.isInstalled);
+      })
+      .catch(() => {
+        setIs2FAInstalled(false);
+      });
+
+    if (currentAccount?.address) {
+      wallet
+        .queryRecoveryContactsByAddress(currentAccount.address as `0x${string}`)
+        .then((res) => {
+          setIsRecoveryInstalled((res?.contacts?.length || 0) > 0);
+        })
+        .catch(() => {
+          setIsRecoveryInstalled(false);
+        });
+    }
+  }, [wallet, currentAccount]);
+
+  const checkedIntalledAddOns = AddOns.map((addOn) => {
+    let installed = false;
+
+    if (addOn.name === 'Social Recovery') {
+      installed = isRecoveryInstalled;
+    } else if (addOn.name === 'Sign with 2FA') {
+      installed = is2FAInstalled;
+    }
+
+    return {
+      ...addOn,
+      installed,
+    };
+  });
+
   return (
     <>
       <div className="grid grid-cols-3 gap-x-2 gap-y-2 px-lg">
-        {AddOns.map((addOn) => (
+        {checkedIntalledAddOns.map((addOn) => (
           <Item key={addOn.name} {...addOn} />
         ))}
       </div>

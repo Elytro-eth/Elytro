@@ -1200,8 +1200,19 @@ class WalletController {
   /**
    * Set daily limit for current account
    */
-  public async setSecurityHookDailyLimit(dailyLimitUsdCents: number): Promise<void> {
-    return await this.securityHookService.setDailyLimit(dailyLimitUsdCents);
+  public async setSecurityHookDailyLimit(dailyLimitUsdCents: number, otpCode?: string): Promise<void> {
+    return await this.securityHookService.setDailyLimit(dailyLimitUsdCents, otpCode);
+  }
+
+  /**
+   * Request OTP for setting daily limit
+   */
+  public async requestDailyLimitOtp(dailyLimitUsdCents: number): Promise<{
+    challengeId: string;
+    maskedEmail: string;
+    otpExpiresAt: string;
+  }> {
+    return await this.securityHookService.requestDailyLimitOtp(dailyLimitUsdCents);
   }
 
   /**

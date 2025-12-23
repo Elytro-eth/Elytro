@@ -37,7 +37,8 @@ type ISecurityHookContext = {
   changeWalletEmail: (email: string) => Promise<TRequestEmailBindingResult>;
   confirmEmailBinding: (bindingId: string, otpCode: string) => Promise<TSecurityProfile>;
   loadSecurityProfile: () => Promise<void>;
-  setDailyLimit: (dailyLimitUsdCents: number) => Promise<void>;
+  setDailyLimit: (dailyLimitUsdCents: number, otpCode?: string) => Promise<void>;
+  requestDailyLimitOtp: (dailyLimitUsdCents: number) => Promise<void>;
   clearAuthSession: () => void;
 };
 
@@ -63,6 +64,9 @@ const SecurityHookContext = createContext<ISecurityHookContext>({
   },
   loadSecurityProfile: async () => {},
   setDailyLimit: async () => {},
+  requestDailyLimitOtp: async () => {
+    throw new Error('Not implemented');
+  },
   clearAuthSession: () => {},
 });
 
@@ -208,16 +212,15 @@ export const SecurityHookProvider = ({ children }: { children: React.ReactNode }
     [address, chainId, wallet]
   );
 
-  // Set daily limit
   const setDailyLimit = useCallback(
-    async (dailyLimitUsdCents: number) => {
+    async (dailyLimitUsdCents: number, otpCode?: string) => {
       if (!address || !chainId) {
         throw new Error('No current account');
       }
 
       try {
         setIsSettingDailyLimit(true);
-        await wallet.setSecurityHookDailyLimit(dailyLimitUsdCents);
+        await wallet.setSecurityHookDailyLimit(dailyLimitUsdCents, otpCode);
         // Reload profile to get updated limit
         const profile = await wallet.loadSecurityHookProfile();
         if (profile) {
@@ -233,6 +236,27 @@ export const SecurityHookProvider = ({ children }: { children: React.ReactNode }
         throw error;
       } finally {
         setIsSettingDailyLimit(false);
+      }
+    },
+    [address, chainId, wallet]
+  );
+
+  const requestDailyLimitOtp = useCallback(
+    async (dailyLimitUsdCents: number) => {
+      if (!address || !chainId) {
+        throw new Error('No current account');
+      }
+
+      try {
+        await wallet.requestDailyLimitOtp(dailyLimitUsdCents);
+      } catch (error) {
+        console.error('Elytro: Request daily limit OTP failed', error);
+        toast({
+          title: 'Failed to request OTP',
+          description: formatErrorMsg(error),
+          variant: 'destructive',
+        });
+        throw error;
       }
     },
     [address, chainId, wallet]
@@ -280,6 +304,7 @@ export const SecurityHookProvider = ({ children }: { children: React.ReactNode }
         confirmEmailBinding,
         loadSecurityProfile,
         setDailyLimit,
+        requestDailyLimitOtp,
         clearAuthSession,
         changeWalletEmail,
       }}
