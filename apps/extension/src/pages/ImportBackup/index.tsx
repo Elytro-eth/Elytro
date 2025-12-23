@@ -97,7 +97,7 @@ export default function ImportBackup() {
 
   if (isGuiding) {
     return (
-      <SecondaryPageWrapper title="Import wallets" isGuide={true} overlayHeader={true}>
+      <SecondaryPageWrapper title="Import wallets" isGuide={true}>
         <Guide imgSrc={WalletImg} title="How Import works" action="Start import" onAction={handleGuiding} tips={tips} />
       </SecondaryPageWrapper>
     );

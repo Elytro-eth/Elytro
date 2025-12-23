@@ -165,7 +165,6 @@ export default function RecoverySettings() {
         }
       }}
       isGuide={showType === ShowType.Guide}
-      overlayHeader={showType === ShowType.Guide}
     >
       {loading ? (
         <>

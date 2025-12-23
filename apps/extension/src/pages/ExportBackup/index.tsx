@@ -122,7 +122,7 @@ export default function ExportBackupPage() {
   }, [accounts]);
 
   return (
-    <SecondaryPageWrapper title="Export wallets" isGuide={true} overlayHeader={true}>
+    <SecondaryPageWrapper title="Export wallets" isGuide={true}>
       {isGuiding ? (
         <div className="page-fade-in">
           <Guide
