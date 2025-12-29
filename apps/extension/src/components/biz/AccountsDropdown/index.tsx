@@ -10,7 +10,6 @@ import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
 import { navigateTo } from '@/utils/navigation';
-import Spin from '@/components/ui/Spin';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/utils/shadcn/utils';
 
@@ -33,7 +32,12 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
   }, [accounts, chainId]);
 
   if (!currentAccount) {
-    return <Spin isLoading />;
+    return (
+      <div className="flex items-center gap-x-sm border border-gray-200 rounded-[8px] bg-white px-sm py-xs">
+        <div className="size-4 rounded-full bg-gray-200 animate-pulse" />
+        <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
+      </div>
+    );
   }
 
   // const { integerPart, decimalPart } = formatBalance(balance, {
@@ -106,7 +110,7 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
             <Avatar className="size-4">
               <AvatarImage src={getIconByChainId(currentAccount.chainId)} />
               <AvatarFallback>
-                <Spin size="sm" color="text-gray-300" isLoading inline />
+                <div className="size-4 rounded-full bg-gray-200" />
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
@@ -115,7 +119,7 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
             {currentAccount?.address ? (
               formatAddressToShort(currentAccount.address)
             ) : (
-              <Spin size="sm" color="text-gray-300" isLoading inline />
+              <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
             )}
           </span>
 

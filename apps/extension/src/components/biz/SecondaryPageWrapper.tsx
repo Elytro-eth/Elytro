@@ -63,7 +63,7 @@ export default function SecondaryPageWrapper({
         <div
           className={cn(
             'flex flex-row items-center justify-center relative pb-lg mb-sm',
-            isGuide ? 'absolute top-sm left-sm right-sm z-10 pt-lg px-lg' : ''
+            isGuide ? 'absolute top-0 left-0 right-0 z-10 pt-lg px-lg' : ''
           )}
         >
           {showBack && (

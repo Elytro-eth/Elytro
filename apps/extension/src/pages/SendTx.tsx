@@ -306,7 +306,7 @@ export default function SendTx() {
         </Form>
 
         {/* Continue button */}
-        <Button variant="secondary" className="w-full gap-xl" disabled={!isFormValid} onClick={handleContinue}>
+        <Button className="w-full gap-xl" disabled={!isFormValid} onClick={handleContinue}>
           {isPreparing ? (
             <>
               <Spin size="sm" isLoading inline className="mr-2" />

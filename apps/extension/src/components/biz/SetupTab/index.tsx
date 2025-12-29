@@ -81,11 +81,16 @@ export default function SetupTab() {
                   {step.done ? (
                     <Check className="size-5 p-1 bg-light-green rounded-full flex-shrink-0" />
                   ) : (
-                    <span className="font-bold text-white bg-black-blue rounded-full size-4 text-sm flex items-center justify-center flex-shrink-0 p-1">
+                    <span className="font-bold text-white bg-black-blue rounded-full size-5 text-sm flex items-center justify-center flex-shrink-0 p-1">
                       {index + 1}
                     </span>
                   )}
-                  <span className="font-bold text-lg text-black-blue whitespace-nowrap flex-shrink-0">
+                  <span
+                    className={cn(
+                      'font-bold text-lg whitespace-nowrap flex-shrink-0',
+                      step.done ? 'text-gray-600' : 'text-black-blue'
+                    )}
+                  >
                     {step.title}
                   </span>
                   {/* {step.showTag && (

@@ -117,7 +117,7 @@ export default function Dashboard() {
   return (
     <PageLayout className="w-full h-screen bg-fade-green">
       <PageLayout.Header className="p-2">
-        <Spin isLoading={loading} />
+        <Spin isLoading={loading} size="lg" />
         <BasicAccountInfo />
       </PageLayout.Header>
       <PageLayout.Body className="px-2 py-2">

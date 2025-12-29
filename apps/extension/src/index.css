@@ -194,31 +194,37 @@
   scrollbar-width: none; /* Firefox */
 }
 
-/* Page fade transitions */
-@keyframes pageFadeIn {
+/* Page transitions - directional */
+@keyframes slideInFromRight {
   from {
     opacity: 0;
+    transform: translateX(16px);
   }
   to {
     opacity: 1;
+    transform: translateX(0);
   }
 }
 
-@keyframes pageFadeOut {
+@keyframes slideInFromLeft {
   from {
-    opacity: 1;
+    opacity: 0;
+    transform: translateX(-16px);
   }
   to {
-    opacity: 0;
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
+/* Default: forward navigation (slide in from right) */
 .page-fade-in {
-  animation: pageFadeIn 0.15s ease-in-out forwards;
+  animation: slideInFromRight 0.15s ease-out forwards;
 }
 
-.page-fade-out {
-  animation: pageFadeOut 0.15s ease-in-out forwards;
+/* Back navigation (slide in from left) */
+body.nav-back .page-fade-in {
+  animation: slideInFromLeft 0.15s ease-out forwards;
 }
 
 *:focus-visible {

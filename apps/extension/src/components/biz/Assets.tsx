@@ -1,15 +1,30 @@
 import { useAccount } from '@/contexts/account-context';
 import EmptyAsset from '@/components/ui/EmptyAsset';
-import Spin from '@/components/ui/Spin';
 import TokenItem from '@/components/ui/TokenItem';
 
 const LoadingSkeleton = () => (
   <div className="space-y-4 px-4 mt-3">
     {Array.from({ length: 3 }).map((_, index) => (
-      <div key={index} className="w-full h-10 flex items-center">
-        <Spin size="sm" color="text-gray-300" isLoading inline />
+      <div
+        key={index}
+        className="w-full flex items-center gap-3"
+        style={{
+          animation: 'pulse 1s ease-in-out infinite',
+          animationDelay: `${index * 200}ms`,
+        }}
+      >
+        <div className="size-10 rounded-full bg-gray-150 flex-shrink-0" />
+        <div className="flex-1">
+          <div className="h-8 bg-gray-150 rounded-sm w-full" />
+        </div>
       </div>
     ))}
+    <style>{`
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+      }
+    `}</style>
   </div>
 );
 

@@ -33,6 +33,7 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
   const [eqMode, setEqMode] = useState<InputMode>(InputMode.DOLLAR);
   const [inputValue, setInputValue] = useState('');
   const [eqValue, setEqValue] = useState('');
+  const [rotation, setRotation] = useState(0);
 
   const isInternalUpdate = useRef(false);
 
@@ -124,6 +125,9 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
   const handleToggleMode = useCallback(() => {
     if (isDisabled || tokenPrice <= 0) return;
 
+    // Trigger swap animation
+    setRotation((prev) => prev + 180);
+
     setInputMode((prevMode) => {
       const newMode = prevMode === InputMode.TOKEN ? InputMode.DOLLAR : InputMode.TOKEN;
 
@@ -177,7 +181,10 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
           {inputPostfix && <div className={cn('flex-none', fontSize)}>{inputPostfix}</div>}
         </div>
         {tokenPrice > 0 && eqValue && !isNaN(Number(eqValue)) && (
-          <div>
+          <div
+            key={rotation}
+            className="text-gray-600 font-bold animate-in fade-in duration-200 delay-100 fill-mode-backwards"
+          >
             {eqPrefix}
             {eqValue}
             {eqPostfix}
@@ -186,12 +193,15 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
 
         <div
           className={cn(
-            'z-10 absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1 p-2 rounded-md bg-gray-150 cursor-pointer hover:bg-gray-300',
+            'z-10 absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1 p-2 rounded-full bg-gray-150 cursor-pointer hover:bg-gray-300 transition-transform active:scale-90',
             (isDisabled || tokenPrice <= 0) && 'opacity-50 cursor-not-allowed'
           )}
           onClick={handleToggleMode}
         >
-          <ArrowUpDownIcon className="size-4" />
+          <ArrowUpDownIcon
+            className="size-4 transition-transform duration-300"
+            style={{ transform: `rotate(${rotation}deg)` }}
+          />
         </div>
       </div>
     </div>
