@@ -47,7 +47,7 @@ export default function TokenAmountItem({
       )}
     >
       <img
-        className={cn('size-8 rounded-full ring-1 ring-gray-150 bg-white', size === 'sm' && 'p-1 size-5')}
+        className={cn('size-6 p-1 rounded-full ring-1 ring-gray-150 bg-white', size === 'sm' && 'p-1 size-5')}
         src={logoURI || DefaultTokenIcon}
         alt={symbol}
       />

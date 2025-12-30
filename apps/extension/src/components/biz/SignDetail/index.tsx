@@ -16,11 +16,17 @@ interface ISendTxProps {
   chainId: number;
 }
 
-export default function SignDetail({ onConfirm, onCancel, dapp, chainId, signData: { method, params } }: ISendTxProps) {
+export default function SignDetail({
+  onConfirm,
+  onCancel,
+  dapp,
+  chainId: _chainId,
+  signData: { method, params },
+}: ISendTxProps) {
   const { wallet } = useWallet();
   const signType = method as SignTypeEn;
 
-  const { title, format, messageIdx, showDetail, signMethod } = getProcessingFromSignType(signType);
+  const { title: _title, format, messageIdx, showDetail, signMethod } = getProcessingFromSignType(signType);
 
   const handleConfirm = async () => {
     try {
@@ -49,13 +55,13 @@ export default function SignDetail({ onConfirm, onCancel, dapp, chainId, signDat
   return (
     <div className="w-full mx-auto">
       <div className="mb-6">
-        <DAppDetail dapp={dapp} chainId={chainId} />
+        <DAppDetail dapp={dapp} />
       </div>
 
       <div className="space-2">
         <div className="rounded-2xl">
           {/* TODO: 区分 */}
-          <div className="text-sm font-bold mb-3">{title}</div>
+          {/* <div className="text-sm font-bold mb-3">{title}</div> */}
 
           {showDetail && <DomainDetail message={params[messageIdx]} />}
 

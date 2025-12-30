@@ -41,9 +41,9 @@ export default function ConnectionConfirmation({ dApp, onConfirm, onCancel }: IP
       <div className="mb-8">
         <ul className="space-y-2xs">
           {tips.map((tip) => (
-            <li className="flex items-start text-sm  align-center" key={tip}>
+            <li className="flex items-start text-sm align-center" key={tip}>
               <CheckIcon className="bg-light-green p-1 w-5 h-5 rounded-full text-green-100 mr-sm flex-shrink-0 size-lg my-auto" />
-              <span>{tip}</span>
+              <span className="text-gray-600">{tip}</span>
             </li>
           ))}
         </ul>

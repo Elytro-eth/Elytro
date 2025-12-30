@@ -88,7 +88,7 @@ export default function Apps() {
             >
               <div className="flex flex-row items-center gap-x-sm">
                 <img src={site.icon} alt={site.name} className="size-8 rounded-full" />
-                <span className="elytro-text-bold-body">{getHostname(site.origin)}</span>
+                <span className="elytro-text-body">{getHostname(site.origin)}</span>
               </div>
               <Unlink className="elytro-clickable-icon" onClick={() => handleDisconnect(site.origin)} />
             </div>

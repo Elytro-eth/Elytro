@@ -42,7 +42,7 @@ export default function DomainDetail({ message }: IDomainDetail) {
   }
 
   return (
-    <div className="text-sm text-gray-500 mb-3 space-y-1">
+    <div className="text-sm text-gray-500 mb-3 space-y-1 bg-gray-150 rounded-2xl p-4">
       {Object.entries(domain).map(([key, value]) => (
         <FieldRender key={key} label={key} value={value as string} />
       ))}

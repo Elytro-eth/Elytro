@@ -23,7 +23,7 @@ export default function ChainItem({ chain, onClick, isSelected = false }: IChain
       )}
     >
       <img src={chain?.icon} alt={chain?.name} className="size-7 rounded-full" />
-      <div className="elytro-text-bold-body">{chain?.name}</div>
+      <div className="elytro-text-body">{chain?.name}</div>
     </div>
   );
 }
