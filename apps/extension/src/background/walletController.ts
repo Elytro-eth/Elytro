@@ -285,6 +285,7 @@ class WalletController {
 
   public async prepareUserOp({ params }: { params?: Transaction[] }): Promise<PrepareUserOpResult> {
     try {
+      await keyring.tryUnlock();
       const { address, chainId, isDeployed } = accountManager.currentAccount || {};
 
       if (!address || !chainId) {
@@ -641,6 +642,7 @@ class WalletController {
   }
 
   public async createDeployUserOp(): Promise<ElytroUserOperation> {
+    await keyring.tryUnlock();
     if (!keyring.currentOwner?.address) {
       throw new Error('Elytro: No owner address. Try create owner first.');
     }
@@ -653,6 +655,7 @@ class WalletController {
   }
 
   public async createTxUserOp(txs: Transaction[]): Promise<ElytroUserOperation> {
+    await keyring.tryUnlock();
     if (!accountManager.currentAccount?.isDeployed && keyring.currentOwner?.address) {
       const txOpCallData = await elytroSDK.createUserOpFromTxs(accountManager.currentAccount?.address as string, txs);
       const deployOp = await elytroSDK.createUnsignedDeployWalletUserOp(
