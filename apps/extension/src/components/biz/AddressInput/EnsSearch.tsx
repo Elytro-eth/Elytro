@@ -22,7 +22,7 @@ const ENSSearchResults = ({ value, ensInfo, loading, onSelectENS }: IENSSearchRe
           </div>
         )}
         {!loading && !ensInfo && value.endsWith('.eth') && (
-          <div className="px-lg text-gray-500 text-center">No ENS found for &quot;{value}&quot;</div>
+          <div className="px-lg text-gray-600">No ENS found for &quot;{value}&quot;</div>
         )}
       </div>
     </div>

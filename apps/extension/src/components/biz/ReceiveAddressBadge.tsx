@@ -26,6 +26,10 @@ export default function ReceiveAddressBadge({ address, chainId, onCopyClick, tri
   useEffect(() => {
     if (triggerCopy && triggerCopy > 0) {
       setIsCopied(true);
+      const timer = setTimeout(() => {
+        setIsCopied(false);
+      }, 1500);
+      return () => clearTimeout(timer);
     }
   }, [triggerCopy]);
 

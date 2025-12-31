@@ -7,13 +7,13 @@ import { useMemo, useState } from 'react';
 import ActivateDetail from './ActivationDetail';
 import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
-import { ChevronUp, Copy, AlertCircle } from 'lucide-react';
+import { ChevronUp, AlertCircle } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import HelperText from '@/components/ui/HelperText';
 import ShortedAddress from '@/components/ui/ShortedAddress';
-import { safeClipboard } from '@/utils/clipboard';
+import Copy from '@/components/ui/Copy';
 import { RawData } from '@/components/ui/rawData';
 import { cn } from '@/utils/shadcn/utils';
 
@@ -137,7 +137,7 @@ export function UserOpDetail() {
   return (
     <div className="flex flex-col w-full gap-y-md">
       {/* DApp Info: no need for sending transaction */}
-      <div className="flex flex-col gap-y-sm">{DetailContent}</div>
+      <div className="flex flex-col gap-y-md">{DetailContent}</div>
 
       {/* UserOp Pay Info */}
       <InfoCardList>
@@ -151,7 +151,7 @@ export function UserOpDetail() {
               type="button"
               className="flex items-center elytro-text-small truncate cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => {
-                setExpandSponsorSelector((prev) => !prev);
+                setExpandSponsorSelector((prev: boolean) => !prev);
               }}
               aria-label={expandSponsorSelector ? 'Collapse gas payment options' : 'Expand gas payment options'}
               aria-expanded={expandSponsorSelector}
@@ -190,13 +190,13 @@ export function UserOpDetail() {
           }
         />
         {expandSponsorSelector && (
-          <div role="radiogroup" aria-label="Gas payment options">
+          <div role="radiogroup" aria-label="Gas payment options" className="mt-2">
             <RadioGroup
               value={gasOption}
               onValueChange={(value: string) => {
                 handleGasOptionChange(value);
               }}
-              className="flex flex-col gap-y-2"
+              className="flex flex-col gap-y-1"
             >
               {gasOptions.map((option, index) => {
                 const value = getOptionValue(option);
@@ -220,21 +220,14 @@ export function UserOpDetail() {
 
         {/* Insufficient Balance Warning */}
         {!hasSufficientBalance && (
-          <div className="bg-light-blue rounded-sm p-3">
+          <div className="bg-light-blue rounded-sm p-3 mt-2">
             <div className="flex flex-row items-center gap-1 text-red mb-2">
               <AlertCircle className="size-4 text-red stroke-dark-red" />
-              <span className="elytro-text-small-body text-dark-red">Not enough for network cost, deposit first</span>
+              <span className="elytro-text-small-body text-dark-red">Not enough balance, deposit first</span>
             </div>
-            <div className="bg-white rounded-sm px-2 py-1 flex items-center justify-between">
-              <button
-                type="button"
-                className="flex items-center gap-1 cursor-pointer hover:opacity-100 transition-opacity"
-                onClick={() => safeClipboard(address)}
-                aria-label="Copy wallet address"
-              >
-                <ShortedAddress address={address} chainId={chainId} className="bg-white" />
-                <Copy className="size-3 stroke-gray-600" aria-hidden="true" />
-              </button>
+            <div className="bg-white rounded-sm px-2 py-1 flex items-center gap-1">
+              <ShortedAddress address={address} chainId={chainId} className="bg-white" />
+              <Copy text={address} size="xs" />
             </div>
           </div>
         )}

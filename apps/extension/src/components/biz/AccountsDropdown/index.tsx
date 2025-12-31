@@ -102,7 +102,7 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
       <div onClick={() => handleOpenChange(!open)}>
         <div
           className={cn(
-            'max-w-fit cursor-pointer flex items-center gap-x-sm border border-gray-200 rounded-[8px] bg-white px-sm py-xs text-gray-750 hover:bg-gray-50',
+            'max-w-fit cursor-pointer flex items-center gap-x-sm rounded-[8px] bg-white px-sm py-xs text-gray-750 hover:bg-gray-300',
             className
           )}
         >

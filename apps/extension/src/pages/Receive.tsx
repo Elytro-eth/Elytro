@@ -9,6 +9,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useState, useCallback, useEffect } from 'react';
 import { safeClipboard } from '@/utils/clipboard';
 import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from '@/hooks/use-toast';
 
 /**
  * "Don't remind me again" feature:
@@ -61,6 +62,10 @@ export default function Receive() {
       // User has previously checked "Don't remind me again" - copy directly
       safeClipboard(address, false);
       setTriggerCopy((prev) => prev + 1);
+      toast({
+        title: 'Address copied',
+        variant: 'constructive',
+      });
     } else {
       // Show the warning dialog first
       setShowDialog(true);
@@ -78,6 +83,10 @@ export default function Receive() {
     safeClipboard(address, false);
     setShowDialog(false);
     setTriggerCopy((prev) => prev + 1); // Trigger the "Copied" state in the button
+    toast({
+      title: 'Address copied',
+      variant: 'constructive',
+    });
   }, [address, dontRemindAgain]);
 
   if (!address) {

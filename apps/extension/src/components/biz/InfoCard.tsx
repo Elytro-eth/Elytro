@@ -15,7 +15,7 @@ function InfoCardItem({ label, content }: IInfoCardItemProps) {
 }
 
 function InfoCardList({ children }: { children: React.ReactNode }) {
-  return <div className="flex flex-col w-full px-lg py-md bg-gray-150 rounded-sm gap-y-sm">{children}</div>;
+  return <div className="flex flex-col w-full px-lg py-md bg-gray-150 rounded-sm gap-y-3xs">{children}</div>;
 }
 const InfoCard = { InfoCardItem, InfoCardList };
 
