@@ -64,33 +64,38 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
 
   const getWalletStatus = async () => {
     try {
-      // if (loading) {
-      //   return;
-      // }
+      if (isCheckingRef.current) {
+        return;
+      }
 
-      // setLoading(true);
       isCheckingRef.current = true;
       const res = await walletControllerProxy.getWalletStatus();
 
       // We should NOT navigate if user already in the home/dashboard page and the status is the same and the status is not in the list of statuses
-      if (
-        ![SIDE_PANEL_ROUTE_PATHS.Home, SIDE_PANEL_ROUTE_PATHS.Dashboard].includes(pathname as SidePanelRoutePath) &&
-        res === status &&
-        ![WalletStatusEn.HasOwnerButLocked, WalletStatusEn.HasAccountAndUnlocked].includes(res)
-      ) {
-        return;
-      }
+      // if (
+      //   ![SIDE_PANEL_ROUTE_PATHS.Home, SIDE_PANEL_ROUTE_PATHS.Dashboard].includes(pathname as SidePanelRoutePath) &&
+      //   res === status &&
+      //   ![WalletStatusEn.HasOwnerButLocked, WalletStatusEn.HasAccountAndUnlocked].includes(res)
+      // ) {
+      //   return;
+      // }
 
       let navigateToPath: SidePanelRoutePath | undefined;
 
       switch (res) {
         case WalletStatusEn.HasOwnerButLocked:
-          navigateToPath = SIDE_PANEL_ROUTE_PATHS.Unlock;
+          if (pathname !== SIDE_PANEL_ROUTE_PATHS.Unlock) {
+            navigateToPath = SIDE_PANEL_ROUTE_PATHS.Unlock;
+          }
           break;
         case WalletStatusEn.Recovering:
-          navigateToPath = SIDE_PANEL_ROUTE_PATHS.RetrieveContacts;
+          if (pathname !== SIDE_PANEL_ROUTE_PATHS.RetrieveContacts) {
+            navigateToPath = SIDE_PANEL_ROUTE_PATHS.RetrieveContacts;
+          }
           break;
-        case WalletStatusEn.NoAccount || WalletStatusEn.NoOwner:
+        case WalletStatusEn.NoAccount:
+        case WalletStatusEn.NoOwner:
+          // If we are NOT on a guest path (i.e. we are on a protected path), go to Home
           if (!INIT_PATHS.includes(pathname as SidePanelRoutePath)) {
             navigateToPath = SIDE_PANEL_ROUTE_PATHS.Home;
           }
@@ -105,18 +110,16 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       setStatus(res);
-      if (navigateToPath) {
+      if (navigateToPath && navigateToPath !== pathname) {
         navigateTo('side-panel', navigateToPath);
       }
     } catch {
       toast({
         title: 'Failed to get wallet status, please try later',
-        // description: 'Please try again later',
         variant: 'destructive',
       });
       setStatus(WalletStatusEn.NoOwner);
     } finally {
-      // setLoading(false);
       isCheckingRef.current = false;
     }
   };

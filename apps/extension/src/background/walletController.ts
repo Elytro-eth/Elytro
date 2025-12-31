@@ -334,7 +334,7 @@ class WalletController {
 
       const canSponsor = await canUserOpGetSponsor(tempUserOp, chainId, entryPoint, hookStatus);
 
-      const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 10000): Promise<T> => {
+      const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 5000): Promise<T> => {
         return Promise.race([
           promise.catch((error) => {
             // Catch and re-throw to prevent error propagation between promises
