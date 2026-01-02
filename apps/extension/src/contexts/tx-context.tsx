@@ -117,9 +117,9 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   const [errorMsg, setErrorMsg] = useState<Nullable<string>>(null);
 
   const [decodedDetail, setDecodedDetail] = useState<Nullable<DecodeResult[]>>(null);
-  const [hasSufficientBalance, setHasSufficientBalance] = useState(false);
   const [chosenGasToken, setChosenGasToken] = useState<TokenQuote | undefined>(undefined);
   const [costResult, setCostResult] = useState<Nullable<TUserOperationPreFundResult>>(null);
+  const hasSufficientBalance = !costResult?.needDeposit;
 
   const [gasOptions, setGasOptions] = useState<GasOptionEstimate[]>([]);
   const [gasPaymentOption, setGasPaymentOption] = useState<GasPaymentOption>({ type: 'self' });
@@ -219,7 +219,6 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
           balance: defaultEstimate.balance || 0n,
           suspiciousOp: false,
         });
-        setHasSufficientBalance(defaultEstimate.hasSufficientBalance);
       }
     } catch (err) {
       console.log('test: prepareUserOp error', err);
@@ -248,7 +247,6 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         balance: estimate.balance || 0n,
         suspiciousOp: false,
       });
-      setHasSufficientBalance(estimate.hasSufficientBalance);
 
       if (estimate.option.type === 'erc20') {
         setChosenGasToken(estimate.option.token);
@@ -334,14 +332,9 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
   //   }
   // };
 
-  useEffect(() => {
-    setHasSufficientBalance(!costResult?.needDeposit);
-  }, [costResult?.needDeposit]);
-
   const resetTxContext = () => {
     setRequestType(null);
     setDecodedDetail(null);
-    setHasSufficientBalance(false);
     setIsPreparing(false); // Reset to false
     setCostResult(null);
     setErrorMsg(null);

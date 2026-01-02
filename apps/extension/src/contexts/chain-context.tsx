@@ -24,7 +24,7 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
   const { wallet } = useWallet();
   const [chains, setChains] = useState<TChainItem[]>([]);
   const [currentChain, setCurrentChain] = useState<TChainItem | null>(null);
-  const [pathname] = useEnhancedHashLocation();
+  useEnhancedHashLocation();
 
   const getChains = async () => {
     try {
@@ -58,7 +58,7 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     getChains();
     getCurrentChain();
-  }, [pathname]);
+  }, []);
 
   const openExplorer = useCallback(
     async ({ txHash, opHash }: { txHash?: string; opHash: string }) => {

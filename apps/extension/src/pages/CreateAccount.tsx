@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { Button } from '@/components/ui/button';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { TChainItem } from '@/constants/chains';
 import { toast } from '@/hooks/use-toast';
-import { useChain } from '@/contexts/chain-context';
+
 import { useWallet } from '@/contexts/wallet';
 import NetworkSelection from '@/components/biz/NetworkSelection';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
@@ -15,16 +15,11 @@ import Spin from '@/components/ui/Spin';
 import CurrentAddress from '@/components/biz/CurrentAddress';
 
 const CreateAccount: React.FC = () => {
-  const { getChains } = useChain();
   const { wallet } = useWallet();
   const [selectedChain, setSelectedChain] = useState<TChainItem | null>(null);
   const [isCreated, setIsCreated] = useState(false);
 
   const { reloadAccount, loading: isLoading } = useAccount();
-
-  useEffect(() => {
-    getChains();
-  }, []);
 
   const handleCreateAccount = async () => {
     if (!selectedChain) {
