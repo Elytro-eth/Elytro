@@ -5,7 +5,14 @@ import { useState } from 'react';
 import { EVENT_TYPES } from '@/constants/events';
 import RuntimeMessage from '@/utils/message/runtimeMessage';
 import { formatAddressToShort } from '@/utils/format';
-import { ArrowDownLeft, ArrowUpRight, ChevronsLeftRight, Check, ShieldQuestion } from 'lucide-react';
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  ChevronsLeftRight,
+  Check,
+  ShieldQuestion,
+  SquareArrowOutUpRight,
+} from 'lucide-react';
 import { useChain } from '@/contexts/chain-context';
 import TokenBalanceItem from '../TokenBalanceItem';
 
@@ -85,7 +92,7 @@ export default function ActivityItem({
   const { label, style } = ActivityStatusMap[latestStatus];
   return (
     <div
-      className="flex items-center w-full justify-between px-lg cursor-pointer py-md hover:bg-gray-50 gap-x-sm min-w-0"
+      className="group flex items-center w-full justify-between px-lg cursor-pointer py-md rounded-sm hover:bg-gray-50 gap-x-sm min-w-0"
       onClick={() => openExplorer({ txHash, opHash })}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -94,6 +101,7 @@ export default function ActivityItem({
         <div className="flex flex-col min-w-0 flex-1">
           <div className="flex items-center gap-2 min-w-0">
             <span className="inline-block font-bold text-base truncate">{name}</span>
+            <SquareArrowOutUpRight className="hidden group-hover:block size-3 stroke-gray-600 flex-shrink-0" />
             <span className={`elytro-text-tiny-body px-xs py-3xs rounded-xs text-white ${style} flex-shrink-0`}>
               {label}
             </span>

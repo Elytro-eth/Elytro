@@ -136,7 +136,7 @@ module.exports = {
         },
       },
       boxShadow: {
-        lg: '0 0.75rem 1.5rem 0 rgba(0, 0, 0, 0.16)',
+        lg: '0 12px 16px -4px rgba(0, 0, 0, 0.16)',
       },
     },
   },

@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle } from 'lucide-react';
-import Spin from '@/components/ui/Spin';
 import { Transaction } from '@elytro/sdk';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
@@ -307,14 +306,7 @@ export default function SendTx() {
 
         {/* Continue button */}
         <Button className="w-full gap-xl" disabled={!isFormValid} onClick={handleContinue}>
-          {isPreparing ? (
-            <>
-              <Spin size="sm" isLoading inline className="mr-2" />
-              Preparing...
-            </>
-          ) : (
-            'Continue'
-          )}
+          {isPreparing ? <>Preparing...</> : 'Continue'}
         </Button>
       </div>
 

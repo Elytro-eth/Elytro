@@ -38,7 +38,14 @@ export default function RecoverySettings() {
   const getRecoveryContactsFromInfoRecorder = async () => {
     try {
       setLoading(true);
-      const { contacts = [], threshold = 0 } = (await wallet.queryRecoveryContactsByAddress(address)) || {};
+
+      // Add timeout to prevent infinite loading
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Request timed out')), 15000)
+      );
+
+      const { contacts = [], threshold = 0 } =
+        (await Promise.race([wallet.queryRecoveryContactsByAddress(address), timeoutPromise])) || {};
 
       console.log('checkRecoveryContactsSettingChanged 1');
       const isOnchainContactsChanged = await wallet.checkRecoveryContactsSettingChanged(contacts, threshold);
@@ -67,6 +74,12 @@ export default function RecoverySettings() {
       setShowType(hasContacts ? ShowType.List : ShowType.Guide);
     } catch (error) {
       console.error(error);
+      toast({
+        title: 'Failed to load recovery contacts',
+        description: error instanceof Error ? error.message : 'Please try again',
+        variant: 'destructive',
+      });
+      setShowType(ShowType.Guide);
     } finally {
       setLoading(false);
     }

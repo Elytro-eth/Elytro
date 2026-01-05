@@ -49,7 +49,7 @@ export default function AccountOption({
   return (
     <div
       className={cn(
-        'flex items-center gap-x-xl justify-between px-lg py-md cursor-pointer hover:bg-gray-150',
+        'flex items-center gap-x-xl justify-between px-lg py-md rounded-sm cursor-pointer hover:bg-gray-150',
         isSelected && 'bg-gray-50'
       )}
       onClick={onSelect}

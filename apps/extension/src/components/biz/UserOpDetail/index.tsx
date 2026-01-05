@@ -223,7 +223,7 @@ export function UserOpDetail() {
           <div className="bg-light-blue rounded-sm p-3 mt-2">
             <div className="flex flex-row items-center gap-1 text-red mb-2">
               <AlertCircle className="size-4 text-red stroke-dark-red" />
-              <span className="elytro-text-small-body text-dark-red">Not enough balance, deposit first</span>
+              <span className="elytro-text-small-body text-dark-red">Not enough ETH, please deposit first</span>
             </div>
             <div className="bg-white rounded-sm px-2 py-1 flex items-center gap-1">
               <ShortedAddress address={address} chainId={chainId} className="bg-white" />

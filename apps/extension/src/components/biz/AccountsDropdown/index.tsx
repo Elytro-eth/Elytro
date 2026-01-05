@@ -133,14 +133,14 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
         sideOffset={10}
         className="w-[calc(100vw-32px)] bg-white rounded-md shadow-lg pt-sm pb-0 px-0"
       >
-        <div className="flex items-center justify-between gap-x-3xl px-lg pb-sm">
+        <div className="flex items-center justify-between gap-x-3xl px-lg">
           <span className="elytro-text-small-bold text-gray-900">Your wallets</span>
           <Button variant="tertiary" size="tiny" className="elytro-text-tiny-body" onClick={handleAddAccount}>
             Add new wallet
           </Button>
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col p-sm">
           {showAccounts.map((account) => (
             <AccountOption
               key={account.address}

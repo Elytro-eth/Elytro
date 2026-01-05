@@ -11,7 +11,7 @@ const portMessage = new PortMessage('elytro-ui');
 
 const INIT_PATHS = [
   SIDE_PANEL_ROUTE_PATHS.Transfer,
-  // SIDE_PANEL_ROUTE_PATHS.CreateAccount,
+  SIDE_PANEL_ROUTE_PATHS.CreateAccount,
   SIDE_PANEL_ROUTE_PATHS.CreatePasscode,
   SIDE_PANEL_ROUTE_PATHS.YouAreIn,
   SIDE_PANEL_ROUTE_PATHS.Education,

@@ -10,7 +10,7 @@ const SelectedToken = memo(({ token }: { token?: TTokenInfo }) => {
   if (!token)
     return (
       <div className="flex items-center">
-        <div className="text-md w-full text-left">Select a token</div>
+        <div className="text-md w-full text-left">Token</div>
         <ChevronDown className="stroke-gray-600" />
       </div>
     );

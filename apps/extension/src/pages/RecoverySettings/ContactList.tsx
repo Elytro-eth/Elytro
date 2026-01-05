@@ -13,6 +13,7 @@ import ShortedAddress from '@/components/ui/ShortedAddress';
 import { cn } from '@/utils/shadcn/utils';
 import { setLocalContacts, setLocalThreshold } from '@/utils/contacts';
 import HelperText from '@/components/ui/HelperText';
+import Copy from '@/components/ui/Copy';
 
 interface IContactListProps {
   contacts: TRecoveryContact[];
@@ -94,8 +95,9 @@ export default function ContactList({
         <h2 className="elytro-text-small-bold text-gray-600">Your wallet</h2>
 
         {/* Operation Bar */}
-        <div className="flex flex-row justify-between">
+        <div className="flex flex-row items-center gap-2">
           <ShortedAddress address={currentAccount.address} chainId={currentAccount.chainId} />
+          <Copy text={currentAccount.address} size="sm" />
         </div>
 
         <HelperText description="Take a note of your address in case of recovery." />

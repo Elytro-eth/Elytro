@@ -1,5 +1,6 @@
 import { Input } from '@/components/ui/input';
 import { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { FieldValues, useFormContext } from 'react-hook-form';
 import { isAddress } from 'viem';
 import { useWallet } from '@/contexts/wallet';
@@ -30,15 +31,40 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
   const [recentAddresses, setRecentAddresses] = useState<TRecentAddress[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null);
 
   useEffect(() => {
-    if (!isFocused) return;
+    if (!isFocused) {
+      setDropdownPosition(null);
+      return;
+    }
 
     getRecentAddresses().then((addresses) => {
       if (addresses) {
         setRecentAddresses(Object.values(addresses));
       }
     });
+
+    const updatePosition = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setDropdownPosition({
+          top: rect.bottom + window.scrollY + 4,
+          left: rect.left + window.scrollX,
+          width: rect.width,
+        });
+      }
+    };
+
+    updatePosition();
+    window.addEventListener('scroll', updatePosition, true);
+    window.addEventListener('resize', updatePosition);
+
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+    };
   }, [isFocused]);
 
   const resolveENS = debounce(async (ensName: string) => {
@@ -229,7 +255,7 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
   }, [value]);
 
   return (
-    <div className="bg-white rounded-md flex flex-col relative -mx-4">
+    <div ref={containerRef} className="bg-white rounded-md flex flex-col relative -mx-4">
       <div className="flex items-center relative px-4">
         <Input
           ref={inputRef}
@@ -250,27 +276,35 @@ const AddressInput = ({ field, chainId }: IAddressInputProps) => {
         )}
       </div>
 
-      {isFocused && (
-        <div
-          className={`absolute top-full left-0 right-0 bg-white shadow-md rounded-md mt-1 z-10 overflow-hidden max-h-80 overflow-y-auto border ${
-            isClosing ? 'animate-out fade-out-0 slide-out-to-top-2' : 'animate-in fade-in-0 slide-in-from-top-2'
-          }`}
-        >
-          <ENSSearchResults value={value} ensInfo={ensInfo} loading={loading} onSelectENS={() => handleSelectENS()} />
+      {isFocused &&
+        dropdownPosition &&
+        createPortal(
+          <div
+            className={`fixed shadow-md rounded-md z-[100] overflow-hidden max-h-80 overflow-y-auto bg-gray-50 ${
+              isClosing ? 'animate-out fade-out-0 slide-out-to-top-2' : 'animate-in fade-in-0 slide-in-from-top-2'
+            }`}
+            style={{
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+              width: `${dropdownPosition.width}px`,
+            }}
+          >
+            <ENSSearchResults value={value} ensInfo={ensInfo} loading={loading} onSelectENS={() => handleSelectENS()} />
 
-          <RecentAddressesList
-            recentAddresses={recentAddresses?.filter((item) => item.address !== ensInfo?.address)}
-            chainId={chainId}
-            onSelectAddress={handleSelectRecentAddress}
-          />
+            <RecentAddressesList
+              recentAddresses={recentAddresses?.filter((item) => item.address !== ensInfo?.address)}
+              chainId={chainId}
+              onSelectAddress={handleSelectRecentAddress}
+            />
 
-          {errorMessage && <div className="p-4 text-red-500 text-sm border-t border-gray-200">{errorMessage}</div>}
+            {errorMessage && <div className="p-4 text-red-500 text-sm border-t border-gray-200">{errorMessage}</div>}
 
-          {!loading && !ensInfo && !recentAddresses.length && !value.endsWith('.eth') && !errorMessage && (
-            <div className="p-4 text-gray-500">Enter an address or ENS name.</div>
-          )}
-        </div>
-      )}
+            {!loading && !ensInfo && !recentAddresses.length && !value.endsWith('.eth') && !errorMessage && (
+              <div className="p-4 text-gray-500">Enter an address or ENS name.</div>
+            )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

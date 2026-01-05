@@ -20,7 +20,7 @@ const RecentAddressItem = ({ item, chainId, onClick }: IRecentAddressItemProps) 
   return (
     <div
       onClick={onClick}
-      className="px-4 py-md cursor-pointer flex-column items-center justify-between hover:bg-gray-150"
+      className="px-4 py-md cursor-pointer flex-column items-center justify-between hover:bg-gray-300"
     >
       {item.name ? (
         <ENSInfoComponent ensInfo={item} extra={time} />
@@ -43,7 +43,7 @@ const RecentAddressesList = ({
   if (!recentAddresses.length) return null;
 
   return (
-    <div className="w-full mt-4">
+    <div className="w-full mt-2">
       <div className="elytro-text-smaller-body text-gray-600 font-bold px-4 py-sm">Recent</div>
       <div>
         {recentAddresses.map((item) => (
