@@ -44,8 +44,13 @@ export default function RecoverySettings() {
         setTimeout(() => reject(new Error('Request timed out')), 15000)
       );
 
-      const { contacts = [], threshold = 0 } =
-        (await Promise.race([wallet.queryRecoveryContactsByAddress(address), timeoutPromise])) || {};
+      const { contacts = [], threshold = 0 } = ((await Promise.race([
+        wallet.queryRecoveryContactsByAddress(address),
+        timeoutPromise,
+      ])) as { contacts: string[]; threshold: number } | undefined) || {
+        contacts: [],
+        threshold: 0,
+      };
 
       console.log('checkRecoveryContactsSettingChanged 1');
       const isOnchainContactsChanged = await wallet.checkRecoveryContactsSettingChanged(contacts, threshold);
