@@ -1,18 +1,25 @@
 import { Button } from '@/components/ui/button';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TChainItem } from '@/constants/chains';
 import { useWallet } from '@/contexts/wallet';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { useAccount } from '@/contexts/account-context';
 import NetworkSelection from '@/components/biz/NetworkSelection';
+import { useChain } from '@/contexts/chain-context';
 import { Box } from 'lucide-react';
 
 export default function CreateNewAddress() {
   const { wallet } = useWallet();
   const { reloadAccount } = useAccount();
+  const { getChains } = useChain();
   const [selectedChain, setSelectedChain] = useState<TChainItem | null>(null);
+
+  useEffect(() => {
+    getChains();
+  }, [getChains]);
+
   const handleChange = (chain: TChainItem) => {
     setSelectedChain(chain);
   };

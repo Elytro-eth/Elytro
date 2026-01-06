@@ -13,6 +13,7 @@ interface IProps {
   showChainIcon?: boolean;
   extra?: ReactNode;
   extraLayout?: 'row' | 'column';
+  iconSize?: string;
 }
 
 const SIZE_MAP = {
@@ -43,6 +44,7 @@ export default function FragmentedAddress({
   showChainIcon = true,
   extra,
   extraLayout = 'column',
+  iconSize,
 }: IProps) {
   if (!address || !isAddress(address)) {
     return '--';
@@ -52,10 +54,11 @@ export default function FragmentedAddress({
   const suffix = address.slice(-5);
   const { icon, text } = SIZE_MAP[size];
   const chain = SUPPORTED_CHAINS.find((chain) => chain.id === chainId);
+  const iconClassName = iconSize ? `${iconSize} rounded-full` : icon;
 
   return (
     <div className={cn('flex items-center gap-xs', className)}>
-      {showChainIcon && chain && <img src={chain.icon} alt={chain.name} className={icon} />}
+      {showChainIcon && chain && <img src={chain.icon} alt={chain.name} className={iconClassName} />}
       <div className={cn('flex', extraLayout === 'row' ? 'flex-row items-center' : 'flex-col')}>
         <div className={cn('flex items-center gap-0.5', text)}>
           <span className={size === 'xs' ? 'text-gray-600' : undefined}>{prefix}</span>

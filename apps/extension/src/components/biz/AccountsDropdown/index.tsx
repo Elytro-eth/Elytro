@@ -1,8 +1,9 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import AccountOption from './AccountOption';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getIconByChainId } from '@/constants/chains';
-import { formatAddressToShort } from '@/utils/format';
+import { getIconByChainId, getChainNameByChainId } from '@/constants/chains';
+import { formatAddressToShort, formatTokenAmount } from '@/utils/format';
+import FragmentedAddress from '@/components/biz/FragmentedAddress';
 import { useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,12 +25,17 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
   const { wallet } = useWallet();
 
   const showAccounts = useMemo(() => {
+    let filtered = accounts;
     if (chainId) {
-      return accounts.filter((account) => Number(account.chainId) === Number(chainId));
+      filtered = accounts.filter((account) => Number(account.chainId) === Number(chainId));
     }
 
-    return accounts;
-  }, [accounts, chainId]);
+    // Separate current account from others
+    const current = filtered.find((account) => account.address === currentAccount?.address);
+    const others = filtered.filter((account) => account.address !== currentAccount?.address);
+
+    return { current, others };
+  }, [accounts, chainId, currentAccount]);
 
   if (!currentAccount) {
     return (
@@ -46,13 +52,19 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
   // });
 
   const handleAddAccount = async () => {
-    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.InternalCreateAccount);
+    navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.CreateNewAddress);
   };
 
   const handleSelectAccount = async (account: TAccountInfo) => {
+    const MIN_LOADING_DURATION = 500; // Minimum 500ms loading time
+
     try {
+      // Execute wallet switch
       await wallet.switchAccount(account);
-      await reloadAccount();
+
+      // Trigger reload with minimum loading duration
+      // This ensures the loading animation shows for at least 500ms
+      await reloadAccount(false, MIN_LOADING_DURATION);
     } catch (error) {
       console.error(error);
       toast({
@@ -131,26 +143,58 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
         align="start"
         alignOffset={-9}
         sideOffset={10}
-        className="w-[calc(100vw-32px)] bg-white rounded-md shadow-lg pt-sm pb-0 px-0"
+        className="w-[calc(100vw-32px)] bg-white rounded-md shadow-lg p-0"
       >
-        <div className="flex items-center justify-between gap-x-3xl px-lg">
-          <span className="elytro-text-small-bold text-gray-900">Your wallets</span>
-          <Button variant="tertiary" size="tiny" className="elytro-text-tiny-body" onClick={handleAddAccount}>
-            Add new wallet
-          </Button>
-        </div>
+        <div className="flex flex-col p-0">
+          {/* Current Account - Highlighted */}
+          {showAccounts.current && (
+            <div
+              className="flex flex-col items-center gap-y-xs px-lg py-2xl cursor-pointer bg-[#dce9f4] mb-sm"
+              onClick={() => handleSwitchAccount(showAccounts.current!)}
+            >
+              <FragmentedAddress
+                address={showAccounts.current.address}
+                chainId={showAccounts.current.chainId}
+                size="lg"
+                iconSize="size-16"
+                dotColor="#f0f8ff"
+                className="flex-col items-center"
+                extra={
+                  <div className="flex flex-col items-center gap-y-0 mt-0">
+                    <span className="elytro-text-small-body text-gray-750">
+                      {getChainNameByChainId(showAccounts.current.chainId)}
+                    </span>
+                    <span className="elytro-text-small-body text-gray-750">
+                      {formatTokenAmount(showAccounts.current?.balance, 18, 'ETH')}
+                    </span>
+                  </div>
+                }
+                extraLayout="column"
+              />
+            </div>
+          )}
 
-        <div className="flex flex-col p-sm">
-          {showAccounts.map((account) => (
-            <AccountOption
-              key={account.address}
-              account={account}
-              isSelected={account.address === currentAccount.address}
-              onDelete={() => handleRemoveAccount(account)}
-              onSelect={() => handleSwitchAccount(account)}
-              showDelete
-            />
-          ))}
+          {/* Header for other accounts */}
+          <div className="flex items-center justify-between gap-x-3xl px-md">
+            <span className="elytro-text-small-bold text-gray-900">Your wallets</span>
+            <Button variant="tertiary" size="tiny" className="elytro-text-tiny-body" onClick={handleAddAccount}>
+              Add new wallet
+            </Button>
+          </div>
+
+          {/* Other Accounts */}
+          <div className="flex flex-col p-sm">
+            {showAccounts.others.map((account) => (
+              <AccountOption
+                key={account.address}
+                account={account}
+                isSelected={false}
+                onDelete={() => handleRemoveAccount(account)}
+                onSelect={() => handleSwitchAccount(account)}
+                showDelete
+              />
+            ))}
+          </div>
         </div>
 
         <div className="flex flex-col gap-y-sm bg-light-brown px-lg py-sm">

@@ -33,7 +33,7 @@ type IAccountContext = {
   accounts: TAccountInfo[];
   getAccounts: () => Promise<void>;
   updateTokens: () => Promise<void>;
-  reloadAccount: DebouncedFunc<(isForce?: boolean) => Promise<void>>;
+  reloadAccount: DebouncedFunc<(isForce?: boolean, minLoadingDuration?: number) => Promise<void>>;
 };
 
 // TODO: extract HistoryContext
@@ -49,7 +49,7 @@ const AccountContext = createContext<IAccountContext>({
   accounts: [],
   getAccounts: async () => {},
   updateTokens: async () => {},
-  reloadAccount: debounce(async () => {}, 1_000),
+  reloadAccount: debounce(async (_isForce?: boolean, _minLoadingDuration?: number) => {}, 1_000),
 });
 
 export const AccountProvider = ({ children }: { children: React.ReactNode }) => {
@@ -81,10 +81,12 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
     return removeInterval;
   }, [searchParams]);
 
-  const updateAccount = async () => {
+  const updateAccount = async (minLoadingDuration?: number) => {
     if (loading) {
       return;
     }
+
+    const startTime = Date.now();
 
     try {
       setLoading(true);
@@ -96,6 +98,14 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
       if (intervalRef.current && res.isDeployed) {
         removeSearchParamsOfCurrentWindow('activating');
         removeInterval();
+      }
+
+      // Ensure minimum loading duration if specified
+      if (minLoadingDuration) {
+        const elapsed = Date.now() - startTime;
+        if (elapsed < minLoadingDuration) {
+          await new Promise((resolve) => setTimeout(resolve, minLoadingDuration - elapsed));
+        }
       }
     } catch (error) {
       console.error(error);
@@ -246,8 +256,8 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
     }
   };
 
-  const reloadAccount = debounce(async (isForce?: boolean) => {
-    await updateAccount();
+  const reloadAccount = debounce(async (isForce?: boolean, minLoadingDuration?: number) => {
+    await updateAccount(minLoadingDuration);
 
     if (isForce) {
       await Promise.all([updateHistory(), updateTokens()]);

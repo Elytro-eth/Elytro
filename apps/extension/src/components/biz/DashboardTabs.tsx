@@ -94,7 +94,13 @@ export default function DashboardTabs({ onReload, onTabChange }: DashboardTabsPr
             {tab.label}
           </TabsTrigger>
         ))}
-        <button type="button" onClick={handleReload} aria-label="Refresh account data" disabled={loading}>
+        <button
+          type="button"
+          onClick={handleReload}
+          aria-label="Refresh account data"
+          disabled={loading}
+          className="ml-auto"
+        >
           <RefreshCcw
             className="elytro-clickable-icon stroke-gray-450"
             aria-hidden="true"

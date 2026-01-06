@@ -1,10 +1,9 @@
 import BasicAccountInfo from '@/components/biz/BasicAccountInfo';
-import Spin from '@/components/ui/Spin';
 import { useAccount } from '@/contexts/account-context';
 import { Check, Plus, AlertTriangle } from 'lucide-react';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PageLayout from '@/components/ui/PageLayout';
 import DashboardTabs, { TABS_KEYS } from '@/components/biz/DashboardTabs';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -13,6 +12,7 @@ import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
 import dayjs from 'dayjs';
 import { writeFile } from '@/utils/file';
+import { cn } from '@/utils/shadcn/utils';
 
 export default function Dashboard() {
   const { loading, reloadAccount, currentAccount } = useAccount();
@@ -20,6 +20,8 @@ export default function Dashboard() {
   const { wallet } = useWallet();
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState(TABS_KEYS.ASSETS);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+  const previousAddressRef = useRef<string | undefined>(currentAccount?.address);
   const [recoveryStatus, setRecoveryStatus] = useState<{
     /* Recovery setup detection */ isEnabled: boolean;
     hasLocalSettings: boolean;
@@ -29,6 +31,32 @@ export default function Dashboard() {
     hasLocalSettings: false,
     isInSync: true,
   });
+
+  // Track wallet switches and trigger page-fade-in animation
+  useEffect(() => {
+    // Only animate if we had a previous address and it's different (wallet switch)
+    if (
+      currentAccount?.address &&
+      previousAddressRef.current &&
+      previousAddressRef.current !== currentAccount.address
+    ) {
+      // Wallet switched - ensure forward navigation class for consistent right-to-left animation
+      document.body.classList.remove('nav-back');
+      document.body.classList.add('nav-forward');
+
+      // Trigger animation
+      setShouldAnimate(true);
+      // Reset animation class after it completes (but keep ref updated)
+      const timer = setTimeout(() => {
+        setShouldAnimate(false);
+      }, 150); // Match animation duration
+      previousAddressRef.current = currentAccount.address;
+      return () => clearTimeout(timer);
+    } else if (currentAccount?.address && !previousAddressRef.current) {
+      // Initial load - just set the ref, no animation
+      previousAddressRef.current = currentAccount.address;
+    }
+  }, [currentAccount?.address]);
 
   useEffect(() => {
     const checkRecoveryStatus = async () => {
@@ -115,13 +143,29 @@ export default function Dashboard() {
   };
 
   return (
-    <PageLayout className="w-full h-screen bg-fade-green">
+    <PageLayout className="w-full h-screen bg-fade-green relative">
+      {loading && (
+        <div
+          className="absolute inset-0 bg-white z-50"
+          style={{
+            animation: 'pulse 1s ease-in-out infinite',
+          }}
+          role="status"
+          aria-live="polite"
+          aria-label="Loading"
+        />
+      )}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 0.8; }
+        }
+      `}</style>
       <PageLayout.Header className="p-2">
-        <Spin isLoading={loading} size="lg" />
         <BasicAccountInfo />
       </PageLayout.Header>
       <PageLayout.Body className="px-2 py-2">
-        <div className="rounded-xl bg-white h-full flex flex-col relative">
+        <div className={cn('rounded-xl bg-white h-full flex flex-col relative', shouldAnimate && 'page-fade-in')}>
           <div className="flex-1 overflow-auto pb-[52px]">
             <DashboardTabs onReload={handleReload} onTabChange={setActiveTab} />
           </div>

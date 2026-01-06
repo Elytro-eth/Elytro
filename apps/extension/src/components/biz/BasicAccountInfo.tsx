@@ -95,7 +95,7 @@ const HeaderSection = () => {
 
   return (
     <>
-      <div className="flex flex-row gap-3 w-full items-center justify-between mb-2">
+      <div className="flex flex-row gap-3 w-full items-center justify-between mb-2 px-sm pt-sm">
         <div className="flex flex-row gap-x-md items-center">
           <AccountsDropdown />
           {isCopied ? (
@@ -197,11 +197,11 @@ const ActionButtons = () => {
 export default function BasicAccountInfo() {
   const { currentAccount } = useAccount();
   return (
-    <div className="flex flex-col p-sm pb-0">
+    <div className="flex flex-col p-0">
       <HeaderSection />
 
       {currentAccount.isDeployed && (
-        <div className="flex flex-row gap-md my-sm">
+        <div className="flex flex-row gap-md my-sm px-sm">
           <ActionButtons />
         </div>
       )}
