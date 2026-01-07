@@ -33,7 +33,7 @@ export default function Settings() {
   return (
     <SecondaryPageWrapper title="Settings">
       <HelperText description="We are in public beta, please keep deposits small" className="mb-4" />
-      <div className="rounded-md overflow-hidden shadow-sm">
+      <div className="rounded-md overflow-hidden">
         <NavItem
           icon={UserRoundIcon}
           label="Change passcode"

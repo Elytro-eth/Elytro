@@ -149,7 +149,7 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
           {/* Current Account - Highlighted */}
           {showAccounts.current && (
             <div
-              className="flex flex-col items-center gap-y-xs px-lg py-2xl cursor-pointer bg-[#dce9f4] mb-sm"
+              className="flex flex-col items-center gap-y-xs px-lg py-2xl cursor-pointer bg-gray-50 rounded-sm m-2"
               onClick={() => handleSwitchAccount(showAccounts.current!)}
             >
               <FragmentedAddress
@@ -157,7 +157,6 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
                 chainId={showAccounts.current.chainId}
                 size="lg"
                 iconSize="size-16"
-                dotColor="#f0f8ff"
                 className="flex-col items-center"
                 extra={
                   <div className="flex flex-col items-center gap-y-0 mt-0">

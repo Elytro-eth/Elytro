@@ -18,7 +18,7 @@ const NetworkConfiguration: React.FC = () => {
 
   useEffect(() => {
     getChains();
-  }, []);
+  }, [getChains]);
 
   const onSelectChain = useCallback((chain: TChainItem) => {
     setSelectedChain(chain);

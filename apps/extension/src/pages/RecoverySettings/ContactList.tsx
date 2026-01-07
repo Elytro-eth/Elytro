@@ -92,7 +92,7 @@ export default function ContactList({
   return (
     <div className="flex flex-col justify-between">
       <div className="flex flex-col gap-y-md">
-        <h2 className="elytro-text-small-bold text-gray-600">Your wallet</h2>
+        <h2 className="elytro-text-small text-gray-600">Your wallet</h2>
 
         {/* Operation Bar */}
         <div className="flex flex-row items-center gap-2">
@@ -105,7 +105,7 @@ export default function ContactList({
         {contacts?.length ? (
           <div className="flex flex-col gap-y-sm">
             <div className="flex flex-row justify-between items-center mt-4">
-              <h2 className="elytro-text-small-bold text-gray-600">Your recovery contacts</h2>
+              <h2 className="elytro-text-small text-gray-600">Your recovery contacts</h2>
 
               {isEmptyContacts ? null : (
                 <Button className="group" variant="secondary" size="tiny" onClick={onAddContact}>
@@ -135,12 +135,15 @@ export default function ContactList({
             ))}
 
             <div>
-              <h2 className="elytro-text-small-bold text-gray-600 mt-4 mb-2">Confirmations required</h2>
+              <h2 className="elytro-text-small text-gray-600 mt-4 mb-2">Confirmations required</h2>
 
               <div className="flex flex-row gap-x-md items-center">
                 <Select value={threshold} onValueChange={setThreshold}>
                   <SelectTrigger
-                    className={cn('w-fit', !threshold || (Number(threshold) < 1 && 'border-red'))}
+                    className={cn(
+                      'border border-1 border-gray-300 w-fit pl-lg pr-sm',
+                      !threshold || (Number(threshold) < 1 && 'border-red')
+                    )}
                     disabled={contacts.length === 0}
                   >
                     <SelectValue placeholder="Select" />
@@ -173,7 +176,7 @@ export default function ContactList({
               <img src={ContactsImg} className="size-36" />
               <span className="elytro-text-subtitle text-center">Add a new contact</span>
 
-              <Button variant="secondary" size="tiny" onClick={onAddContact}>
+              <Button variant="secondary" className="w-full mt-4" onClick={onAddContact}>
                 <Plus className="h-4 w-4 mr-1 stroke-[1.5px] group-hover:stroke-white" />
                 Add contact
               </Button>

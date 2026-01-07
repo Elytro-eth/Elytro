@@ -24,7 +24,7 @@ const Item = ({ name, logo, url, installed }: { name: string; logo: string; url:
       className="flex flex-col gap-y-2 cursor-pointer bg-gray-50 rounded-md p-lg hover:bg-gray-150"
       onClick={() => navigateTo('side-panel', url as SidePanelRoutePath)}
     >
-      <div className="flex flex-row items-center justify-between">
+      <div className="flex flex-row items-top justify-between">
         <img src={logo} alt={name} className="size-10 rounded-full p-1 bg-white" />
         {installed && <img src={CheckedIcon} alt="checked" className="size-6" />}
       </div>

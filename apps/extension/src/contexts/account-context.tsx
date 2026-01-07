@@ -108,7 +108,14 @@ export const AccountProvider = ({ children }: { children: React.ReactNode }) => 
         }
       }
     } catch (error) {
-      console.error(error);
+      console.error('Elytro: updateAccount error', error);
+      // If getCurrentAccount fails, try to use cached account info
+      // This prevents the app from being completely stuck
+      const cachedAccount = currentAccount;
+      if (cachedAccount && cachedAccount.address) {
+        console.warn('Elytro: Using cached account info due to updateAccount error');
+        setCurrentAccount(cachedAccount);
+      }
     } finally {
       setLoading(intervalRef.current ? true : false);
     }

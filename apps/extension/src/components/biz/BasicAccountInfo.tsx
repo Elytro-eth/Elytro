@@ -73,7 +73,7 @@ const HeaderSection = () => {
   const handleCopyClick = useCallback(() => {
     if (skipDialog) {
       // User has previously checked "Don't remind me again" - copy directly
-      safeClipboard(currentAccount.address, false, onCopied);
+      safeClipboard(currentAccount.address, true, onCopied, 'Address copied!');
     } else {
       // Show the warning dialog first
       setShowDialog(true);
@@ -88,8 +88,8 @@ const HeaderSection = () => {
       setSkipDialog(true);
     }
     // Copy the address to clipboard (onCopied callback will show "Copied" state)
-    // safeClipboard(formatAddress(currentAccount.address, currentAccount.chainId), false, onCopied);
-    safeClipboard(currentAccount.address, false, onCopied);
+    // safeClipboard(formatAddress(currentAccount.address, currentAccount.chainId), true, onCopied, 'Address Copied!');
+    safeClipboard(currentAccount.address, true, onCopied, 'Address copied!');
     setShowDialog(false);
   }, [currentAccount.address, currentAccount.chainId, dontRemindAgain, onCopied]);
 

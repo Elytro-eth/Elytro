@@ -46,12 +46,18 @@ const isClipboardAPISupported = (): boolean =>
 /**
  * Safe clipboard operation function
  * @param text text to be copied
+ * @param showToast whether to show toast notification
+ * @param onCopied callback when copy succeeds
+ * @param toastTitle custom toast title (defaults to 'Copied')
+ * @param toastVariant toast variant (defaults to 'constructive' to show check icon)
  * @returns Promise<void>
  */
 export const safeClipboard = async (
   text: string,
   showToast = true,
-  onCopied?: (error?: Error) => void
+  onCopied?: (error?: Error) => void,
+  toastTitle = 'Copied',
+  toastVariant: 'default' | 'constructive' | 'destructive' = 'constructive'
 ): Promise<void> => {
   try {
     if (isClipboardAPISupported()) {
@@ -62,13 +68,15 @@ export const safeClipboard = async (
 
     if (showToast) {
       toast({
-        title: 'Copied',
+        title: toastTitle,
+        variant: toastVariant,
       });
     }
     onCopied?.();
   } catch (error) {
     toast({
       title: 'Copy failed',
+      variant: 'destructive',
     });
     onCopied?.(error as Error);
     throw error;

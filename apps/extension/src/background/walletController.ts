@@ -565,12 +565,25 @@ class WalletController {
       const updatedInfo = { ...basicInfo };
 
       if (updatedInfo.isDeployed) {
+        // Add timeout to recoveryInfo call to prevent hanging
+        const recoveryInfoPromise = elytroSDK.getRecoveryInfo(basicInfo.address).catch((error) => {
+          console.error('Elytro: getRecoveryInfo error', error);
+          return null; // Return null on error instead of hanging
+        });
+
+        const timeoutPromise = new Promise<null>((resolve) => {
+          setTimeout(() => {
+            console.warn('Elytro: getRecoveryInfo timeout after 5s, using fallback');
+            resolve(null);
+          }, 5_000);
+        });
+
         const [balance, versionInfo, recoveryInfo] = await Promise.all([
           walletClient.getBalance(basicInfo.address),
           VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId]
             ? elytroSDK.getContractVersion(basicInfo.address)
             : Promise.resolve('0.0.0'),
-          elytroSDK.getRecoveryInfo(basicInfo.address),
+          Promise.race([recoveryInfoPromise, timeoutPromise]),
         ]);
 
         updatedInfo.balance = Number(balance);

@@ -17,8 +17,9 @@ import { THookStatus } from '@/types/securityHook';
 import { RuntimeMessage } from '@/utils/message';
 import { EVENT_TYPES } from '@/constants/events';
 import { Switch } from '@/components/ui/switch';
-import CurrentAddress from '@/components/biz/CurrentAddress';
 import HelperText from '@/components/ui/HelperText';
+import ShortedAddress from '@/components/ui/ShortedAddress';
+import Copy from '@/components/ui/Copy';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import NavItem from '@/components/ui/NavItem';
@@ -392,10 +393,12 @@ function SecurityHookSettingsInnerPage() {
       }}
     >
       <div className="flex flex-col gap-y-md">
-        {/* Your wallet section */}
-        <div className="flex flex-row justify-between items-center gap-y-md">
-          <div className="elytro-text-bold-body text-gray-600">Your wallet</div>
-          <CurrentAddress className="bg-gray-150 rounded-2xs" />
+        <h2 className="elytro-text-small text-gray-600">Your wallet</h2>
+
+        {/* Operation Bar */}
+        <div className="flex flex-row items-center gap-2">
+          <ShortedAddress address={address} chainId={chainId} />
+          <Copy text={address} size="sm" />
         </div>
 
         <HelperText description="Use email to confirm certain wallet activities" />
@@ -455,7 +458,7 @@ function SecurityHookSettingsInnerPage() {
           </>
         ) : (
           <>
-            <div className="elytro-text-bold-body text-gray-600">Linked Email</div>
+            <div className="elytro-text-small text-gray-600">Linked Email</div>
 
             {securityProfile?.emailVerified && !isEditingEmail ? (
               <div className="flex flex-col gap-y-2">

@@ -66,7 +66,7 @@ export default function Apps() {
           <div
             key={dapp.name}
             onClick={() => handleOpenDapp(dapp.url)}
-            className="relative flex flex-row gap-x-sm flex-1 cursor-pointer group bg-gray-50 hover:bg-gray-150 p-lg rounded-md"
+            className="relative flex flex-row gap-x-sm flex-1 cursor-pointer group bg-gray-50 hover:bg-gray-150 p-lg rounded-sm"
           >
             <img src={dapp.icon} alt={dapp.name} className="size-10" />
             <div className="flex flex-col flex-1">

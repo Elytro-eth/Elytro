@@ -26,7 +26,7 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentChain, setCurrentChain] = useState<TChainItem | null>(null);
   useEnhancedHashLocation();
 
-  const getChains = async () => {
+  const getChains = useCallback(async () => {
     try {
       const res = await wallet.getChains();
       setChains(res);
@@ -37,9 +37,9 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
         // description: 'Failed to get chains',
       });
     }
-  };
+  }, [wallet]);
 
-  const getCurrentChain = async () => {
+  const getCurrentChain = useCallback(async () => {
     try {
       const res = await wallet.getCurrentChain();
       setCurrentChain(res);
@@ -49,16 +49,16 @@ export const ChainProvider = ({ children }: { children: React.ReactNode }) => {
         title: 'Failed to get current network',
         // description: 'Failed to get current chain',
       });
+      // Fallback: try again even after error
+      const res = await wallet.getCurrentChain();
+      setCurrentChain(res);
     }
-
-    const res = await wallet.getCurrentChain();
-    setCurrentChain(res);
-  };
+  }, [wallet]);
 
   useEffect(() => {
     getChains();
     getCurrentChain();
-  }, []);
+  }, [getChains, getCurrentChain]);
 
   const openExplorer = useCallback(
     async ({ txHash, opHash }: { txHash?: string; opHash: string }) => {
