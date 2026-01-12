@@ -7,15 +7,13 @@ import { useMemo, useState } from 'react';
 import ActivateDetail from './ActivationDetail';
 import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
-import { ChevronUp, AlertCircle } from 'lucide-react';
+import { ChevronUp, RefreshCw, Copy as CopyIcon, Check } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import HelperText from '@/components/ui/HelperText';
-import ShortedAddress from '@/components/ui/ShortedAddress';
-import Copy from '@/components/ui/Copy';
 import { RawData } from '@/components/ui/rawData';
 import { cn } from '@/utils/shadcn/utils';
+import { safeClipboard } from '@/utils/clipboard';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -33,9 +31,13 @@ const formatGasUsed = (gasUsed?: string) => {
 
 export function UserOpDetail() {
   const [expandSponsorSelector, setExpandSponsorSelector] = useState(false);
+  const [isCheckingBalance, setIsCheckingBalance] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const {
     tokenInfo: { tokenPrices },
     currentAccount: { isDeployed, address, chainId },
+    reloadAccount,
+    loading: isAccountLoading,
   } = useAccount();
   const {
     requestType,
@@ -89,20 +91,6 @@ export function UserOpDetail() {
 
     return [gasInETH, gasInDollar];
   }, [gasOptions, tokenPrices]);
-
-  const getOptionLabel = (option: GasOptionEstimate) => {
-    if (option.option.type === 'sponsor') {
-      return 'Sponsored by Elytro';
-    } else if (option.option.type === 'self') {
-      return `${formatGasUsed(option.gasUsed)} ETH${gasInDollar ? ` ($${Number(gasInDollar).toFixed(4)})` : ''}`;
-    } else if (option.option.type === 'erc20') {
-      const token = option.option.token;
-      const gasUsed = BigInt(option.gasUsed);
-      const gasInToken = gasUsed;
-      return `${formatUnits(gasInToken, token.decimals)} ${token.symbol.toUpperCase()}`;
-    }
-    return 'Unknown option';
-  };
 
   const getOptionValue = (option: GasOptionEstimate) => {
     if (option.option.type === 'sponsor') return 'sponsor';
@@ -164,7 +152,7 @@ export function UserOpDetail() {
                   {gasInETH} ETH
                   {gasInDollar && (
                     <span className="elytro-text-small-body text-gray-600 ml-2xs">
-                      (${Number(gasInDollar).toFixed(4)})
+                      (${Number(gasInDollar).toFixed(2)})
                     </span>
                   )}
                 </span>
@@ -190,46 +178,131 @@ export function UserOpDetail() {
           }
         />
         {expandSponsorSelector && (
-          <div role="radiogroup" aria-label="Gas payment options" className="mt-2">
-            <RadioGroup
-              value={gasOption}
-              onValueChange={(value: string) => {
-                handleGasOptionChange(value);
-              }}
-              className="flex flex-col gap-y-1"
-            >
-              {gasOptions.map((option, index) => {
+          <RadioGroup
+            value={gasOption}
+            onValueChange={(value: string) => {
+              handleGasOptionChange(value);
+            }}
+            className="mt-2 flex flex-col gap-y-2"
+            aria-label="Gas payment options"
+          >
+            {gasOptions
+              .filter((option) => option.option.type === 'sponsor' || option.option.type === 'self')
+              .map((option) => {
                 const value = getOptionValue(option);
-                const label = getOptionLabel(option);
+                const isSelected = gasOption === value;
+                const isSponsor = option.option.type === 'sponsor';
+                const showActions = !isSponsor && isSelected && !hasSufficientBalance;
 
                 return (
-                  <div key={`${option.option.type}-${index}`} className="flex items-center space-x-2 cursor-pointer">
-                    <RadioGroupItem value={value} id={`gas-fee-${value}`} />
-                    <Label
-                      htmlFor={`gas-fee-${value}`}
-                      className="flex items-center elytro-text-small text-gray-750 truncate cursor-pointer"
+                  <div
+                    key={`${option.option.type}`}
+                    className={cn('w-full rounded-sm', isSelected ? 'bg-white' : 'bg-gray-50')}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleGasOptionChange(value)}
+                      className={cn(
+                        'w-full rounded-sm p-3 text-left',
+                        'flex items-center gap-3 hover:bg-white',
+                        isSelected ? 'bg-white' : 'hover:bg-white'
+                      )}
+                      aria-pressed={isSelected}
                     >
-                      <span className="text-gray-750">{label}</span>
-                    </Label>
+                      <RadioGroupItem value={value} id={`gas-fee-${value}`} className="flex-shrink-0" />
+                      <div className="flex flex-col gap-0">
+                        {isSponsor ? (
+                          <>
+                            <span className={cn('elytro-text-small text-gray-900', isSelected && 'font-bold')}>
+                              Free
+                            </span>
+                            <span className="elytro-text-tiny-body text-gray-600">Sponsored by Elytro</span>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex items-center gap-2xs">
+                              <span className={cn('elytro-text-small text-gray-900', isSelected && 'font-bold')}>
+                                {gasInETH} ETH
+                              </span>
+                              {!hasSufficientBalance && (
+                                <span className="ml-1 px-xs py-3xs bg-light-red elytro-text-tiny-body rounded-xs text-dark-red">
+                                  Insufficient
+                                </span>
+                              )}
+                            </div>
+                            {gasInDollar && (
+                              <span className="elytro-text-tiny-body text-gray-600">
+                                ${Number(gasInDollar).toFixed(2)}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </button>
+                    {showActions && (
+                      <div className="border-t border-gray-150 flex items-center gap-3 px-3 py-2">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await safeClipboard(
+                              address,
+                              true,
+                              () => {
+                                setIsCopied(true);
+                                setTimeout(() => {
+                                  setIsCopied(false);
+                                }, 1500);
+                              },
+                              'Address copied'
+                            );
+                          }}
+                          className="px-3 py-1 flex rounded-sm items-center gap-2 bg-gray-50 hover:bg-gray-150 transition-colors"
+                        >
+                          {isCopied ? (
+                            <>
+                              <Check className="size-3 stroke-green" />
+                              <span className="elytro-text-xs text-gray-750">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <CopyIcon className="size-3 stroke-gray-750" />
+                              <span className="elytro-text-xs text-gray-750">Add funds</span>
+                            </>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            setIsCheckingBalance(true);
+                            const startTime = Date.now();
+                            const minDuration = 500; // Minimum 500ms to show animation
+                            try {
+                              await reloadAccount();
+                            } finally {
+                              const elapsed = Date.now() - startTime;
+                              if (elapsed < minDuration) {
+                                await new Promise((resolve) => setTimeout(resolve, minDuration - elapsed));
+                              }
+                              setIsCheckingBalance(false);
+                            }
+                          }}
+                          disabled={isCheckingBalance || isAccountLoading}
+                          className="flex items-center gap-1 ml-auto text-sm text-gray-900 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <RefreshCw
+                            className={cn(
+                              'size-3 stroke-gray-600',
+                              (isCheckingBalance || isAccountLoading) && 'animate-spin'
+                            )}
+                          />
+                          <span className="text-xs text-gray-600 hover:text-gray-750">Refresh balance</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 );
               })}
-            </RadioGroup>
-          </div>
-        )}
-
-        {/* Insufficient Balance Warning */}
-        {!hasSufficientBalance && (
-          <div className="bg-light-blue rounded-sm p-3 mt-2">
-            <div className="flex flex-row items-center gap-1 text-red mb-2">
-              <AlertCircle className="size-4 text-red stroke-dark-red" />
-              <span className="elytro-text-small-body text-dark-red">Not enough ETH, please deposit first</span>
-            </div>
-            <div className="bg-white rounded-sm px-2 py-1 flex items-center gap-1">
-              <ShortedAddress address={address} chainId={chainId} className="bg-white" />
-              <Copy text={address} size="xs" />
-            </div>
-          </div>
+          </RadioGroup>
         )}
       </InfoCardList>
 

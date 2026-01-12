@@ -9,9 +9,16 @@ interface ICopyProps {
   size?: 'sm' | 'xs';
   showToast?: boolean;
   toastTitle?: string;
+  iconOnly?: boolean;
 }
 
-export default function Copy({ text, size = 'sm', showToast = true, toastTitle = 'Address copied' }: ICopyProps) {
+export default function Copy({
+  text,
+  size = 'sm',
+  showToast = true,
+  toastTitle = 'Address copied',
+  iconOnly = false,
+}: ICopyProps) {
   const [isCopied, setIsCopied] = useState(false);
 
   const iconSize = size === 'xs' ? 'size-3' : 'size-4';
@@ -42,7 +49,7 @@ export default function Copy({ text, size = 'sm', showToast = true, toastTitle =
   return isCopied ? (
     <span className={cn('flex items-center gap-1', textSize)}>
       <IconCheck className={cn(iconSize, 'stroke-green')} />
-      Copied
+      {!iconOnly && 'Copied'}
     </span>
   ) : (
     <IconCopy

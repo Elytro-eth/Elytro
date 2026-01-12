@@ -87,7 +87,7 @@ export default function AddOnsTab() {
         ))}
       </div>
 
-      <div className="elytro-text-tiny-body mt-2xl text-center text-gray-450">
+      <div className="elytro-text-tiny-body mt-2xl text-center text-gray-450 hover:text-gray-750">
         <a href="https://t.me/+l9coqJq9QHgyYjI1" target="_blank" rel="noopener noreferrer">
           Interested in developing new Add-ons?
         </a>

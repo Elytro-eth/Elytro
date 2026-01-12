@@ -62,7 +62,7 @@ export default function GlobalApprovalDialog() {
       <DialogContent
         showCloseButton={false}
         onInteractOutside={(e) => e.preventDefault()}
-        className="!fixed !top-4 !left-4 !right-4 !w-auto !max-w-none !translate-x-0 !translate-y-0 h-auto max-h-[80vh] overflow-y-auto"
+        className="!fixed !top-4 !left-4 !right-4 !w-auto !max-w-none !translate-x-0 !translate-y-0 h-auto max-h-[100vh] overflow-y-auto"
       >
         {renderContent()}
       </DialogContent>

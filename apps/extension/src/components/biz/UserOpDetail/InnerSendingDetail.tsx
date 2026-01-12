@@ -1,8 +1,10 @@
-import TokenAmountItem from '../TokenAmountItem';
 import FragmentedAddress from '../FragmentedAddress';
 import { DecodeResult } from '@elytro/decoder';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { useAccount } from '@/contexts/account-context';
+import { formatTokenAmount, formatDollarBalance } from '@/utils/format';
+import DefaultTokenIcon from '@/assets/icons/ether.svg';
+import { useMemo } from 'react';
 
 interface IInnerSendingDetailProps {
   decodedUserOp: Nullable<DecodeResult>;
@@ -17,11 +19,35 @@ export default function InnerSendingDetail({ decodedUserOp }: IInnerSendingDetai
 
   const transferredTokenInfo = getTransferredTokenInfo(decodedUserOp);
 
+  const { logoURI, symbol, decimals, value } = transferredTokenInfo;
+  const {
+    tokenInfo: { tokenPrices },
+  } = useAccount();
+
+  const [tokenAmount, displayPrice] = useMemo(() => {
+    if (!value) return ['--', null];
+    const tokenAmount = formatTokenAmount(String(value), decimals);
+    const displayPrice = formatDollarBalance(tokenPrices, {
+      symbol,
+      balance: Number(tokenAmount),
+    });
+    return [tokenAmount, displayPrice];
+  }, [value, decimals, symbol, tokenPrices]);
+
   return (
     <>
-      <div className="elytro-text-bold-body">You are sending</div>
-      <div className="flex items-center justify-between px-lg py-md rounded-md bg-gray-150 ">
-        <TokenAmountItem {...transferredTokenInfo} showPrice />
+      <div className="flex flex-col items-center gap-y-sm px-lg py-md rounded-md">
+        <img
+          className="size-16 p-2 rounded-full ring-1 ring-gray-150 bg-white"
+          src={logoURI || DefaultTokenIcon}
+          alt={symbol}
+        />
+        <div className="flex flex-col items-center gap-y-0">
+          <span className="elytro-text-bold-body text-2xl font-extrabold">
+            -{tokenAmount} {symbol}
+          </span>
+          {displayPrice && <span className="text-gray-600 elytro-text-small-body">-{displayPrice}</span>}
+        </div>
       </div>
 
       <div className="elytro-text-bold-body">To</div>
