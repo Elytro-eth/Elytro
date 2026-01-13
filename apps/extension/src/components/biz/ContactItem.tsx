@@ -1,14 +1,24 @@
 import { formatAddressToShort } from '@/utils/format';
 import { UserRound } from 'lucide-react';
+import { cn } from '@/utils/shadcn/utils';
 
 interface IContactItemProps {
   contact: TRecoveryContact;
   rightContent?: React.ReactNode;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
-export default function ContactItem({ contact, rightContent }: IContactItemProps) {
+export default function ContactItem({ contact, rightContent, isFirst, isLast }: IContactItemProps) {
   return (
-    <div className="flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-lg py-md">
+    <div
+      className={cn(
+        'flex w-full items-center justify-between bg-gray-50 px-lg py-md hover:bg-gray-150',
+        isFirst && 'rounded-t-md',
+        isLast && 'rounded-b-md',
+        !isLast && ''
+      )}
+    >
       <div className="flex items-center gap-x-sm flex-1 min-w-0">
         <UserRound className="size-2xl" />
 

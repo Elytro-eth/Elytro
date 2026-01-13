@@ -2,14 +2,7 @@ import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { Button } from '@/components/ui/button';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo, SidePanelRoutePath } from '@/utils/navigation';
-import {
-  ExternalLinkIcon,
-  LockKeyholeIcon,
-  Settings2Icon,
-  RefreshCcw,
-  WalletCardsIcon,
-  UserRoundIcon,
-} from 'lucide-react';
+import { LockKeyholeIcon, Settings2Icon, RefreshCcw, WalletCardsIcon, UserRoundIcon } from 'lucide-react';
 import { useWallet } from '@/contexts/wallet';
 import NavItem from '@/components/ui/NavItem';
 import { useAccount } from '@/contexts/account-context';
@@ -64,24 +57,25 @@ export default function Settings() {
           <LockKeyholeIcon className="w-4 h-4 mr-2 duration-100 stroke-dark-blue group-hover:stroke-white" />
           Lock Elytro
         </Button>
-
-        <Button variant="tertiary" asChild>
-          <a href="https://elytro.com/faq" target="_blank" rel="noopener noreferrer">
-            <ExternalLinkIcon className="w-4 h-4 mr-2" />
-            FAQ
-          </a>
-        </Button>
       </div>
 
       <div className="text-center text-gray-450">
         <p>
           <a
             className="text-gray-450 hover:text-gray-750"
+            href="https://elytro.com/faq"
+            target="_blank"
+            rel="noreferrer"
+          >
+            FAQ
+          </a>
+          <a
+            className="ml-3 text-gray-450 hover:text-gray-750"
             href="https://t.me/+l9coqJq9QHgyYjI1"
             target="_blank"
             rel="noreferrer"
           >
-            Join Telegram
+            Telegram
           </a>
           <a
             className="ml-3 text-gray-450 hover:text-gray-750"

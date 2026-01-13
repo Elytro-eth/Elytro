@@ -90,7 +90,7 @@ export default function Apps() {
                 <img src={site.icon} alt={site.name} className="size-8 rounded-full" />
                 <span className="elytro-text-body">{getHostname(site.origin)}</span>
               </div>
-              <Unlink className="elytro-clickable-icon" onClick={() => handleDisconnect(site.origin)} />
+              <Unlink className="elytro-clickable-icon size-4" onClick={() => handleDisconnect(site.origin)} />
             </div>
           ))}
         </div>

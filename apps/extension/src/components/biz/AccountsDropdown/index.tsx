@@ -196,8 +196,8 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
           </div>
         </div>
 
-        <div className="flex flex-col gap-y-sm bg-light-brown px-lg py-sm">
-          <span className="elytro-text-tiny-body text-dark-brown">Different network, different address</span>
+        <div className="flex flex-col gap-y-sm bg-fade-brown px-lg py-sm">
+          <span className="elytro-text-tiny-body text-brown">Different network, different address</span>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

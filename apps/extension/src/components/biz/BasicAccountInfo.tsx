@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight, Box, Settings2Icon } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Settings2Icon } from 'lucide-react';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
 import ActionButton from './ActionButton';
@@ -162,49 +162,33 @@ const ActionButtons = () => {
     navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Receive);
   };
 
-  const handleClickActivateWallet = () => {
-    // TODO: Implement activate wallet
-  };
-
-  if (currentAccount.isDeployed) {
-    return (
-      <>
-        <ActionButton
-          className="bg-[#BFE7A7] hover:bg-green hover:stroke-white" /* darker light-gren */
-          icon={<ArrowDownLeft className="size-5 mr-1 stroke-dark-blue group-hover:stroke-white" />}
-          label="Receive"
-          onClick={handleClickReceive}
-        />
-        <ActionButton
-          className="bg-[#C5DCE8] hover:bg-blue hover:stroke-white" /* darker blue */
-          icon={<ArrowUpRight className="size-5 mr-1 stroke-dark-blue group-hover:stroke-white" />}
-          label="Send"
-          onClick={handleClickSend}
-        />
-      </>
-    );
-  }
-
   return (
-    <ActionButton
-      icon={<Box className="size-5 mr-1 stroke-dark-blue group-hover:stroke-white" />}
-      label="Activate wallet"
-      onClick={handleClickActivateWallet}
-    />
+    <>
+      <ActionButton
+        className="bg-[#BFE7A7] hover:bg-green hover:stroke-white" /* darker light-gren */
+        icon={<ArrowDownLeft className="size-5 mr-1 stroke-dark-blue group-hover:stroke-white" />}
+        label="Receive"
+        onClick={handleClickReceive}
+      />
+      <ActionButton
+        className="bg-[#C5DCE8] hover:bg-blue hover:stroke-white" /* darker blue */
+        icon={<ArrowUpRight className="size-5 mr-1 stroke-dark-blue group-hover:stroke-white" />}
+        label="Send"
+        onClick={handleClickSend}
+        disabled={!currentAccount.isDeployed}
+      />
+    </>
   );
 };
 
 export default function BasicAccountInfo() {
-  const { currentAccount } = useAccount();
   return (
     <div className="flex flex-col p-0">
       <HeaderSection />
 
-      {currentAccount.isDeployed && (
-        <div className="flex flex-row gap-md my-sm px-sm">
-          <ActionButtons />
-        </div>
-      )}
+      <div className="flex flex-row gap-md my-sm px-sm">
+        <ActionButtons />
+      </div>
     </div>
   );
 }

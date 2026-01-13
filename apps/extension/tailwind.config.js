@@ -79,10 +79,11 @@ module.exports = {
         'dark-red': '#BE4862',
         red: '#FF7066',
         'light-red': '#F9DEDF',
-        'fade-red': '#FDF6F7',
+        'fade-red': '#FAF2F2',
         'dark-brown': '#A65839',
         brown: '#BA8F77',
-        'light-brown': '#F1E4DB',
+        'light-brown': '#E7D8CF',
+        'fade-brown': '#FCF3EE',
         overlay: 'rgba(22, 42, 54, 0.26)',
 
         // Start of Selection

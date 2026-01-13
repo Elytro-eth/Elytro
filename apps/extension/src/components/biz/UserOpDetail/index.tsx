@@ -3,7 +3,7 @@ import InfoCard from '@/components/biz/InfoCard';
 import { formatEther, formatUnits } from 'viem';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';
 import { formatBalance, formatDollarBalance, formatRawData } from '@/utils/format';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import ActivateDetail from './ActivationDetail';
 import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
@@ -109,6 +109,13 @@ export function UserOpDetail() {
       onGasOptionChange(matchedOption.option);
     }
   };
+
+  // Automatically expand dropdown when there's insufficient balance
+  useEffect(() => {
+    if (!hasSufficientBalance) {
+      setExpandSponsorSelector(true);
+    }
+  }, [hasSufficientBalance]);
 
   if (!costResult) {
     return null;

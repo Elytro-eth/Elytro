@@ -1,12 +1,11 @@
 import ContactItem from '@/components/biz/ContactItem';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAccount } from '@/contexts/account-context';
 import { useTx } from '@/contexts/tx-context';
 import { TxRequestTypeEn } from '@/contexts/tx-context';
 import { useWallet } from '@/contexts/wallet';
 import { toast } from '@/hooks/use-toast';
-import { Box, PencilLine, Plus, Trash2 } from 'lucide-react';
+import { Box, Minus, PencilLine, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import ContactsImg from '@/assets/contacts.png';
 import ShortedAddress from '@/components/ui/ShortedAddress';
@@ -91,20 +90,20 @@ export default function ContactList({
 
   return (
     <div className="flex flex-col justify-between">
-      <div className="flex flex-col gap-y-md">
-        <h2 className="elytro-text-small text-gray-600">Your wallet</h2>
-
-        {/* Operation Bar */}
-        <div className="flex flex-row items-center gap-2">
-          <ShortedAddress address={currentAccount.address} chainId={currentAccount.chainId} />
-          <Copy text={currentAccount.address} size="sm" />
+      <div className="flex flex-col gap-y-sm">
+        <div className="flex flex-row items-center gap-x-md px-4 py-3 rounded-md bg-gray-50">
+          <span className="elytro-text-small-bold">Your wallet</span>
+          <div className="flex flex-row items-center gap-x-2 ml-auto">
+            <ShortedAddress address={currentAccount.address} chainId={currentAccount.chainId} className="bg-gray-50" />
+            <Copy text={currentAccount.address} size="sm" iconOnly />
+          </div>
         </div>
 
         <HelperText description="Take a note of your address in case of recovery." />
 
         {contacts?.length ? (
-          <div className="flex flex-col gap-y-sm">
-            <div className="flex flex-row justify-between items-center mt-4">
+          <div className="flex flex-col">
+            <div className="flex flex-row justify-between items-center my-4">
               <h2 className="elytro-text-small text-gray-600">Your recovery contacts</h2>
 
               {isEmptyContacts ? null : (
@@ -115,49 +114,71 @@ export default function ContactList({
               )}
             </div>
 
-            {contacts.map((contact) => (
-              <ContactItem
-                key={contact.address}
-                contact={contact}
-                rightContent={
-                  <div className="flex items-center gap-x-sm flex-shrink-0">
-                    <PencilLine
-                      onClick={() => onEditContact(contact)}
-                      className="size-xl cursor-pointer stroke-gray-600 hover:stroke-gray-900"
-                    />
-                    <Trash2
-                      onClick={() => onDeleteContact(contact)}
-                      className="size-xl cursor-pointer stroke-gray-600 hover:stroke-gray-900"
-                    />
-                  </div>
-                }
-              />
-            ))}
+            <div className="rounded-md overflow-hidden">
+              {contacts.map((contact, index) => (
+                <ContactItem
+                  key={contact.address}
+                  contact={contact}
+                  isFirst={index === 0}
+                  isLast={index === contacts.length - 1}
+                  rightContent={
+                    <div className="flex items-center gap-x-sm flex-shrink-0">
+                      <PencilLine
+                        onClick={() => onEditContact(contact)}
+                        className="size-4 cursor-pointer stroke-gray-600 hover:stroke-gray-900"
+                      />
+                      <Trash2
+                        onClick={() => onDeleteContact(contact)}
+                        className="size-4 cursor-pointer stroke-gray-600 hover:stroke-gray-900"
+                      />
+                    </div>
+                  }
+                />
+              ))}
+            </div>
 
-            <div>
-              <h2 className="elytro-text-small text-gray-600 mt-4 mb-2">Confirmations required</h2>
+            <div className="mb-2">
+              <h2 className="elytro-text-small text-gray-600 mt-4 mb-2">Confirmations</h2>
 
-              <div className="flex flex-row gap-x-md items-center">
-                <Select value={threshold} onValueChange={setThreshold}>
-                  <SelectTrigger
+              <div className="flex flex-row items-center gap-x-md px-4 py-3 rounded-md bg-gray-50 justify-between">
+                <span className="elytro-text-small-bold flex-shrink-0">Minimum required</span>
+                <div className="flex flex-row items-center gap-x-sm">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = Number(threshold) || 1;
+                      if (current > 1) {
+                        setThreshold((current - 1).toString());
+                      }
+                    }}
+                    disabled={contacts.length === 0 || Number(threshold) <= 1}
                     className={cn(
-                      'border border-1 border-gray-300 w-fit pl-lg pr-sm',
-                      !threshold || (Number(threshold) < 1 && 'border-red')
+                      'size-8 rounded-full border border-gray-300 bg-white flex items-center justify-center flex-shrink-0',
+                      'disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors'
                     )}
-                    disabled={contacts.length === 0}
                   >
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent className="elytro-select-content">
-                    {Array.from({ length: contacts.length }, (_, index) => (
-                      <SelectItem key={index} value={(index + 1).toString()}>
-                        {index + 1}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <span className="elytro-text-small-bold">out of {contacts.length} contacts need to confirm</span>
+                    <Minus className="size-4 stroke-gray-600" />
+                  </button>
+                  <span className="elytro-text-small-bold text-center">
+                    {threshold || '1'} of {contacts.length}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = Number(threshold) || 1;
+                      if (current < contacts.length) {
+                        setThreshold((current + 1).toString());
+                      }
+                    }}
+                    disabled={contacts.length === 0 || Number(threshold) >= contacts.length}
+                    className={cn(
+                      'size-8 rounded-full bg-light-blue flex items-center justify-center flex-shrink-0',
+                      'disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue transition-colors'
+                    )}
+                  >
+                    <Plus className="size-4 stroke-gray-900 hover:stroke-white" />
+                  </button>
+                </div>
               </div>
             </div>
 
