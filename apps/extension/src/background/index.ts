@@ -296,6 +296,20 @@ const initBackgroundMessage = () => {
   eventBus.on(EVENT_TYPES.UI.CONNECTED_SITES_UPDATED, () => {
     RuntimeMessage.sendMessage(EVENT_TYPES.UI.CONNECTED_SITES_UPDATED);
   });
+
+  chrome.alarms.onAlarm.addListener(async (alarm) => {
+    if (alarm.name.startsWith('EIP5792_POLL_')) {
+      const callId = alarm.name.replace('EIP5792_POLL_', '');
+      try {
+        const isComplete = await walletController.checkEIP5792Status(callId);
+        if (isComplete) {
+          await chrome.alarms.clear(alarm.name);
+        }
+      } catch (error) {
+        console.error(`[EIP-5792] Alarm handler error for ${callId}:`, error);
+      }
+    }
+  });
 };
 
 initBackgroundMessage();

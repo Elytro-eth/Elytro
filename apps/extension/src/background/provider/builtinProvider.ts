@@ -7,8 +7,7 @@ import { rpcCacheManager } from '@/utils/cache/rpcCacheManager';
 import accountManager from '../services/account';
 import chainService from '../services/chain';
 // import callManager from '../services/callManager';
-// import eip5792Service from '../services/eip5792Service';
-// import { EIP5792Call, EIP5792CallResult } from '@/types/eip5792';
+// import callManager from '../services/callManager';
 
 /**
  * Elytro Builtin Provider: based on EIP-1193
