@@ -172,11 +172,11 @@ export default function ContactList({
                     }}
                     disabled={contacts.length === 0 || Number(threshold) >= contacts.length}
                     className={cn(
-                      'size-8 rounded-full bg-light-blue flex items-center justify-center flex-shrink-0',
+                      'group size-8 rounded-full bg-light-blue flex items-center justify-center flex-shrink-0',
                       'disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue transition-colors'
                     )}
                   >
-                    <Plus className="size-4 stroke-gray-900 hover:stroke-white" />
+                    <Plus className="size-4 stroke-gray-900 group-hover:stroke-white transition-colors" />
                   </button>
                 </div>
               </div>
