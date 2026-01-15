@@ -1276,7 +1276,7 @@ class WalletController {
 
     tracking.userOpHash = userOpHash;
 
-    this.startEIP5792Polling(callId, userOpHash);
+    this.startEIP5792Polling(callId);
   }
 
   /**
