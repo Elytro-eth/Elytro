@@ -454,7 +454,7 @@ class WalletController {
           gasUsed: String(tempUserOp.callGasLimit ?? 0n),
           needDeposit: true, // Conservative: assume deposit needed
           hasSufficientBalance: false, // Conservative: assume insufficient balance
-          balance: 0n,
+          balance: 0,
         });
       }
 
@@ -484,7 +484,7 @@ class WalletController {
             gasUsed: '100000', // Default fallback gas estimate
             needDeposit: true,
             hasSufficientBalance: false,
-            balance: 0n,
+            balance: 0,
           },
         ],
         defaultOption: { type: 'self' },
@@ -732,7 +732,7 @@ class WalletController {
 
   public async getRecoveryInfo(address: Address) {
     const recoveryInfo = await elytroSDK.getRecoveryInfo(address);
-    return recoveryInfo;
+    return formatObjectWithBigInt(recoveryInfo);
   }
 
   private async _getRecoveryContactsHash(contacts: string[], threshold: number) {
