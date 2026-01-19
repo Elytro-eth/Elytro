@@ -212,11 +212,18 @@ export function UserOpDetail() {
                       className={cn(
                         'w-full rounded-sm p-3 text-left',
                         'flex items-center gap-3 hover:bg-white',
-                        isSelected ? 'bg-white' : 'hover:bg-white'
+                        isSelected ? 'bg-white' : 'hover:bg-white',
+                        !option.hasSufficientBalance && 'opacity-50 cursor-not-allowed'
                       )}
+                      disabled={!option.hasSufficientBalance}
                       aria-pressed={isSelected}
                     >
-                      <RadioGroupItem value={value} id={`gas-fee-${value}`} className="flex-shrink-0" />
+                      <RadioGroupItem
+                        value={value}
+                        id={`gas-fee-${value}`}
+                        disabled={!option.hasSufficientBalance}
+                        className="flex-shrink-0"
+                      />
                       <div className="flex flex-col gap-0">
                         {isSponsor ? (
                           <>
