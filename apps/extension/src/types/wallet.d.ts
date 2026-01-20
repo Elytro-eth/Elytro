@@ -17,7 +17,7 @@ type GasOptionEstimate = {
   gasUsed: string;
   needDeposit: boolean;
   hasSufficientBalance: boolean;
-  balance?: bigint;
+  balance?: bigint | number;
 };
 
 type OtpPrecheckResult = {

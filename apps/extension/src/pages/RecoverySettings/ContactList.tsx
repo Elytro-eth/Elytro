@@ -165,7 +165,7 @@ export default function ContactList({
                   <button
                     type="button"
                     onClick={() => {
-                      const current = Number(threshold) || 1;
+                      const current = Number(threshold) || 0;
                       if (current < contacts.length) {
                         setThreshold((current + 1).toString());
                       }

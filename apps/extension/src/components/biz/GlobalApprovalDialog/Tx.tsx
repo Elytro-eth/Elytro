@@ -23,6 +23,7 @@ export default function Tx() {
     onCancel,
     onRetry,
     hasSufficientBalance,
+    gasPaymentOption,
     hookError,
     requestSecurityOtp,
     verifySecurityOtp,
@@ -110,7 +111,11 @@ export default function Tx() {
               Cancel
             </Button>
 
-            <Button onClick={onConfirm} className="flex-1 rounded-md" disabled={isSending || !hasSufficientBalance}>
+            <Button
+              onClick={onConfirm}
+              className="flex-1 rounded-md"
+              disabled={isSending || (gasPaymentOption.type === 'self' && !hasSufficientBalance)}
+            >
               <Box className="size-4 mr-sm" color="#cce1ea" />
               Confirm
             </Button>
