@@ -2,39 +2,11 @@ import { v4 as UUIDv4 } from 'uuid';
 import { EIP5792Call, EIP5792CallTracking, EIP5792CallsStatus, EIP5792CallResult } from '@/types/eip5792';
 import eventBus from '@/utils/eventBus';
 import { EVENT_TYPES } from '@/constants/events';
-import { localStorage } from '@/utils/storage/local';
 
 class CallManager {
   private _calls: Map<string, EIP5792CallTracking> = new Map();
   private _maxCallsPerBatch = 10; // Limit for security
   private _callTimeout = 5 * 60 * 1000; // 5 minutes timeout
-  private _storageKey = 'EIP5792_CALLS_STATE';
-
-  constructor() {
-    this.loadState();
-  }
-
-  private async loadState() {
-    try {
-      const data = await localStorage.get(this._storageKey);
-      if (data && typeof data === 'object') {
-        const callsMap = new Map(Object.entries(data));
-        this._calls = callsMap as Map<string, EIP5792CallTracking>;
-        console.log(`[EIP-5792] Loaded ${this._calls.size} calls from storage`);
-      }
-    } catch (error) {
-      console.error('[EIP-5792] Failed to load state:', error);
-    }
-  }
-
-  private async saveState() {
-    try {
-      const serialized = Object.fromEntries(this._calls);
-      await localStorage.save({ [this._storageKey]: serialized });
-    } catch (error) {
-      console.error('[EIP-5792] Failed to save state:', error);
-    }
-  }
 
   public createCalls(calls: EIP5792Call[]): string {
     if (calls.length === 0) {
@@ -54,7 +26,6 @@ class CallManager {
     };
 
     this._calls.set(callId, tracking);
-    this.saveState();
 
     // Set timeout for the call
     setTimeout(() => {
@@ -99,8 +70,6 @@ class CallManager {
 
     // Emit event for UI updates
     eventBus.emit(EVENT_TYPES.EIP5792.CALLS_COMPLETED, { callId, results, userOpHash, txHash });
-
-    this.saveState();
   }
 
   public failCalls(callId: string, error: string): void {
@@ -119,8 +88,6 @@ class CallManager {
 
     // Emit event for UI updates
     eventBus.emit(EVENT_TYPES.EIP5792.CALLS_FAILED, { callId, error });
-
-    this.saveState();
   }
 
   public getCallTracking(callId: string): EIP5792CallTracking | undefined {
@@ -147,7 +114,6 @@ class CallManager {
 
     if (toDelete.length > 0) {
       console.log(`[EIP-5792] Cleaned up ${toDelete.length} old calls`);
-      this.saveState();
     }
   }
 

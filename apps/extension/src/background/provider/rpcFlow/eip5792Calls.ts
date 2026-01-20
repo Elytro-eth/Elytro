@@ -3,8 +3,8 @@ import callManager from '@/background/services/callManager';
 import { EIP5792Call, EIP5792CallsStatus, EIP5792Capabilities } from '@/types/eip5792';
 import type { TFlowMiddleWareFn } from '@/utils/asyncTaskFlow';
 import { ethErrors } from 'eth-rpc-errors';
+import { elytroSDK } from '@/background/services/sdk';
 import accountManager from '@/background/services/account';
-import { walletController } from '@/background/walletController';
 import type { TProviderRequest } from './index';
 import type { Transaction } from '@elytro/sdk';
 import type { Address } from 'viem';
@@ -95,7 +95,6 @@ async function handleGetCallsStatus(params: SafeAny): Promise<EIP5792CallsStatus
       throw new Error('Call not found');
     }
 
-    // If no userOpHash, it's definitely pending (waiting for user approval/signing)
     if (!tracking.userOpHash) {
       return {
         status: 100, // Pending
@@ -104,28 +103,82 @@ async function handleGetCallsStatus(params: SafeAny): Promise<EIP5792CallsStatus
       };
     }
 
-    if (tracking.status === 'pending' && tracking.userOpHash) {
-      try {
-        await walletController.checkEIP5792Status(callId);
+    try {
+      const receiptResult = await elytroSDK.getUserOperationReceiptFull(tracking.userOpHash);
 
-        const updatedTracking = callManager.getCallTracking(callId);
-        if (updatedTracking && updatedTracking.status !== 'pending') {
-          return callManager.getCallsStatus(callId);
-        }
-      } catch (error) {
-        console.error('[EIP-5792] Lazy check error:', error);
+      if (!receiptResult) {
+        // No receipt yet - still pending
+        return {
+          status: 100, // Pending
+          atomic: true,
+          id: callId,
+        };
       }
-    }
 
-    if (!tracking.userOpHash) {
+      if ((receiptResult as SafeAny).error) {
+        return {
+          status: 400, // Failed offchain
+          atomic: true,
+          id: callId,
+        };
+      }
+
+      const userOpReceipt = receiptResult as SafeAny;
+      const isSuccess = userOpReceipt.success;
+
+      if (tracking.status === 'pending') {
+        const results = tracking.calls.map(() => ({
+          status: (isSuccess ? 'success' : 'failure') as 'success' | 'failure',
+          returnData: '0x' as `0x${string}`, // Would need to extract from receipt logs
+        }));
+
+        callManager.completeCalls(callId, results, tracking.userOpHash, userOpReceipt.receipt?.transactionHash);
+      }
+
+      return {
+        status: isSuccess ? 200 : 500, // 200 = Confirmed, 500 = Reverted
+        atomic: true,
+        id: callId,
+        receipts: [
+          {
+            logs: userOpReceipt.logs || [],
+            status: isSuccess ? ('0x1' as `0x${string}`) : ('0x0' as `0x${string}`),
+            blockHash: userOpReceipt.receipt?.blockHash,
+            blockNumber: userOpReceipt.receipt?.blockNumber?.toString(),
+            gasUsed: userOpReceipt.actualGasUsed?.toString(),
+            transactionHash: userOpReceipt.receipt?.transactionHash,
+          },
+        ],
+      };
+    } catch (error) {
+      console.error('[EIP-5792] Error getting receipt:', error);
+      if (tracking.status === 'completed') {
+        const receipt = await elytroSDK.getUserOperationReceipt(tracking.userOpHash);
+        if (receipt) {
+          return {
+            status: receipt.success ? 200 : 500,
+            atomic: true,
+            id: callId,
+            receipts: [
+              {
+                logs: (receipt as SafeAny).logs || [],
+                status: receipt.success ? ('0x1' as `0x${string}`) : ('0x0' as `0x${string}`),
+                blockHash: (receipt as SafeAny).blockHash,
+                blockNumber: (receipt as SafeAny).blockNumber?.toString(),
+                gasUsed: (receipt as SafeAny).gasUsed?.toString(),
+                transactionHash: (receipt as SafeAny).transactionHash,
+              },
+            ],
+          };
+        }
+      }
+
       return {
         status: 100, // Pending
         atomic: true,
         id: callId,
       };
     }
-
-    return callManager.getCallsStatus(callId);
   } catch (error) {
     console.error('[EIP-5792] Error in handleGetCallsStatus:', error);
     throw ethErrors.rpc.internal('Failed to get calls status');

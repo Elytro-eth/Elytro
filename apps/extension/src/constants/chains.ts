@@ -119,7 +119,8 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
   {
     ...sepolia,
     icon: 'https://static1.tokenterminal.com//ethereum/logo.png',
-    endpoint: `https://eth-sepolia.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
+    endpoint: 'https://0xrpc.io/sep',
+    // || `https://eth-sepolia.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
     bundler: `https://api.pimlico.io/v2/11155111/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
     opExplorer: 'https://eth-sepolia.blockscout.com/op/',
     stablecoins: [

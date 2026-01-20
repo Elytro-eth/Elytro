@@ -1274,9 +1274,13 @@ class WalletController {
       return;
     }
 
+    // Update tracking with userOpHash
     tracking.userOpHash = userOpHash;
 
-    this.startEIP5792Polling(callId, userOpHash);
+    // Start polling for receipt (async, don't wait)
+    this._waitForEIP5792Receipt(callId, userOpHash).catch((error) => {
+      console.error(`[EIP-5792] Error waiting for receipt for ${callId}:`, error);
+    });
   }
 
   /**
@@ -1287,55 +1291,79 @@ class WalletController {
   }
 
   /**
+   * Process EIP-5792 batch calls (legacy method, kept for backward compatibility)
+   * Note: This method is no longer used as we now use TxConfirm flow
+   */
+  public async processEIP5792Calls(callId: string): Promise<{ id: string }> {
+    const tracking = callManager.getCallTracking(callId);
+
+    if (!tracking) {
+      throw new Error('Call not found');
+    }
+
+    // Convert EIP-5792 calls to Transaction format
+    const transactions: Transaction[] = tracking.calls.map((call) => ({
+      to: call.to as Address,
+      data: call.data as `0x${string}`,
+      value: call.value || '0x0',
+      gasLimit: call.gas,
+    }));
+
+    // Use default gas payment option (self-pay)
+    const gasOption: GasPaymentOption = {
+      type: 'self',
+    };
+
+    try {
+      const result = await this.buildAndSendUserOp(transactions, gasOption);
+
+      if (typeof result === 'string') {
+        // Success - update tracking with userOpHash
+        await this.updateEIP5792CallWithUserOpHash(callId, result);
+        return { id: callId };
+      } else {
+        // Hook error
+        callManager.failCalls(callId, `Hook error: ${(result as THookError).code || 'Unknown error'}`);
+        throw new Error(`Hook error: ${(result as THookError).code || 'Unknown error'}`);
+      }
+    } catch (error) {
+      callManager.failCalls(callId, error instanceof Error ? error.message : 'Unknown error');
+      throw error;
+    }
+  }
+
+  /**
    * Wait for UserOperation receipt and update call status
    */
-  public startEIP5792Polling(callId: string) {
-    // skip UserOperation hash for now.
-    chrome.alarms.create(`EIP5792_POLL_${callId}`, { periodInMinutes: 1 });
-
-    const maxAttempts = 60;
+  private async _waitForEIP5792Receipt(callId: string, userOpHash: string): Promise<void> {
+    const maxAttempts = 60; // 5 minutes (5 seconds per attempt)
     let attempts = 0;
 
-    const poll = async () => {
-      if (attempts >= maxAttempts) return;
+    while (attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
 
-      try {
-        const isComplete = await this.checkEIP5792Status(callId);
-        if (isComplete) return;
-      } catch (error) {
-        console.error(`[EIP-5792] Polling error for ${callId}:`, error);
+      const receipt = await elytroSDK.getUserOperationReceipt(userOpHash);
+      if (receipt) {
+        const tracking = callManager.getCallTracking(callId);
+        if (!tracking) return;
+
+        const userOpReceipt = receipt as SafeAny;
+        // Create results (simplified - in real implementation, extract return data from logs)
+        const results = tracking.calls.map(() => ({
+          status: (userOpReceipt.success ? 'success' : 'failure') as 'success' | 'failure',
+          returnData: '0x' as `0x${string}`, // Would need to extract from receipt logs
+        }));
+
+        callManager.completeCalls(callId, results, userOpHash, userOpReceipt.transactionHash);
+
+        return;
       }
 
       attempts++;
-      setTimeout(poll, 5000);
-    };
-
-    poll();
-  }
-
-  public async checkEIP5792Status(callId: string): Promise<boolean> {
-    const tracking = callManager.getCallTracking(callId);
-    if (!tracking || !tracking.userOpHash) return false;
-
-    if (tracking.status !== 'pending') return true;
-
-    try {
-      const receipt = await elytroSDK.getUserOperationReceipt(tracking.userOpHash);
-      if (receipt) {
-        const userOpReceipt = receipt as SafeAny;
-        const results = tracking.calls.map(() => ({
-          status: (userOpReceipt.success ? 'success' : 'failure') as 'success' | 'failure',
-          returnData: '0x' as `0x${string}`,
-        }));
-
-        callManager.completeCalls(callId, results, tracking.userOpHash, userOpReceipt.transactionHash);
-        return true;
-      }
-    } catch (error) {
-      console.error(`[EIP-5792] Check status error for ${callId}:`, error);
     }
 
-    return false;
+    // Timeout
+    callManager.failCalls(callId, 'Timeout waiting for receipt');
   }
 
   public async buildAndSendUserOp(
