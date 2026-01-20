@@ -1,5 +1,5 @@
 type TUserOperationPreFundResult = {
-  balance: bigint;
+  balance: bigint | number;
   hasSponsored: boolean;
   // missAmount: bigint;
   needDeposit: boolean;
