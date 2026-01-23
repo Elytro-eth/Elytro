@@ -67,7 +67,7 @@ const Unlock = () => {
       <div className="flex flex-col w-full">
         <div className="flex flex-col gap-y-3xl">
           <PasswordInput
-            className="bg-white"
+            variant="white"
             onValueChange={setPassword}
             placeholder="Enter your passcode"
             disabled={isLoading}

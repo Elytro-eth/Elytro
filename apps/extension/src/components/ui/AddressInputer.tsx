@@ -53,38 +53,38 @@ export default function AddressInputWithChainIcon({ chainId, address, onChange }
   const isValidAddress = isAddress(address);
   const showFragmentedAddress = !isFocused && isValidAddress && (displayAddress || address);
 
+  const chainIcon = <img src={getIconByChainId(chainId)} className="rounded-full size-6 flex-shrink-0" />;
+
   return (
-    <div className="w-full flex flex-row items-center bg-gray-150 rounded-md px-lg py-sm elytro-text-body text-gray-600 relative">
-      <img src={getIconByChainId(chainId)} className="rounded-full size-6 flex-shrink-0" />
-      <div className="flex-1 relative min-w-0">
-        {showFragmentedAddress ? (
-          <div
-            className="cursor-pointer"
-            onClick={() => {
-              setIsFocused(true);
-              inputRef.current?.focus();
-            }}
-          >
-            <FragmentedAddress
-              address={displayAddress || address}
-              chainId={chainId}
-              size="lg"
-              showChainIcon={false}
-              className="h-10 ml-3"
-            />
-          </div>
-        ) : (
-          <Input
-            ref={inputRef}
-            className="border-none bg-transparent text-lg outline-0 focus:outline-0 focus-visible:outline-0 focus-visible:bg-transparent w-full text-gray-900"
-            placeholder="Enter wallet address"
-            value={address}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            onFocus={handleFocus}
+    <div className="w-full relative">
+      {showFragmentedAddress ? (
+        <div
+          className="w-full flex flex-row items-center bg-gray-150 rounded-md px-lg py-sm cursor-pointer"
+          onClick={() => {
+            setIsFocused(true);
+            inputRef.current?.focus();
+          }}
+        >
+          {chainIcon}
+          <FragmentedAddress
+            address={displayAddress || address}
+            chainId={chainId}
+            size="lg"
+            showChainIcon={false}
+            className="h-10 ml-3"
           />
-        )}
-      </div>
+        </div>
+      ) : (
+        <Input
+          ref={inputRef}
+          leftIcon={chainIcon}
+          placeholder="Enter wallet address"
+          value={address}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          onFocus={handleFocus}
+        />
+      )}
     </div>
   );
 }

@@ -2,14 +2,14 @@ import { EyeOnOff } from '@/components/ui/EyeOnOff';
 import { Input, InputProps } from './input';
 import { ControllerRenderProps, FieldValues } from 'react-hook-form';
 import { useState } from 'react';
-import { cn } from '@/utils/shadcn/utils';
 
-interface PasswordInputProps<T extends FieldValues> extends InputProps {
+interface PasswordInputProps<T extends FieldValues> extends Omit<InputProps, 'rightIcon' | 'type'> {
   field?: ControllerRenderProps<T>;
   showEye?: boolean;
   onValueChange?: (value: string) => void;
   outerPwdVisible?: boolean;
   onPwdVisibleChange?: (visible: boolean) => void;
+  iconSize?: number;
 }
 
 export default function PasswordInput<T extends FieldValues>({
@@ -20,6 +20,8 @@ export default function PasswordInput<T extends FieldValues>({
   onValueChange,
   outerPwdVisible,
   onPwdVisibleChange,
+  variant = 'default',
+  iconSize = 20,
   ...rest
 }: PasswordInputProps<T>) {
   const [innerPwdVisible, setInnerPwdVisible] = useState(false);
@@ -30,20 +32,17 @@ export default function PasswordInput<T extends FieldValues>({
   };
 
   return (
-    <div className="relative w-full">
-      <Input
-        disabled={disabled}
-        type={outerPwdVisible || innerPwdVisible ? 'text' : 'password'}
-        className={cn('bg-gray-150 border-none rounded-2xl p-4 h-14', className)}
-        onChange={(e) => {
-          onValueChange?.(e.target.value);
-        }}
-        {...field}
-        {...rest}
-      />
-      {showEye && (
-        <EyeOnOff className="absolute top-1/4 right-4 cursor-pointer" onChangeVisible={handlePwdVisibleChange} />
-      )}
-    </div>
+    <Input
+      disabled={disabled}
+      type={outerPwdVisible || innerPwdVisible ? 'text' : 'password'}
+      variant={variant}
+      className={className}
+      onChange={(e) => {
+        onValueChange?.(e.target.value);
+      }}
+      rightIcon={showEye ? <EyeOnOff size={iconSize} onChangeVisible={handlePwdVisibleChange} /> : undefined}
+      {...field}
+      {...rest}
+    />
   );
 }
