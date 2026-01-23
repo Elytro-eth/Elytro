@@ -17,6 +17,7 @@ const INIT_PATHS = [
   SIDE_PANEL_ROUTE_PATHS.Education,
   SIDE_PANEL_ROUTE_PATHS.AccountRecovery,
   SIDE_PANEL_ROUTE_PATHS.RetrieveContacts,
+  SIDE_PANEL_ROUTE_PATHS.ImportBackup,
   SIDE_PANEL_ROUTE_PATHS.Home,
 ];
 
