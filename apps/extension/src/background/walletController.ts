@@ -173,7 +173,7 @@ class WalletController {
     }
 
     await elytroSDK.sendUserOperation(finalUserOp);
-    return opHash;
+    return formatObjectWithBigInt(opHash);
   }
 
   public async sendPackedUserOperation(
@@ -190,7 +190,7 @@ class WalletController {
 
       const hookSignatureRes = await this.securityHookService.getHookSignature(userOp);
       if (!hookSignatureRes?.signature) {
-        return {
+        return formatObjectWithBigInt({
           code: hookSignatureRes?.code,
           challengeId: hookSignatureRes?.challengeId,
           currentSpendUsdCents: hookSignatureRes?.currentSpendUsdCents,
@@ -199,7 +199,7 @@ class WalletController {
           otpExpiresAt: hookSignatureRes?.otpExpiresAt,
           projectedSpendUsdCents: hookSignatureRes?.projectedSpendUsdCents,
           userOp,
-        };
+        });
       }
 
       userOp.signature = hookSignatureRes?.signature;
@@ -213,7 +213,7 @@ class WalletController {
     }
 
     await elytroSDK.sendUserOperation(finalUserOp);
-    return opHash;
+    return formatObjectWithBigInt(opHash);
   }
 
   public async signMessage(message: string) {
@@ -458,8 +458,6 @@ class WalletController {
         });
       }
 
-      const otpPrecheck: OtpPrecheckResult | undefined = undefined;
-
       // Determine default option: prefer sponsor if available and has sufficient balance
       const defaultOption = gasOptions.find((opt) => opt.option.type === 'sponsor' && opt.hasSufficientBalance)
         ? { type: 'sponsor' as const }
@@ -471,7 +469,6 @@ class WalletController {
         decodedRes: formatObjectWithBigInt(decodedRes),
         gasOptions: formatObjectWithBigInt(gasOptions),
         defaultOption,
-        otpPrecheck,
       };
     } catch (error) {
       console.error('Elytro: prepareUserOp failed with error:', error);
@@ -488,7 +485,6 @@ class WalletController {
           },
         ],
         defaultOption: { type: 'self' },
-        otpPrecheck: undefined,
       };
     }
   }
@@ -1418,7 +1414,7 @@ class WalletController {
       gasToken
     );
 
-    return await this.sendPackedUserOperation(packedUserOp, noHookSignWith2FA);
+    return formatObjectWithBigInt(await this.sendPackedUserOperation(packedUserOp, noHookSignWith2FA));
   }
 }
 

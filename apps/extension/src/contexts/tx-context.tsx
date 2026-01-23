@@ -50,7 +50,6 @@ type ITxContext = {
   // New: Gas options
   gasOptions: GasOptionEstimate[];
   gasPaymentOption: GasPaymentOption;
-  otpPrecheck: Nullable<OtpPrecheckResult>;
 
   // Actions
   handleTxRequest: (requestType: TxRequestTypeEn, params?: Transaction[], meta?: TTxMeta) => void;
@@ -86,7 +85,6 @@ const TxContext = createContext<ITxContext>({
   chosenGasToken: null,
   gasOptions: [],
   gasPaymentOption: { type: 'self' },
-  otpPrecheck: null,
   handleTxRequest: () => {},
   onConfirm: () => {},
   onCancel: () => {},
@@ -123,7 +121,6 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [gasOptions, setGasOptions] = useState<GasOptionEstimate[]>([]);
   const [gasPaymentOption, setGasPaymentOption] = useState<GasPaymentOption>({ type: 'self' });
-  const [otpPrecheck, setOtpPrecheck] = useState<Nullable<OtpPrecheckResult>>(null);
 
   const registerOpStatusListener = useCallback(
     (opHash: string) => {
@@ -204,7 +201,6 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       setDecodedDetail(result.decodedRes);
       setGasOptions(result.gasOptions);
       setGasPaymentOption(result.defaultOption);
-      setOtpPrecheck(result.otpPrecheck || null);
 
       // Set initial cost display from default option
       const defaultEstimate = result.gasOptions.find(
@@ -404,7 +400,11 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       );
 
       if ((res as SafeAny)?.code) {
-        setHookError(res as THookError);
+        if ((res as SafeAny)?.code === 'OTP_REQUIRED') {
+          setHookError(res as THookError);
+        } else {
+          setErrorMsg(formatErrorMsg(res as SafeAny));
+        }
         userOpRef.current = (res as SafeAny)?.userOp;
       } else {
         const opHash = res as string;
@@ -427,10 +427,10 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         });
         resolve();
         handleBack();
+
+        setErrorMsg(null);
       }
-      setErrorMsg(null);
     } catch (error) {
-      console.log('test: onConfirm error', error);
       const msg = formatErrorMsg(error);
       setErrorMsg(msg);
 
@@ -536,7 +536,6 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
         chosenGasToken,
         gasOptions, // New
         gasPaymentOption, // New
-        otpPrecheck, // New
         handleTxRequest,
         onConfirm,
         onCancel,

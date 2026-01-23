@@ -32,7 +32,6 @@ type PrepareUserOpResult = {
   decodedRes: import('@elytro/decoder').DecodeResult[];
   gasOptions: GasOptionEstimate[]; // 所有 gas 支付选项的预估结果
   defaultOption: GasPaymentOption; // 默认选项（基于 canSponsor）
-  otpPrecheck?: OtpPrecheckResult; // OTP 预检查结果
 };
 
 // Network cost option types
