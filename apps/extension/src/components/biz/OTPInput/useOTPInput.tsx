@@ -10,10 +10,8 @@ export function useOTPInput() {
   const [hookError, setHookError] = useState<THookError | null>(null);
 
   const showOTP = useCallback((error: THookError) => {
-    console.log('Elytro: useOTPInput showOTP called', error);
     setHookError(error);
     setOpen(true);
-    console.log('Elytro: useOTPInput showOTP - state updated');
   }, []);
 
   const hideOTP = useCallback(() => {

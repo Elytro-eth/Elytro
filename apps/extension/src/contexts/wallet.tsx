@@ -7,6 +7,7 @@ import { navigateTo, SidePanelRoutePath } from '@/utils/navigation';
 import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';
 import { cn } from '@/utils/shadcn/utils';
 import { useInterval } from 'usehooks-ts';
+import { formatObjectWithBigInt } from '@/utils/format';
 const portMessage = new PortMessage('elytro-ui');
 
 const INIT_PATHS = [
@@ -30,7 +31,7 @@ const walletControllerProxy = new Proxy(
         portMessage.sendMessage('UI_REQUEST', {
           method: prop,
           random,
-          params: args,
+          params: formatObjectWithBigInt(args),
         });
 
         return new Promise((resolve, reject) => {

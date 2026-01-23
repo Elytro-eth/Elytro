@@ -40,7 +40,6 @@ class AccountManager {
     this._store.state.currentAccount = currentAccount;
   }
 
-  // TODO: maybe make _accounts public?
   get accounts() {
     return this._accounts;
   }

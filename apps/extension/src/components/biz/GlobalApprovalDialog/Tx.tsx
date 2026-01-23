@@ -76,7 +76,7 @@ export default function Tx() {
   }
 
   if (hookError) {
-    return (
+    return hookError?.code === 'OTP_REQUIRED' ? (
       <OTPInputContent
         hookError={hookError}
         isVerifying={isSending}
@@ -86,6 +86,20 @@ export default function Tx() {
         confirmButtonText="Confirm"
         cancelButtonText="Cancel"
       />
+    ) : (
+      <div className="flex flex-col w-full items-center justify-center">
+        <AlertCircle className="size-12 text-destructive animate-pulse mb-md" />
+
+        <h2 className="text-lg font-semibold text-foreground mb-xs">Transaction Failed</h2>
+
+        <div className="text-center text-muted-foreground text-sm mb-6 max-w-[17.5rem]">
+          {errorMsg || 'Please try again or contact support'}
+        </div>
+
+        <Button onClick={() => onRetry()} className="w-full">
+          Retry
+        </Button>
+      </div>
     );
   }
 
