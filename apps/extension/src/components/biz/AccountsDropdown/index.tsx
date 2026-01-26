@@ -149,7 +149,7 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
           {/* Current Account - Highlighted */}
           {showAccounts.current && (
             <div
-              className="flex flex-col items-center gap-y-xs px-lg py-2xl cursor-pointer bg-gray-50 rounded-sm m-2"
+              className="flex flex-col items-center gap-y-xs px-lg py-2xl cursor-pointer bg-blue-50 rounded-sm m-2"
               onClick={() => handleSwitchAccount(showAccounts.current!)}
             >
               <FragmentedAddress
@@ -176,7 +176,7 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
           {/* Header for other accounts */}
           <div className="flex items-center justify-between gap-x-3xl px-md">
             <span className="elytro-text-small-bold text-gray-900">Your wallets</span>
-            <Button variant="tertiary" size="tiny" className="elytro-text-tiny-body" onClick={handleAddAccount}>
+            <Button variant="secondary" size="tiny" className="elytro-text-tiny-body" onClick={handleAddAccount}>
               Add new wallet
             </Button>
           </div>
@@ -196,8 +196,8 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
           </div>
         </div>
 
-        <div className="flex flex-col gap-y-sm bg-fade-brown px-lg py-sm">
-          <span className="elytro-text-tiny-body text-dark-brown">Different network, different address</span>
+        <div className="flex flex-col gap-y-sm bg-brown-300 px-lg py-sm">
+          <span className="elytro-text-tiny-body text-brown-750">Different network, different address</span>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

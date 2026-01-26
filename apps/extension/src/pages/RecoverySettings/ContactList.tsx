@@ -108,7 +108,7 @@ export default function ContactList({
 
               {isEmptyContacts ? null : (
                 <Button className="group" variant="secondary" size="tiny" onClick={onAddContact}>
-                  <Plus className="size-3 mr-1 group-hover:stroke-gray-0" />
+                  <Plus className="size-3 mr-1" />
                   Add
                 </Button>
               )}
@@ -154,7 +154,7 @@ export default function ContactList({
                     disabled={contacts.length === 0 || Number(threshold) <= 1}
                     className={cn(
                       'size-8 rounded-full border border-gray-300 bg-white flex items-center justify-center flex-shrink-0',
-                      'disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors'
+                      'disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50'
                     )}
                   >
                     <Minus className="size-4 stroke-gray-600" />
@@ -172,11 +172,11 @@ export default function ContactList({
                     }}
                     disabled={contacts.length === 0 || Number(threshold) >= contacts.length}
                     className={cn(
-                      'group size-8 rounded-full bg-light-blue flex items-center justify-center flex-shrink-0',
-                      'disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue transition-colors'
+                      'group size-8 rounded-full bg-blue-300 flex items-center justify-center flex-shrink-0',
+                      'disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-450 transition-colors'
                     )}
                   >
-                    <Plus className="size-4 stroke-gray-900 group-hover:stroke-white transition-colors" />
+                    <Plus className="size-4 stroke-gray-900 group-hover:stroke-white" />
                   </button>
                 </div>
               </div>

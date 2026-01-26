@@ -43,7 +43,7 @@ export default function InnerSendingDetail({ decodedUserOp }: IInnerSendingDetai
           alt={symbol}
         />
         <div className="flex flex-col items-center gap-y-0">
-          <span className="elytro-text-bold-body text-2xl font-extrabold">
+          <span className="elytro-text-bold-body text-2xl font-bold">
             -{tokenAmount} {symbol}
           </span>
           {displayPrice && <span className="text-gray-600 elytro-text-small-body">-{displayPrice}</span>}

@@ -26,11 +26,11 @@ export default function Spin({
   const spinner = (
     <div className={cn('relative inline-flex items-center justify-center', className)} aria-hidden="true">
       {/* Background ring */}
-      <div className={cn(`${sizeClasses[size]} rounded-full border-solid border-light-blue absolute`)} />
+      <div className={cn(`${sizeClasses[size]} rounded-full border-solid border-green-300 absolute`)} />
       {/* Animated ring */}
       <div
         className={cn(
-          `${sizeClasses[size]} ${color} animate-spin rounded-full border-solid border-blue border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]`
+          `${sizeClasses[size]} ${color} animate-spin rounded-full border-solid border-green-600 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]`
         )}
       >
         <span className="sr-only">Loading...</span>

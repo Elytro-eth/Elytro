@@ -471,7 +471,7 @@ function SecurityHookSettingsInnerPage() {
                     </div>
                   </div>
                   <div className="flex flex-row items-center gap-x-2">
-                    {/* <Check className="size-5 text-green" /> */}
+                    {/* <Check className="size-5 text-green-600" /> */}
                     <button
                       onClick={() => {
                         setIsEditingEmail(true);

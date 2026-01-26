@@ -63,7 +63,7 @@ export default function PrivateRecoveryDialog() {
           <DialogDescription>Download your recovery file and store it safely.</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="tertiary" size="small" onClick={() => setOpen(false)}>
+          <Button variant="secondary" size="small" onClick={() => setOpen(false)}>
             Later
           </Button>
           <Button size="small" onClick={handleDownload}>

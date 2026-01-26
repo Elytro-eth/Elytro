@@ -88,7 +88,7 @@ export default function SignDetail({
           </div>
         </div>
         <div className="flex w-full justify-between gap-x-2">
-          <Button variant="tertiary" onClick={handleCancel} className="flex-1 rounded-md border border-gray-200">
+          <Button variant="secondary" onClick={handleCancel} className="flex-1 rounded-md border border-gray-200">
             Cancel
           </Button>
           <Button onClick={handleConfirm} className="flex-1 rounded-md">

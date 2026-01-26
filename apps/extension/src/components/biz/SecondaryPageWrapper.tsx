@@ -52,7 +52,7 @@ export default function SecondaryPageWrapper({
   };
 
   return (
-    <div className={cn('w-full min-h-full bg-fade-green p-sm', fadeIn && 'page-fade-in', className)}>
+    <div className={cn('w-full min-h-full bg-green-50 p-sm', fadeIn && 'page-fade-in', className)}>
       <div
         className={cn(
           'flex flex-col flex-grow w-full min-h-full bg-white rounded-sm pb-2xl relative overflow-hidden',

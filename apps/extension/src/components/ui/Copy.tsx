@@ -48,7 +48,7 @@ export default function Copy({
 
   return isCopied ? (
     <span className={cn('flex items-center gap-1', textSize)}>
-      <IconCheck className={cn(iconSize, 'stroke-green')} />
+      <IconCheck className={cn(iconSize, 'stroke-green-600')} />
       {!iconOnly && 'Copied'}
     </span>
   ) : (

@@ -167,7 +167,7 @@ function PageContent() {
       <HelperText
         // title={`${recoveryRecord?.threshold} signatures required`}
         description={`${recoveryRecord?.threshold} confirmations required. Ask your contacts to confirm with below links`}
-        className="bg-light-green text-green"
+        className="bg-green-300 text-green-600"
       />
       <h2 className="elytro-text-small-bold text-gray-600 mt-4">Your wallet</h2>
 
@@ -182,7 +182,7 @@ function PageContent() {
             rightContent={
               // TODO: use confirm status to decide whether to show the copy button
               contact.confirmed ? (
-                <span className="elytro-text-tiny-body bg-light-green px-xs py-3xs rounded-xs">Confirmed</span>
+                <span className="elytro-text-tiny-body bg-green-300 px-xs py-3xs rounded-xs">Confirmed</span>
               ) : (
                 <Button variant="secondary" size="tiny" className="group" onClick={handleShareContact}>
                   <Copy className="size-md mr-xs group-hover:stroke-white" />

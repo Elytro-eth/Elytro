@@ -143,7 +143,7 @@ export default function Dashboard() {
   };
 
   return (
-    <PageLayout className="w-full h-screen bg-fade-green relative">
+    <PageLayout className="w-full h-screen bg-green-50 relative">
       {loading && (
         <div
           className="absolute inset-0 bg-white z-50"
@@ -193,7 +193,7 @@ export default function Dashboard() {
               <button
                 type="button"
                 className={`text-xs text-left cursor-pointer h-8 transition-all duration-200 ${
-                  recoveryStatus.isEnabled ? 'bg-light-green' : 'bg-yellow-100'
+                  recoveryStatus.isEnabled ? 'bg-green-300' : 'bg-yellow-100'
                 } ${isExpanded ? 'w-full rounded-b-sm ' : 'w-[50px] rounded-bl-sm'}`}
                 onClick={() => setIsExpanded(!isExpanded)}
                 aria-label={isExpanded ? 'Collapse recovery status' : 'Expand recovery status'}
@@ -208,16 +208,16 @@ export default function Dashboard() {
                             <Check className="w-4 h-4 p-0.5 mr-2 bg-white rounded-full" />
                             <span>Recovery {isPrivacyMode ? '(Private)' : ''} enabled</span>
                             {!recoveryStatus.isInSync && (
-                              <span className="ml-2 text-xs text-yellow-600">(Settings out of sync)</span>
+                              <span className="ml-2 text-xs text-brown-600">(Settings out of sync)</span>
                             )}
                           </>
                         ) : (
                           <>
-                            <AlertTriangle className="w-4 h-4 mr-1 stroke-yellow-600" />
-                            <span className="text-yellow-700">Recovery not set up</span>
+                            <AlertTriangle className="w-4 h-4 mr-1 stroke-brown-600" />
+                            <span className="text-brown-600">Recovery not set up</span>
                             <button
                               type="button"
-                              className="flex flex-row items-center cursor-pointer text-yellow-600 bg-white hover:text-yellow-700 rounded-full px-2 ml-2 transition-colors"
+                              className="flex flex-row items-center cursor-pointer text-brown-600 bg-white hover:text-brown-600 rounded-full px-2 ml-2 transition-colors"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RecoverySetting);
@@ -232,7 +232,7 @@ export default function Dashboard() {
                       {isPrivacyMode && recoveryStatus.hasLocalSettings && recoveryStatus.isEnabled && (
                         <button
                           type="button"
-                          className="flex flex-row items-center cursor-pointer bg-white hover:bg-light-blue rounded-full px-2 transition-colors"
+                          className="flex flex-row items-center cursor-pointer bg-white hover:bg-blue-300 rounded-full px-2 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDownloadRecoveryContacts();
@@ -249,7 +249,7 @@ export default function Dashboard() {
                     {recoveryStatus.isEnabled ? (
                       <Check className="w-4 h-4 p-0.5 mt-[1px] bg-white rounded-full" />
                     ) : (
-                      <AlertTriangle className="w-4 h-4 mt-[1px] stroke-yellow-600" />
+                      <AlertTriangle className="w-4 h-4 mt-[1px] stroke-brown-600" />
                     )}
                   </div>
                 )}

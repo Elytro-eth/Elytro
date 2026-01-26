@@ -233,8 +233,8 @@ export default function SendTx() {
         )}
 
         <Form {...form}>
-          <div className="bg-light-green rounded-md mb-4">
-            <h3 className="text-lg font-bold px-4 pt-3">Sending</h3>
+          <div className="bg-green-300 rounded-md mb-4">
+            <h3 className="text-lg font-bold px-4 pt-3 text-green-750">Sending</h3>
             {/* Token selector */}
             <FormField
               control={form.control}
@@ -244,7 +244,7 @@ export default function SendTx() {
                   <FormItem>
                     <FormControl>
                       <TokenSelector
-                        className="h-16 bg-light-green"
+                        className="h-16 bg-green-300"
                         tokens={filteredTokens}
                         onTokenChange={handleTokenSelect}
                       />
@@ -253,7 +253,7 @@ export default function SendTx() {
 
                     <Button
                       disabled={!form.getValues('token')}
-                      className="absolute right-4 top-4 bg-green !text-white !py-2"
+                      className="absolute right-4 top-4 bg-green-600 !text-white !py-2"
                       size="tiny"
                       onClick={handleFillMax}
                     >
@@ -282,8 +282,8 @@ export default function SendTx() {
             />
           </div>
 
-          <div className="bg-light-blue p-4 pt-3 rounded-md mb-4">
-            <h3 className="text-lg font-bold mb-3">To</h3>
+          <div className="bg-blue-300 p-4 pt-3 rounded-md mb-4">
+            <h3 className="text-lg font-bold mb-3 text-blue-750">To</h3>
             {/* Address input */}
             <FormField
               control={form.control}
@@ -323,7 +323,7 @@ export default function SendTx() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2 mt-xl">
-            <Button variant="tertiary" onClick={() => setOpenToContractConfirmModal(false)}>
+            <Button variant="secondary" onClick={() => setOpenToContractConfirmModal(false)}>
               Back
             </Button>
             <Button onClick={handleOpenTx}>I understand</Button>

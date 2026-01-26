@@ -172,7 +172,11 @@ const AmountInput = memo(({ field, isDisabled, token }: AmountInputProps) => {
           <Input
             value={inputValue}
             onChange={handleChange}
-            className={cn('flex-1 border-none', fontSize, 'font-bold pr-24 pl-px bg-white focus-visible:outline-0')}
+            className={cn(
+              'flex-1 border-none',
+              fontSize,
+              'py-0 font-bold pr-24 pl-px bg-white focus-visible:outline-0'
+            )}
             placeholder="0"
             disabled={isDisabled}
             type="text"

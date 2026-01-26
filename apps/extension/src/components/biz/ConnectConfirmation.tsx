@@ -42,7 +42,7 @@ export default function ConnectionConfirmation({ dApp, onConfirm, onCancel }: IP
         <ul className="space-y-2xs">
           {tips.map((tip) => (
             <li className="flex items-start text-sm align-center" key={tip}>
-              <CheckIcon className="bg-light-green p-1 w-5 h-5 rounded-full text-green-100 mr-sm flex-shrink-0 size-lg my-auto" />
+              <CheckIcon className="bg-green-300 p-1 w-5 h-5 rounded-full text-green-100 mr-sm flex-shrink-0 size-lg my-auto" />
               <span className="text-gray-600">{tip}</span>
             </li>
           ))}
@@ -50,7 +50,7 @@ export default function ConnectionConfirmation({ dApp, onConfirm, onCancel }: IP
       </div>
 
       <div className="flex space-x-2">
-        <Button variant="tertiary" className="flex-1" onClick={onCancel}>
+        <Button variant="secondary" className="flex-1" onClick={onCancel}>
           Cancel
         </Button>
         <Button className="flex-1" onClick={onConfirm}>

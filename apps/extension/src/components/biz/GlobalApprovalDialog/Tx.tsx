@@ -116,12 +116,12 @@ export default function Tx() {
       {/* Footer */}
       <DialogFooter className="w-full gap-x-sm [&>button]:flex-1 mt-2xl">
         {isSending ? (
-          <Button variant="tertiary" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
+          <Button variant="secondary" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
             Close
           </Button>
         ) : (
           <div className="w-full grid grid-cols-2 gap-x-sm">
-            <Button variant="tertiary" onClick={onCancel} disabled={isSending}>
+            <Button variant="secondary" onClick={onCancel} disabled={isSending}>
               Cancel
             </Button>
 

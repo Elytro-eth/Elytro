@@ -15,7 +15,7 @@ export default function SetupTab() {
 
   const STEPS = [
     {
-      title: 'Deposit ETH',
+      title: 'Add tokens',
       description: 'Deposit ETH to activate wallet.',
       action: () => {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Receive);
@@ -45,7 +45,7 @@ export default function SetupTab() {
 
   return (
     <div className="flex flex-col p-4">
-      <h1 className="font-bold w-full text-left text-3xl text-black-blue mb-xl pl-lg">Welcome</h1>
+      <h1 className="font-bold w-full text-left text-3xl text-blue-900 mb-xl pl-lg">Welcome</h1>
 
       <div className="flex flex-col gap-y-md">
         {realSteps.map((step, index) => {
@@ -59,7 +59,7 @@ export default function SetupTab() {
           return (
             <div
               key={step.title}
-              className={cn('flex items-center gap-x-3 px-4 py-4 rounded-md bg-gray-50 hover:bg-gray-150')}
+              className={cn('flex items-center gap-x-3 px-4 py-4 rounded-md bg-brown-150 hover:bg-brown-300')}
               // make it all grey when it's not done
               style={{
                 filter: index === 0 || realSteps[index - 1]?.done || step.done ? 'none' : 'grayscale(100%)',
@@ -73,18 +73,16 @@ export default function SetupTab() {
               }}
             >
               {step.done ? (
-                <div className="size-8 rounded-full bg-light-green flex items-center justify-center flex-shrink-0">
+                <div className="size-8 rounded-full bg-green-300 flex items-center justify-center flex-shrink-0">
                   <Check className="size-4 text-white" />
                 </div>
               ) : (
-                <div className="size-8 rounded-full bg-blue flex items-center justify-center flex-shrink-0">
+                <div className="size-8 rounded-full bg-brown-600 flex items-center justify-center flex-shrink-0">
                   <span className="font-bold text-white text-lg">{index + 1}</span>
                 </div>
               )}
               <div className="flex flex-col gap-y-0 flex-1 min-w-0">
-                <span
-                  className={cn('font-bold text-lg', step.done || isDisabled ? 'text-gray-600' : 'text-black-blue')}
-                >
+                <span className={cn('font-bold text-lg', step.done || isDisabled ? 'text-gray-600' : 'text-blue-900')}>
                   {step.title}
                 </span>
                 <p className="text-sm text-gray-600">{step.description}</p>
