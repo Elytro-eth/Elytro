@@ -4,13 +4,10 @@ import { useState } from 'react';
 interface EyeOnOffProps extends React.SVGProps<SVGSVGElement> {
   defaultIsOn?: boolean;
   onChangeVisible?: (isOn: boolean) => void;
+  size?: number | string;
 }
 
-export function EyeOnOff({
-  defaultIsOn = false,
-  onChangeVisible,
-  ...rest
-}: EyeOnOffProps) {
+export function EyeOnOff({ defaultIsOn = false, onChangeVisible, size = 20, ...rest }: EyeOnOffProps) {
   const [isOn, setIsOn] = useState(defaultIsOn);
 
   const handleChanged = (val: boolean) => {
@@ -19,8 +16,8 @@ export function EyeOnOff({
   };
 
   return isOn ? (
-    <Eye onClick={() => handleChanged(false)} {...rest} />
+    <Eye onClick={() => handleChanged(false)} size={size} {...rest} />
   ) : (
-    <EyeOff onClick={() => handleChanged(true)} {...rest} />
+    <EyeOff onClick={() => handleChanged(true)} size={size} {...rest} />
   );
 }
