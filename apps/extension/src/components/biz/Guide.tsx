@@ -77,7 +77,7 @@ export default function Guide({
               <div
                 key={index}
                 className={`flex items-center justify-center w-6 h-6 rounded-full text-sm font-semibold ${
-                  index === currentStep ? 'bg-blue text-white' : 'bg-gray-450 text-white'
+                  index === currentStep ? 'bg-brown-600 text-white' : 'bg-gray-450 text-white'
                 }`}
               >
                 {index + 1}

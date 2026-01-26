@@ -65,7 +65,7 @@ export const AlerterProvider = ({ children }: { children: React.ReactNode }) => 
               <AlertDialogDescription>{description}</AlertDialogDescription>
             </AlertDialogHeader>
             <div className="flex gap-2 justify-between mt-2">
-              <Button className="flex-1" size="small" variant="tertiary" onClick={handleCancel}>
+              <Button className="flex-1" size="small" variant="secondary" onClick={handleCancel}>
                 Cancel
               </Button>
               <Button className="flex-1" size="small" onClick={handleConfirm}>

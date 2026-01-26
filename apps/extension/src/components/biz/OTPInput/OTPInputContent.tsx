@@ -122,13 +122,13 @@ export function OTPInputContent({
         {renderCustomFooter ? (
           renderCustomFooter(hookError)
         ) : hookError?.code === 'LIMIT_EXCEEDED' ? (
-          <Button variant="tertiary" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
+          <Button variant="secondary" className="flex-1 rounded-md border border-gray-200" onClick={onCancel}>
             Close
           </Button>
         ) : (
           <>
             {showCancel && onCancel && (
-              <Button variant="tertiary" onClick={onCancel} disabled={isVerifying}>
+              <Button variant="secondary" onClick={onCancel} disabled={isVerifying}>
                 {cancelButtonText}
               </Button>
             )}

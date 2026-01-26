@@ -48,7 +48,7 @@ const Education = () => {
           <div className="w-full text-left text-gray-600 text-base font-normal">A new kind of wallet</div>
         )}
       </div>
-      <h1 key={`title-${currentStep}`} className="font-extrabold text-4xl text-left mt-md page-fade-in">
+      <h1 key={`title-${currentStep}`} className="font-bold text-4xl text-left mt-md page-fade-in">
         {STEPS[currentStep].title}
       </h1>
       <Button className="w-full mt-9 text-lg font-bold" onClick={handleNext}>

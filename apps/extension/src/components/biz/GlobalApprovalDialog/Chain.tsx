@@ -130,7 +130,7 @@ export default function Chain() {
       </div>
 
       <DialogFooter className="grid grid-cols-2 gap-4 mt-8">
-        <Button variant="tertiary" onClick={handleCancel}>
+        <Button variant="secondary" onClick={handleCancel}>
           Cancel
         </Button>
         <Button

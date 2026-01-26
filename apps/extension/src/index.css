@@ -13,7 +13,7 @@
     --primary: 200 44% 24%;
     --primary-foreground: 199, 42%, 86%;
     --secondary: 199, 42%, 86%;
-    --secondary-foreground: 200, 44%, 24%;
+    --secondary-foreground: 197, 41%, 93%; /* blue 150 */
     --tertiary: 0, 0%, 89%; /* Gray-300 */
     --tertiary-foreground: 223, 42%, 15%;
     --muted: 240 4.8% 95.9%;
@@ -46,7 +46,7 @@
     --primary: 0 0% 98%;
     --primary-foreground: 240 5.9% 10%;
     --secondary: 199, 42%, 86%;
-    --secondary-foreground: 200, 44%, 24%;
+    --secondary-foreground: 197, 41%, 93%; /* blue 150 */
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
     --accent: 240 3.7% 15.9%;
@@ -66,7 +66,7 @@
 @layer base {
   * {
     @apply border-border;
-    @apply text-black-blue;
+    @apply text-blue-900;
   }
   @font-face {
     font-family: 'ElytroSoehne';
@@ -102,22 +102,22 @@
 
 @layer components {
   .elytro-text-hero {
-    @apply text-[3.25rem] font-bold leading-[100%] text-black-blue;
+    @apply text-[3.25rem] font-bold leading-[100%] text-blue-900;
   }
   .elytro-text-headline {
-    @apply text-[2.5rem] font-bold leading-[100%] text-black-blue;
+    @apply text-[2.5rem] font-bold leading-[100%] text-blue-900;
   }
 
   .elytro-text-title {
-    @apply text-[1.75rem] font-bold leading-[100%] text-black-blue;
+    @apply text-[1.75rem] font-bold leading-[100%] text-blue-900;
   }
 
   .elytro-text-subtitle {
-    @apply text-[1.5rem] font-bold leading-[105%] text-black-blue;
+    @apply text-[1.5rem] font-bold leading-[105%] text-blue-900;
   }
 
   .elytro-text-body {
-    @apply text-[1rem] font-normal leading-[125%] text-black-blue;
+    @apply text-[1rem] font-normal leading-[125%] text-blue-900;
   }
 
   .elytro-text-bold-body {
@@ -125,7 +125,7 @@
   }
 
   .elytro-text-small {
-    @apply text-[.875rem] font-normal leading-[130%] text-black-blue;
+    @apply text-[.875rem] font-normal leading-[130%] text-blue-900;
   }
 
   .elytro-text-small-bold {
@@ -133,7 +133,7 @@
   }
 
   .elytro-text-smaller-body {
-    @apply text-[0.75rem] font-normal leading-[135%] text-black-blue;
+    @apply text-[0.75rem] font-normal leading-[135%] text-blue-900;
   }
 
   .elytro-text-smaller-bold-body {
@@ -141,15 +141,15 @@
   }
 
   .elytro-text-code-body {
-    @apply text-[0.625rem] font-normal leading-[140%] text-black-blue;
+    @apply text-[0.625rem] font-normal leading-[140%] text-blue-900;
   }
 
   .elytro-text-tiny-body {
-    @apply text-[0.75rem] font-normal leading-[140%] text-black-blue;
+    @apply text-[0.75rem] font-normal leading-[140%] text-blue-900;
   }
 
   .elytro-clickable-icon {
-    @apply size-xl text-dark-blue cursor-pointer hover:text-gray-600 hover:stroke-gray-600;
+    @apply size-xl text-blue-750 cursor-pointer hover:text-gray-600 hover:stroke-gray-600;
   }
 
   .elytro-gradient-bg {

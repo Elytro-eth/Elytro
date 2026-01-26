@@ -33,9 +33,9 @@ import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 //       <img src={icon} alt={title} className="size-[70px]" />
 //       <div className="flex flex-col gap-y-2 min-w-0 flex-1">
 //         <div className="flex items-center gap-x-2 min-w-0 overflow-hidden">
-//           <span className="font-medium text-lg text-dark-blue truncate flex-shrink-0 min-w-0">{title}</span>
+//           <span className="font-medium text-lg text-blue-750 truncate flex-shrink-0 min-w-0">{title}</span>
 //           {tag && (
-//             <span className="font-medium text-sm text-dark-blue bg-light-green rounded-2xs px-2 py-1 flex-shrink whitespace-nowrap overflow-hidden text-ellipsis">
+//             <span className="font-medium text-sm text-blue-750 bg-green-300 rounded-2xs px-2 py-1 flex-shrink whitespace-nowrap overflow-hidden text-ellipsis">
 //               {tag}
 //             </span>
 //           )}
@@ -60,7 +60,7 @@ export default function SecureWallet() {
 //   return (
 //     <SecondaryPageWrapper title="Secure wallet">
 //       <div className="flex flex-col items-center gap-y-2xs">
-//         <h1 className="text-3xl font-bold text-dark-blue">Secure your wallet</h1>
+//         <h1 className="text-3xl font-bold text-blue-750">Secure your wallet</h1>
 //         <p className="text-sm text-gray-600">In case you lose access to your wallet</p>
 //         <CurrentAddress className="mt-2 bg-gray-150" />
 //       </div>

@@ -34,7 +34,7 @@ export default function ReceiveAddressBadge({ address, chainId, onCopyClick, tri
   }, [triggerCopy]);
 
   return (
-    <div className="px-2xl py-4xl bg-light-green rounded-lg flex flex-col items-center gap-y-2xl w-full">
+    <div className="px-2xl py-4xl bg-green-300 rounded-lg flex flex-col items-center gap-y-2xl w-full">
       <QRCodeSVG className="mix-blend-multiply" value={addressWithChainPrefix} size={205} />
 
       <FragmentedAddress
@@ -50,13 +50,13 @@ export default function ReceiveAddressBadge({ address, chainId, onCopyClick, tri
           >
             {isCopied ? (
               <>
-                <Check className="size-3 stroke-dark-blue" />
-                <span className="text-dark-blue text-xs">Copied</span>
+                <Check className="size-3 stroke-blue-750" />
+                <span className="text-blue-750 text-xs">Copied</span>
               </>
             ) : (
               <>
-                <Copy className="size-3 stroke-dark-blue" />
-                <span className="text-dark-blue text-xs">Copy</span>
+                <Copy className="size-3 stroke-blue-750" />
+                <span className="text-blue-750 text-xs">Copy</span>
               </>
             )}
           </button>

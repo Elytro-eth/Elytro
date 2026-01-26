@@ -152,7 +152,7 @@ export function UserOpDetail() {
               aria-expanded={expandSponsorSelector}
             >
               {gasOption === 'sponsor' && (
-                <span className="px-xs py-3xs bg-light-green elytro-text-tiny-body rounded-xs">Sponsored</span>
+                <span className="px-xs py-3xs bg-green-300 elytro-text-tiny-body rounded-xs">Sponsored</span>
               )}
               {gasOption === 'self' && (
                 <span className="px-xs text-xs text-gray-600">
@@ -239,7 +239,7 @@ export function UserOpDetail() {
                                 {gasInETH} ETH
                               </span>
                               {!hasSufficientBalance && (
-                                <span className="ml-1 px-xs py-3xs bg-light-red elytro-text-tiny-body rounded-xs text-dark-red">
+                                <span className="ml-1 px-xs py-3xs bg-red-300 elytro-text-tiny-body rounded-xs text-red-750">
                                   Insufficient
                                 </span>
                               )}
@@ -274,7 +274,7 @@ export function UserOpDetail() {
                         >
                           {isCopied ? (
                             <>
-                              <Check className="size-3 stroke-green" />
+                              <Check className="size-3 stroke-green-600" />
                               <span className="elytro-text-xs text-gray-750">Copied</span>
                             </>
                           ) : (

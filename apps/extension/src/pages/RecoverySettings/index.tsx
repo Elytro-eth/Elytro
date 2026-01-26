@@ -188,7 +188,7 @@ export default function RecoverySettings() {
         <>
           <ProcessingTip body="Getting recovery contacts" />
           <Button
-            variant="tertiary"
+            variant="secondary"
             onClick={() => {
               history.back();
             }}

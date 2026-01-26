@@ -20,29 +20,29 @@ const ActivityTypeMap = {
   [HistoricalActivityTypeEn.Send]: {
     name: 'Send',
     IconComponent: ArrowUpRight,
-    bg: 'bg-light-blue',
+    bg: 'bg-blue-300',
   },
   [HistoricalActivityTypeEn.Receive]: {
     name: 'Receive',
     IconComponent: ArrowDownLeft,
-    bg: 'bg-light-green',
+    bg: 'bg-green-300',
   },
   [HistoricalActivityTypeEn.ActivateAccount]: {
     name: 'Activate Wallet',
     IconComponent: Check,
-    bg: 'bg-light-brown',
+    bg: 'bg-brown-300',
   },
   [HistoricalActivityTypeEn.ContractInteract]: {
     name: 'Contract Interaction',
     IconComponent: ChevronsLeftRight,
-    bg: 'bg-light-brown',
+    bg: 'bg-brown-300',
   },
 };
 
 const UnknownActivity = {
   name: 'Unknown Activity',
   IconComponent: ShieldQuestion,
-  bg: 'bg-light-brown',
+  bg: 'bg-brown-300',
 };
 
 const ActivityStatusMap = {
@@ -56,7 +56,7 @@ const ActivityStatusMap = {
   },
   [UserOperationStatusEn.pending]: {
     label: 'Pending',
-    style: 'bg-blue',
+    style: 'bg-blue-600',
   },
 };
 

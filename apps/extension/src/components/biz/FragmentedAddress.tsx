@@ -68,11 +68,11 @@ export default function FragmentedAddress({
                 …
               </span>
             </TooltipTrigger>
-            <TooltipContent className="bg-dark-blue p-4">
-              <div className="text-blue">
-                <span className="text-light-blue font-bold">{prefix}</span>
+            <TooltipContent className="bg-blue-750 p-4">
+              <div className="text-blue-600">
+                <span className="text-blue-300 font-bold">{prefix}</span>
                 {address.slice(7, -5)}
-                <span className="text-light-blue font-bold">{suffix}</span>
+                <span className="text-blue-300 font-bold">{suffix}</span>
               </div>
             </TooltipContent>
           </Tooltip>

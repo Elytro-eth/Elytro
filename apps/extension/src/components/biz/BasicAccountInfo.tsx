@@ -100,7 +100,7 @@ const HeaderSection = () => {
           <AccountsDropdown />
           {isCopied ? (
             <div className="flex items-center gap-2">
-              <IconCheck className="elytro-icon size-4 stroke-green" />
+              <IconCheck className="elytro-icon size-4 stroke-green-600" />
               <span className="text-green-600">Copied</span>
             </div>
           ) : (
@@ -165,14 +165,14 @@ const ActionButtons = () => {
   return (
     <>
       <ActionButton
-        className="bg-[#BFE7A7] hover:bg-green hover:stroke-white" /* darker light-gren */
-        icon={<ArrowDownLeft className="size-5 mr-1 stroke-dark-blue group-hover:stroke-white" />}
+        className="bg-[#C5DCE8] hover:bg-blue-600 hover:text-white hover:stroke-white" /* blue */
+        icon={<ArrowDownLeft className="size-5 mr-1 stroke-blue-600 group-hover:stroke-white" />}
         label="Receive"
         onClick={handleClickReceive}
       />
       <ActionButton
-        className="bg-[#C5DCE8] hover:bg-blue hover:stroke-white" /* darker blue */
-        icon={<ArrowUpRight className="size-5 mr-1 stroke-dark-blue group-hover:stroke-white" />}
+        className="bg-[#BFE7A7] hover:bg-green-600 hover:text-white hover:stroke-white" /* green */
+        icon={<ArrowUpRight className="size-5 mr-1 stroke-blue-600 group-hover:stroke-white" />}
         label="Send"
         onClick={handleClickSend}
         disabled={!currentAccount.isDeployed}

@@ -1,4 +1,4 @@
-import WalletImg from '@/assets/wallet.png';
+import WalletImg from '@/assets/bg-images/wallet-bg-lg.png';
 import { Button } from '@/components/ui/button';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
@@ -7,9 +7,9 @@ import FullPageWrapper from '@/components/biz/FullPageWrapper';
 export default function Transfer() {
   return (
     <FullPageWrapper className="elytro-gradient-bg-2 h-full">
-      <img src={WalletImg} alt="Wallet" className="size-[9rem] mt-10" />
-      <div className="text-center flex flex-col gap-y-2xs">
-        <h1 className="elytro-text-subtitle mb-6">
+      <img src={WalletImg} alt="Wallet" className="size-[full] my-10" />
+      <div className="text-left flex flex-col w-full gap-y-2xs">
+        <h1 className="elytro-text-headline mb-6">
           Already have
           <br />
           an Elytro wallet
@@ -25,8 +25,12 @@ export default function Transfer() {
         >
           Recover a wallet
         </Button>
-        <Button variant="secondary" onClick={() => navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportBackup)}>
-          Import all wallets
+        <Button
+          variant="secondary"
+          className="bg-green-300 hover:bg-green-450"
+          onClick={() => navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportBackup)}
+        >
+          Import wallets
         </Button>
       </div>
     </FullPageWrapper>

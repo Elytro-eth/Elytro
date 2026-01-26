@@ -4,7 +4,7 @@ import { cn } from '@/utils/shadcn/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 const inputVariants = cva(
-  'flex w-full rounded-sm border-input px-3 py-3 text-lg outline-gray-300 focus-visible:outline-offset-0 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-gray-600 focus-visible:outline-blue focus-visible:outline-1 disabled:cursor-not-allowed disabled:opacity-50 transition-colors',
+  'flex w-full rounded-sm border-input px-3 py-3 text-lg outline-gray-300 focus-visible:outline-offset-0 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-gray-600 focus-visible:outline-blue-450 focus-visible:outline-1 disabled:cursor-not-allowed disabled:opacity-50 transition-colors',
   {
     variants: {
       variant: {
