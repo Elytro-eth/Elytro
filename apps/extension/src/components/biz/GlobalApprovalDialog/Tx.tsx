@@ -5,6 +5,7 @@ import { UserOpDetail } from '@/components/biz/UserOpDetail';
 import { AlertCircle, Box, InfoIcon } from 'lucide-react';
 import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { OTPInputContent } from '@/components/biz/OTPInput';
+import { toast } from '@/hooks/use-toast';
 
 const UserOpTitleMap: Record<TxRequestTypeEn, string> = {
   [TxRequestTypeEn.DeployWallet]: 'Activate wallet',
@@ -30,12 +31,15 @@ export default function Tx() {
   } = useTx();
 
   const handleConfirmOTP = async (otpCode: string) => {
-    console.log('Elytro: handleConfirmOTP', otpCode);
     try {
       await verifySecurityOtp(otpCode);
-      console.log('Elytro: verifySecurityOtp success');
     } catch (error) {
       console.error('Elytro: handleConfirmOTP failed', error);
+      toast({
+        title: 'Failed to verify OTP',
+        description: (error as SafeAny)?.message || 'Unknown error',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -93,7 +97,7 @@ export default function Tx() {
         <h2 className="text-lg font-semibold text-foreground mb-xs">Transaction Failed</h2>
 
         <div className="text-center text-muted-foreground text-sm mb-6 max-w-[17.5rem]">
-          {errorMsg || 'Please try again or contact support'}
+          {(hookError as SafeAny)?.message || errorMsg || 'Please try again or contact support'}
         </div>
 
         <Button onClick={() => onRetry()} className="w-full">

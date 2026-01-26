@@ -385,6 +385,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     setErrorMsg(null);
+    setHookError(null);
 
     // prepareUserOp(requestType!);
   };
@@ -515,6 +516,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       }
       return res;
     } catch (error) {
+      setErrorMsg(formatErrorMsg(error));
       setHookError(error as THookError);
       throw error;
     } finally {

@@ -589,6 +589,8 @@ class WalletController {
           recoveryInfo.contactsHash !== '0x0000000000000000000000000000000000000000000000000000000000000000';
       } else {
         updatedInfo.isDeployed = await elytroSDK.isSmartAccountDeployed(basicInfo.address);
+        const balance = await walletClient.getBalance(basicInfo.address);
+        updatedInfo.balance = Number(balance);
       }
 
       accountManager.updateCurrentAccountInfo(updatedInfo);

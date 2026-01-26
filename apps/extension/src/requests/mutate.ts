@@ -12,6 +12,15 @@ export async function mutate<T>(mutationDocument: DocumentNode, variables?: Reco
     if (errors) {
       throw errors;
     }
+
+    if ((data as SafeAny).extensions?.code) {
+      if ((data as SafeAny).extensions?.code === 'OTP_REQUIRED') {
+        return data as T;
+      } else if ((data as SafeAny).extensions?.code === 'BAD_USER_INPUT') {
+        throw new Error((data as SafeAny).message || 'Bad user input');
+      }
+      throw new Error((data as SafeAny).extensions?.code || (data as SafeAny).message || 'Unknown error');
+    }
     return data as T;
   } catch (error) {
     console.error('Elytro: GraphQL Mutation Error:', error);
