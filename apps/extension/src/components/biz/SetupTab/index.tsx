@@ -56,13 +56,16 @@ export default function SetupTab() {
             step.title === 'Activate wallet' &&
             (canSponsor || (currentAccount.balance !== undefined && currentAccount.balance !== null));
           const isDisabled = step.done || (!canActivateWallet && index > 0 && !realSteps[index - 1]?.done);
+          const isAvailable = !isDisabled && !step.done;
           return (
             <div
               key={step.title}
-              className={cn('flex items-center gap-x-3 px-4 py-4 rounded-md bg-brown-150 hover:bg-brown-300')}
-              // make it all grey when it's not done
+              className={cn(
+                'flex items-center gap-x-3 px-4 py-4 rounded-md',
+                isAvailable ? 'bg-brown-150 hover:bg-brown-300' : 'bg-gray-50'
+              )}
               style={{
-                filter: index === 0 || realSteps[index - 1]?.done || step.done ? 'none' : 'grayscale(100%)',
+                filter: isDisabled && !step.done ? 'grayscale(100%)' : 'none',
                 cursor: isDisabled ? 'not-allowed' : 'pointer',
                 pointerEvents: isDisabled ? 'none' : 'auto',
               }}

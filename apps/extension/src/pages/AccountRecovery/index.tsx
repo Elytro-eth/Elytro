@@ -180,7 +180,7 @@ export default function AccountRecovery() {
 
       <AddressInputWithChainIcon chainId={selectedChain!.id} address={address} onChange={setAddress} />
       <Button className="w-full mt-10" disabled={!isAddress(address)} onClick={handleStartRecovery}>
-        <Box className="size-4 mr-sm" color="#cce1ea" />
+        <Box className="size-4 mr-sm stroke-white" />
         Retrieve my contacts
       </Button>
     </SecondaryPageWrapper>

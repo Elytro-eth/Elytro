@@ -16,7 +16,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { safeClipboard } from '@/utils/clipboard';
-import { Copy } from 'lucide-react';
+import { Copy as CopyIcon } from 'lucide-react';
+import Copy from '@/components/ui/Copy';
 import { toast } from '@/hooks/use-toast';
 import WalletImg from '@/assets/wallet.png';
 import { RecoveryStatusEn } from '@/constants/recovery';
@@ -162,18 +163,18 @@ function PageContent() {
 
   return (
     <div className="flex flex-col gap-y-md">
-      <h1 className="elytro-text-bold-body ">Wallet recovery</h1>
-
+      <div className="flex flex-row items-center gap-x-md px-4 py-3 rounded-md bg-gray-50">
+        <span className="elytro-text-small-bold">Your wallet</span>
+        <div className="flex flex-row items-center gap-x-2 ml-auto">
+          <ShortedAddress address={recoveryRecord?.address} chainId={currentChain?.id} className="bg-gray-50" />
+          <Copy text={recoveryRecord?.address || ''} size="sm" iconOnly />
+        </div>
+      </div>
       <HelperText
         // title={`${recoveryRecord?.threshold} signatures required`}
         description={`${recoveryRecord?.threshold} confirmations required. Ask your contacts to confirm with below links`}
-        className="bg-green-300 text-green-600"
       />
-      <h2 className="elytro-text-small-bold text-gray-600 mt-4">Your wallet</h2>
-
-      <ShortedAddress address={recoveryRecord?.address} chainId={currentChain?.id} />
-
-      <h2 className="elytro-text-small-bold text-gray-600 mt-4">Your recovery contacts</h2>
+      <h2 className="elytro-text-small text-gray-600 mt-4">Your recovery contacts</h2>
       <div className="flex flex-col gap-y-sm">
         {recoveryRecord?.contacts.map((contact) => (
           <ContactItem
@@ -184,8 +185,13 @@ function PageContent() {
               contact.confirmed ? (
                 <span className="elytro-text-tiny-body bg-green-300 px-xs py-3xs rounded-xs">Confirmed</span>
               ) : (
-                <Button variant="secondary" size="tiny" className="group" onClick={handleShareContact}>
-                  <Copy className="size-md mr-xs group-hover:stroke-white" />
+                <Button
+                  variant="secondary"
+                  size="tiny"
+                  className="bg-blue-300 hover:bg-blue-450"
+                  onClick={handleShareContact}
+                >
+                  <CopyIcon className="size-md mr-xs" />
                   Get link
                 </Button>
               )
@@ -210,9 +216,7 @@ function PageContent() {
           </pre>
 
           <DialogFooter>
-            <Button size="small" onClick={handleCloseShareDialog}>
-              I&apos;ve done this
-            </Button>
+            <Button onClick={handleCloseShareDialog}>I&apos;ve done this</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

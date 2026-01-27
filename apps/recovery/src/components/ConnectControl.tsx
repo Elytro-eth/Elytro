@@ -139,7 +139,7 @@ export default function ConnectControl() {
           <div className="flex items-center gap-2">
             {isWrongChain ? (
               <Button
-                className="rounded-full font-bold shadow-none duration-0 bg-transparent hover:bg-light-blue hover:text-dark-blue text-light-blue bg-dark-blue hover:border-light-blue"
+                className="rounded-full font-bold shadow-none duration-0 bg-transparent hover:bg-blue-300 hover:text-blue-750 text-blue-300 bg-blue-750 hover:border-blue-300"
                 onClick={switchChain}
               >
                 Switch to {CHAIN_ID_TO_NAME_MAP[Number(recoveryChainId)]}
@@ -149,7 +149,7 @@ export default function ConnectControl() {
               <AddressWithChain
                 address={address}
                 chainID={chainId}
-                className={cn('!p-0', isWrongChain && '!text-red !border-red')}
+                className={cn('!p-0', isWrongChain && '!text-red-750 !border-red-750')}
                 hideTooltip={true}
               />
               <div className="h-4 w-[1px] bg-gray-300" />
@@ -158,7 +158,7 @@ export default function ConnectControl() {
           </div>
         ) : (
           <Button
-            className="rounded-full font-bold shadow-none duration-0 bg-transparent hover:bg-light-blue hover:text-dark-blue text-light-blue bg-dark-blue hover:border-light-blue"
+            className="rounded-full font-bold shadow-none duration-0 bg-transparent hover:bg-blue-300 hover:text-blue-750 text-blue-300 bg-blue-750 hover:border-blue-300"
             onClick={() => setShowDialog(true)}
           >
             Connect Wallet

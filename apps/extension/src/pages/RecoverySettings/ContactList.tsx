@@ -187,7 +187,7 @@ export default function ContactList({
               disabled={loading || !threshold || Number(threshold) < 1}
               onClick={handleConfirmContacts}
             >
-              <Box className="size-4 mr-sm" color="#cce1ea" />
+              <Box className="size-4 mr-sm stroke-white" />
               {loading ? 'Confirming...' : 'Confirm contacts'}
             </Button>
           </div>
@@ -204,7 +204,7 @@ export default function ContactList({
             </div>
             {hasOnchainContacts && (
               <Button className="w-full mt-4" disabled={loading} variant="destructive" onClick={handleConfirmContacts}>
-                <Box className="size-4 mr-sm" color="#cce1ea" />
+                <Box className="size-4 mr-sm stroke-white" />
                 {loading ? 'Clearing...' : 'Clear recovery settings'}
               </Button>
             )}

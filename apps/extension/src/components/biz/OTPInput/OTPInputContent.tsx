@@ -137,7 +137,7 @@ export function OTPInputContent({
               className="flex-1 rounded-md"
               disabled={otpCode.length !== 6 || isVerifying || disabled}
             >
-              <Box className="size-4 mr-sm" color="#cce1ea" />
+              <Box className="size-4 mr-sm stroke-white" />
               {confirmButtonText}
             </Button>
           </>

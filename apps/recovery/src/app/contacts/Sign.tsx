@@ -101,9 +101,9 @@ export default function Sign() {
         chainID={recoveryChainId}
         rightExtra={
           recoveryChainId === chainId ? (
-            <div className="flex items-center text-tiny rounded-xs bg-light-green px-xs py-3xs">Connected</div>
+            <div className="flex items-center text-tiny rounded-xs bg-green-300 px-xs py-3xs">Connected</div>
           ) : (
-            <div className="flex items-center text-tiny rounded-xs bg-light-red text-red px-xs py-3xs">
+            <div className="flex items-center text-tiny rounded-xs bg-red-150 text-red-750 px-xs py-3xs">
               Wrong network
             </div>
           )
@@ -116,7 +116,7 @@ export default function Sign() {
         disabled={!isConnected || isSigned || loading || recoveryChainId !== chainId}
         onClick={sendSignatureRequest}
       >
-        <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
+        <Box className="size-4 stroke-blue-300 group-hover:stroke-blue-750" />
         {loading ? 'Confirming...' : isSigned ? 'Already confirmed' : 'Confirm Recovery'}
       </Button>
     </div>

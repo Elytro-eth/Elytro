@@ -57,7 +57,7 @@ export function RPCSettingDialog() {
             <div>
               <div className="text-sm text-gray-600 mb-1">RPC</div>
               <input
-                className="w-full rounded-lg border px-3 py-2 text-lg font-bold bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full rounded-lg border px-3 py-2 text-lg font-bold bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-450"
                 value={rpcInput}
                 onChange={(e) => setRpcInput(e.target.value)}
                 placeholder="Enter RPC URL"
@@ -67,12 +67,12 @@ export function RPCSettingDialog() {
             <div>
               <div className="text-sm text-gray-600 mb-1">Chain ID</div>
               <input
-                className="w-full rounded-lg border px-3 py-2 text-lg font-bold bg-gray-100 text-gray-400"
+                className="w-full rounded-lg border px-3 py-2 text-lg font-bold bg-gray-50 text-gray-450"
                 value={chainId?.toString() || ''}
                 readOnly
               />
             </div>
-            {error && <div className="text-red text-sm mt-1">{error}</div>}
+            {error && <div className="text-red-750 text-sm mt-1">{error}</div>}
             <Button className="w-full mt-2" size="lg" onClick={handleSave}>
               Save
             </Button>

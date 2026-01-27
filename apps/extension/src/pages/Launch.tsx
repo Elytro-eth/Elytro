@@ -23,7 +23,7 @@ export default function Launch() {
             <Button onClick={() => handleNavigate(SIDE_PANEL_ROUTE_PATHS.CreatePasscode)}>Create a new wallet</Button>
             <Button
               variant="secondary"
-              className="bg-green-300 hover:bg-green-450"
+              className="bg-blue-300 hover:bg-blue-450"
               onClick={() => handleNavigate(SIDE_PANEL_ROUTE_PATHS.Transfer)}
             >
               Already have a wallet

@@ -29,7 +29,7 @@
 @layer base {
   * {
     @apply border-border;
-    @apply text-black-blue hover:text-dark-blue;
+    @apply text-blue-900;
     scrollbar-width: none !important;
     scrollbar-color: transparent transparent !important;
   }

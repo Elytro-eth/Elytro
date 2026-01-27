@@ -12,9 +12,9 @@ export const InvalidRecordView = () => {
   return (
     <div className="flex flex-row items-center justify-center w-full h-full">
       <div className="rounded-xl bg-white px-4xl py-5xl flex flex-col items-center justify-center gap-y-sm w-[36rem]">
-        <AlertCircle className="size-20 stroke-red rounded-full" />
+        <AlertCircle className="size-20 stroke-red-750 rounded-full" />
 
-        <div className="text-dark-blue text-bold-body">Invalid recovery link</div>
+        <div className="text-blue-750 text-bold-body">Invalid recovery link</div>
 
         <p className="text-md text-center text-gray-600">
           {/* {hasValidParams

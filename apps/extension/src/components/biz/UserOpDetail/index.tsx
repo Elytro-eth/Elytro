@@ -14,6 +14,7 @@ import HelperText from '@/components/ui/HelperText';
 import { RawData } from '@/components/ui/rawData';
 import { cn } from '@/utils/shadcn/utils';
 import { safeClipboard } from '@/utils/clipboard';
+import { Button } from '@/components/ui/button';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -213,7 +214,7 @@ export function UserOpDetail() {
                         'w-full rounded-sm p-3 text-left',
                         'flex items-center gap-3 hover:bg-white',
                         isSelected ? 'bg-white' : 'hover:bg-white',
-                        !option.hasSufficientBalance && 'opacity-50 cursor-not-allowed'
+                        !option.hasSufficientBalance && 'cursor-not-allowed'
                       )}
                       disabled={!option.hasSufficientBalance}
                       aria-pressed={isSelected}
@@ -255,8 +256,10 @@ export function UserOpDetail() {
                     </button>
                     {showActions && (
                       <div className="border-t border-gray-150 flex items-center gap-3 px-3 py-2">
-                        <button
+                        <Button
                           type="button"
+                          variant="secondary"
+                          size="tiny"
                           onClick={async () => {
                             await safeClipboard(
                               address,
@@ -270,20 +273,19 @@ export function UserOpDetail() {
                               'Address copied'
                             );
                           }}
-                          className="px-3 py-1 flex rounded-sm items-center gap-2 bg-gray-50 hover:bg-gray-150 transition-colors"
                         >
                           {isCopied ? (
                             <>
-                              <Check className="size-3 stroke-green-600" />
-                              <span className="elytro-text-xs text-gray-750">Copied</span>
+                              <Check className="size-3 stroke-green-600 mr-2" />
+                              <span className="elytro-text-xs text-blue-750">Copied</span>
                             </>
                           ) : (
                             <>
-                              <CopyIcon className="size-3 stroke-gray-750" />
-                              <span className="elytro-text-xs text-gray-750">Add funds</span>
+                              <CopyIcon className="size-3 stroke-blue-750 mr-2" />
+                              <span className="elytro-text-xs text-blue-750">Add funds</span>
                             </>
                           )}
-                        </button>
+                        </Button>
                         <button
                           type="button"
                           onClick={async () => {
@@ -309,7 +311,7 @@ export function UserOpDetail() {
                               (isCheckingBalance || isAccountLoading) && 'animate-spin'
                             )}
                           />
-                          <span className="text-xs text-gray-600 hover:text-gray-750">Refresh balance</span>
+                          <span className="text-xs text-gray-600 hover:text-gray-750">Check balance</span>
                         </button>
                       </div>
                     )}

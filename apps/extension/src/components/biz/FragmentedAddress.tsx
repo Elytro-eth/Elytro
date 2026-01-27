@@ -64,12 +64,12 @@ export default function FragmentedAddress({
           <span className={size === 'xs' ? 'text-gray-600' : undefined}>{prefix}</span>
           <Tooltip delayDuration={0}>
             <TooltipTrigger>
-              <span className="px-1 bg-gray-150 rounded-xs" style={{ backgroundColor: dotColor }}>
-                …
+              <span className="py-0 px-[6px] bg-gray-150 rounded-full" style={{ backgroundColor: dotColor }}>
+                ···
               </span>
             </TooltipTrigger>
-            <TooltipContent className="bg-blue-750 p-4">
-              <div className="text-blue-600">
+            <TooltipContent className="bg-blue-600 p-4">
+              <div className="text-blue-450">
                 <span className="text-blue-300 font-bold">{prefix}</span>
                 {address.slice(7, -5)}
                 <span className="text-blue-300 font-bold">{suffix}</span>

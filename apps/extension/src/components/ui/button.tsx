@@ -5,11 +5,11 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/utils/shadcn/utils';
 
 const buttonVariants = cva(
-  'rounded-pill inline-flex items-center justify-center whitespace-nowrap ring-offset-background group transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]',
+  'rounded-pill inline-flex flex items-center justify-center whitespace-nowrap ring-offset-background group transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-blue-900 hover:text-white',
+        default: 'bg-primary text-white hover:bg-blue-900 hover:text-white',
         secondary: 'bg-blue-150 text-blue-600 hover:bg-blue-300',
         tertiary: 'bg-white text-gray-900 hover:bg-gray-300 hover:text-hover-tertiary-foreground ',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',

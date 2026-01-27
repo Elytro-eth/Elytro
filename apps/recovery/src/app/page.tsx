@@ -80,7 +80,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="my-auto flex flex-col items-center justify-center gap-y-lg">
-        <div className="bg-blue rounded-pill p-md">
+        <div className="bg-blue-600 rounded-pill p-md">
           <LoaderCircle className="size-12 animate-spin" stroke="#fff" strokeOpacity={0.9} />
         </div>
         <div className="text-bold-body">Fetching...</div>
@@ -95,8 +95,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-row items-center justify-center w-full h-full">
-      <div className="flex flex-row gap-8 items-start">
-        <div className="bg-white rounded-xl p-0 flex items-center min-w-[260px]">
+      <div className="relative">
+        <div className="absolute right-full mr-8 top-0 bg-white rounded-xl p-0 flex items-center min-w-[260px]">
           <SidebarStepper currentStep={getCurrentStep()} />
         </div>
         {error ? (
@@ -122,7 +122,7 @@ export default function Home() {
                         >
                           <LinkWithQuery href={step.href}>
                             {getCurrentStep() === 3 && step.title === 'Confirm' && (
-                              <Check className="w-4 h-4 mr-2 stroke-gray-400 inline" />
+                              <Check className="w-4 h-4 mr-2 stroke-gray-450 inline" />
                             )}
                             {buttonText}
                           </LinkWithQuery>

@@ -128,7 +128,7 @@ export default function Receive() {
         </div>
 
         {/* Close Button */}
-        <Button variant="secondary" className="w-full" onClick={handleClose}>
+        <Button className="w-full" onClick={handleClose}>
           I’m done
         </Button>
       </div>

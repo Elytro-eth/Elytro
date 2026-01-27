@@ -7,8 +7,8 @@ import { SidebarStepper } from '@/components/SidebarStepper';
 export default function Finished() {
   return (
     <div className="flex flex-row items-center justify-center w-full h-full">
-      <div className="flex flex-row gap-8 items-start">
-        <div className="bg-white rounded-xl p-0 flex items-center min-w-[260px]">
+      <div className="relative">
+        <div className="absolute right-full mr-8 top-0 bg-white rounded-xl p-0 flex items-center min-w-[260px]">
           <SidebarStepper currentStep={3} />
         </div>
         <ContentWrapper title={<div className="text-center">Recovery successful</div>}>

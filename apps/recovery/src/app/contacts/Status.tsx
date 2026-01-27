@@ -41,9 +41,9 @@ export default function Status() {
             chainID={chainId!}
             rightExtra={
               contact.confirmed ? (
-                <div className="flex items-center text-tiny rounded-xs bg-light-green px-xs py-3xs">Confirmed</div>
+                <div className="flex items-center text-tiny rounded-xs bg-green-300 px-xs py-3xs">Confirmed</div>
               ) : getConnectionStatus(contact) ? (
-                <div className="flex items-center text-tiny rounded-xs bg-light-red text-red px-xs py-3xs">
+                <div className="flex items-center text-tiny rounded-xs bg-red-150 text-red-750 px-xs py-3xs">
                   {getConnectionStatus(contact)}
                 </div>
               ) : null

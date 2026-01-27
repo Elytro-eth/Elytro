@@ -22,6 +22,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState(TABS_KEYS.ASSETS);
   const [shouldAnimate, setShouldAnimate] = useState(false);
   const previousAddressRef = useRef<string | undefined>(currentAccount?.address);
+  const [recoveryLoading, setRecoveryLoading] = useState(true);
   const [recoveryStatus, setRecoveryStatus] = useState<{
     /* Recovery setup detection */ isEnabled: boolean;
     hasLocalSettings: boolean;
@@ -62,6 +63,7 @@ export default function Dashboard() {
     const checkRecoveryStatus = async () => {
       if (!currentAccount?.address) return;
 
+      setRecoveryLoading(true);
       try {
         const recoveryData = await wallet.queryRecoveryContactsByAddress(currentAccount.address);
         console.log('Recovery Data:', recoveryData);
@@ -102,6 +104,8 @@ export default function Dashboard() {
           hasLocalSettings: false,
           isInSync: true,
         });
+      } finally {
+        setRecoveryLoading(false);
       }
     };
 
@@ -188,8 +192,8 @@ export default function Dashboard() {
               </button>
             )}
 
-            {/* Recovery Status */}
-            {
+            {/* Recovery Status - hidden while loading */}
+            {!recoveryLoading && (
               <button
                 type="button"
                 className={`text-xs text-left cursor-pointer h-8 transition-all duration-200 ${
@@ -254,7 +258,7 @@ export default function Dashboard() {
                   </div>
                 )}
               </button>
-            }
+            )}
 
             {/* <BetaNotice text="We're in beta. Please keep deposits small." closeable /> */}
           </div>

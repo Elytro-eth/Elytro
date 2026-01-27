@@ -84,10 +84,10 @@ export default function Start() {
       variant: 'default',
       action: (
         <a
-          className="mr-3 text-sm text-light-green flex cursor-pointer items-center"
+          className="mr-3 text-sm text-green-300 flex cursor-pointer items-center"
           onClick={() => openExplorer(txHash)}
         >
-          <ExternalLink className="size-4 stroke-light-green ml-1" />
+          <ExternalLink className="size-4 stroke-green-300 ml-1" />
         </a>
       ),
     });
@@ -274,8 +274,8 @@ export default function Start() {
 
   return (
     <div className="flex flex-row items-center justify-center w-full h-full">
-      <div className="flex flex-row gap-8 items-start">
-        <div className="bg-white rounded-xl p-0 flex items-center min-w-[260px]">
+      <div className="relative">
+        <div className="absolute right-full mr-8 top-0 bg-white rounded-xl p-0 flex items-center min-w-[260px]">
           <SidebarStepper currentStep={3} />
         </div>
         <ContentWrapper
@@ -344,7 +344,7 @@ export default function Start() {
                 onClick={startRecovery}
                 className="w-full group"
               >
-                <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
+                <Box className="size-4 stroke-blue-300 group-hover:stroke-blue-750" />
                 Start Recovery
               </Button>
             ) : (
@@ -356,7 +356,7 @@ export default function Start() {
                 onClick={completeRecovery}
                 className="w-full group"
               >
-                <Box className="size-4 stroke-light-blue group-hover:stroke-dark-blue" />
+                <Box className="size-4 stroke-blue-300 group-hover:stroke-blue-750" />
                 Complete Recovery
               </Button>
             )}

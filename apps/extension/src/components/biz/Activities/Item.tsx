@@ -56,7 +56,7 @@ const ActivityStatusMap = {
   },
   [UserOperationStatusEn.pending]: {
     label: 'Pending',
-    style: 'bg-blue-600',
+    style: 'bg-gray-450',
   },
 };
 

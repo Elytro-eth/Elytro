@@ -134,7 +134,7 @@ export default function Tx() {
               className="flex-1 rounded-md"
               disabled={isSending || (gasPaymentOption.type === 'self' && !hasSufficientBalance)}
             >
-              <Box className="size-4 mr-sm" color="#cce1ea" />
+              <Box className="size-4 mr-sm stroke-white" />
               Confirm
             </Button>
           </div>

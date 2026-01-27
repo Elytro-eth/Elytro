@@ -20,7 +20,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="antialiased w-screen h-screen screen-bg min-w-[800px]">
+      <body className="antialiased w-screen h-screen bg-green-50 min-w-[800px]">
         <Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}>
           <RpcProvider>
             <Providers>

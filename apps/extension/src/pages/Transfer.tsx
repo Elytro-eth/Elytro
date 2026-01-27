@@ -27,7 +27,7 @@ export default function Transfer() {
         </Button>
         <Button
           variant="secondary"
-          className="bg-green-300 hover:bg-green-450"
+          className="bg-blue-300 hover:bg-blue-450"
           onClick={() => navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.ImportBackup)}
         >
           Import wallets

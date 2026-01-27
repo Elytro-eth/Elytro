@@ -1,4 +1,4 @@
-import emptyImage from '@/assets/coin_eth.png';
+import emptyImage from '@/assets/bg-images/coin_eth.png';
 import { PropsWithChildren } from 'react';
 
 interface IProps extends PropsWithChildren {
