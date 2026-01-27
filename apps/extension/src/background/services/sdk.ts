@@ -576,7 +576,7 @@ export class SDKService {
       method: 'pimlico_getUserOperationGasPrice' as SafeAny,
       params: [] as SafeAny,
     });
-    return (ret as SafeAny)?.standard;
+    return (ret as SafeAny)?.fast;
   }
 
   private async _getFeeData() {
@@ -627,7 +627,11 @@ export class SDKService {
 
     const res = await this._sdk.estimateUserOperationGas(
       this._config.validator,
-      userOp,
+      {
+        ...userOp,
+        signature:
+          '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c',
+      },
       stateOverride,
       SignkeyType.EOA, // Only EOA is supported currently
       semiValidHookInputData

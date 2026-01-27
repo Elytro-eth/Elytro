@@ -451,7 +451,7 @@ class WalletController {
         console.warn('All gas estimations failed, providing fallback ETH option');
         gasOptions.push({
           option: { type: 'self' },
-          gasUsed: String(tempUserOp.callGasLimit ?? 0n),
+          gasUsed: String(tempUserOp.callGasLimit ?? 1000000000000000n),
           needDeposit: true, // Conservative: assume deposit needed
           hasSufficientBalance: false, // Conservative: assume insufficient balance
           balance: 0,
@@ -473,19 +473,20 @@ class WalletController {
     } catch (error) {
       console.error('Elytro: prepareUserOp failed with error:', error);
       // Return a minimal fallback result to prevent UI from being blank
-      return {
-        decodedRes: [],
-        gasOptions: [
-          {
-            option: { type: 'self' },
-            gasUsed: '100000', // Default fallback gas estimate
-            needDeposit: true,
-            hasSufficientBalance: false,
-            balance: 0,
-          },
-        ],
-        defaultOption: { type: 'self' },
-      };
+      throw error;
+      // return {
+      //   decodedRes: [],
+      //   gasOptions: [
+      //     {
+      //       option: { type: 'self' },
+      //       gasUsed: '1000000000000000', // Default fallback gas estimate
+      //       needDeposit: true,
+      //       hasSufficientBalance: false,
+      //       balance: 0,
+      //     },
+      //   ],
+      //   defaultOption: { type: 'self' },
+      // };
     }
   }
 

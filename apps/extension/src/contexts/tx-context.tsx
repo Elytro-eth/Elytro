@@ -387,7 +387,7 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
     setErrorMsg(null);
     setHookError(null);
 
-    // prepareUserOp(requestType!);
+    prepareUserOp(requestType!);
   };
 
   const onConfirm = async () => {
