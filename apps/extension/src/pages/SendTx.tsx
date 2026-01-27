@@ -62,7 +62,7 @@ export default function SendTx() {
       .superRefine((data, ctx) => {
         const token = form.getValues('token');
 
-        if (data && (data === '' || isNaN(Number(data)) || Number(data) <= 0)) {
+        if (!data || data === '' || isNaN(Number(data)) || Number(data) <= 0) {
           ctx.addIssue({
             code: 'custom',
             message: 'Please input a valid amount',
@@ -99,7 +99,7 @@ export default function SendTx() {
 
   const form = useForm<z.infer<typeof formResolverConfig>>({
     resolver: zodResolver(formResolverConfig),
-    mode: 'onChange',
+    mode: 'all',
   });
 
   useEffect(() => {
@@ -215,6 +215,8 @@ export default function SendTx() {
   const isFormValid = useMemo(() => {
     return form.formState.isValid && !isPreparing && !tokensLoading && !!form.getValues('amount');
   }, [form.formState.isValid, isPreparing, tokensLoading]);
+
+  console.log('isFormValid', isFormValid);
 
   return (
     <SecondaryPageWrapper title="Send">
