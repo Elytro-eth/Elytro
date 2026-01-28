@@ -19,7 +19,7 @@ export default function AddressWithChain({ address, chainID = 0, className, righ
 
   return (
     <div
-      className={cn('flex items-center justify-between  py-sm px-md rounded-sm bg-white fix:bg-gray-300', className)}
+      className={cn('flex items-center justify-between py-sm px-md rounded-sm bg-gray-50 fix:bg-gray-150', className)}
     >
       <div className="flex items-center gap-2">
         {isSupportedChain && (
@@ -40,7 +40,7 @@ export default function AddressWithChain({ address, chainID = 0, className, righ
             </div>
             {/* CSS-only tooltip - only show if hideTooltip is false */}
             {!hideTooltip && (
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 ml-1.5 mb-2 px-3 py-2 bg-blue-750 text-blue-450 text-sm rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 ml-1.5 mb-2 px-3 py-2 bg-blue-600 text-blue-450 text-sm rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
                 <span className="font-bold text-blue-300">{address?.slice(0, 7)}</span>
                 {address?.slice(7, -5)}
                 <span className="font-bold text-blue-300">{address?.slice(-5)}</span>

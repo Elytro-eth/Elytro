@@ -1,6 +1,13 @@
 import { Check } from 'lucide-react';
+import AddressWithChain from './AddressWithChain';
 
-export const SidebarStepper = ({ currentStep }: { currentStep: number }) => {
+interface SidebarStepperProps {
+  currentStep: number;
+  address?: string;
+  chainId?: number;
+}
+
+export const SidebarStepper = ({ currentStep, address, chainId }: SidebarStepperProps) => {
   const getStepStyles = (step: number) => {
     const isActive = step === currentStep;
     const isCompleted = step < currentStep;
@@ -15,6 +22,15 @@ export const SidebarStepper = ({ currentStep }: { currentStep: number }) => {
 
   return (
     <div className="w-64 bg-gray-0 rounded-lg p-2xl">
+      {address && chainId && (
+        <>
+          <div className="mb-lg">
+            <h2 className="text-small-bold text-blue-900 mb-sm">Account in recovery</h2>
+            <AddressWithChain address={address as `0x${string}`} chainID={chainId} className="bg-gray-150" />
+          </div>
+          <div className="border-t border-gray-300 mb-lg" />
+        </>
+      )}
       <div className="space-y-sm">
         {/* Step 1: Find details */}
         <div className="flex items-center space-x-md">

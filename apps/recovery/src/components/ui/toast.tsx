@@ -29,8 +29,8 @@ const toastVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-blue-750',
-        destructive: 'destructive group bg-destructive',
+        default: 'bg-green-600',
+        destructive: 'destructive group border-destructive bg-destructive text-destructive-foreground',
       },
     },
     defaultVariants: {
@@ -75,7 +75,7 @@ const ToastClose = React.forwardRef<
     toast-close=""
     {...props}
   >
-    <X className="h-4 w-4 stroke-green-300 group-[.destructive]:stroke-destructive-foreground group-[.destructive]:hover:stroke-destructive-foreground " />
+    <X className="h-4 w-4 stroke-white group-[.destructive]:stroke-destructive-foreground group-[.destructive]:hover:stroke-destructive-foreground" />
   </ToastPrimitives.Close>
 ));
 ToastClose.displayName = ToastPrimitives.Close.displayName;
@@ -87,7 +87,7 @@ const ToastTitle = React.forwardRef<
   <ToastPrimitives.Title
     ref={ref}
     className={cn(
-      'text-md font-normal text-green-300 [&+div]:text-xs group-[.destructive]:text-destructive-foreground',
+      'text-sm font-bold text-white [&+div]:text-xs group-[.destructive]:text-destructive-foreground',
       className
     )}
     {...props}
@@ -102,7 +102,7 @@ const ToastDescription = React.forwardRef<
   <ToastPrimitives.Description
     ref={ref}
     className={cn(
-      'text-md font-normal text-green-300 [&+div]:text-xs group-[.destructive]:text-destructive-foreground',
+      'text-sm text-white [&+div]:text-xs group-[.destructive]:text-destructive-foreground whitespace-nowrap',
       className
     )}
     {...props}

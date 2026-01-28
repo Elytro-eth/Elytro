@@ -96,7 +96,7 @@ export default function Sign() {
   return (
     <div>
       <AddressWithChain
-        className="border !p-lg border-gray-300 rounded-[16px]"
+        className="!p-lg rounded-[16px]"
         address={address}
         chainID={recoveryChainId}
         rightExtra={

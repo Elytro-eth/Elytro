@@ -41,6 +41,7 @@ export default function AccountRecovery() {
   const [checked, setChecked] = useState(false);
   const [isChainConfirmed, setIsChainConfirmed] = useState(false);
   const [isFileDialogOpen, setIsFileDialogOpen] = useState(false);
+  const [isRetrieving, setIsRetrieving] = useState(false);
 
   useEffect(() => {
     const checkRecoveryRecord = async () => {
@@ -156,9 +157,7 @@ export default function AccountRecovery() {
   }
 
   const handleStartRecovery = async () => {
-    // navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RetrieveContacts, {
-    //   address,
-    // });
+    setIsRetrieving(true);
     try {
       await wallet.createRecoveryRecord(address as Address);
       navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.RetrieveContacts);
@@ -166,8 +165,9 @@ export default function AccountRecovery() {
       console.error(error);
       toast({
         title: 'Failed to create recovery record',
-        // description: 'Please try again',
       });
+    } finally {
+      setIsRetrieving(false);
     }
   };
 
@@ -179,9 +179,9 @@ export default function AccountRecovery() {
       </div>
 
       <AddressInputWithChainIcon chainId={selectedChain!.id} address={address} onChange={setAddress} />
-      <Button className="w-full mt-10" disabled={!isAddress(address)} onClick={handleStartRecovery}>
+      <Button className="w-full mt-10" disabled={!isAddress(address) || isRetrieving} onClick={handleStartRecovery}>
         <Box className="size-4 mr-sm stroke-white" />
-        Retrieve my contacts
+        {isRetrieving ? 'Retrieving...' : 'Retrieve my contacts'}
       </Button>
     </SecondaryPageWrapper>
   );

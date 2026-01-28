@@ -110,7 +110,7 @@ function PageContent() {
     return (
       <div className="flex flex-col items-center justify-between gap-y-sm">
         {loading ? (
-          <ProcessingTip body="Fetching" subBody="" className="flex-1" />
+          <ProcessingTip body="Getting recovery contacts" subBody="" className="flex-1" />
         ) : (
           <ErrorTip title="Sorry we didn't find any recovery contact or failed to initiate recovery" />
         )}
@@ -119,9 +119,11 @@ function PageContent() {
           <Button variant="secondary" onClick={() => history.back()} className="flex-1">
             Cancel
           </Button>
-          <Button onClick={() => getRecoveryRecord()} className="flex-1">
-            Retry
-          </Button>
+          {!loading && (
+            <Button onClick={() => getRecoveryRecord()} className="flex-1">
+              Retry
+            </Button>
+          )}
         </div>
       </div>
     );
@@ -172,14 +174,16 @@ function PageContent() {
       </div>
       <HelperText
         // title={`${recoveryRecord?.threshold} signatures required`}
-        description={`${recoveryRecord?.threshold} confirmations required. Ask your contacts to confirm with below links`}
+        description={`${recoveryRecord?.threshold} confirmation(s) needed. Share links with contacts.`}
       />
       <h2 className="elytro-text-small text-gray-600 mt-4">Your recovery contacts</h2>
-      <div className="flex flex-col gap-y-sm">
-        {recoveryRecord?.contacts.map((contact) => (
+      <div className="rounded-md overflow-hidden">
+        {recoveryRecord?.contacts.map((contact, index) => (
           <ContactItem
             key={contact.address}
             contact={contact}
+            isFirst={index === 0}
+            isLast={index === recoveryRecord.contacts.length - 1}
             rightContent={
               // TODO: use confirm status to decide whether to show the copy button
               contact.confirmed ? (

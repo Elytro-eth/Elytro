@@ -276,7 +276,7 @@ export default function Start() {
     <div className="flex flex-row items-center justify-center w-full h-full">
       <div className="relative">
         <div className="absolute right-full mr-8 top-0 bg-white rounded-xl p-0 flex items-center min-w-[260px]">
-          <SidebarStepper currentStep={3} />
+          <SidebarStepper currentStep={3} address={address ?? undefined} chainId={chainId ?? undefined} />
         </div>
         <ContentWrapper
           // currentStep={2}

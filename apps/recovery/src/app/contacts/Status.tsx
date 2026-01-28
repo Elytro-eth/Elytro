@@ -35,7 +35,7 @@ export default function Status() {
         ?.filter((contact) => !contact.confirmed)
         .map((contact) => (
           <AddressWithChain
-            className="border !p-lg border-gray-300 rounded-[16px]"
+            className="!p-lg rounded-[16px]"
             key={contact.address}
             address={contact.address}
             chainID={chainId!}

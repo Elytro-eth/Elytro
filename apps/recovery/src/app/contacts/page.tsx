@@ -11,7 +11,7 @@ import { toast } from '@/hooks/use-toast';
 import { SidebarStepper } from '@/components/SidebarStepper';
 
 export default function Contacts() {
-  const { contacts, loading } = useRecoveryRecord();
+  const { contacts, loading, address: recoveryAddress, chainId } = useRecoveryRecord();
   const { address } = useAccount();
 
   const { subtitle, content } = useMemo(() => {
@@ -40,10 +40,10 @@ export default function Contacts() {
       subtitle: address ? (
         <span className="text-gray-600">
           {/* The connected wallet is not a recovery contact. Please switch to a recovery contact wallet. */}
-          CConnect to a wallet you control from below to confirm recovery.
+          All recovery contacts
         </span>
       ) : (
-        <span className="text-gray-600">Connect to a wallet you control from below to confirm recovery.</span>
+        <span className="text-gray-600">All recovery contacts</span>
       ),
       content: <Status />,
     };
@@ -53,10 +53,10 @@ export default function Contacts() {
     <div className="flex flex-row items-center justify-center w-full h-full">
       <div className="relative">
         <div className="absolute right-full mr-8 top-0 bg-white rounded-xl p-0 flex items-center min-w-[260px]">
-          <SidebarStepper currentStep={2} />
+          <SidebarStepper currentStep={2} address={recoveryAddress ?? undefined} chainId={chainId ?? undefined} />
         </div>
         <ContentWrapper
-          title={<div className="text-left mr-5xl">I’m a recovery contact</div>}
+          title={<div className="text-left mr-5xl">Connect a wallet to confirm </div>}
           // allSteps={3}
           // currentStep={1}
           subtitle={subtitle}

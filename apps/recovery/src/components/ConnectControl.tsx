@@ -26,7 +26,7 @@ const ConnectorItem = ({
   return (
     <div
       onClick={() => handleConnect(connector)}
-      className="rounded-md p-lg flex items-center gap-2 border border-gray-300 bg-white hover:bg-gray-150 cursor-pointer"
+      className="rounded-md p-lg flex items-center gap-2 bg-gray-50 hover:bg-gray-150 cursor-pointer"
     >
       <WrappedImage
         src={connector?.icon || `https://placehold.co/24x24?text=${connector.name?.[0]}`}

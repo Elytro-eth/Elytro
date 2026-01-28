@@ -1,8 +1,7 @@
 'use client';
 
 import { useRecoveryRecord } from '@/contexts';
-import { LoaderCircle, Check } from 'lucide-react';
-import AddressWithChain from '@/components/AddressWithChain';
+import { LoaderCircle } from 'lucide-react';
 import ContentWrapper from '@/components/ContentWrapper';
 import { Button } from '@/components/ui/button';
 import React from 'react';
@@ -11,53 +10,9 @@ import { RecoveryStatusEn } from '@/constants/enums';
 import LinkWithQuery from '@/components/LinkWithQuery';
 import { InvalidRecordView } from '@/components/InvalidRecordView';
 import { SidebarStepper } from '@/components/SidebarStepper';
-
-interface StepConfig {
-  title: string;
-  status: RecoveryStatusEn[];
-  href: string;
-  buttonText: string;
-}
-
-const RECOVERY_STEPS: StepConfig[] = [
-  {
-    title: 'I’m a recovery contact',
-    status: [RecoveryStatusEn.WAITING_FOR_SIGNATURE],
-    href: '/contacts',
-    buttonText: 'Confirm Recovery',
-  },
-  {
-    title: 'Anyone helping to recover',
-    status: [RecoveryStatusEn.SIGNATURE_COMPLETED, RecoveryStatusEn.RECOVERY_STARTED, RecoveryStatusEn.RECOVERY_READY],
-    href: '/start',
-    buttonText: 'Start Recovery',
-  },
-];
-
-interface IStepBlockProps {
-  title: string;
-  actionButton: React.ReactNode;
-  isActive: boolean;
-}
-
-const StepBlock = ({ title, actionButton, isActive }: IStepBlockProps) => {
-  const styles = {
-    container: `flex flex-row p-lg rounded-lg border-1 min-w-[250px] justify-between items-center gap-4 ${
-      isActive ? 'bg-gray-150 border-gray-150' : 'bg-gray-0 border-gray-300'
-    }`,
-    title: `text-small-bold text-nowrap ${isActive ? 'text-gray-900' : 'text-gray-450'}`,
-    description: `text-tiny whitespace-pre-wrap ${isActive ? 'text-gray-450' : 'text-gray-300'}`,
-  };
-
-  return (
-    <div className={styles.container}>
-      <div className="flex direction-row gap-2 flex-1">
-        <div className={styles.title}>{title}</div>
-      </div>
-      {actionButton}
-    </div>
-  );
-};
+import Image from 'next/image';
+import ShieldImg from '@/assets/shield.png';
+import DoorImg from '@/assets/door.png';
 
 export default function Home() {
   const { status, loading, address, chainId, error } = useRecoveryRecord();
@@ -76,6 +31,13 @@ export default function Home() {
       return 3; // Recover wallet to Recovery successful
     return 1; // Default to Step 1
   };
+
+  const isConfirmStep = status === RecoveryStatusEn.WAITING_FOR_SIGNATURE;
+  const isRecoverStep = [
+    RecoveryStatusEn.SIGNATURE_COMPLETED,
+    RecoveryStatusEn.RECOVERY_STARTED,
+    RecoveryStatusEn.RECOVERY_READY,
+  ].includes(status!);
 
   if (loading) {
     return (
@@ -97,43 +59,36 @@ export default function Home() {
     <div className="flex flex-row items-center justify-center w-full h-full">
       <div className="relative">
         <div className="absolute right-full mr-8 top-0 bg-white rounded-xl p-0 flex items-center min-w-[260px]">
-          <SidebarStepper currentStep={getCurrentStep()} />
+          <SidebarStepper
+            currentStep={getCurrentStep()}
+            address={address ?? undefined}
+            chainId={chainId ?? undefined}
+          />
         </div>
         {error ? (
           <InvalidRecordView />
-        ) : (
-          <ContentWrapper title="Start recovery for">
-            <div className="flex flex-col gap-xl items-left">
-              <AddressWithChain className="bg-gray-150 w-fit" address={address!} chainID={chainId!} />
-
-              <div className="flex flex-col gap-4 justify-between w-full">
-                {RECOVERY_STEPS.map((step) => {
-                  const isActive = status !== null && step.status.includes(status!);
-                  const buttonText = getCurrentStep() === 3 && step.title === 'Confirm' ? 'Completed' : step.buttonText;
-                  return (
-                    <StepBlock
-                      key={step.title}
-                      title={step.title}
-                      isActive={isActive}
-                      actionButton={
-                        <Button
-                          className={!isActive ? 'border-gray-450 border-1 text-gray-600 bg-gray-0 shadow-none' : ''}
-                          disabled={!isActive}
-                        >
-                          <LinkWithQuery href={step.href}>
-                            {getCurrentStep() === 3 && step.title === 'Confirm' && (
-                              <Check className="w-4 h-4 mr-2 stroke-gray-450 inline" />
-                            )}
-                            {buttonText}
-                          </LinkWithQuery>
-                        </Button>
-                      }
-                    />
-                  );
-                })}
-              </div>
+        ) : isConfirmStep ? (
+          <ContentWrapper title={<div className="text-center">Confirm Recovery</div>}>
+            <div className="flex flex-col items-center justify-center text-center gap-y-xl mx-10 mt-6">
+              <Image src={ShieldImg} alt="shield" width={164} height={164} />
+              <p className="text-smaller text-gray-600">Only recovery contacts can confirm recovery</p>
+              <Button asChild>
+                <LinkWithQuery href="/contacts">Get started</LinkWithQuery>
+              </Button>
             </div>
           </ContentWrapper>
+        ) : isRecoverStep ? (
+          <ContentWrapper title={<div className="text-center">Recover your account</div>}>
+            <div className="flex flex-col items-center justify-center text-center gap-y-xl mx-10 mt-6">
+              <Image src={DoorImg} alt="door" width={164} height={164} />
+              <p className="text-smaller text-gray-600">Account owner or helpers can start recovery</p>
+              <Button asChild>
+                <LinkWithQuery href="/start">Get started</LinkWithQuery>
+              </Button>
+            </div>
+          </ContentWrapper>
+        ) : (
+          <InvalidRecordView />
         )}
       </div>
     </div>
