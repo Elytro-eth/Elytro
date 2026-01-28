@@ -627,11 +627,7 @@ export class SDKService {
 
     const res = await this._sdk.estimateUserOperationGas(
       this._config.validator,
-      {
-        ...userOp,
-        signature:
-          '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c',
-      },
+      userOp,
       stateOverride,
       SignkeyType.EOA, // Only EOA is supported currently
       semiValidHookInputData
