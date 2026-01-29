@@ -2,8 +2,8 @@
 
 import React, { useMemo, useState } from 'react';
 import { Connector, useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@elytro/extension-ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@elytro/extension-ui/dialog';
 
 import { X } from 'lucide-react';
 import AddressWithChain from './AddressWithChain';

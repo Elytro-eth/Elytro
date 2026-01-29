@@ -2,7 +2,11 @@
 module.exports = {
   mode: 'jit',
   darkMode: ['class'],
-  content: ['./src/**/*.{tsx,html}'],
+  content: [
+    './src/**/*.{tsx,html}',
+    // Include extension UI components for shared Button, Dialog, Toast, etc.
+    '../extension/src/components/ui/**/*.{ts,tsx}',
+  ],
   theme: {
     extend: {
       spacing: {

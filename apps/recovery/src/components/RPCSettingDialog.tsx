@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Dialog, DialogHeader, DialogContent, DialogTitle } from './ui/dialog';
-import { Button } from './ui/button';
+import { Dialog, DialogHeader, DialogContent, DialogTitle } from '@elytro/extension-ui/dialog';
+import { Button } from '@elytro/extension-ui/button';
 import { useRecoveryRecord } from '@/contexts';
 import { SUPPORTED_CHAINS } from '@/constants/chains';
 import { Settings } from 'lucide-react';
@@ -73,7 +73,7 @@ export function RPCSettingDialog() {
               />
             </div>
             {error && <div className="text-red-750 text-sm mt-1">{error}</div>}
-            <Button className="w-full mt-2" size="lg" onClick={handleSave}>
+            <Button className="w-full mt-2" size="regular" onClick={handleSave}>
               Save
             </Button>
           </div>

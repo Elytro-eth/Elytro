@@ -7,46 +7,110 @@
 - **设计变量** (颜色、间距、排版、圆角等)
 - **配置文件** (tailwind.config.js, globals.css/index.css)
 
-## 🎯 推荐方案：创建共享设计系统包
+## 🎯 方案：Extension 作为 Canonical 源
 
 ### 方案概述
-在 monorepo 根目录创建一个 `@elytro/ui` 包（或 `@elytro/design-system`），包含所有共享的 UI 组件、设计令牌和样式配置。
+
+**`/extension` 是 UI 组件和设计系统的权威来源（canonical source）。**
+
+`/recovery` 应用将：
+1. 直接使用 `/extension` 中已有的组件（通过共享包）
+2. 遵循 `/extension` 的设计令牌和样式规范
+3. 如需新组件，优先在 `/extension` 中创建，再由 `/recovery` 使用
+
+### 目录结构
 
 ```
 /Users/rexchen/dev/Elytro/
 ├── apps/
-│   ├── extension/
-│   ├── recovery/
-│   └── ...
-├── packages/                         # 新增
-│   ├── ui/                          # 共享 UI 包
+│   ├── extension/                   # 📌 CANONICAL SOURCE
 │   │   ├── src/
-│   │   │   ├── components/          # 所有 UI 组件
-│   │   │   │   ├── button.tsx
-│   │   │   │   ├── dialog.tsx
-│   │   │   │   ├── input.tsx
-│   │   │   │   ├── toast.tsx
-│   │   │   │   ├── toaster.tsx
-│   │   │   │   └── ...
-│   │   │   ├── styles/              # 样式文件
-│   │   │   │   ├── globals.css
-│   │   │   │   └── tokens.css
-│   │   │   ├── config/              # 配置导出
-│   │   │   │   └── tailwind.config.ts
-│   │   │   └── index.ts             # 入口文件
-│   │   ├── tailwind.config.js       # 共享 tailwind 配置
-│   │   ├── package.json
-│   │   └── tsconfig.json
+│   │   │   ├── components/
+│   │   │   │   └── ui/             # 权威 UI 组件库 (54+ 组件)
+│   │   │   └── ...
+│   │   ├── tailwind.config.js      # 权威 Tailwind 配置
+│   │   └── ...
+│   ├── recovery/                    # 消费者应用
+│   │   ├── src/
+│   │   │   ├── components/
+│   │   │   │   └── ui/             # 仅保留 recovery 特有组件
+│   │   │   └── ...
+│   │   └── ...
 │   └── ...
-├── package.json
-└── pnpm-workspace.yaml (or similar)
+├── packages/
+│   └── ui/                          # 共享 UI 包（从 extension 提取）
+│       ├── src/
+│       │   ├── components/          # 镜像 extension 的 UI 组件
+│       │   ├── styles/
+│       │   └── index.ts
+│       ├── tailwind.config.js       # 基于 extension 的配置
+│       └── package.json
+└── pnpm-workspace.yaml
 ```
 
 ---
 
-## 📦 实施步骤
+## ✅ Phase 0: 直接导入（已完成）
 
-### 第 1 步：创建共享 UI 包
+在创建共享包之前，我们先实现了直接从 extension 导入的方案来验证可行性。
+
+### 已完成的配置
+
+**1. recovery/tsconfig.json** - 添加路径别名：
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@elytro/extension-ui/*": ["../extension/src/components/ui/*"]
+    }
+  }
+}
+```
+
+**2. recovery/next.config.mjs** - 启用外部目录编译：
+```javascript
+experimental: {
+  externalDir: true,
+},
+webpack: (config) => {
+  config.resolve.alias['@elytro/extension-ui'] = path.resolve(__dirname, '../extension/src/components/ui');
+  return config;
+},
+```
+
+**3. recovery/src/utils/shadcn/utils.ts** - 兼容性 shim：
+```typescript
+// Re-export cn for extension component compatibility
+export { cn } from '@/lib/utils';
+```
+
+### 已迁移的组件
+
+| 组件 | 状态 | 说明 |
+|------|------|------|
+| Button | ✅ 已迁移 | `import { Button } from '@elytro/extension-ui/button'` |
+| Dialog | ✅ 已迁移 | `import { Dialog, ... } from '@elytro/extension-ui/dialog'` |
+| Toast | ✅ 已迁移 | `import { Toast, ... } from '@elytro/extension-ui/toast'` |
+| Toaster | ⚠️ 保留本地 | recovery 自定义布局，内部使用 extension Toast 组件 |
+
+### 已删除的重复文件
+
+- `recovery/src/components/ui/button.tsx`
+- `recovery/src/components/ui/dialog.tsx`
+- `recovery/src/components/ui/toast.tsx`
+
+### API 适配
+
+- Button `size="lg"` → `size="regular"` (extension 最大尺寸)
+
+---
+
+## 📦 Phase 1+: 共享 UI 包（待实施）
+
+当直接导入验证成功后，可选择提取到独立共享包以获得更清晰的架构。
+
+### 第 1 步：创建共享 UI 包（从 extension 提取）
 
 ```bash
 # 在 packages 目录下创建
@@ -74,14 +138,15 @@ cat > packages/ui/package.json << 'EOF'
 EOF
 ```
 
-### 第 2 步：统一设计令牌
+### 第 2 步：从 extension 提取设计令牌
 
-创建 `packages/ui/src/styles/tokens.ts`：
+基于 `/extension/tailwind.config.js` 创建 `packages/ui/src/styles/tokens.ts`：
 
 ```typescript
-// 所有颜色、间距、排版的单一真实来源
+// 从 extension 的 tailwind.config.js 提取，作为单一真实来源
 export const designTokens = {
   colors: {
+    // 直接复制 extension 的颜色配置
     gray: { 900: '#3c3f45', 750: '#676b75', ... },
     blue: { 900: '#05131a', 750: '#0a2533', ... },
     // ... 其他颜色
@@ -99,75 +164,93 @@ export const designTokens = {
 };
 ```
 
-### 第 3 步：统一 Tailwind 配置
+### 第 3 步：基于 extension 创建共享 Tailwind 配置
 
-创建 `packages/ui/tailwind.config.js`：
+从 `/extension/tailwind.config.js` 复制并创建 `packages/ui/tailwind.config.js`：
 
 ```javascript
-// 从设计令牌导出配置
+// 基于 extension 的配置（canonical source）
 module.exports = {
   mode: 'jit',
   darkMode: ['class'],
   theme: {
     extend: {
-      // 从 tokens 统一配置
       colors: designTokens.colors,
       spacing: designTokens.spacing,
-      // ... 其他配置
+      // ... 与 extension 保持一致
     },
   },
 };
 ```
 
-### 第 4 步：提取所有 UI 组件
+### 第 4 步：从 extension 复制 UI 组件
 
-1. **合并 extension 和 recovery 的 UI 组件**：
-   - 优先使用 extension 的更完整的组件库（54 个 UI 组件 vs 4 个）
-   - 补充 recovery 独有的组件（如 `AddressWithChain`, `ContentWrapper` 等）
+**直接将 extension 的 UI 组件复制到共享包：**
 
-2. **标准化组件 API**：
-   - 确保相同功能的组件有一致的 props
-   - 添加 JSDoc 文档
+```bash
+# 复制 extension 的所有 UI 组件到共享包
+cp -r apps/extension/src/components/ui/* packages/ui/src/components/
+```
 
-### 第 5 步：更新应用配置
+- **extension 的组件即为标准**，不做修改
+- **extension 保持不变**，继续使用本地组件或改为使用共享包
+- **recovery 移除重复组件**，改为导入共享包
 
-在 `extension` 和 `recovery` 的 `package.json` 中添加依赖：
+### 第 5 步：更新 recovery 配置
+
+仅在 `recovery` 的 `package.json` 中添加依赖（extension 可选）：
 
 ```json
 {
   "dependencies": {
     "@elytro/ui": "workspace:*"
-  },
-  "devDependencies": {
-    "@elytro/ui": "workspace:*"
   }
 }
 ```
 
-### 第 6 步：简化应用的 Tailwind 配置
+### 第 6 步：简化 recovery 的 Tailwind 配置
 
-替换 `apps/extension/tailwind.config.js` 和 `apps/recovery/tailwind.config.js`：
+替换 `apps/recovery/tailwind.config.js`：
 
 ```javascript
-// apps/*/tailwind.config.js
+// apps/recovery/tailwind.config.js
+// 继承 extension 的配置（通过共享包）
 const baseConfig = require('@elytro/ui/tailwind.config.js');
 
 module.exports = {
   ...baseConfig,
   content: ['./src/**/*.{tsx,html}'],
-  // 如需覆盖，在此处添加
+  // recovery 特有的覆盖（如需要）
 };
 ```
 
-### 第 7 步：导入全局样式
+**注意：extension 的 tailwind.config.js 保持不变，因为它是 canonical source。**
 
-在各应用的入口：
+### 第 7 步：更新 recovery 的导入
+
+在 recovery 中替换本地 UI 组件导入：
 
 ```typescript
-// apps/extension/src/index.tsx or apps/recovery/src/app/layout.tsx
-import '@elytro/ui/styles';
-import '@/styles/local-overrides.css'; // 应用特有的样式
+// ❌ 之前 (recovery 本地组件)
+import { Button } from '@/components/ui/button';
+import { Dialog } from '@/components/ui/dialog';
+
+// ✅ 之后 (使用共享包，来源于 extension)
+import { Button, Dialog } from '@elytro/ui';
 ```
+
+### 第 8 步：清理 recovery 的重复组件
+
+删除 recovery 中与 extension 重复的 UI 组件：
+
+```bash
+# 删除 recovery 中已被共享包覆盖的组件
+rm apps/recovery/src/components/ui/button.tsx
+rm apps/recovery/src/components/ui/dialog.tsx
+# ... 其他重复组件
+```
+
+**仅保留 recovery 特有的组件**（如果有且 extension 中不存在的）。
 
 ---
 
@@ -175,79 +258,102 @@ import '@/styles/local-overrides.css'; // 应用特有的样式
 
 | 优势 | 说明 |
 |------|------|
-| 🎨 **单一真实来源** | 所有设计决策在一处维护 |
-| 🔄 **减少重复** | 消除 50% 以上的配置文件重复 |
-| 📈 **可扩展性** | 新增应用自动获得最新 UI 系统 |
-| 🚀 **快速迭代** | UI 更新立即影响所有应用 |
-| 📚 **一致性** | 统一的组件 API 和设计语言 |
-| 🧪 **集中测试** | UI 组件在共享包中集中测试 |
+| 🎨 **单一真实来源** | extension 是所有 UI 决策的权威来源 |
+| 🔄 **减少重复** | recovery 不再维护重复的 UI 组件 |
+| 📈 **简化维护** | 只需在 extension 中更新组件，recovery 自动受益 |
+| 🚀 **快速迭代** | extension 的 UI 更新自动同步到 recovery |
+| 📚 **一致性** | recovery 强制遵循 extension 的设计规范 |
+| 🧪 **集中测试** | UI 组件在 extension 中测试，recovery 直接使用 |
+| ⚡ **低风险** | extension 代码不变，仅 recovery 需要适配 |
 
 ---
 
 ## 🔄 迁移路线图
 
-| 阶段 | 任务 | 预计时间 |
-|------|------|--------|
-| **Phase 1** | 创建 UI 包结构、提取设计令牌 | 2-3 天 |
-| **Phase 2** | 迁移所有 UI 组件到共享包 | 3-4 天 |
-| **Phase 3** | 更新应用配置和导入 | 1-2 天 |
-| **Phase 4** | 测试和调整 | 2-3 天 |
-| **Phase 5** | 文档和知识交接 | 1 天 |
+| 阶段 | 任务 | 状态 |
+|------|------|------|
+| **Phase 0** | 直接导入 - recovery 直接从 extension 导入组件 | ✅ 已完成 |
+| **Phase 1** | 从 extension 提取 UI 组件到共享包 | ⏳ 待实施 |
+| **Phase 2** | 从 extension 提取 Tailwind 配置和设计令牌 | ⏳ 待实施 |
+| **Phase 3** | 更新 recovery 依赖和配置 | ⏳ 待实施 |
+| **Phase 4** | 替换 recovery 中的组件导入 | ⏳ 待实施 |
+| **Phase 5** | 删除 recovery 中的重复组件 | ⏳ 待实施 |
+| **Phase 6** | 测试 recovery 应用 | ⏳ 待实施 |
 
-**总计：约 10-13 个工作日**
+> **注意**: Phase 0 已验证直接导入可行，Phase 1+ 为可选的架构优化。
 
 ---
 
 ## 🛠 具体待做项
 
-### UI 包迁移
-- [ ] 创建 packages/ui 目录结构
-- [ ] 提取和规范化 tailwind.config.js
-- [ ] 创建 designTokens 中心化配置
-- [ ] 复制 extension 的 54 个 UI 组件
-- [ ] 补充 recovery 独有的 5 个组件
-- [ ] 添加组件文档和使用示例
-- [ ] 创建 index.ts 导出所有组件
+### Phase 0: 直接导入（✅ 已完成）
+- [x] 配置 recovery/tsconfig.json 路径别名
+- [x] 配置 recovery/next.config.mjs 外部目录编译
+- [x] 创建兼容性 shim (utils/shadcn/utils.ts)
+- [x] 迁移 Button 组件导入
+- [x] 迁移 Dialog 组件导入
+- [x] 迁移 Toast 组件导入
+- [x] 删除 recovery 中的重复组件 (button, dialog, toast)
+- [x] 保留 recovery 特有的 Toaster 组件
+- [x] 测试 recovery 应用构建
 
-### 应用更新
-- [ ] 更新 extension/package.json (添加 @elytro/ui 依赖)
-- [ ] 更新 recovery/package.json (添加 @elytro/ui 依赖)
-- [ ] 简化 extension/tailwind.config.js
-- [ ] 简化 recovery/tailwind.config.js
-- [ ] 删除 extension/src/components/ui (替换为导入)
-- [ ] 删除 recovery/src/components/ui (替换为导入)
-- [ ] 更新所有导入路径
-- [ ] 测试各应用的样式和组件
+### Phase 1+: 共享 UI 包创建（⏳ 待实施）
+- [ ] 创建 packages/ui 目录结构
+- [ ] 从 extension/tailwind.config.js 提取设计令牌
+- [ ] 基于 extension 创建共享 tailwind.config.js
+- [ ] 复制 extension/src/components/ui 的所有组件到共享包
+- [ ] 创建 index.ts 导出所有组件
+- [ ] 配置共享包的构建流程
+
+### Recovery 应用更新（Phase 1+ 后）
+- [ ] 更新 recovery/package.json（添加 @elytro/ui 依赖）
+- [ ] 简化 recovery/tailwind.config.js（继承共享配置）
+- [ ] 更新导入路径从 `@elytro/extension-ui/*` 到 `@elytro/ui`
+
+### Extension 应用（可选更新）
+- [ ] （可选）更新 extension/package.json（添加 @elytro/ui 依赖）
+- [ ] （可选）更新 extension 的导入路径使用共享包
+- [ ] **注意：extension 保持为 canonical source，其组件代码不变**
 
 ### 文档
-- [ ] 编写 UI 包 README
-- [ ] 创建组件使用指南
-- [ ] 文档化设计令牌
-- [ ] 示例应用集成步骤
+- [ ] 编写 UI 包 README（说明 extension 是 canonical source）
+- [ ] 文档化哪些组件可用
+- [ ] 说明 recovery 如何使用共享组件
 
 ---
 
 ## 📝 注意事项
 
-1. **Monorepo 工具**：确认使用 pnpm/yarn/npm workspaces
-2. **构建配置**：需要配置共享包的构建流程（如 tsup, swc）
-3. **版本管理**：可以使用 changeset 或 lerna 管理版本
-4. **样式冲突**：迁移前审查两个应用的 CSS 差异
-5. **渐进式迁移**：可以先共享部分组件（如 button）再逐步扩展
+1. **Extension 是权威来源**：所有 UI 决策以 extension 为准，recovery 仅消费
+2. **不要修改 extension**：除非需要新增组件，否则 extension 代码保持不变
+3. **Monorepo 工具**：确认使用 pnpm/yarn/npm workspaces
+4. **构建配置**：需要配置共享包的构建流程（如 tsup, swc）
+5. **样式差异处理**：如 recovery 有特殊样式需求，在 recovery 本地覆盖，不影响共享包
+6. **渐进式迁移**：可以先共享部分组件（如 button）再逐步扩展
 
 ---
 
 ## 💡 额外建议
 
-1. **组件变体系统**：使用 CVA（class-variance-authority）管理组件变体
-2. **主题支持**：虽然目前没有深色模式，但设计系统应为此做准备
-3. **Storybook**：为共享 UI 包建立 Storybook 文档网站
-4. **TypeScript**：确保所有组件有完整的 TS 类型定义
-5. **CI/CD**：在自动化流程中测试共享包的更新
+1. **保持 extension 组件不变**：共享包应直接镜像 extension 的组件，不做"改进"
+2. **Recovery 适配**：如果 extension 组件不满足 recovery 需求，有两个选择：
+   - 在 extension 中增强组件（推荐，使其成为新的标准）
+   - 在 recovery 中创建特有组件（仅当功能完全不同时）
+3. **TypeScript**：确保所有组件有完整的 TS 类型定义
+4. **CI/CD**：在自动化流程中测试共享包的更新
+
+---
+
+## 🔑 核心原则
+
+> **Extension = Canonical Source**
+>
+> - Extension 的 UI 组件是标准，不因 recovery 需求而改变
+> - Recovery 应适配 extension 的组件，而非反过来
+> - 如需新功能，优先在 extension 中实现，再共享给 recovery
 
 ---
 
 ## 联系&支持
 
 如有问题，请联系设计系统团队。
-

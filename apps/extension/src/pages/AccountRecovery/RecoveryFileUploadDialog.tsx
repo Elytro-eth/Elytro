@@ -141,7 +141,7 @@ export default function RecoveryFileUploadDialog({ open, onOpenChange, onFileUpl
             className={cn(
               'flex-1',
               selectedFile
-                ? 'bg-primary hover:bg-primary/90 text-white'
+                ? 'bg-blue-600 hover:bg-blue-600/90 text-white'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             )}
           >
