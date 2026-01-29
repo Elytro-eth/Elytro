@@ -487,7 +487,9 @@ export const TxProvider = ({ children }: { children: React.ReactNode }) => {
       const res = await wallet.verifyOTP(hookError.challengeId, otpCode);
       if (res.status === 'VERIFIED') {
         setHookError(null);
-        const sendRes = await wallet.sendUserOperation(userOpRef.current!);
+        const sendRes = await wallet.sendUserOperation(userOpRef.current!, undefined, {
+          skipEstimateGas: true,
+        });
 
         if ((sendRes as SafeAny)?.code) {
           setHookError(sendRes as THookError);

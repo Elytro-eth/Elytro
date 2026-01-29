@@ -136,8 +136,12 @@ class WalletController {
     return await elytroSDK.signUserOperation(userOp);
   }
 
-  public async sendUserOperation(userOp: ElytroUserOperation, noHookSignWith2FA?: boolean) {
-    if (!userOp?.paymaster) {
+  public async sendUserOperation(
+    userOp: ElytroUserOperation,
+    noHookSignWith2FA?: boolean,
+    options?: { skipEstimateGas?: boolean }
+  ) {
+    if (!userOp?.paymaster && !options?.skipEstimateGas) {
       await elytroSDK.estimateGas(userOp!);
     }
 
