@@ -2,7 +2,7 @@
 
 import ContentWrapper from '@/components/ContentWrapper';
 import React from 'react';
-import DoorImg from '@/assets/door.png';
+import { doorImage } from '@elytro/ui/assets';
 import Image from 'next/image';
 import { SidebarStepper } from '@/components/SidebarStepper';
 import { useRecoveryRecord } from '@/contexts';
@@ -18,7 +18,7 @@ export default function Finished() {
         </div>
         <ContentWrapper title={<div className="text-center">Recovery successful</div>}>
           <div className="flex flex-col items-center justify-center text-center gap-y-xl mx-20 mt-10">
-            <Image src={DoorImg} alt="door" width={164} height={164} />
+            <Image src={doorImage} alt="door" width={164} height={164} />
             <p className="text-smaller text-gray-600">Open Elytro extension to access wallet</p>
           </div>
         </ContentWrapper>

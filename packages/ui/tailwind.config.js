@@ -1,47 +1,45 @@
 /** @type {import('tailwindcss').Config} */
+// Shared Tailwind config based on extension (canonical source)
 module.exports = {
   mode: 'jit',
   darkMode: ['class'],
-  content: [
-    './src/**/*.{tsx,html}',
-    // Include shared UI components from @elytro/ui package
-    '../../packages/ui/src/**/*.{ts,tsx}',
-  ],
+  // Note: Consumer apps need to specify their own content paths
+  content: [],
   theme: {
     extend: {
       spacing: {
-        '4xs': '1px',
-        '3xs': '2px',
-        '2xs': '4px',
-        xs: '6px',
-        sm: '8px',
-        md: '12px',
-        lg: '16px',
-        xl: '20px',
-        '2xl': '24px',
-        '3xl': '32px',
-        '4xl': '40px',
-        '5xl': '64px',
+        '4xs': '0.0625rem', // 1px
+        '3xs': '0.125rem', // 2px
+        '2xs': '0.25rem', // 4px
+        xs: '0.375rem', // 6px
+        sm: '0.5rem', // 8px
+        md: '0.75rem', // 12px
+        lg: '1rem', // 16px
+        xl: '1.25rem', // 20px
+        '2xl': '1.5rem', // 24px
+        '3xl': '2rem', // 32px
+        '4xl': '2.5rem', // 40px
+        '5xl': '4rem', // 64px
       },
       borderRadius: {
-        pill: '9999px',
-        xs: '4px',
-        sm: '8px',
-        md: '16px',
-        lg: '24px',
+        pill: '9999rem',
+        lg: '1.5rem', // 24px
+        md: '1rem', // 16px
+        sm: '0.75rem', // 12px
+        xs: '0.25rem', // 4px
+        '2xs': '0.5rem', // 8px
       },
       borderWidth: {
-        1: '1px',
-        2: '2px',
+        1: '0.0625rem', // 1px
+        2: '0.125rem', // 2px
       },
       fontSize: {
-        xs: '12px',
-        sm: '14px',
-        base: '16px',
-        lg: '18px',
-        xl: '28px',
-        '2xl': '40px',
-        '3xl': '52px',
+        xs: '0.75rem' /* 'tiny', 12px */,
+        sm: '0.875rem' /* 'smaller', 14px */,
+        base: '1rem' /*'small', 16px */,
+        lg: '1.1rem' /* 'body', 18px */,
+        xl: '1.75rem' /* 'title', 28px */,
+        '2xl': '2.5rem' /* 'headline', 40px */,
       },
       backgroundImage: {
         'elytro-background': 'var(--elytro-background-image)',
@@ -97,6 +95,8 @@ module.exports = {
         },
         white: '#ffffff',
         overlay: 'rgba(22, 42, 54, 0.26)',
+
+        // Semantic colors (CSS variable based)
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -148,7 +148,10 @@ module.exports = {
           secondaryForeground: 'hsl(var(--hover-secondary-foreground))',
         },
       },
+      boxShadow: {
+        lg: '0 12px 16px -4px rgba(0, 0, 0, 0.16)',
+      },
     },
   },
-  plugins: [require('tailwindcss-animate'), require('tailwindcss')],
+  plugins: [require('tailwindcss-animate')],
 };

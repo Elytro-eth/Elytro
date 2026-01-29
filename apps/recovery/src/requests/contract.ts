@@ -1,7 +1,7 @@
 import { SUPPORTED_CHAINS } from '@/constants/chains';
 import { SocialRecoveryContractConfig, SocialRecoveryInfoRecorderContractConfig } from '@/constants/contracts';
 import { RecoveryStatusEn } from '@/constants/enums';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@elytro/ui';
 import { getLogsOnchain } from '@/lib/utils';
 import { getConfig } from '@/wagmi';
 import { SocialRecovery } from '@soulwallet/sdk';

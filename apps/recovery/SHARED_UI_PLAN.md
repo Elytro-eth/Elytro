@@ -273,12 +273,12 @@ rm apps/recovery/src/components/ui/dialog.tsx
 | 阶段 | 任务 | 状态 |
 |------|------|------|
 | **Phase 0** | 直接导入 - recovery 直接从 extension 导入组件 | ✅ 已完成 |
-| **Phase 1** | 从 extension 提取 UI 组件到共享包 | ⏳ 待实施 |
-| **Phase 2** | 从 extension 提取 Tailwind 配置和设计令牌 | ⏳ 待实施 |
-| **Phase 3** | 更新 recovery 依赖和配置 | ⏳ 待实施 |
-| **Phase 4** | 替换 recovery 中的组件导入 | ⏳ 待实施 |
-| **Phase 5** | 删除 recovery 中的重复组件 | ⏳ 待实施 |
-| **Phase 6** | 测试 recovery 应用 | ⏳ 待实施 |
+| **Phase 1** | 从 extension 提取 UI 组件到共享包 | ✅ 已完成 |
+| **Phase 2** | 从 extension 提取 Tailwind 配置和设计令牌 | ✅ 已完成 |
+| **Phase 3** | 更新 recovery 依赖和配置 | ✅ 已完成 |
+| **Phase 4** | 替换 recovery 中的组件导入 | ✅ 已完成 |
+| **Phase 5** | 删除 recovery 中的重复组件 | ✅ 已完成 |
+| **Phase 6** | 测试 recovery 应用 | ✅ 已完成 |
 
 > **注意**: Phase 0 已验证直接导入可行，Phase 1+ 为可选的架构优化。
 
@@ -297,18 +297,18 @@ rm apps/recovery/src/components/ui/dialog.tsx
 - [x] 保留 recovery 特有的 Toaster 组件
 - [x] 测试 recovery 应用构建
 
-### Phase 1+: 共享 UI 包创建（⏳ 待实施）
-- [ ] 创建 packages/ui 目录结构
-- [ ] 从 extension/tailwind.config.js 提取设计令牌
-- [ ] 基于 extension 创建共享 tailwind.config.js
-- [ ] 复制 extension/src/components/ui 的所有组件到共享包
-- [ ] 创建 index.ts 导出所有组件
-- [ ] 配置共享包的构建流程
+### Phase 1+: 共享 UI 包创建（✅ 已完成）
+- [x] 创建 packages/ui 目录结构
+- [x] 从 extension/tailwind.config.js 提取设计令牌
+- [x] 基于 extension 创建共享 tailwind.config.js
+- [x] 复制 extension/src/components/ui 的基础组件到共享包（23个组件）
+- [x] 创建 index.ts 导出所有组件
+- [x] 配置共享包的构建流程（使用 pnpm workspace 直接引用源码）
 
-### Recovery 应用更新（Phase 1+ 后）
-- [ ] 更新 recovery/package.json（添加 @elytro/ui 依赖）
-- [ ] 简化 recovery/tailwind.config.js（继承共享配置）
-- [ ] 更新导入路径从 `@elytro/extension-ui/*` 到 `@elytro/ui`
+### Recovery 应用更新（✅ 已完成）
+- [x] 更新 recovery/package.json（添加 @elytro/ui 依赖）
+- [x] 更新 recovery/tailwind.config.js（指向共享包路径）
+- [x] 更新导入路径从 `@elytro/extension-ui/*` 到 `@elytro/ui`
 
 ### Extension 应用（可选更新）
 - [ ] （可选）更新 extension/package.json（添加 @elytro/ui 依赖）

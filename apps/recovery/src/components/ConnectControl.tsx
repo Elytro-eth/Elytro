@@ -2,12 +2,11 @@
 
 import React, { useMemo, useState } from 'react';
 import { Connector, useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
-import { Button } from '@elytro/extension-ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@elytro/extension-ui/dialog';
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@elytro/ui';
 
 import { X } from 'lucide-react';
 import AddressWithChain from './AddressWithChain';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@elytro/ui';
 import { useRecoveryRecord } from '@/contexts';
 import WrappedImage from './WrappedImage';
 import { CONNECTOR_ICON_MAP } from '@/wagmi';

@@ -3,15 +3,14 @@
 import { useRecoveryRecord } from '@/contexts';
 import { LoaderCircle } from 'lucide-react';
 import ContentWrapper from '@/components/ContentWrapper';
-import { Button } from '@elytro/extension-ui/button';
+import { Button } from '@elytro/ui';
 import React from 'react';
 import { redirect, useRouter, useSearchParams } from 'next/navigation';
 import { RecoveryStatusEn } from '@/constants/enums';
 import { InvalidRecordView } from '@/components/InvalidRecordView';
 import { SidebarStepper } from '@/components/SidebarStepper';
 import Image from 'next/image';
-import ShieldImg from '@/assets/shield.png';
-import DoorImg from '@/assets/door.png';
+import { shieldImage, doorImage } from '@elytro/ui/assets';
 
 export default function Home() {
   const { status, loading, address, chainId, error } = useRecoveryRecord();
@@ -78,7 +77,7 @@ export default function Home() {
         ) : isConfirmStep ? (
           <ContentWrapper title={<div className="text-center">Confirm Recovery</div>}>
             <div className="flex flex-col items-center justify-center text-center gap-y-xl mx-10 mt-6">
-              <Image src={ShieldImg} alt="shield" width={164} height={164} />
+              <Image src={shieldImage} alt="shield" width={164} height={164} />
               <p className="text-smaller text-gray-600">Only recovery contacts can confirm recovery</p>
               <Button onClick={() => navigateWithQuery('/contacts')}>Get started</Button>
             </div>
@@ -86,7 +85,7 @@ export default function Home() {
         ) : isRecoverStep ? (
           <ContentWrapper title={<div className="text-center">Recover your account</div>}>
             <div className="flex flex-col items-center justify-center text-center gap-y-xl mx-10 mt-6">
-              <Image src={DoorImg} alt="door" width={164} height={164} />
+              <Image src={doorImage} alt="door" width={164} height={164} />
               <p className="text-smaller text-gray-600">Account owner or helpers can start recovery</p>
               <Button onClick={() => navigateWithQuery('/start')}>Get started</Button>
             </div>

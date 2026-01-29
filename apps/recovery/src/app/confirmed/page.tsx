@@ -4,9 +4,9 @@ import ContentWrapper from '@/components/ContentWrapper';
 import React from 'react';
 import Image from 'next/image';
 import { SidebarStepper } from '@/components/SidebarStepper';
-import { Button } from '@elytro/extension-ui/button';
+import { Button } from '@elytro/ui';
 import { useRecoveryRecord } from '@/contexts';
-import ShieldImg from '@/assets/shield.png';
+import { shieldImage } from '@elytro/ui/assets';
 
 export default function Confirmed() {
   let backToHome;
@@ -46,7 +46,7 @@ export default function Confirmed() {
         </div>
         <ContentWrapper title={<div className="text-center">Confirmed successfully</div>}>
           <div className="flex flex-col items-center justify-center text-center gap-y-xl mx-20 mt-10">
-            <Image src={ShieldImg} alt="door" width={164} height={164} />
+            <Image src={shieldImage} alt="shield" width={164} height={164} />
             <p className="text-smaller text-gray-600">You can disconnect and close the window now</p>
             <Button onClick={handleBackToHome} variant="secondary" className="mt-4">
               Back to Recovery

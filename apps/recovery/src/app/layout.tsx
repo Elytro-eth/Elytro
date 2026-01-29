@@ -3,7 +3,7 @@ import { Providers } from './providers';
 import ConnectControl from '@/components/ConnectControl';
 import { LogoHeader } from '@/components/LogoHeader';
 import { RPCSettingDialog } from '@/components/RPCSettingDialog';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from '@elytro/ui/toaster';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { RpcProvider } from '@/contexts/rpc-context';

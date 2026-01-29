@@ -3,9 +3,9 @@ import AddressWithChain from '@/components/AddressWithChain';
 import { useAccount, useSendTransaction, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 import { useRecoveryRecord } from '@/contexts';
 import React, { useEffect, useRef, useState } from 'react';
-import { Button } from '@elytro/extension-ui/button';
+import { Button } from '@elytro/ui';
 import { getApproveHashTxData } from '@/requests/contract';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@elytro/ui';
 import { Box } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

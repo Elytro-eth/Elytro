@@ -20,8 +20,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@elytro/extension-ui/*": ["../extension/src/components/ui/*"]
+      "@/*": ["./src/*"]
     },
     "baseUrl": "./"
   },

@@ -1,7 +1,7 @@
 'use client';
 
 import { RecoveryStatusEn } from '@/constants/enums';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@elytro/ui';
 import {
   checkIsContactSigned,
   getExecuteRecoveryTxData,

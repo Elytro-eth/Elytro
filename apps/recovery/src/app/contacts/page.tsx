@@ -7,7 +7,7 @@ import { useAccount } from 'wagmi';
 import Sign from './Sign';
 import Status from './Status';
 import { isConnectedAccountAContact } from '@/lib/contact';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@elytro/ui';
 import { SidebarStepper } from '@/components/SidebarStepper';
 
 export default function Contacts() {

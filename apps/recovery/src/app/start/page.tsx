@@ -1,16 +1,16 @@
 'use client';
 
 import ContentWrapper from '@/components/ContentWrapper';
-import { Button } from '@elytro/extension-ui/button';
+import { Button } from '@elytro/ui';
 import { useRecoveryRecord } from '@/contexts';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@elytro/ui';
 import { getConfig } from '@/wagmi';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { useAccount, usePublicClient } from 'wagmi';
 import { sendTransaction } from 'wagmi/actions';
 import { Box, ExternalLink, Loader2 } from 'lucide-react';
-import DoorImg from '@/assets/door.png';
+import { doorImage } from '@elytro/ui/assets';
 import Image from 'next/image';
 import { RecoveryStatusEn } from '@/constants/enums';
 import { cn } from '@/lib/utils';
@@ -308,7 +308,7 @@ export default function Start() {
               leftTime.minutes === 0 &&
               leftTime.seconds === 0 ? (
                 <div className="flex flex-col items-center justify-center my-2xl">
-                  <Image src={DoorImg} alt="door" width={164} height={164} />
+                  <Image src={doorImage} alt="door" width={164} height={164} />
                 </div>
               ) : (
                 <div

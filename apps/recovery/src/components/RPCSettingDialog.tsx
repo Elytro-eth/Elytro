@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Dialog, DialogHeader, DialogContent, DialogTitle } from '@elytro/extension-ui/dialog';
-import { Button } from '@elytro/extension-ui/button';
+import { Dialog, DialogHeader, DialogContent, DialogTitle, Button } from '@elytro/ui';
 import { useRecoveryRecord } from '@/contexts';
 import { SUPPORTED_CHAINS } from '@/constants/chains';
 import { Settings } from 'lucide-react';
