@@ -3,11 +3,10 @@
 import { useRecoveryRecord } from '@/contexts';
 import { LoaderCircle } from 'lucide-react';
 import ContentWrapper from '@/components/ContentWrapper';
-import { Button } from '@/components/ui/button';
+import { Button } from '@elytro/extension-ui/button';
 import React from 'react';
-import { redirect } from 'next/navigation';
+import { redirect, useRouter, useSearchParams } from 'next/navigation';
 import { RecoveryStatusEn } from '@/constants/enums';
-import LinkWithQuery from '@/components/LinkWithQuery';
 import { InvalidRecordView } from '@/components/InvalidRecordView';
 import { SidebarStepper } from '@/components/SidebarStepper';
 import Image from 'next/image';
@@ -16,6 +15,15 @@ import DoorImg from '@/assets/door.png';
 
 export default function Home() {
   const { status, loading, address, chainId, error } = useRecoveryRecord();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const navigateWithQuery = (href: string) => {
+    const query = searchParams.toString();
+    const url = query ? `${href}?${query}` : href;
+    console.log('Navigating to:', url);
+    router.push(url);
+  };
 
   const getCurrentStep = () => {
     if (error) return 1; // Invalid URL
@@ -72,9 +80,7 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center text-center gap-y-xl mx-10 mt-6">
               <Image src={ShieldImg} alt="shield" width={164} height={164} />
               <p className="text-smaller text-gray-600">Only recovery contacts can confirm recovery</p>
-              <Button asChild>
-                <LinkWithQuery href="/contacts">Get started</LinkWithQuery>
-              </Button>
+              <Button onClick={() => navigateWithQuery('/contacts')}>Get started</Button>
             </div>
           </ContentWrapper>
         ) : isRecoverStep ? (
@@ -82,9 +88,7 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center text-center gap-y-xl mx-10 mt-6">
               <Image src={DoorImg} alt="door" width={164} height={164} />
               <p className="text-smaller text-gray-600">Account owner or helpers can start recovery</p>
-              <Button asChild>
-                <LinkWithQuery href="/start">Get started</LinkWithQuery>
-              </Button>
+              <Button onClick={() => navigateWithQuery('/start')}>Get started</Button>
             </div>
           </ContentWrapper>
         ) : (

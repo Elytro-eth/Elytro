@@ -1,7 +1,7 @@
 'use client';
 
 import ContentWrapper from '@/components/ContentWrapper';
-import { Button } from '@/components/ui/button';
+import { Button } from '@elytro/extension-ui/button';
 import { useRecoveryRecord } from '@/contexts';
 import { toast } from '@/hooks/use-toast';
 import { getConfig } from '@/wagmi';
@@ -337,7 +337,7 @@ export default function Start() {
           <div className="grid grid-cols-1 gap-x-sm">
             {status === RecoveryStatusEn.SIGNATURE_COMPLETED ? (
               <Button
-                size="lg"
+                size="regular"
                 disabled={
                   !isConnected || isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.SIGNATURE_COMPLETED
                 }
@@ -349,7 +349,7 @@ export default function Start() {
               </Button>
             ) : (
               <Button
-                size="lg"
+                size="regular"
                 disabled={
                   !isConnected || isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.RECOVERY_READY
                 }

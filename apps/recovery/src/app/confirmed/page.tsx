@@ -4,7 +4,7 @@ import ContentWrapper from '@/components/ContentWrapper';
 import React from 'react';
 import Image from 'next/image';
 import { SidebarStepper } from '@/components/SidebarStepper';
-import { Button } from '@/components/ui/button';
+import { Button } from '@elytro/extension-ui/button';
 import { useRecoveryRecord } from '@/contexts';
 import ShieldImg from '@/assets/shield.png';
 

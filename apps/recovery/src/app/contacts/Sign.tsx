@@ -3,7 +3,7 @@ import AddressWithChain from '@/components/AddressWithChain';
 import { useAccount, useSendTransaction, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 import { useRecoveryRecord } from '@/contexts';
 import React, { useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@elytro/extension-ui/button';
 import { getApproveHashTxData } from '@/requests/contract';
 import { toast } from '@/hooks/use-toast';
 import { Box } from 'lucide-react';
@@ -111,7 +111,7 @@ export default function Sign() {
       />
 
       <Button
-        size="lg"
+        size="regular"
         className="w-full group mt-lg shadow-none"
         disabled={!isConnected || isSigned || loading || recoveryChainId !== chainId}
         onClick={sendSignatureRequest}

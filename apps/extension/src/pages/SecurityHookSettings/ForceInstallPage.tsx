@@ -65,7 +65,7 @@ export default function ForceInstallInnerPage({ status }: ForceInstallInnerPageP
         </div>
 
         <Button
-          className="mt-4 w-full bg-primary text-primary-foreground hover:bg-hover-primary hover:text-hover-primary-foreground"
+          className="mt-4 w-full bg-blue-600 text-primary-foreground hover:bg-hover-primary hover:text-hover-primary-foreground"
           disabled={countdown > 0}
           onClick={handleConfirmReset}
         >
