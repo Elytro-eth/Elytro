@@ -1,4 +1,4 @@
-import { SUPPORTED_CHAIN_IDS, TChainItem } from '@/constants/chains';
+import { getPimlicoUrl, SUPPORTED_CHAIN_IDS, TChainItem } from '@/constants/chains';
 import {
   getDomainSeparator,
   getEncoded1271MessageHash,
@@ -7,6 +7,7 @@ import {
   DEFAULT_GUARDIAN_SAFE_PERIOD,
   GUARDIAN_INFO_KEY,
 } from '@/constants/sdk-config';
+import CONFIG from '@/config';
 import { formatHex, paddingBytesToEven, paddingZero } from '@/utils/format';
 import { Bundler, SignkeyType, SocialRecovery, ElytroWallet, Transaction } from '@elytro/sdk';
 import { DecodeUserOp } from '@elytro/decoder';
@@ -34,6 +35,7 @@ import {
   keccak256,
   Abi,
 } from 'viem';
+
 import { createAccount } from '@/utils/ethRpc/create-account';
 import { ethErrors } from 'eth-rpc-errors';
 import { ABI_Elytro, ABI_SocialRecoveryModule, ABI_SecurityHook } from '@elytro/abi';
@@ -565,7 +567,8 @@ export class SDKService {
   }
 
   private async _getPimlicoFeeData() {
-    const newRpcUrl = this._config.bundler;
+    const newRpcUrl = getPimlicoUrl(this._config.id);
+
     if (!this._pimlicoRpc || this._pimlicoRpc.transport.url !== newRpcUrl) {
       this._pimlicoRpc = createPublicClient({
         transport: http(newRpcUrl),
@@ -666,15 +669,12 @@ export class SDKService {
   }
 
   private _getPimlicoRpc() {
-    if (this.isPimlicoBundler) {
-      if (!this._pimlicoRpc) {
-        this._pimlicoRpc = createPublicClient({
-          transport: http(this._config.bundler),
-        });
-      }
-      return this._pimlicoRpc;
+    if (!this._pimlicoRpc) {
+      this._pimlicoRpc = createPublicClient({
+        transport: http(getPimlicoUrl(this._config.id)),
+      });
     }
-    return null;
+    return this._pimlicoRpc;
   }
 
   public async getMaxCostInToken(userOp: ElytroUserOperation, token: TokenQuote) {
@@ -1419,6 +1419,12 @@ export class SDKService {
   }
 
   public async getSupportedGasTokens() {
+    // Check if ERC20 paymaster feature is disabled
+    if (!CONFIG.features?.erc20Paymaster) {
+      console.log('Elytro: ERC20 paymaster feature is temporarily disabled.');
+      return [];
+    }
+
     const pimlicoRpc = this._getPimlicoRpc();
     if (!pimlicoRpc) {
       console.error('Elytro: You need to use a pimlico bundler to get token paymaster.');
@@ -1437,6 +1443,12 @@ export class SDKService {
   }
 
   public async getTokenPaymaster() {
+    // Check if ERC20 paymaster feature is disabled
+    if (!CONFIG.features?.erc20Paymaster) {
+      console.log('Elytro: ERC20 paymaster feature is temporarily disabled.');
+      return [];
+    }
+
     const tokens = await this.getSupportedGasTokens();
 
     if (!tokens || !tokens?.length) {

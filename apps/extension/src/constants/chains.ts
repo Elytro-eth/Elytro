@@ -31,12 +31,20 @@ export type TChainItem = Chain & {
   }[];
 };
 
+export const getPimlicoUrl = (chainId: number) => {
+  return `https://api.pimlico.io/v2/${chainId}/rpc?apikey=${CONFIG.rpc.pimlicoKey}`;
+};
+
+export const getFreeBundlerUrl = (chainId: number) => {
+  return `https://rpc.erc4337.io/${chainId}`;
+};
+
 export const SUPPORTED_CHAINS: TChainItem[] = [
   {
     ...mainnet,
     icon: 'https://static1.tokenterminal.com//ethereum/logo.png',
     endpoint: 'https://eth.drpc.org',
-    bundler: `https://api.pimlico.io/v2/1/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
+    bundler: getFreeBundlerUrl(mainnet.id), //`https://api.pimlico.io/v2/1/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
     opExplorer: 'https://eth.blockscout.com/op/',
     stablecoins: [
       {
@@ -62,7 +70,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     ...arbitrum,
     icon: 'https://icons.llamao.fi/icons/protocols/arbitrum-timeboost',
     endpoint: arbitrum.rpcUrls.default.http[0] || `https://arb-mainnet.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
-    bundler: `https://api.pimlico.io/v2/42161/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
+    bundler: getFreeBundlerUrl(arbitrum.id), //`https://api.pimlico.io/v2/42161/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
     opExplorer: 'https://arbitrum.blockscout.com/op/',
     stablecoins: [
       {
@@ -83,7 +91,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     ...optimism,
     icon: 'https://icons.llamao.fi/icons/chains/rsz_optimism',
     endpoint: 'https://1rpc.io/op', //|| `https://opt-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
-    bundler: `https://api.pimlico.io/v2/10/rpc?apikey=${import.meta.env.VITE_PIMLICO_API_KEY}`,
+    bundler: getFreeBundlerUrl(optimism.id), //`https://api.pimlico.io/v2/10/rpc?apikey=${import.meta.env.VITE_PIMLICO_API_KEY}`,
     opExplorer: 'https://explorer.optimism.io/op/',
     stablecoins: [
       {
@@ -107,7 +115,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     endpoint:
       // optimismSepolia.rpcUrls.default.http[0]
       `https://opt-sepolia.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
-    bundler: `https://api.pimlico.io/v2/11155420/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
+    bundler: getFreeBundlerUrl(optimismSepolia.id), //`https://api.pimlico.io/v2/11155420/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
     stablecoins: [
       {
         name: 'USDC',
@@ -121,7 +129,7 @@ export const SUPPORTED_CHAINS: TChainItem[] = [
     icon: 'https://static1.tokenterminal.com//ethereum/logo.png',
     endpoint: 'https://0xrpc.io/sep',
     // || `https://eth-sepolia.g.alchemy.com/v2/${CONFIG.rpc.alchemyKey}`,
-    bundler: `https://api.pimlico.io/v2/11155111/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
+    bundler: getFreeBundlerUrl(sepolia.id), //`https://api.pimlico.io/v2/11155111/rpc?apikey=${CONFIG.rpc.pimlicoKey}`,
     opExplorer: 'https://eth-sepolia.blockscout.com/op/',
     stablecoins: [
       {

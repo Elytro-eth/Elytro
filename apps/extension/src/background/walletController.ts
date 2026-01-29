@@ -37,6 +37,7 @@ import type { TSecurityProfile } from './services/securityHook';
 import { canUserOpGetSponsor } from '@/utils/ethRpc/sponsor';
 import type { THookError } from '@/types/securityHook';
 import callManager from './services/callManager';
+import CONFIG from '@/config';
 
 enum WalletStatusEn {
   NoOwner = 'NoOwner',
@@ -329,7 +330,7 @@ class WalletController {
       const [hookStatus, entryPoint, availableTokens] = await Promise.all([
         this.getSecurityHookStatus(),
         this.getEntryPoint(),
-        elytroSDK.getTokenPaymaster(),
+        CONFIG.features?.erc20Paymaster ? elytroSDK.getTokenPaymaster() : Promise.resolve([]),
       ]);
 
       const canSponsor = await canUserOpGetSponsor(tempUserOp, chainId, entryPoint, hookStatus);
@@ -788,6 +789,11 @@ class WalletController {
       getTokenList(chainId),
       walletClient.getBalance(address),
       (async (): Promise<TTokenInfo[]> => {
+        // Check if ERC20 paymaster feature is disabled
+        if (!CONFIG.features?.erc20Paymaster) {
+          return [];
+        }
+
         const tokens = await elytroSDK.getSupportedGasTokens();
         if (tokens.length === 0) {
           return [];
@@ -1154,6 +1160,11 @@ class WalletController {
   }
 
   public async getTokenPaymaster() {
+    // Check if ERC20 paymaster feature is disabled
+    if (!CONFIG.features?.erc20Paymaster) {
+      console.log('Elytro: ERC20 paymaster feature is temporarily disabled.');
+      return [];
+    }
     return await elytroSDK.getTokenPaymaster();
   }
 

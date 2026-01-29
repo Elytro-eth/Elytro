@@ -55,7 +55,7 @@ export default function Tx() {
 
         <h2 className="text-lg font-semibold text-foreground mb-xs">Transaction Failed</h2>
 
-        <div className="text-center text-muted-foreground text-sm mb-6 max-w-[17.5rem]">
+        <div className="text-center text-muted-foreground text-sm mb-6 max-w-[17.5rem] max-h-[10rem] overflow-y-auto">
           {errorMsg || 'Please try again or contact support'}
         </div>
 
@@ -72,7 +72,7 @@ export default function Tx() {
         <InfoIcon className="size-12 text-destructive animate-pulse mb-md" />
         <h2 className="text-lg font-semibold text-foreground mb-xs">Transaction Processing</h2>
 
-        <div className="text-center text-muted-foreground text-sm mb-6 max-w-[17.5rem]">
+        <div className="text-center text-muted-foreground text-sm mb-6 max-w-[17.5rem] max-h-[10rem] overflow-y-auto">
           Your transaction is being processed, please wait...
         </div>
       </div>
@@ -96,7 +96,7 @@ export default function Tx() {
 
         <h2 className="text-lg font-semibold text-foreground mb-xs">Transaction Failed</h2>
 
-        <div className="text-center text-muted-foreground text-sm mb-6 max-w-[17.5rem]">
+        <div className="text-center text-muted-foreground text-sm mb-6 max-w-[17.5rem] max-h-[10rem] overflow-y-auto">
           {(hookError as SafeAny)?.message || errorMsg || 'Please try again or contact support'}
         </div>
 
