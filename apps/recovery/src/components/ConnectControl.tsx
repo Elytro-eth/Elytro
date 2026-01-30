@@ -2,15 +2,13 @@
 
 import React, { useMemo, useState } from 'react';
 import { Connector, useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@elytro/ui';
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, cn, toast } from '@elytro/ui';
 
 import { X } from 'lucide-react';
 import AddressWithChain from './AddressWithChain';
-import { toast } from '@elytro/ui';
 import { useRecoveryRecord } from '@/contexts';
 import WrappedImage from './WrappedImage';
 import { CONNECTOR_ICON_MAP } from '@/wagmi';
-import { cn } from '@/lib/utils';
 import { CHAIN_ID_TO_NAME_MAP } from '@/constants/chains';
 import { useCurrentChain } from '@/hooks/use-current-chain';
 import { usePathname } from 'next/navigation';

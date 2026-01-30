@@ -1,7 +1,7 @@
 'use client';
 
 import { CHAIN_LOGOS, SUPPORTED_CHAINS } from '@/constants/chains';
-import { cn } from '@/lib/utils';
+import { cn } from '@elytro/ui';
 import Image from 'next/image';
 import React from 'react';
 import { Address } from 'viem';

@@ -1,9 +1,13 @@
 import { ApolloClient, InMemoryCache, HttpLink, from, DocumentNode } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
-import config from '../config';
+
+const graphqlEndpoint =
+  process.env.NODE_ENV === 'production'
+    ? 'https://api.soulwallet.io/elytroapi/graphql/'
+    : 'https://api-dev.soulwallet.io/elytroapi/graphql/';
 
 const httpLink = new HttpLink({
-  uri: config.graphqlEndpoint,
+  uri: graphqlEndpoint,
 });
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {

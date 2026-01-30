@@ -1,9 +1,8 @@
 'use client';
 
 import ContentWrapper from '@/components/ContentWrapper';
-import { Button } from '@elytro/ui';
+import { Button, cn, toast } from '@elytro/ui';
 import { useRecoveryRecord } from '@/contexts';
-import { toast } from '@elytro/ui';
 import { getConfig } from '@/wagmi';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -13,7 +12,6 @@ import { Box, ExternalLink, Loader2 } from 'lucide-react';
 import { doorImage } from '@elytro/ui/assets';
 import Image from 'next/image';
 import { RecoveryStatusEn } from '@/constants/enums';
-import { cn } from '@/lib/utils';
 import { SidebarStepper } from '@/components/SidebarStepper';
 
 const TimeBlock = ({ time, unit }: { time: number; unit: string }) => {
