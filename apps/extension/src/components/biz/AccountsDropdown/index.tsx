@@ -1,18 +1,24 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  toast,
+  cn,
+} from '@elytro/ui';
 import AccountOption from './AccountOption';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getIconByChainId, getChainNameByChainId } from '@/constants/chains';
 import { formatAddressToShort, formatTokenAmount } from '@/utils/format';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';
 import { useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
 import { navigateTo } from '@/utils/navigation';
-import { toast } from '@/hooks/use-toast';
-import { cn } from '@/utils/shadcn/utils';
 
 interface IAccountsDropdownProps {
   className?: string;

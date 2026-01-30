@@ -1,15 +1,20 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  cn,
+  Spin,
+} from '@elytro/ui';
 import AccountOption from '../AccountsDropdown/AccountOption';
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getIconByChainId } from '@/constants/chains';
 import { formatAddressToShort } from '@/utils/format';
 import { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { ChevronUp } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
-import Spin from '@/components/ui/Spin';
-import { cn } from '@/utils/shadcn/utils';
 
 interface IAccountsDropdownProps {
   className?: string;

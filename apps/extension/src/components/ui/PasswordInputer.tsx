@@ -1,5 +1,4 @@
-import { EyeOnOff } from '@/components/ui/EyeOnOff';
-import { Input, InputProps } from './input';
+import { Input, InputProps, EyeOnOff } from '@elytro/ui';
 import { ControllerRenderProps, FieldValues } from 'react-hook-form';
 import { useState } from 'react';
 

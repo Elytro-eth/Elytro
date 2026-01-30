@@ -9,12 +9,9 @@ import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
 import { ChevronUp, RefreshCw, Copy as CopyIcon, Check } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import HelperText from '@/components/ui/HelperText';
+import { RadioGroup, RadioGroupItem, Button, cn, HelperText } from '@elytro/ui';
 import { RawData } from '@/components/ui/rawData';
-import { cn } from '@/utils/shadcn/utils';
 import { safeClipboard } from '@/utils/clipboard';
-import { Button } from '@/components/ui/button';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 

@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Box } from 'lucide-react';
-import { InputOTPGroup, InputOTP, InputOTPSlot } from '@/components/ui/input-otp';
+import { InputOTPGroup, InputOTP, InputOTPSlot, Button, DialogFooter } from '@elytro/ui';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
-import { Button } from '@/components/ui/button';
-import { DialogFooter } from '@/components/ui/dialog';
 import type { THookError } from '@/types/securityHook';
 
 export interface OTPInputProps {

@@ -1,6 +1,5 @@
 import { navigateTo, SidePanelRoutePath } from '@/utils/navigation';
-import LogoIcon from '@/assets/logo.svg';
-import CheckedIcon from '@/assets/icons/checked.svg';
+import { logoSvg, checkedIcon } from '@elytro/ui/assets';
 import { useAccount } from '@/contexts/account-context';
 import { useEffect, useState } from 'react';
 import { useWallet } from '@/contexts/wallet';
@@ -8,12 +7,12 @@ import { useWallet } from '@/contexts/wallet';
 const AddOns = [
   {
     name: 'Social Recovery',
-    logo: LogoIcon,
+    logo: logoSvg,
     url: '/recovery-setting' as SidePanelRoutePath,
   },
   {
     name: 'Sign with 2FA',
-    logo: LogoIcon,
+    logo: logoSvg,
     url: '/settings/security-hook' as SidePanelRoutePath,
   },
 ];
@@ -26,7 +25,7 @@ const Item = ({ name, logo, url, installed }: { name: string; logo: string; url:
     >
       <div className="flex flex-row items-top justify-between">
         <img src={logo} alt={name} className="size-10 rounded-full p-1 bg-white" />
-        {installed && <img src={CheckedIcon} alt="checked" className="size-6" />}
+        {installed && <img src={checkedIcon} alt="checked" className="size-6" />}
       </div>
 
       <div className="flex flex-col gap-y-2">

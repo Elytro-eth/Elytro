@@ -3,7 +3,7 @@ import { DecodeResult } from '@elytro/decoder';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { useAccount } from '@/contexts/account-context';
 import { formatTokenAmount, formatDollarBalance } from '@/utils/format';
-import DefaultTokenIcon from '@/assets/icons/ether.svg';
+import { etherIcon } from '@elytro/ui/assets';
 import { useMemo } from 'react';
 
 interface IInnerSendingDetailProps {
@@ -39,7 +39,7 @@ export default function InnerSendingDetail({ decodedUserOp }: IInnerSendingDetai
       <div className="flex flex-col items-center gap-y-sm px-lg py-md rounded-md">
         <img
           className="size-16 p-2 rounded-full ring-1 ring-gray-150 bg-white"
-          src={logoURI || DefaultTokenIcon}
+          src={logoURI || etherIcon}
           alt={symbol}
         />
         <div className="flex flex-col items-center gap-y-0">

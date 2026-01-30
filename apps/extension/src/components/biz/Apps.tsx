@@ -4,7 +4,7 @@ import { SquareArrowOutUpRight, Unlink } from 'lucide-react';
 import { useEffect, useState, useCallback } from 'react';
 import { useWallet } from '@/contexts/wallet';
 import { getHostname } from '@/utils/format';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@elytro/ui';
 import RuntimeMessage from '@/utils/message/runtimeMessage';
 import { EVENT_TYPES } from '@/constants/events';
 

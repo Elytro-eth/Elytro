@@ -1,8 +1,7 @@
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, Button } from '@elytro/ui';
+import { envelopeImage } from '@elytro/ui/assets';
 import { useWallet } from '@/contexts/wallet';
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
-import EnvelopeIcon from '@/assets/envelope.png';
-import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 
 export default function ConfirmPreForceUninstallModal() {
@@ -35,7 +34,7 @@ export default function ConfirmPreForceUninstallModal() {
         </DialogHeader>
 
         <div className="flex flex-col items-center justify-center w-full text-center gap-y-lg my-4">
-          <img src={EnvelopeIcon} alt="envelope" className="size-24" />
+          <img src={envelopeImage} alt="envelope" className="size-24" />
           <div className="text-lg font-bold">Reset Sign with 2FA</div>
           <div className="text-sm text-gray-500">
             You’ve lost access to your verification email. <br />

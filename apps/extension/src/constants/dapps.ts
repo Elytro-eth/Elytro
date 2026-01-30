@@ -1,30 +1,23 @@
-import aave from '@/assets/icons/aave.svg';
-import lido from '@/assets/icons/lido.svg';
-import logo from '@/assets/logo.svg';
-import ens from '@/assets/icons/ens.svg';
-// import opensea from '@/assets/icons/opensea.svg';
-import cowswap from '@/assets/icons/cowswap.svg';
-import relay from '@/assets/icons/relay.svg';
-import shield from '@/assets/icons/privacypools.svg';
+import { aaveIcon, lidoIcon, logoSvg, ensIcon, cowswapIcon, relayIcon, privacypoolsIcon } from '@elytro/ui/assets';
 
 export const ENCOURAGE_DAPPS = [
   {
     name: 'ENS',
     label: 'Names',
     url: 'https://app.ens.domains/',
-    icon: ens,
+    icon: ensIcon,
   },
   {
     name: 'Aave',
     label: 'Lend',
     url: 'https://app.aave.com/',
-    icon: aave,
+    icon: aaveIcon,
   },
   {
     name: 'Lido',
     label: 'Stake',
     url: 'https://stake.lido.fi/',
-    icon: lido,
+    icon: lidoIcon,
   },
   // {
   //   name: 'OpenSea',
@@ -36,24 +29,24 @@ export const ENCOURAGE_DAPPS = [
     name: 'CoW Swap',
     label: 'Swap',
     url: 'https://swap.cow.fi/',
-    icon: cowswap,
+    icon: cowswapIcon,
   },
   {
     name: 'Relay',
     label: 'Bridge',
     url: 'https://www.relay.link/bridge',
-    icon: relay,
+    icon: relayIcon,
   },
   {
     name: 'PrivacyPools',
     label: 'Privacy',
     url: 'https://privacypools.com/',
-    icon: shield,
+    icon: privacypoolsIcon,
   },
 ];
 
 export const ELYTRO_APP_DATA: TDAppInfo = {
   name: 'Elytro',
   origin: 'https://elytro.com',
-  icon: logo,
+  icon: logoSvg,
 };

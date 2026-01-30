@@ -1,5 +1,5 @@
-import { cn } from '@/utils/shadcn/utils';
-import Spin from './Spin';
+import { cn } from '../utils';
+import Spin from './spin';
 
 interface IProcessingTipProps {
   body?: string;

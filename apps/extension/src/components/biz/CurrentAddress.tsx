@@ -1,7 +1,7 @@
 import { getIconByChainId } from '@/constants/chains';
 import { useAccount } from '@/contexts/account-context';
 import { formatAddressToShort } from '@/utils/format';
-import { cn } from '@/utils/shadcn/utils';
+import { cn } from '@elytro/ui';
 
 interface IProps {
   className?: string;

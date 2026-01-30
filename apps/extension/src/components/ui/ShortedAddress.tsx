@@ -1,8 +1,6 @@
 import { getIconByChainId } from '@/constants/chains';
 import { formatAddressToShort } from '@/utils/format';
-import { cn } from '@/utils/shadcn/utils';
-import { Tooltip, TooltipContent } from './tooltip';
-import { TooltipTrigger } from '@radix-ui/react-tooltip';
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from '@elytro/ui';
 
 interface IProps {
   address: string;

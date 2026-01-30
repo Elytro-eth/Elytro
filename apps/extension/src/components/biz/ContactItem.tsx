@@ -1,6 +1,6 @@
 import { formatAddressToShort } from '@/utils/format';
 import { UserRound } from 'lucide-react';
-import { cn } from '@/utils/shadcn/utils';
+import { cn } from '@elytro/ui';
 
 interface IContactItemProps {
   contact: TRecoveryContact;

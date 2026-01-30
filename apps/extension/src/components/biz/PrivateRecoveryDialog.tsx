@@ -6,14 +6,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+  Button,
+  toast,
+} from '@elytro/ui';
 import RuntimeMessage from '@/utils/message/runtimeMessage';
 import { EVENT_TYPES } from '@/constants/events';
 import { useAccount } from '@/contexts/account-context';
 import { useWallet } from '@/contexts/wallet';
 import { getLocalContactsSetting } from '@/utils/contacts';
-import { toast } from '@/hooks/use-toast';
 import { writeFile } from '@/utils/file';
 import dayjs from 'dayjs';
 

@@ -1,6 +1,5 @@
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger, cn } from '@elytro/ui';
 import { SUPPORTED_CHAINS } from '@/constants/chains';
-import { cn } from '@/utils/shadcn/utils';
 import { ReactNode } from 'react';
 import { isAddress } from 'viem';
 

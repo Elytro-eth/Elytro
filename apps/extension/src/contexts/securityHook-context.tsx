@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useAccount } from './account-context';
 import { useWallet } from './wallet';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@elytro/ui';
 import { formatErrorMsg } from '@/utils/format';
 import type { TRequestEmailBindingResult, TSecurityProfile } from '@/background/services/securityHook';
 import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';

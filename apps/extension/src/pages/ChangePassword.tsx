@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button, Form, FormControl, FormField, FormItem, FormMessage, toast, HelperText } from '@elytro/ui';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useWallet } from '@/contexts/wallet';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from '@/hooks/use-toast';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import PasswordInput from '@/components/ui/PasswordInputer';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
-import HelperText from '@/components/ui/HelperText';
 
 const ChangePassword: React.FC = () => {
   const { wallet } = useWallet();

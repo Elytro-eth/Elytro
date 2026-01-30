@@ -1,7 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import LogoWithCircle from '@/assets/logo_full.svg';
+import { Avatar, AvatarFallback, AvatarImage, Button, Card } from '@elytro/ui';
+import { logoWithCircleSvg } from '@elytro/ui/assets';
 import { CheckIcon } from 'lucide-react';
 
 interface IProps {
@@ -17,7 +15,7 @@ export default function ConnectionConfirmation({ dApp, onConfirm, onCancel }: IP
     <Card className="w-full h-full p-1 flex flex-col border-none rounded-none shadow-none">
       <div className="flex justify-center mt-10 ">
         <Avatar className="size-5xl left-2 rounded-full border border-1 border-gray-300 bg-white">
-          <AvatarImage src={LogoWithCircle} alt="Elytro" className="size-[60%]" />
+          <AvatarImage src={logoWithCircleSvg} alt="Elytro" className="size-[60%]" />
           <AvatarFallback>Elytro</AvatarFallback>
         </Avatar>
         <Avatar className="size-5xl z-0 rounded-full mr-4 border border-1 border-gray-300 bg-white">

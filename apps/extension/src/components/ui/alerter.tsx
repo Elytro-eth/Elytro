@@ -5,8 +5,8 @@ import {
   AlertDialogDescription,
   AlertDialogHeader,
   AlertDialogTitle,
-} from './alert-dialog';
-import { Button } from './button';
+  Button,
+} from '@elytro/ui';
 
 type ElytroAlertProps = {
   title: string;

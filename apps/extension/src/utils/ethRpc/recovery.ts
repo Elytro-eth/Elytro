@@ -1,7 +1,7 @@
 import { mutate, query } from '@/requests';
 import { mutate_create_recovery_record } from '@/requests/mutate';
 import { formatHex, paddingZero } from '../format';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@elytro/ui';
 import { query_recovery_record } from '@/requests/query';
 
 interface ICreateRecoveryRecordInput {

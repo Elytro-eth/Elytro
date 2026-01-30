@@ -1,9 +1,8 @@
 import { useApproval } from '@/contexts/approval-context';
 import { ethErrors } from 'eth-rpc-errors';
-import Spin from '@/components/ui/Spin';
-import { Button } from '@/components/ui/button';
+import { Button, Spin } from '@elytro/ui';
+import { errorSvg } from '@elytro/ui/assets';
 import { UnsupportedMethod } from '@/background/provider/rpcFlow/checkCallable';
-import ErrorIcon from '@/assets/error.svg';
 export default function BlockedAlert() {
   const { approval, reject } = useApproval();
 
@@ -35,7 +34,7 @@ export default function BlockedAlert() {
         </div>
       </div> */}
 
-      <img src={ErrorIcon} alt="error" className="size-16 self-center" />
+      <img src={errorSvg} alt="error" className="size-16 self-center" />
 
       <div className="elytro-text-small">
         {(options as UnsupportedMethod).name} failed, {(options as UnsupportedMethod).reason}

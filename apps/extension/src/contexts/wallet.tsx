@@ -1,11 +1,10 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { WalletController, WalletStatusEn } from '@/background/walletController';
 import PortMessage from '@/utils/message/portMessage';
-import { toast } from '@/hooks/use-toast';
+import { toast, cn } from '@elytro/ui';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo, SidePanelRoutePath } from '@/utils/navigation';
 import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';
-import { cn } from '@/utils/shadcn/utils';
 import { useInterval } from 'usehooks-ts';
 import { formatObjectWithBigInt } from '@/utils/format';
 const portMessage = new PortMessage('elytro-ui');

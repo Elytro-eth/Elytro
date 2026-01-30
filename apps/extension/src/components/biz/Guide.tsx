@@ -1,5 +1,5 @@
 import TipItem from '@/components/biz/TipItem';
-import { Button } from '@/components/ui/button';
+import { Button } from '@elytro/ui';
 import { LucideProps } from 'lucide-react';
 import { useState } from 'react';
 

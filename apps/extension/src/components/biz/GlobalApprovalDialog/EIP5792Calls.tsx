@@ -1,10 +1,7 @@
 import { useApproval } from '@/contexts/approval-context';
 import { useWallet } from '@/contexts/wallet';
 import { ethErrors } from 'eth-rpc-errors';
-import Spin from '@/components/ui/Spin';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Badge, Spin } from '@elytro/ui';
 import { EIP5792Call } from '@/types/eip5792';
 import { formatAddressToShort } from '@/utils/format';
 

@@ -7,9 +7,9 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/utils/shadcn/utils';
+  Button,
+  cn,
+} from '@elytro/ui';
 
 interface RecoveryFileUploadDialogProps {
   open: boolean;

@@ -1,17 +1,14 @@
 import ContactItem from '@/components/biz/ContactItem';
-import { Button } from '@/components/ui/button';
+import { Button, toast, cn, HelperText } from '@elytro/ui';
 import { useAccount } from '@/contexts/account-context';
 import { useTx } from '@/contexts/tx-context';
 import { TxRequestTypeEn } from '@/contexts/tx-context';
 import { useWallet } from '@/contexts/wallet';
-import { toast } from '@/hooks/use-toast';
 import { Box, Minus, PencilLine, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import ContactsImg from '@/assets/contacts.png';
+import { contactsImage } from '@elytro/ui/assets';
 import ShortedAddress from '@/components/ui/ShortedAddress';
-import { cn } from '@/utils/shadcn/utils';
 import { setLocalContacts, setLocalThreshold } from '@/utils/contacts';
-import HelperText from '@/components/ui/HelperText';
 import Copy from '@/components/ui/Copy';
 
 interface IContactListProps {
@@ -194,7 +191,7 @@ export default function ContactList({
         ) : (
           <div className="flex flex-col gap-y-md">
             <div className="flex flex-col gap-y-md items-center mt-4xl">
-              <img src={ContactsImg} className="size-36" />
+              <img src={contactsImage} className="size-36" />
               <span className="elytro-text-subtitle text-center">Add a new contact</span>
 
               <Button variant="secondary" className="w-full mt-4" onClick={onAddContact}>

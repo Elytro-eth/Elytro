@@ -1,6 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Input } from '@elytro/ui';
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 
 interface ILabelDialogProps {

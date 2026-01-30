@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@elytro/ui';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useState, useEffect } from 'react';
 import { TChainItem } from '@/constants/chains';

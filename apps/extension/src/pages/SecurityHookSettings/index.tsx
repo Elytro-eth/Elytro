@@ -5,23 +5,17 @@ import { useTx } from '@/contexts/tx-context';
 import { SecurityHookProvider, useSecurityHook } from '@/contexts/securityHook-context';
 import { TxRequestTypeEn } from '@/contexts/tx-context';
 import type { Transaction } from '@elytro/sdk';
-import { toast } from '@/hooks/use-toast';
 import { formatErrorMsg } from '@/utils/format';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import ProcessingTip from '@/components/ui/ProcessingTip';
 import { AlertCircle, Mail, PauseOctagon, Edit2, X } from 'lucide-react';
-import Spin from '@/components/ui/Spin';
-import GuardianIcon from '@/assets/icons/guardian.svg';
+import { guardianIcon } from '@elytro/ui/assets';
 import { getChainNameByChainId } from '@/constants/chains';
 import { THookStatus } from '@/types/securityHook';
 import { RuntimeMessage } from '@/utils/message';
 import { EVENT_TYPES } from '@/constants/events';
-import { Switch } from '@/components/ui/switch';
-import HelperText from '@/components/ui/HelperText';
+import { Switch, Input, Button, toast, ProcessingTip, Spin, HelperText } from '@elytro/ui';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import Copy from '@/components/ui/Copy';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import NavItem from '@/components/ui/NavItem';
 import { OTPInputDialog, useOTPInput } from '@/components/biz/OTPInput';
 import ConfirmPreForceUninstallModal from './ConfirmPreForceUninstallModal';
@@ -489,7 +483,7 @@ function SecurityHookSettingsInnerPage() {
                 <div className="bg-white rounded-md p-4 border border-gray-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-x-3">
-                      <img src={GuardianIcon} alt="Guardian" className="size-5" />
+                      <img src={guardianIcon} alt="Guardian" className="size-5" />
                       <span className="text-base font-normal">Sign with 2FA</span>
                     </div>
                     <Switch

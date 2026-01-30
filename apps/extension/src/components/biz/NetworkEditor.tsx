@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { Button, Form, FormControl, FormField, FormItem, FormMessage, useToast } from '@elytro/ui';
 import { TChainItem } from '@/constants/chains';
 import { LabelInput } from './LabelInput';
 import { useWallet } from '@/contexts/wallet';
@@ -7,7 +6,6 @@ import { createPublicClient, http } from 'viem';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useEffect, useState } from 'react';
 import { maskApiKeyInUrl } from '@/utils/url';
 

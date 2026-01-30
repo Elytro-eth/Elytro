@@ -1,11 +1,9 @@
-import { Button } from '@/components/ui/button';
+import { Button, toast, cn } from '@elytro/ui';
 import DAppDetail from '../DAppDetail';
 import { useWallet } from '@/contexts/wallet';
-import { toast } from '@/hooks/use-toast';
 import { SignTypeEn, getProcessingFromSignType } from './utils';
 import DomainDetail from './DomainDetail';
 import { WalletController } from '@/background/walletController';
-import { cn } from '@/utils/shadcn/utils';
 import { formatErrorMsg } from '@/utils/format';
 
 interface ISendTxProps {

@@ -1,4 +1,4 @@
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@elytro/ui';
 
 /**
  * Copy text using modern Clipboard API

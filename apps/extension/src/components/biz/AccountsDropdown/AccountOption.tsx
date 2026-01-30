@@ -1,11 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import { Button, Checkbox, Dialog, DialogContent, DialogHeader, DialogTitle, Label, toast, cn } from '@elytro/ui';
 import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
-import { toast } from '@/hooks/use-toast';
 import { formatAddressToShort, formatTokenAmount } from '@/utils/format';
-import { cn } from '@/utils/shadcn/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';

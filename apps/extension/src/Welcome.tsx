@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { SOCIAL_MEDIA_LINKS } from '@/constants/social-media';
-import { Button } from '@/components/ui/button';
-import ElytroIcon from '@/assets/logo.svg';
+import { Button } from '@elytro/ui';
+import { logoSvg } from '@elytro/ui/assets';
 import '@/index.css';
 import { openSidePanel } from './utils/window';
 import { ArrowUp } from 'lucide-react';
@@ -22,7 +22,7 @@ const SocialMediaIcon: React.FC<{
 const Welcome = () => (
   <div className="w-screen h-screen bg-green-50 flex flex-col items-center justify-center">
     <header className="fixed top-4 left-4 elytro-text-subtitle flex items-center gap-3xs">
-      <img src={ElytroIcon} alt="Elytro" className="size-2xl" />
+      <img src={logoSvg} alt="Elytro" className="size-2xl" />
       Elytro
     </header>
     <div className="absolute top-4 right-8 elytro-text-small text-gray-600 flex items-top gap-2">

@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import Spin from '@/components/ui/Spin';
+import { Spin } from '@elytro/ui';
 import { Router, Route, Switch, Redirect } from 'wouter';
 import { TRoute } from '@/types/route';
 import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';

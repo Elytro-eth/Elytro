@@ -1,7 +1,7 @@
 import { useAccount } from '@/contexts/account-context';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
-import { cn } from '@/utils/shadcn/utils';
+import { cn } from '@elytro/ui';
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import { Check, ChevronRight } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/use-local-storage';

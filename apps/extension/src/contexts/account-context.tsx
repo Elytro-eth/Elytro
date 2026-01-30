@@ -9,7 +9,7 @@ import { EVENT_TYPES } from '@/constants/events';
 import { removeSearchParamsOfCurrentWindow } from '@/utils/url';
 import { query, query_receive_activities, query_token_price } from '@/requests/query';
 import { debounce, DebouncedFunc } from 'lodash';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@elytro/ui';
 import { useInterval } from 'usehooks-ts';
 
 const DEFAULT_ACCOUNT_INFO: TAccountInfo = {

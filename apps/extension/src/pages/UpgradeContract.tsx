@@ -1,13 +1,12 @@
-import { Button } from '@/components/ui/button';
+import { Button, toast } from '@elytro/ui';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useAccount } from '@/contexts/account-context';
-import WalletImg from '@/assets/bg-images/wallet-bg-sm.png';
+import { bgWalletSm } from '@elytro/ui/assets';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';
 import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 import { getInstallModuleTx, getUpgradeModuleTx, getUninstallModuleTx } from '@/utils/contracts/upgrade';
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import type { Transaction } from '@elytro/sdk';
-import { toast } from '@/hooks/use-toast';
 import { formatErrorMsg } from '@/utils/format';
 import { useWallet } from '@/contexts/wallet';
 
@@ -60,7 +59,7 @@ export default function UpgradeContract() {
           <FragmentedAddress address={address} chainId={chainId} className="p-xs rounded-2xs bg-gray-150" />
         </div>
         <div>
-          <img src={WalletImg} alt="Wallet" className="size-[200px] mt-3xl mx-auto" />
+          <img src={bgWalletSm} alt="Wallet" className="size-[200px] mt-3xl mx-auto" />
         </div>
         <div className="text-xl font-bold text-center">Update contract</div>
         <div className="bg-gray-150 p-lg text-gray-750 rounded-sm space-y-2">

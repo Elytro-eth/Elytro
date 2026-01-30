@@ -1,10 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import RequestProvider from './RequestProvider';
 import '@/index.css';
-import { Toaster } from './toaster';
 import { WalletProvider } from '@/contexts/wallet';
 import ErrorBoundary from './ErrorBoundary';
-import { cn } from '@/utils/shadcn/utils';
+import { cn, Toaster } from '@elytro/ui';
 import { ChainProvider } from '@/contexts/chain-context';
 
 interface IPageContainerProps {

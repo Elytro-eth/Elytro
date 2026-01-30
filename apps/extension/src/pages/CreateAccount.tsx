@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
-import { Button } from '@/components/ui/button';
+import { Button, toast, Spin } from '@elytro/ui';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { TChainItem } from '@/constants/chains';
-import { toast } from '@/hooks/use-toast';
 
 import { useWallet } from '@/contexts/wallet';
 import NetworkSelection from '@/components/biz/NetworkSelection';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
-import DoorImg from '@/assets/bg-images/wallet-bg-lg.png';
+import { bgWalletLg } from '@elytro/ui/assets';
 import { useAccount } from '@/contexts/account-context';
-import Spin from '@/components/ui/Spin';
 import CurrentAddress from '@/components/biz/CurrentAddress';
 
 const CreateAccount: React.FC = () => {
@@ -54,7 +52,7 @@ const CreateAccount: React.FC = () => {
     return (
       <FullPageWrapper className={`h-full flex flex-col items-center justify-center page-fade-in`}>
         <div className="flex flex-col items-center gap-y-2xs">
-          <img src={DoorImg} alt="Passcode" width={200} />
+          <img src={bgWalletLg} alt="Passcode" width={200} />
 
           <h1 className="elytro-text-title text-center mt-6">Your wallet is created</h1>
 

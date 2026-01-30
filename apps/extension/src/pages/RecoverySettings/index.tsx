@@ -1,13 +1,11 @@
-import ProcessingTip from '@/components/ui/ProcessingTip';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
-import { Button } from '@/components/ui/button';
+import { Button, toast, ProcessingTip } from '@elytro/ui';
 import { useEffect, useRef, useState } from 'react';
 import ContactList from './ContactList';
 import ContactDetail from './ContactDetail';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
 import RecoverGuide from './RecoverGuide';
-import { toast } from '@/hooks/use-toast';
 import LabelDialog, { ILabelDialogRef } from './LabelDialog';
 import { getLocalContacts, getLocalContactsSetting, setLocalContacts, setLocalThreshold } from '@/utils/contacts';
 

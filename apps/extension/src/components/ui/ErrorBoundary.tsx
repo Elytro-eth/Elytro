@@ -1,5 +1,5 @@
 import { Component, ErrorInfo } from 'react';
-import { Button } from './button';
+import { Button } from '@elytro/ui';
 
 type ErrorBoundaryState = {
   hasError: boolean;

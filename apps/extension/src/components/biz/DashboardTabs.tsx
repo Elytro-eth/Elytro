@@ -1,4 +1,4 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@elytro/ui';
 import { RefreshCcw } from 'lucide-react';
 import Activities from '@/components/biz/Activities';
 import Assets from '@/components/biz/Assets';

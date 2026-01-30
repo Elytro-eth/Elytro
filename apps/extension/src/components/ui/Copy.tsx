@@ -1,8 +1,7 @@
 import { safeClipboard } from '@/utils/clipboard';
 import { Copy as IconCopy, Check as IconCheck } from 'lucide-react';
 import { useCallback, useState } from 'react';
-import { toast } from '@/hooks/use-toast';
-import { cn } from '@/utils/shadcn/utils';
+import { toast, cn } from '@elytro/ui';
 
 interface ICopyProps {
   text: string;

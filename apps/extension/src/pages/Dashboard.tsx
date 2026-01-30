@@ -9,10 +9,9 @@ import DashboardTabs, { TABS_KEYS } from '@/components/biz/DashboardTabs';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { getLocalContactsSetting } from '@/utils/contacts';
 import { useWallet } from '@/contexts/wallet';
-import { toast } from '@/hooks/use-toast';
+import { toast, cn } from '@elytro/ui';
 import dayjs from 'dayjs';
 import { writeFile } from '@/utils/file';
-import { cn } from '@/utils/shadcn/utils';
 
 export default function Dashboard() {
   const { loading, reloadAccount, currentAccount } = useAccount();

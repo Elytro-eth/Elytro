@@ -1,5 +1,5 @@
 import { getIconByChainId } from '@/constants/chains';
-import { Input } from '@/components/ui/input';
+import { Input } from '@elytro/ui';
 import { useState, useRef, useEffect } from 'react';
 import { isAddress } from 'viem';
 import FragmentedAddress from '@/components/biz/FragmentedAddress';

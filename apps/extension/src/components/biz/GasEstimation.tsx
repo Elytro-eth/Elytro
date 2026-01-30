@@ -1,9 +1,19 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import Spin from '@/components/ui/Spin';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Badge,
+  Spin,
+} from '@elytro/ui';
 import { useInterval } from 'usehooks-ts';
 
 const INTERVAL_TIME = 15000; // TODO: see if this value is fine

@@ -1,6 +1,5 @@
-import { Input } from '@/components/ui/input';
+import { Input, cn } from '@elytro/ui';
 import { FieldValues } from 'react-hook-form';
-import { cn } from '@/utils/shadcn/utils';
 import { memo, useCallback, useState, useEffect, useRef } from 'react';
 import { ArrowUpDownIcon } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
