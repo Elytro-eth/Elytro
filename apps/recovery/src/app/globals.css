@@ -1,3 +1,4 @@
+@import '@elytro/ui/styles';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -17,8 +18,6 @@
     url('../assets/fonts/soehne-kraftig.woff') format('woff');
   font-weight: 700;
 }
-
-@import '@elytro/ui/styles';
 
 @layer base {
   * {
