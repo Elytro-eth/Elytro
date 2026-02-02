@@ -113,6 +113,10 @@ export default defineConfig({
       usePolling: false,
       ignored: ['**/node_modules/**', '**/dist/**', '**/build/**'],
     },
+    fs: {
+      // Allow serving files from the monorepo root (packages/ui/src/assets)
+      allow: [resolve(__dirname, '../..')],
+    },
   },
   preview: {
     port: 4173,
