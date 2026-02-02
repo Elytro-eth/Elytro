@@ -1,0 +1,27 @@
+---
+description: Prioritize unified UI components from @elytro/ui package
+alwaysApply: true
+---
+
+# Unified UI Priority
+
+When working on UI in this extension, **always prioritize the shared UI package** (`@elytro/ui`) over app-specific implementations.
+
+## Guidelines
+
+1. **Check `@elytro/ui` first** - Before creating or modifying a component, check if it exists in `packages/ui/src/`
+2. **Extend, don't duplicate** - If a similar component exists in the UI package, extend or compose it rather than creating a new one
+3. **Propose additions** - If a component should be shared, suggest adding it to `@elytro/ui` instead of keeping it app-specific
+4. **Consistent theming** - Use theme tokens and CSS variables from the UI package, not hardcoded values
+
+## Package Structure
+
+- **Shared UI**: `../../packages/ui/src/` (imported as `@elytro/ui`)
+- **App-specific**: `./src/components/` (only for extension-specific components)
+
+## When to Use App-Specific Components
+
+Only create components in `./src/components/` when:
+- The component is truly extension-specific (e.g., Chrome extension APIs)
+- It composes multiple `@elytro/ui` components for a specific use case
+- It requires extension-specific context or state
