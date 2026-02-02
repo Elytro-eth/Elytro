@@ -1,7 +1,7 @@
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import InfoCard from '@/components/biz/InfoCard';
 import { formatEther, formatUnits } from 'viem';
-import FragmentedAddress from '@/components/biz/FragmentedAddress';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 import { formatBalance, formatDollarBalance, formatRawData } from '@/utils/format';
 import { useMemo, useState, useEffect } from 'react';
 import ActivateDetail from './ActivationDetail';
@@ -134,7 +134,10 @@ export function UserOpDetail() {
 
       {/* UserOp Pay Info */}
       <InfoCardList>
-        <InfoCardItem label="From wallet" content={<FragmentedAddress address={address} chainId={chainId} />} />
+        <InfoCardItem
+          label="From wallet"
+          content={<ShortedAddress address={address} chainId={chainId} className="!bg-transparent !p-0" />}
+        />
 
         {/* Network cost: unit ETH */}
         <InfoCardItem

@@ -19,17 +19,11 @@ const CreateAccount: React.FC = () => {
 
   const { reloadAccount, loading: isLoading } = useAccount();
 
-  const handleCreateAccount = async () => {
-    if (!selectedChain) {
-      toast({
-        title: 'Please select a network',
-        // description: 'Please select a chain to create your wallet',
-      });
-      return;
-    }
+  const handleSelectChain = async (chain: TChainItem) => {
+    setSelectedChain(chain);
 
     try {
-      await wallet.createAccount(selectedChain.id);
+      await wallet.createAccount(chain.id);
       await reloadAccount();
       setIsCreated(true);
     } catch (error) {
@@ -38,10 +32,6 @@ const CreateAccount: React.FC = () => {
         description: error?.toString(),
       });
     }
-  };
-
-  const handleSelectChain = (chain: TChainItem) => {
-    setSelectedChain(chain);
   };
 
   const handleStart = () => {
@@ -69,10 +59,6 @@ const CreateAccount: React.FC = () => {
   return (
     <SecondaryPageWrapper title="Create wallet">
       <NetworkSelection selectedChain={selectedChain} handleSelectChain={handleSelectChain} />
-
-      <Button type="submit" className="w-full rounded-full mt-10" onClick={handleCreateAccount}>
-        Continue
-      </Button>
     </SecondaryPageWrapper>
   );
 };

@@ -1,9 +1,10 @@
 import { Button, Checkbox, Dialog, DialogContent, DialogHeader, DialogTitle, Label, toast, cn } from '@elytro/ui';
 import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
-import { formatAddressToShort, formatTokenAmount } from '@/utils/format';
+import { formatTokenAmount } from '@/utils/format';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 
 interface IAccountOptionProps {
   account: TAccountInfo;
@@ -56,7 +57,12 @@ export default function AccountOption({
         </Avatar>
 
         <div className="flex flex-col gap-y-0">
-          <span className="font-bold text-sm">{formatAddressToShort(account.address)}</span>
+          <ShortedAddress
+            address={account.address}
+            showChainIcon={false}
+            hideTooltip
+            className="!bg-transparent !p-0 font-bold text-sm"
+          />
           <span className="elytro-text-tiny-body text-gray-500">{getChainNameByChainId(account.chainId)}</span>
         </div>
       </div>

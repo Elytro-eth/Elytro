@@ -1,5 +1,5 @@
 import LabelValue from '../LabelValue';
-import { formatAddressToShort } from '@/utils/format';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 
 interface IDomainDetail {
   message: string;
@@ -23,7 +23,9 @@ const FieldRender = ({ label, value }: { label: string; value: string }) => {
       renderValue = value || '--';
       break;
     case 'verifyingContract':
-      renderValue = <div title={value}>{formatAddressToShort(value as string)}</div>;
+      renderValue = (
+        <ShortedAddress address={value as string} showChainIcon={false} hideTooltip className="!bg-transparent !p-0" />
+      );
       break;
     default:
       renderValue = value || '--';

@@ -1,5 +1,6 @@
 import { Check } from 'lucide-react';
-import AddressWithChain from './AddressWithChain';
+import { ShortedAddress } from '@elytro/ui';
+import { CHAIN_LOGOS } from '@/constants/chains';
 
 interface SidebarStepperProps {
   currentStep: number;
@@ -26,7 +27,11 @@ export const SidebarStepper = ({ currentStep, address, chainId }: SidebarStepper
         <>
           <div className="mb-lg">
             <h2 className="text-small-bold text-blue-900 mb-sm">Account in recovery</h2>
-            <AddressWithChain address={address as `0x${string}`} chainID={chainId} className="bg-gray-150" />
+            <ShortedAddress
+              address={address}
+              chainIconUrl={CHAIN_LOGOS[chainId]}
+              className="bg-gray-150 px-4 rounded-sm"
+            />
           </div>
           <div className="border-t border-gray-300 mb-lg" />
         </>

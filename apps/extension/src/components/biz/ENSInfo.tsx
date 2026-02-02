@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import FragmentedAddress from './FragmentedAddress';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 const ENSInfo = ({ ensInfo, extra }: { ensInfo: TRecentAddress; extra?: ReactNode }) => {
   if (!ensInfo || !ensInfo.address) return null;
   return (
@@ -14,7 +14,12 @@ const ENSInfo = ({ ensInfo, extra }: { ensInfo: TRecentAddress; extra?: ReactNod
       <div className="text-base font-bold">
         <div>{ensInfo.name}</div>
         <div className="flex text-xs font-normal">
-          <FragmentedAddress address={ensInfo?.address} extra={extra} size="xs" />
+          <ShortedAddress
+            address={ensInfo?.address || ''}
+            rightExtra={extra}
+            size="sm"
+            className="!bg-transparent !p-0"
+          />
         </div>
       </div>
     </div>

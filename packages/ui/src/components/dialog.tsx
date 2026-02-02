@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
@@ -31,21 +32,21 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     // Elytro customized props
     showCloseButton?: boolean;
+    centered?: boolean;
   }
->(({ className, children, showCloseButton = true, ...props }, ref) => (
+>(({ className, children, showCloseButton = true, centered = false, ...props }, ref) => (
   <DialogPortal>
-    <DialogOverlay />
+    <DialogOverlay className={centered ? 'flex items-center justify-center' : ''} />
     <DialogPrimitive.Content
       ref={ref}
-      style={
-        {
-          // animationTimingFunction: 'cubic-bezier( 0.6, -0.28, 0.735, 0.045 )',
-        }
-      }
       className={cn(
-        'fixed z-50 grid w-full rounded-sm gap-2 bg-background p-4 shadow-lg duration-1500 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-4 data-[state=open]:slide-in-from-top-full',
-        // Elytro Customized Style. PLEASE DO NOT CHANGE IT
-        'bg-white w-[calc(100%-2rem)] top-4 left-4 right-4 max-h-[calc(100%-2rem)]',
+        'fixed z-50 grid w-full rounded-sm gap-2 bg-background p-4 shadow-lg',
+        centered
+          ? // Centered positioning (for desktop/web apps) - simple opacity transition only
+            'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-150 data-[state=open]:opacity-100 data-[state=closed]:opacity-0'
+          : // Top positioning (for mobile/extension) - Elytro Customized Style
+            'top-4 left-4 right-4 max-h-[calc(100%-2rem)] data-[state=open]:animate-in data-[state=closed]:animate-out duration-1500 data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-4 data-[state=open]:slide-in-from-top-full',
+        'bg-white w-[calc(100%-2rem)]',
         className
       )}
       {...props}

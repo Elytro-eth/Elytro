@@ -8,7 +8,7 @@ import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 
 import InfoCard from '../InfoCard';
 import TokenAmountItem from '../TokenAmountItem';
-import FragmentedAddress from '../FragmentedAddress';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -18,14 +18,13 @@ function ContractAddress({ address }: { address: string }) {
   const { currentChain } = useChain();
 
   return (
-    <FragmentedAddress
-      className="flex flex-row items-center gap-sm"
+    <ShortedAddress
+      className="!bg-transparent !p-0"
       address={address}
       showChainIcon={false}
-      extraLayout="row"
-      extra={
+      rightExtra={
         <ExternalLink
-          className="size-4 cursor-pointer"
+          className="size-4 cursor-pointer ml-sm"
           onClick={() =>
             currentChain?.blockExplorers?.default?.url &&
             window.open(`${currentChain?.blockExplorers?.default?.url}/address/${address}`, '_blank')

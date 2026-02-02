@@ -1,13 +1,12 @@
 'use client';
-import AddressWithChain from '@/components/AddressWithChain';
 import { useAccount, useSendTransaction, useSwitchChain, useWaitForTransactionReceipt } from 'wagmi';
 import { useRecoveryRecord } from '@/contexts';
 import React, { useEffect, useRef, useState } from 'react';
-import { Button } from '@elytro/ui';
+import { Button, toast, ShortedAddress } from '@elytro/ui';
 import { getApproveHashTxData } from '@/requests/contract';
-import { toast } from '@elytro/ui';
 import { Box } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { CHAIN_LOGOS } from '@/constants/chains';
 
 export default function Sign() {
   const { address, isConnected, chainId } = useAccount();
@@ -95,10 +94,10 @@ export default function Sign() {
 
   return (
     <div>
-      <AddressWithChain
-        className="!p-lg rounded-[16px]"
-        address={address}
-        chainID={recoveryChainId}
+      <ShortedAddress
+        className="!p-lg rounded-[16px] w-full"
+        address={address || ''}
+        chainIconUrl={CHAIN_LOGOS[recoveryChainId]}
         rightExtra={
           recoveryChainId === chainId ? (
             <div className="flex items-center text-tiny rounded-xs bg-green-300 px-xs py-3xs">Connected</div>

@@ -2,14 +2,23 @@
 
 import React, { useMemo, useState } from 'react';
 import { Connector, useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, cn, toast } from '@elytro/ui';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  cn,
+  toast,
+  ShortedAddress,
+} from '@elytro/ui';
 
 import { X } from 'lucide-react';
-import AddressWithChain from './AddressWithChain';
 import { useRecoveryRecord } from '@/contexts';
 import WrappedImage from './WrappedImage';
 import { CONNECTOR_ICON_MAP } from '@/wagmi';
-import { CHAIN_ID_TO_NAME_MAP } from '@/constants/chains';
+import { CHAIN_ID_TO_NAME_MAP, CHAIN_LOGOS } from '@/constants/chains';
 import { useCurrentChain } from '@/hooks/use-current-chain';
 import { usePathname } from 'next/navigation';
 
@@ -143,10 +152,10 @@ export default function ConnectControl() {
               </Button>
             ) : null}
             <div className="flex items-center gap-2 py-sm px-md rounded-sm bg-white">
-              <AddressWithChain
-                address={address}
-                chainID={chainId}
-                className={cn('!p-0', isWrongChain && '!text-red-750 !border-red-750')}
+              <ShortedAddress
+                address={address || ''}
+                chainIconUrl={chainId ? CHAIN_LOGOS[chainId] : undefined}
+                className={cn('!p-0 !bg-transparent', isWrongChain && '!text-red-750 !border-red-750')}
                 hideTooltip={true}
               />
               <div className="h-4 w-[1px] bg-gray-300" />
@@ -162,7 +171,7 @@ export default function ConnectControl() {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" centered>
         <DialogHeader>
           <DialogTitle>Select a wallet client</DialogTitle>
         </DialogHeader>

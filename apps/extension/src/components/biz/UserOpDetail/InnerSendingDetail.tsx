@@ -1,4 +1,4 @@
-import FragmentedAddress from '../FragmentedAddress';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 import { DecodeResult } from '@elytro/decoder';
 import { getTransferredTokenInfo } from '@/utils/dataProcess';
 import { useAccount } from '@/contexts/account-context';
@@ -52,11 +52,11 @@ export default function InnerSendingDetail({ decodedUserOp }: IInnerSendingDetai
 
       <div className="elytro-text-bold-body">To</div>
 
-      <FragmentedAddress
-        size="md"
-        address={decodedUserOp?.to}
+      <ShortedAddress
+        size="lg"
+        address={decodedUserOp?.to || ''}
         chainId={currentAccount?.chainId}
-        className="bg-gray-150 px-lg py-lg rounded-md"
+        className="px-lg py-lg rounded-md w-full"
       />
     </>
   );

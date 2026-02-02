@@ -1,6 +1,6 @@
-import { formatAddressToShort } from '@/utils/format';
 import { UserRound } from 'lucide-react';
 import { cn } from '@elytro/ui';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 
 interface IContactItemProps {
   contact: TRecoveryContact;
@@ -23,9 +23,14 @@ export default function ContactItem({ contact, rightContent, isFirst, isLast }: 
         <UserRound className="size-2xl" />
 
         <div className="flex flex-col flex-1 min-w-0">
-          <p className="elytro-text-bold-body" title={contact.address}>
-            {formatAddressToShort(contact.address)}
-          </p>
+          <div className="elytro-text-bold-body" title={contact.address}>
+            <ShortedAddress
+              address={contact.address}
+              showChainIcon={false}
+              hideTooltip
+              className="!bg-transparent !p-0"
+            />
+          </div>
           <p className="elytro-text-tiny-body text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap">
             {contact.label || 'No label'}
           </p>

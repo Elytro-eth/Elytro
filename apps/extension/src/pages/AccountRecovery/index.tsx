@@ -116,19 +116,16 @@ export default function AccountRecovery() {
     );
   }
 
-  const handleSelectChain = (chain: TChainItem) => {
+  const handleSelectChain = async (chain: TChainItem) => {
     setSelectedChain(chain);
-  };
 
-  const handleNext = async () => {
     try {
-      await wallet.switchChain(selectedChain!.id);
+      await wallet.switchChain(chain.id);
       setIsChainConfirmed(true);
     } catch (error) {
       console.error(error);
       toast({
         title: 'Failed to switch network',
-        // description: 'Please try again',
       });
     }
   };
@@ -140,17 +137,10 @@ export default function AccountRecovery() {
         onBack={() => {
           setAddress('');
           setSelectedChain(null);
+          setChecked(false);
         }}
       >
         <NetworkSelection selectedChain={selectedChain} handleSelectChain={handleSelectChain} />
-        <div className="w-full grid grid-cols-2 gap-x-sm mt-10">
-          <Button variant="secondary" onClick={() => setChecked(false)}>
-            Cancel
-          </Button>
-          <Button disabled={!selectedChain} onClick={handleNext}>
-            Next
-          </Button>
-        </div>
       </SecondaryPageWrapper>
     );
   }

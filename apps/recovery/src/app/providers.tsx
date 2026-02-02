@@ -10,6 +10,7 @@ import { client } from '@/requests/client';
 import { RecoveryRecordProvider } from '@/contexts';
 import { useRpc } from '@/contexts/rpc-context';
 import { useSearchParams } from 'next/navigation';
+import { TooltipProvider } from '@elytro/ui';
 
 export function Providers(props: { children: ReactNode; initialState?: State }) {
   const { rpc } = useRpc();
@@ -23,7 +24,9 @@ export function Providers(props: { children: ReactNode; initialState?: State }) 
     <WagmiProvider config={config} initialState={props.initialState} key={rpc}>
       <QueryClientProvider client={queryClient}>
         <ApolloProvider client={client}>
-          <RecoveryRecordProvider>{props.children}</RecoveryRecordProvider>
+          <TooltipProvider>
+            <RecoveryRecordProvider>{props.children}</RecoveryRecordProvider>
+          </TooltipProvider>
         </ApolloProvider>
       </QueryClientProvider>
     </WagmiProvider>

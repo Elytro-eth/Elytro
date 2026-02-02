@@ -2,7 +2,7 @@ import { Button, toast } from '@elytro/ui';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useAccount } from '@/contexts/account-context';
 import { bgWalletSm } from '@elytro/ui/assets';
-import FragmentedAddress from '@/components/biz/FragmentedAddress';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 import { VERSION_MODULE_ADDRESS_MAP } from '@/constants/versions';
 import { getInstallModuleTx, getUpgradeModuleTx, getUninstallModuleTx } from '@/utils/contracts/upgrade';
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
@@ -56,7 +56,7 @@ export default function UpgradeContract() {
       <div className="flex flex-col gap-y-md">
         <h2 className="elytro-text-small text-gray-600 mt-4">Your are updating</h2>
         <div className="flex flex-row justify-between">
-          <FragmentedAddress address={address} chainId={chainId} className="p-xs rounded-2xs bg-gray-150" />
+          <ShortedAddress address={address} chainId={chainId} />
         </div>
         <div>
           <img src={bgWalletSm} alt="Wallet" className="size-[200px] mt-3xl mx-auto" />

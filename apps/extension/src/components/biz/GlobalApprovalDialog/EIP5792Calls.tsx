@@ -3,7 +3,7 @@ import { useWallet } from '@/contexts/wallet';
 import { ethErrors } from 'eth-rpc-errors';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Badge, Spin } from '@elytro/ui';
 import { EIP5792Call } from '@/types/eip5792';
-import { formatAddressToShort } from '@/utils/format';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 
 export default function EIP5792Calls() {
   const { wallet } = useWallet();
@@ -55,9 +55,18 @@ export default function EIP5792Calls() {
                   {call.value && call.value !== '0x0' && <Badge variant="outline">{call.value}</Badge>}
                 </div>
                 <div className="space-y-1 text-xs">
-                  <div>
+                  <div className="flex items-center gap-1">
                     <span className="text-gray-500">To:</span>{' '}
-                    <span className="font-mono">{formatAddressToShort(call.to) || call.to}</span>
+                    {call.to ? (
+                      <ShortedAddress
+                        address={call.to}
+                        showChainIcon={false}
+                        hideTooltip
+                        className="!bg-transparent !p-0 font-mono"
+                      />
+                    ) : (
+                      <span className="font-mono">--</span>
+                    )}
                   </div>
                   <div>
                     <span className="text-gray-500">Data:</span>{' '}
