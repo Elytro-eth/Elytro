@@ -14,7 +14,7 @@ export const SidebarStepper = ({ currentStep, address, chainId }: SidebarStepper
     const isCompleted = step < currentStep;
     return {
       circle: `flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-sm font-bold ${
-        isActive ? 'bg-blue-750 text-white' : isCompleted ? 'bg-green-300 text-blue-900' : 'bg-gray-450 text-white'
+        isActive ? 'bg-brown-600 text-white' : isCompleted ? 'bg-green-300 text-blue-900' : 'bg-gray-450 text-white'
       }`,
       text: `text-base font-medium ${isActive ? 'text-blue-900' : isCompleted ? 'text-blue-900' : 'text-gray-600'}`,
       content: isCompleted ? <Check className="w-3.5 h-3.5" /> : step,
@@ -30,34 +30,34 @@ export const SidebarStepper = ({ currentStep, address, chainId }: SidebarStepper
             <ShortedAddress
               address={address}
               chainIconUrl={CHAIN_LOGOS[chainId]}
-              className="bg-gray-150 px-4 rounded-sm"
+              className="bg-gray-150 px-2 rounded-sm"
             />
           </div>
           <div className="border-t border-gray-300 mb-lg" />
         </>
       )}
       <div className="space-y-sm">
-        {/* Step 1: Find details */}
+        {/* Step 1: Confirm recovery */}
         <div className="flex items-center space-x-md">
           <div className={getStepStyles(1).circle}>{getStepStyles(1).content}</div>
           <div className="flex-1 min-w-0">
-            <h3 className={getStepStyles(1).text}>Verify</h3>
+            <h3 className={getStepStyles(1).text}>Confirm</h3>
           </div>
         </div>
 
-        {/* Step 2: Collect Confirmations */}
+        {/* Step 2: Start recovery */}
         <div className="flex items-center space-x-md">
           <div className={getStepStyles(2).circle}>{getStepStyles(2).content}</div>
           <div className="flex-1 min-w-0">
-            <h3 className={getStepStyles(2).text}>Confirm</h3>
+            <h3 className={getStepStyles(2).text}>Start</h3>
           </div>
         </div>
 
-        {/* Step 3: Recover wallet */}
+        {/* Step 3: Complete recovery */}
         <div className="flex items-center space-x-md">
           <div className={getStepStyles(3).circle}>{getStepStyles(3).content}</div>
           <div className="flex-1 min-w-0">
-            <h3 className={getStepStyles(3).text}>Recover</h3>
+            <h3 className={getStepStyles(3).text}>Complete</h3>
           </div>
         </div>
       </div>

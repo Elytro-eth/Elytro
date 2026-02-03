@@ -1,4 +1,4 @@
-import { bgGuardianTop } from '@elytro/ui/assets';
+import { bgContactsTop } from '@elytro/ui/assets';
 import step1Img from '@/assets/guides/rc_1.png';
 import step2Img from '@/assets/guides/rc_2.png';
 import step3Img from '@/assets/guides/rc_3.png';
@@ -10,7 +10,7 @@ interface RecoverGuideProps {
 
 const STEPS = [
   {
-    image: bgGuardianTop,
+    image: bgContactsTop,
     title: 'How Recovery works',
   },
   {

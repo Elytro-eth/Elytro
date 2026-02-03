@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { SidebarStepper } from '@/components/SidebarStepper';
 import { Button } from '@elytro/ui';
 import { useRecoveryRecord } from '@/contexts';
-import { shieldImage } from '@elytro/ui/assets';
+import { bgContactsLg } from '@elytro/ui/assets';
 
 export default function Confirmed() {
   let backToHome;
@@ -44,9 +44,10 @@ export default function Confirmed() {
         <div className="absolute right-full mr-8 top-0 bg-white rounded-xl p-0 flex items-center min-w-[260px]">
           <SidebarStepper currentStep={2} address={address} chainId={chainId} />
         </div>
-        <ContentWrapper title={<div className="text-center">Confirmed successfully</div>}>
+        <ContentWrapper>
           <div className="flex flex-col items-center justify-center text-center gap-y-xl mx-20 mt-10">
-            <Image src={shieldImage} alt="shield" width={164} height={164} />
+            <Image src={bgContactsLg} alt="shield" width={164} height={164} />
+            <h1 className="text-title text-center">Confirmed successfully</h1>
             <p className="text-smaller text-gray-600">You can disconnect and close the window now</p>
             <Button onClick={handleBackToHome} variant="secondary" className="mt-4">
               Back to Recovery

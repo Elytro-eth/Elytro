@@ -12,13 +12,12 @@ import {
   HelperText,
   ErrorTip,
 } from '@elytro/ui';
-import ShortedAddress from '@/components/ui/ShortedAddress';
 import { useWallet } from '@/contexts/wallet';
 import { useEffect, useState } from 'react';
 import ContactItem from '@/components/biz/ContactItem';
 import { safeClipboard } from '@/utils/clipboard';
 import { Copy as CopyIcon } from 'lucide-react';
-import Copy from '@/components/ui/Copy';
+import YourWallet from '@/components/biz/YourWallet';
 import { walletImage } from '@elytro/ui/assets';
 import { RecoveryStatusEn } from '@/constants/recovery';
 import { safeOpen } from '@/utils/safeOpen';
@@ -165,13 +164,7 @@ function PageContent() {
 
   return (
     <div className="flex flex-col gap-y-md">
-      <div className="flex flex-row items-center gap-x-md px-4 py-3 rounded-md bg-gray-50">
-        <span className="elytro-text-small-bold">Your wallet</span>
-        <div className="flex flex-row items-center gap-x-2 ml-auto">
-          <ShortedAddress address={recoveryRecord?.address} chainId={currentChain?.id} className="bg-gray-50" />
-          <Copy text={recoveryRecord?.address || ''} size="sm" iconOnly />
-        </div>
-      </div>
+      <YourWallet address={recoveryRecord?.address || ''} chainId={currentChain?.id} />
       <HelperText
         // title={`${recoveryRecord?.threshold} signatures required`}
         description={`${recoveryRecord?.threshold} confirmation(s) needed. Share links with contacts.`}
@@ -195,7 +188,7 @@ function PageContent() {
                   className="bg-blue-300 hover:bg-blue-450"
                   onClick={handleShareContact}
                 >
-                  <CopyIcon className="size-md mr-xs" />
+                  <CopyIcon className="size-md mr-xs stroke-blue-600" />
                   Get link
                 </Button>
               )

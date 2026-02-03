@@ -10,7 +10,7 @@ import { RecoveryStatusEn } from '@/constants/enums';
 import { InvalidRecordView } from '@/components/InvalidRecordView';
 import { SidebarStepper } from '@/components/SidebarStepper';
 import Image from 'next/image';
-import { shieldImage, doorImage } from '@elytro/ui/assets';
+import { bgContactsLg, bgWalletLg } from '@elytro/ui/assets';
 
 export default function Home() {
   const { status, loading, address, chainId, error } = useRecoveryRecord();
@@ -26,16 +26,16 @@ export default function Home() {
 
   const getCurrentStep = () => {
     if (error) return 1; // Invalid URL
-    if (status === RecoveryStatusEn.WAITING_FOR_SIGNATURE) return 2; // Collect confirmations
+    if (status === RecoveryStatusEn.WAITING_FOR_SIGNATURE) return 1; // Confirm recovery
     if (
       [
         RecoveryStatusEn.SIGNATURE_COMPLETED,
         RecoveryStatusEn.RECOVERY_STARTED,
         RecoveryStatusEn.RECOVERY_READY,
-        RecoveryStatusEn.RECOVERY_COMPLETED,
       ].includes(status!)
     )
-      return 3; // Recover wallet to Recovery successful
+      return 2; // Start recovery
+    if (status === RecoveryStatusEn.RECOVERY_COMPLETED) return 3; // Complete recovery
     return 1; // Default to Step 1
   };
 
@@ -75,17 +75,19 @@ export default function Home() {
         {error ? (
           <InvalidRecordView />
         ) : isConfirmStep ? (
-          <ContentWrapper title={<div className="text-center">Confirm Recovery</div>}>
+          <ContentWrapper>
             <div className="flex flex-col items-center justify-center text-center gap-y-xl mx-10 mt-6">
-              <Image src={shieldImage} alt="shield" width={164} height={164} />
+              <Image src={bgContactsLg} alt="shield" width={164} height={164} />
+              <h1 className="text-title text-center">Confirm Recovery</h1>
               <p className="text-smaller text-gray-600">Only recovery contacts can confirm recovery</p>
               <Button onClick={() => navigateWithQuery('/contacts')}>Get started</Button>
             </div>
           </ContentWrapper>
         ) : isRecoverStep ? (
-          <ContentWrapper title={<div className="text-center">Recover your account</div>}>
+          <ContentWrapper>
             <div className="flex flex-col items-center justify-center text-center gap-y-xl mx-10 mt-6">
-              <Image src={doorImage} alt="door" width={164} height={164} />
+              <Image src={bgWalletLg} alt="door" width={164} height={164} />
+              <h1 className="text-title text-center">Recover your account</h1>
               <p className="text-smaller text-gray-600">Account owner or helpers can start recovery</p>
               <Button onClick={() => navigateWithQuery('/start')}>Get started</Button>
             </div>

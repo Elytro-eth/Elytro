@@ -1,4 +1,4 @@
-import { getIconByChainId } from '@/constants/chains';
+import { getIconByChainId, getChainNameByChainId } from '@/constants/chains';
 import { Input } from '@elytro/ui';
 import { useState, useRef, useEffect } from 'react';
 import { isAddress } from 'viem';
@@ -52,39 +52,56 @@ export default function AddressInputWithChainIcon({ chainId, address, onChange }
 
   const isValidAddress = isAddress(address);
   const showShortedAddress = !isFocused && isValidAddress && (displayAddress || address);
-
-  const chainIcon = <img src={getIconByChainId(chainId)} className="rounded-full size-6 flex-shrink-0" />;
+  const chainName = getChainNameByChainId(chainId);
 
   return (
-    <div className="w-full relative">
-      {showShortedAddress ? (
-        <div
-          className="w-full flex flex-row items-center bg-gray-150 rounded-md px-lg py-sm cursor-pointer"
-          onClick={() => {
-            setIsFocused(true);
-            inputRef.current?.focus();
-          }}
-        >
-          {chainIcon}
-          <ShortedAddress
-            address={displayAddress || address}
-            chainId={chainId}
-            size="lg"
-            showChainIcon={false}
-            className="h-10 ml-3 !bg-transparent !p-0"
-          />
+    <>
+      <style>{`
+        .address-input-wrapper input:focus,
+        .address-input-wrapper input:focus-visible {
+          outline: none !important;
+          outline-width: 0 !important;
+          outline-color: transparent !important;
+        }
+      `}</style>
+      <div className="w-full relative bg-gray-50 rounded-md px-lg py-0 address-input-wrapper">
+        {/* Chain info at top */}
+        <div className="flex flex-row items-center gap-x-2xs mb-md pt-md">
+          <img src={getIconByChainId(chainId)} alt="chain" className="size-4 rounded-full" />
+          <span className="text-sm text-gray-750">{chainName}</span>
         </div>
-      ) : (
-        <Input
-          ref={inputRef}
-          leftIcon={chainIcon}
-          placeholder="Enter wallet address"
-          value={address}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          onFocus={handleFocus}
-        />
-      )}
-    </div>
+
+        {/* Address input/display */}
+        <div className="h-[2.5rem] flex items-center pb-md">
+          {showShortedAddress ? (
+            <div
+              className="w-full cursor-pointer flex items-center"
+              onClick={() => {
+                setIsFocused(true);
+                inputRef.current?.focus();
+              }}
+            >
+              <ShortedAddress
+                address={displayAddress || address}
+                chainId={chainId}
+                size="lg"
+                showChainIcon={false}
+                className="!bg-transparent !p-0"
+              />
+            </div>
+          ) : (
+            <Input
+              ref={inputRef}
+              placeholder="Address"
+              value={address}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              onFocus={handleFocus}
+              className="!bg-transparent !px-0 !border-none !py-0 rounded-none"
+            />
+          )}
+        </div>
+      </div>
+    </>
   );
 }

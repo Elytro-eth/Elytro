@@ -48,7 +48,7 @@ export function RPCSettingDialog() {
     <div>
       <Settings className="w-4 h-4 cursor-pointer" onClick={() => setOpen(true)} />
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-md min-h-fit" centered>
+        <DialogContent className="max-w-md min-h-fit rounded-xl" centered>
           <DialogHeader>
             <DialogTitle>Network setting</DialogTitle>
           </DialogHeader>

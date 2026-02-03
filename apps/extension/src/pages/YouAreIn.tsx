@@ -1,5 +1,5 @@
 import React from 'react';
-import { bgGuardianSm } from '@elytro/ui/assets';
+import { bgContactsSm } from '@elytro/ui/assets';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { Button } from '@elytro/ui';
@@ -49,7 +49,7 @@ const YouAreIn: React.FC = () => {
     >
       <div className="flex flex-col items-center gap-y-2xl flex-1 w-full">
         <div className="flex justify-center pt-20">
-          <img src={bgGuardianSm} alt="Passcode" width={200} />
+          <img src={bgContactsSm} alt="Passcode" width={200} />
         </div>
 
         <div className="flex flex-col gap-y-sm">

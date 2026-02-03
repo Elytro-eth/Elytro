@@ -3,7 +3,7 @@ import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useWallet } from '@/contexts/wallet';
 import { formatErrorMsg } from '@/utils/format';
 import { ArrowLeft, Laptop, Lock, WalletCards } from 'lucide-react';
-import { bgKeySm, bgWalletTop } from '@elytro/ui/assets';
+import { bgPasscodeSm, bgWalletTop } from '@elytro/ui/assets';
 import { useState, useRef } from 'react';
 import { Input, Checkbox, Label, Button, toast, cn } from '@elytro/ui';
 import PasswordInput from '@/components/ui/PasswordInputer';
@@ -112,7 +112,7 @@ export default function ImportBackup() {
       </div>
 
       <div className="flex flex-col gap-y-2xl">
-        <img src={bgKeySm} alt="Passcode" width={200} className="mx-auto mt-20" />
+        <img src={bgPasscodeSm} alt="Passcode" width={200} className="mx-auto mt-20" />
         <h1 className="elytro-text-title text-center">Import wallets</h1>
 
         <div className="flex flex-col gap-y-sm w-full max-w-full min-w-full">

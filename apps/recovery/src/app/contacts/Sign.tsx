@@ -95,7 +95,8 @@ export default function Sign() {
   return (
     <div>
       <ShortedAddress
-        className="!p-lg rounded-[16px] w-full"
+        size="lg"
+        className="!p-lg rounded-[16px] w-full bg-gray-50"
         address={address || ''}
         chainIconUrl={CHAIN_LOGOS[recoveryChainId]}
         rightExtra={
@@ -111,11 +112,11 @@ export default function Sign() {
 
       <Button
         size="regular"
-        className="w-full group mt-lg shadow-none"
+        className="w-full group mt-lg shadow-none gap-2"
         disabled={!isConnected || isSigned || loading || recoveryChainId !== chainId}
         onClick={sendSignatureRequest}
       >
-        <Box className="size-4 stroke-blue-300 group-hover:stroke-blue-750" />
+        <Box className="size-4 stroke-white shrink-0" />
         {loading ? 'Confirming...' : isSigned ? 'Already confirmed' : 'Confirm Recovery'}
       </Button>
     </div>

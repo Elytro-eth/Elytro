@@ -145,13 +145,14 @@ export default function ConnectControl() {
           <div className="flex items-center gap-2">
             {isWrongChain ? (
               <Button
+                size="small"
                 className="rounded-full font-bold shadow-none duration-0 bg-transparent hover:bg-blue-300 hover:text-blue-750 text-blue-300 bg-blue-750 hover:border-blue-300"
                 onClick={switchChain}
               >
                 Switch to {CHAIN_ID_TO_NAME_MAP[Number(recoveryChainId)]}
               </Button>
             ) : null}
-            <div className="flex items-center gap-2 py-sm px-md rounded-sm bg-white">
+            <div className="flex items-center gap-2 h-9 px-md rounded-sm bg-white">
               <ShortedAddress
                 address={address || ''}
                 chainIconUrl={chainId ? CHAIN_LOGOS[chainId] : undefined}
@@ -164,6 +165,7 @@ export default function ConnectControl() {
           </div>
         ) : (
           <Button
+            size="small"
             className="rounded-full font-bold shadow-none duration-0 bg-transparent hover:bg-blue-300 hover:text-blue-750 text-blue-300 bg-blue-750 hover:border-blue-300"
             onClick={() => setShowDialog(true)}
           >
@@ -171,7 +173,7 @@ export default function ConnectControl() {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md" centered>
+      <DialogContent className="sm:max-w-md rounded-xl" centered>
         <DialogHeader>
           <DialogTitle>Select a wallet client</DialogTitle>
         </DialogHeader>

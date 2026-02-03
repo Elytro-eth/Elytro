@@ -53,7 +53,7 @@ export default function Contacts() {
     <div className="flex flex-row items-center justify-center w-full h-full">
       <div className="relative">
         <div className="absolute right-full mr-8 top-0 bg-white rounded-xl p-0 flex items-center min-w-[260px]">
-          <SidebarStepper currentStep={2} address={recoveryAddress ?? undefined} chainId={chainId ?? undefined} />
+          <SidebarStepper currentStep={1} address={recoveryAddress ?? undefined} chainId={chainId ?? undefined} />
         </div>
         <ContentWrapper
           title={<div className="text-left mr-5xl">Connect a wallet to confirm </div>}

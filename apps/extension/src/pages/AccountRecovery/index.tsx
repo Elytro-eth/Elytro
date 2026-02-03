@@ -8,7 +8,7 @@ import { Box, Clock, Search, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Address, isAddress } from 'viem';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
-import { bgGuardianTop } from '@elytro/ui/assets';
+import { bgContactsTop } from '@elytro/ui/assets';
 import TipItem from '@/components/biz/TipItem';
 import { TChainItem } from '@/constants/chains';
 import NetworkSelection from '@/components/biz/NetworkSelection';
@@ -88,7 +88,7 @@ export default function AccountRecovery() {
       >
         <div className="flex flex-col h-full">
           <div className="w-full">
-            <img src={bgGuardianTop} className="w-full h-full object-contain mb-3" />
+            <img src={bgContactsTop} className="w-full h-full object-contain mb-3" />
           </div>
           <div className="flex-1 flex flex-col px-lg">
             <h3 className="text-xl font-bold text-gray-900 mb-4 leading-tight">How to recover</h3>

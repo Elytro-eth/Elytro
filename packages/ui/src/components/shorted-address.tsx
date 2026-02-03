@@ -55,7 +55,7 @@ export function ShortedAddress({
       <span>{prefix}</span>
       {hideTooltip ? (
         <span
-          className={cn('bg-gray-150 rounded-full', config.dotPadding)}
+          className="bg-transparent rounded-full py-0 px-0"
           style={dotColor ? { backgroundColor: dotColor } : undefined}
         >
           ···

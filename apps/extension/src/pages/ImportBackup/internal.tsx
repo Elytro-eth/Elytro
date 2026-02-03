@@ -1,7 +1,7 @@
 import { useWallet } from '@/contexts/wallet';
 import { formatErrorMsg } from '@/utils/format';
 import { ArrowLeft } from 'lucide-react';
-import { bgKeySm } from '@elytro/ui/assets';
+import { bgPasscodeSm } from '@elytro/ui/assets';
 import { useState, useRef, useEffect } from 'react';
 import { Input, Checkbox, Label, Button, toast, cn } from '@elytro/ui';
 import PasswordInput from '@/components/ui/PasswordInputer';
@@ -84,7 +84,7 @@ export default function InternalImportBackup() {
       </div>
 
       <div className="flex flex-col gap-y-2xl">
-        <img src={bgKeySm} alt="Passcode" width={200} className="mx-auto" />
+        <img src={bgPasscodeSm} alt="Passcode" width={200} className="mx-auto" />
         <h1 className="elytro-text-title text-center">Import all wallets</h1>
 
         <div className="flex flex-col gap-y-sm w-full max-w-full min-w-full">

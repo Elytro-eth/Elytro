@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react';
 import { useAccount, usePublicClient } from 'wagmi';
 import { sendTransaction } from 'wagmi/actions';
 import { Box, ExternalLink, Loader2 } from 'lucide-react';
-import { doorImage } from '@elytro/ui/assets';
+import { bgWalletLg } from '@elytro/ui/assets';
 import Image from 'next/image';
 import { RecoveryStatusEn } from '@/constants/enums';
 import { SidebarStepper } from '@/components/SidebarStepper';
@@ -270,15 +270,36 @@ export default function Start() {
     }
   }, [status, validTime]);
 
+  const getCurrentStep = () => {
+    if (status === RecoveryStatusEn.RECOVERY_COMPLETED) return 3; // Complete recovery
+    if ([RecoveryStatusEn.RECOVERY_STARTED, RecoveryStatusEn.RECOVERY_READY].includes(status!)) return 3; // Recovery in progress or ready to complete: Confirm and Start both done
+    if (status === RecoveryStatusEn.SIGNATURE_COMPLETED) return 2; // Start recovery
+    return 1; // Default to Step 1
+  };
+
   return (
     <div className="flex flex-row items-center justify-center w-full h-full">
       <div className="relative">
         <div className="absolute right-full mr-8 top-0 bg-white rounded-xl p-0 flex items-center min-w-[260px]">
-          <SidebarStepper currentStep={3} address={address ?? undefined} chainId={chainId ?? undefined} />
+          <SidebarStepper
+            currentStep={getCurrentStep()}
+            address={address ?? undefined}
+            chainId={chainId ?? undefined}
+          />
         </div>
         <ContentWrapper
           // currentStep={2}
           // allSteps={3}
+          top={
+            status === RecoveryStatusEn.RECOVERY_READY &&
+            leftTime.hours === 0 &&
+            leftTime.minutes === 0 &&
+            leftTime.seconds === 0 ? (
+              <div className="flex flex-col items-center justify-center mb-2xl">
+                <Image src={bgWalletLg} alt="door" width={164} height={164} />
+              </div>
+            ) : undefined
+          }
           title={
             <div className="text-center">
               {status === RecoveryStatusEn.SIGNATURE_COMPLETED
@@ -304,11 +325,7 @@ export default function Start() {
               {status === RecoveryStatusEn.RECOVERY_READY &&
               leftTime.hours === 0 &&
               leftTime.minutes === 0 &&
-              leftTime.seconds === 0 ? (
-                <div className="flex flex-col items-center justify-center my-2xl">
-                  <Image src={doorImage} alt="door" width={164} height={164} />
-                </div>
-              ) : (
+              leftTime.seconds === 0 ? null : (
                 <div
                   className={cn(
                     'flex flex-row my-2xl w-full justify-center gap-x-sm flex-nowrap mb-lg ',
@@ -340,9 +357,9 @@ export default function Start() {
                   !isConnected || isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.SIGNATURE_COMPLETED
                 }
                 onClick={startRecovery}
-                className="w-full group"
+                className="w-full gap-2"
               >
-                <Box className="size-4 stroke-blue-300 group-hover:stroke-blue-750" />
+                <Box className="size-4 stroke-white shrink-0" />
                 Start Recovery
               </Button>
             ) : (
@@ -352,9 +369,9 @@ export default function Start() {
                   !isConnected || isLoading || txStatus === 'pending' || status !== RecoveryStatusEn.RECOVERY_READY
                 }
                 onClick={completeRecovery}
-                className="w-full group"
+                className="w-full gap-2"
               >
-                <Box className="size-4 stroke-blue-300 group-hover:stroke-blue-750" />
+                <Box className="size-4 stroke-white shrink-0" />
                 Complete Recovery
               </Button>
             )}

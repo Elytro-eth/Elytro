@@ -1,6 +1,7 @@
 // 'use client';
 
-import { AlertCircle } from 'lucide-react';
+import Image from 'next/image';
+import { errorSvg } from '@elytro/ui/assets';
 
 // import { useSearchParams } from 'next/navigation';
 
@@ -12,9 +13,9 @@ export const InvalidRecordView = () => {
   return (
     <div className="flex flex-row items-center justify-center w-full h-full">
       <div className="rounded-xl bg-white px-4xl py-5xl flex flex-col items-center justify-center gap-y-sm w-[36rem]">
-        <AlertCircle className="size-20 stroke-red-750 rounded-full" />
+        <Image src={errorSvg} alt="" width={85} height={84} className="shrink-0" />
 
-        <div className="text-blue-750 text-bold-body">Invalid recovery link</div>
+        <h1 className="text-title text-center text-blue-750">Invalid recovery link</h1>
 
         <p className="text-md text-center text-gray-600">
           {/* {hasValidParams

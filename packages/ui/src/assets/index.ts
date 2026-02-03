@@ -41,17 +41,17 @@ export { default as twitterIcon } from './icons/twitter.svg';
 // Error image
 export { default as errorSvg } from './images/error.svg';
 
-// Background images
-export { default as bgCoinEth } from './bg-images/coin_eth.png';
-export { default as bgEnvelopeTop } from './bg-images/envelope-bg-top.png.png';
-export { default as bgGuardianLg } from './bg-images/guardian-bg-lg.png';
-export { default as bgGuardianSm } from './bg-images/guardian-bg-sm.png';
-export { default as bgGuardianTop } from './bg-images/guardian-bg-top.png';
-export { default as bgKeyLg } from './bg-images/key-bg-lg.png';
-export { default as bgKeySm } from './bg-images/key-bg-sm.png';
-export { default as bgWalletLg } from './bg-images/wallet-bg-lg.png';
-export { default as bgWalletSm } from './bg-images/wallet-bg-sm.png';
-export { default as bgWalletTop } from './bg-images/wallet-bg-top.png';
+// Background images (moved from bg-images to images)
+export { default as bgCoinEth } from './images/coin_eth.png';
+export { default as bgEnvelopeTop } from './images/envelope-bg-top.png';
+export { default as bgContactsLg } from './images/contacts-bg-lg.png';
+export { default as bgContactsSm } from './images/contacts-bg-sm.png';
+export { default as bgContactsTop } from './images/contacts-bg-top.png';
+export { default as bgPasscodeLg } from './images/passcode-bg-lg.png';
+export { default as bgPasscodeSm } from './images/passcode-bg-sm.png';
+export { default as bgWalletLg } from './images/wallet-bg-lg.png';
+export { default as bgWalletSm } from './images/wallet-bg-sm.png';
+export { default as bgWalletTop } from './images/wallet-bg-top.png';
 
 // Elytro icon data URLs
 export const iconElytroDark =

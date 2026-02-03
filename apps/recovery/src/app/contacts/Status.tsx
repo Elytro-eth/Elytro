@@ -36,7 +36,8 @@ export default function Status() {
         ?.filter((contact) => !contact.confirmed)
         .map((contact) => (
           <ShortedAddress
-            className="!p-lg rounded-[16px] w-full"
+            size="lg"
+            className="!p-lg rounded-[16px] w-full bg-gray-50"
             key={contact.address}
             address={contact.address}
             chainIconUrl={chainId ? CHAIN_LOGOS[chainId] : undefined}

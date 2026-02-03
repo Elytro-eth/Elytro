@@ -7,9 +7,8 @@ import { useWallet } from '@/contexts/wallet';
 import { Box, Minus, PencilLine, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { contactsImage } from '@elytro/ui/assets';
-import ShortedAddress from '@/components/ui/ShortedAddress';
 import { setLocalContacts, setLocalThreshold } from '@/utils/contacts';
-import Copy from '@/components/ui/Copy';
+import YourWallet from '@/components/biz/YourWallet';
 
 interface IContactListProps {
   contacts: TRecoveryContact[];
@@ -88,13 +87,7 @@ export default function ContactList({
   return (
     <div className="flex flex-col justify-between">
       <div className="flex flex-col gap-y-sm">
-        <div className="flex flex-row items-center gap-x-md px-4 py-3 rounded-md bg-gray-50">
-          <span className="elytro-text-small-bold">Your wallet</span>
-          <div className="flex flex-row items-center gap-x-2 ml-auto">
-            <ShortedAddress address={currentAccount.address} chainId={currentAccount.chainId} className="bg-gray-50" />
-            <Copy text={currentAccount.address} size="sm" iconOnly />
-          </div>
-        </div>
+        <YourWallet address={currentAccount.address} chainId={currentAccount.chainId} />
 
         <HelperText description="Take a note of your address in case of recovery." />
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@elytro/ui';
-import { bgWalletLg, bgGuardianLg, bgKeyLg } from '@elytro/ui/assets';
+import { bgWalletLg, bgContactsLg, bgPasscodeLg } from '@elytro/ui/assets';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
@@ -13,7 +13,7 @@ const STEPS = [
   },
   {
     title: 'No seed phrase to remember',
-    img: bgKeyLg,
+    img: bgPasscodeLg,
   },
   {
     title: 'Different network, different address',
@@ -21,7 +21,7 @@ const STEPS = [
   },
   {
     title: 'Your wallet is recoverable',
-    img: bgGuardianLg,
+    img: bgContactsLg,
   },
 ];
 
