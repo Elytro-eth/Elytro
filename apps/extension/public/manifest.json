@@ -14,22 +14,11 @@
   "action": {
     "default_title": "Click to open Elytro wallet"
   },
-  "permissions": [
-    "activeTab",
-    "storage",
-    "tabs",
-    "sidePanel",
-    "gcm",
-    "notifications"
-  ],
+  "permissions": ["activeTab", "storage", "tabs", "sidePanel", "gcm", "notifications"],
   "web_accessible_resources": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "resources": [
-        "src/tab.html"
-      ]
+      "matches": ["<all_urls>"],
+      "resources": ["src/tab.html"]
     }
   ],
   "background": {
@@ -38,12 +27,8 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "src/content-scripts/index.ts"
-      ]
+      "matches": ["<all_urls>"],
+      "js": ["src/content-scripts/index.ts"]
     }
   ],
   "content_security_policy": {
@@ -51,8 +36,6 @@
     "sandbox": "sandbox allow-scripts; script-src 'self' 'unsafe-inline' 'unsafe-eval'; object-src 'none'; default-src 'none'; connect-src *; font-src 'self';"
   },
   "externally_connectable": {
-    "matches": [
-      "https://*.elytro.com/*"
-    ]
+    "matches": ["https://*.elytro.com/*"]
   }
 }

@@ -1,6 +1,5 @@
 import AddressInputWithChainIcon from '@/components/ui/AddressInputer';
-import { Button } from '@/components/ui/button';
-import HelperText from '@/components/ui/HelperText';
+import { Button, HelperText } from '@elytro/ui';
 import { useAccount } from '@/contexts/account-context';
 import { CircleAlert } from 'lucide-react';
 import { useState } from 'react';

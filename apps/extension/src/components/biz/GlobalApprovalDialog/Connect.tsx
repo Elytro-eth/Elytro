@@ -2,7 +2,7 @@ import { useApproval } from '@/contexts/approval-context';
 import { useWallet } from '@/contexts/wallet';
 import { ethErrors } from 'eth-rpc-errors';
 import ConnectionConfirmation from '@/components/biz/ConnectConfirmation';
-import Spin from '@/components/ui/Spin';
+import { Spin } from '@elytro/ui';
 
 export default function Connect() {
   const { wallet } = useWallet();

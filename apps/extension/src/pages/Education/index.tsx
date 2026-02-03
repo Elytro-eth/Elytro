@@ -1,30 +1,27 @@
-import WalletImg from '@/assets/bg-images/wallet-bg-lg.png';
-import ContactsImg from '@/assets/bg-images/guardian-bg-lg.png';
-import PasscodeImg from '@/assets/bg-images/key-bg-lg.png';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@elytro/ui';
+import { bgWalletLg, bgGuardianLg, bgKeyLg } from '@elytro/ui/assets';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
 import FullPageWrapper from '@/components/biz/FullPageWrapper';
-import DoorImg from '@/assets/bg-images/wallet-bg-lg.png';
 
 const STEPS = [
   {
     title: 'Elytro is a new kind of wallet',
-    img: DoorImg,
+    img: bgWalletLg,
     noDescription: true,
   },
   {
     title: 'No seed phrase to remember',
-    img: PasscodeImg,
+    img: bgKeyLg,
   },
   {
     title: 'Different network, different address',
-    img: WalletImg,
+    img: bgWalletLg,
   },
   {
     title: 'Your wallet is recoverable',
-    img: ContactsImg,
+    img: bgGuardianLg,
   },
 ];
 

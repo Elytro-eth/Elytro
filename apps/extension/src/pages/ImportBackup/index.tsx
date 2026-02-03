@@ -1,21 +1,15 @@
 import Guide from '@/components/biz/Guide';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useWallet } from '@/contexts/wallet';
-import { toast } from '@/hooks/use-toast';
 import { formatErrorMsg } from '@/utils/format';
 import { ArrowLeft, Laptop, Lock, WalletCards } from 'lucide-react';
-import IconPasscode from '@/assets/bg-images/key-bg-sm.png';
+import { bgKeySm, bgWalletTop } from '@elytro/ui/assets';
 import { useState, useRef } from 'react';
-import WalletImg from '@/assets/bg-images/wallet-bg-top.png';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+import { Input, Checkbox, Label, Button, toast, cn } from '@elytro/ui';
 import PasswordInput from '@/components/ui/PasswordInputer';
 import { TPasswordEncryptedData } from '@/utils/passworder';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
-import { cn } from '@/utils/shadcn/utils';
 
 const tips = [
   {
@@ -98,7 +92,13 @@ export default function ImportBackup() {
   if (isGuiding) {
     return (
       <SecondaryPageWrapper title="Import wallets" isGuide={true}>
-        <Guide imgSrc={WalletImg} title="How Import works" action="Start import" onAction={handleGuiding} tips={tips} />
+        <Guide
+          imgSrc={bgWalletTop}
+          title="How Import works"
+          action="Start import"
+          onAction={handleGuiding}
+          tips={tips}
+        />
       </SecondaryPageWrapper>
     );
   }
@@ -112,7 +112,7 @@ export default function ImportBackup() {
       </div>
 
       <div className="flex flex-col gap-y-2xl">
-        <img src={IconPasscode} alt="Passcode" width={200} className="mx-auto mt-20" />
+        <img src={bgKeySm} alt="Passcode" width={200} className="mx-auto mt-20" />
         <h1 className="elytro-text-title text-center">Import wallets</h1>
 
         <div className="flex flex-col gap-y-sm w-full max-w-full min-w-full">

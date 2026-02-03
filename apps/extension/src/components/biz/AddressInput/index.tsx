@@ -1,4 +1,4 @@
-import { Input } from '@/components/ui/input';
+import { Input, useFormField } from '@elytro/ui';
 import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { FieldValues, useFormContext } from 'react-hook-form';
@@ -11,7 +11,6 @@ import InputDisplay from './InputDisplay';
 import { getRecentAddresses } from '@/utils/recentAddresses';
 import { parseEIP3770Address } from '@/utils/format';
 import { getChainNameByChainId } from '@/constants/chains';
-import { useFormField } from '@/components/ui/form';
 
 interface IAddressInputProps {
   field: FieldValues;

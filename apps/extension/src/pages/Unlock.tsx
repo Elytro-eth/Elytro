@@ -1,15 +1,13 @@
-import { Button } from '@/components/ui/button';
+import { Button, toast, cn } from '@elytro/ui';
+import { launchImage } from '@elytro/ui/assets';
 
 import { useCallback, useEffect, useState } from 'react';
-import { toast } from '@/hooks/use-toast';
 
 import { useApproval } from '@/contexts/approval-context';
 import { useWallet } from '@/contexts/wallet';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
 import PasswordInput from '@/components/ui/PasswordInputer';
-import LaunchImg from '@/assets/launch.png';
-import { cn } from '@/utils/shadcn/utils';
 
 const Unlock = () => {
   const { wallet } = useWallet();
@@ -62,7 +60,7 @@ const Unlock = () => {
         isFadingOut ? 'page-fade-out' : 'page-fade-in'
       )}
     >
-      <img src={LaunchImg} alt="Launch" className="size-[8rem] mt-10" />
+      <img src={launchImage} alt="Launch" className="size-[8rem] mt-10" />
       <h1 className="elytro-text-headline text-center">Welcome back</h1>
       <div className="flex flex-col w-full">
         <div className="flex flex-col gap-y-3xl">

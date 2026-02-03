@@ -1,4 +1,4 @@
-import { Button } from './button';
+import { Button } from '@elytro/ui';
 import EmptyTip from './EmptyTip';
 
 export default function EmptyAsset() {

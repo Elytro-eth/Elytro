@@ -1,13 +1,18 @@
 import Guide from '@/components/biz/Guide';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import HelperText from '@/components/ui/HelperText';
-import { Label } from '@/components/ui/label';
+import {
+  Button,
+  Checkbox,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Label,
+  toast,
+  HelperText,
+} from '@elytro/ui';
 import PasswordInput from '@/components/ui/PasswordInputer';
 import { useWallet } from '@/contexts/wallet';
-import { toast } from '@/hooks/use-toast';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { writeFile } from '@/utils/file';
 import { formatErrorMsg } from '@/utils/format';
@@ -15,7 +20,7 @@ import { navigateTo } from '@/utils/navigation';
 import dayjs from 'dayjs';
 import { LaptopMinimal, DownloadIcon, LockKeyhole, WalletCards } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import WalletImg from '@/assets/bg-images/wallet-bg-top.png';
+import { bgWalletTop } from '@elytro/ui/assets';
 import { useAccount } from '@/contexts/account-context';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import { formatEther } from 'viem';
@@ -130,7 +135,7 @@ export default function ExportBackupPage() {
             action="Start backup"
             onAction={handleGuiding}
             tips={tips}
-            imgSrc={WalletImg}
+            imgSrc={bgWalletTop}
           />
         </div>
       ) : (

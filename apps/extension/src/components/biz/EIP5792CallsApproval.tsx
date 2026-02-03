@@ -7,7 +7,7 @@
 // import { Button } from '@/components/ui/button';
 // import { Separator } from '@/components/ui/separator';
 // import { Copy, CheckCircle, XCircle } from 'lucide-react';
-// import { toast } from '@/hooks/use-toast';
+// import { toast } from '@elytro/ui';
 
 // interface EIP5792CallsApprovalProps {
 //   calls: EIP5792Call[];

@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Workaround for crxjs monorepo asset path bug
+@fs
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

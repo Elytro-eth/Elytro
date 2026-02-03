@@ -1,4 +1,4 @@
-import { cn } from '@/utils/shadcn/utils';
+import { cn } from '@elytro/ui';
 import { ReactNode } from 'react';
 
 interface IPageLayoutProps {

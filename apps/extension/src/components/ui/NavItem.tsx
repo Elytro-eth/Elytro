@@ -1,4 +1,4 @@
-import { RedDot } from './RedDot';
+import { RedDot } from '@elytro/ui';
 import { navigateTo, SidePanelRoutePath } from '@/utils/navigation';
 import { ChevronRight } from 'lucide-react';
 

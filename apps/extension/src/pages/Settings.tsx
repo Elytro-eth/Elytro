@@ -1,12 +1,11 @@
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
-import { Button } from '@/components/ui/button';
+import { Button, HelperText } from '@elytro/ui';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo, SidePanelRoutePath } from '@/utils/navigation';
 import { LockKeyholeIcon, Settings2Icon, RefreshCcw, WalletCardsIcon, UserRoundIcon } from 'lucide-react';
 import { useWallet } from '@/contexts/wallet';
 import NavItem from '@/components/ui/NavItem';
 import { useAccount } from '@/contexts/account-context';
-import HelperText from '@/components/ui/HelperText';
 
 export default function Settings() {
   const { wallet } = useWallet();

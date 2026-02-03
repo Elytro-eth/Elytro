@@ -1,8 +1,8 @@
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
-import WalletImg from '@/assets/wallet.png';
+import { walletImage } from '@elytro/ui/assets';
 import { THookStatus } from '@/types/securityHook';
 import { useCountdown } from 'usehooks-ts';
-import { Button } from '@/components/ui/button';
+import { Button } from '@elytro/ui';
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import { useWallet } from '@/contexts/wallet';
 
@@ -42,7 +42,7 @@ export default function ForceInstallInnerPage({ status }: ForceInstallInnerPageP
   return (
     <SecondaryPageWrapper title="Sign with 2FA">
       <div className="flex flex-col gap-y-md items-center justify-center p-6">
-        <img src={WalletImg} alt="Wallet" className="size-[9rem] mt-[20%] mx-auto" />
+        <img src={walletImage} alt="Wallet" className="size-[9rem] mt-[20%] mx-auto" />
         <div className="text-center flex flex-col gap-y-2xs mb-4">
           <h1 className="elytro-text-subtitle mb-2">Reset Sign with 2FA</h1>
           <p className="text-gray-600">Resetting Sign with 2FA will take 7 days.</p>

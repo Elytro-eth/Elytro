@@ -1,6 +1,6 @@
 import { useApproval } from '@/contexts/approval-context';
 import { useTx } from '@/contexts/tx-context';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@elytro/ui';
 import { ApprovalTypeEn } from '@/constants/operations';
 import { useEffect, useState } from 'react';
 import Connect from './Connect';

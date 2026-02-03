@@ -1,6 +1,6 @@
 import { X, ArrowLeft } from 'lucide-react';
 import { navigateTo } from '@/utils/navigation';
-import { cn } from '@/utils/shadcn/utils';
+import { cn } from '@elytro/ui';
 import React, { PropsWithChildren } from 'react';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 

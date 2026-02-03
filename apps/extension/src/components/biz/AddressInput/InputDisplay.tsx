@@ -1,4 +1,4 @@
-import FragmentedAddress from '../FragmentedAddress';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 import ENSInfoComponent from '../ENSInfo';
 
 interface IInputDisplayProps {
@@ -13,12 +13,24 @@ const InputDisplay = ({ displayLabel, ensInfo, chainId, onClick }: IInputDisplay
   return (
     <div className="absolute bg-white" onClick={onClick}>
       {displayLabel ? (
-        <FragmentedAddress address={displayLabel} chainId={chainId} size="lg" showChainIcon={false} />
+        <ShortedAddress
+          address={displayLabel}
+          chainId={chainId}
+          size="lg"
+          showChainIcon={false}
+          className="!bg-transparent !p-0"
+        />
       ) : ensInfo ? (
         ensInfo.name ? (
           <ENSInfoComponent ensInfo={ensInfo} />
         ) : (
-          <FragmentedAddress address={ensInfo.address} chainId={chainId} size="lg" showChainIcon={false} />
+          <ShortedAddress
+            address={ensInfo.address}
+            chainId={chainId}
+            size="lg"
+            showChainIcon={false}
+            className="!bg-transparent !p-0"
+          />
         )
       ) : null}
     </div>

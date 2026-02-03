@@ -1,4 +1,4 @@
-import { cn } from '@/utils/shadcn/utils';
+import { cn } from '../utils';
 
 export interface RedDotProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: 'normal' | 'small';

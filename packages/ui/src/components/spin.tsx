@@ -1,4 +1,4 @@
-import { cn } from '@/utils/shadcn/utils';
+import { cn } from '../utils';
 
 interface ISpinProps {
   size?: 'sm' | 'md' | 'lg';

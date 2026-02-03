@@ -9,6 +9,10 @@ import {
   sepolia,
 } from 'viem/chains';
 
+// Note: These URLs must match @elytro/ui CHAIN_LOGOS for consistency
+// We inline them here to avoid importing @elytro/ui which pulls in React
+// and breaks the service worker context (no `window` in service workers)
+
 export type TChainConfigItem = {
   chainId: number;
   chainName: string;

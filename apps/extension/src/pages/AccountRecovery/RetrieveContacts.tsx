@@ -1,25 +1,25 @@
-import ProcessingTip from '@/components/ui/ProcessingTip';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
-import { Button } from '@/components/ui/button';
-import HelperText from '@/components/ui/HelperText';
-import ShortedAddress from '@/components/ui/ShortedAddress';
-import { useWallet } from '@/contexts/wallet';
-import { useEffect, useState } from 'react';
-import ErrorTip from '@/components/ui/ErrorTip';
-import ContactItem from '@/components/biz/ContactItem';
 import {
+  Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogFooter,
-} from '@/components/ui/dialog';
+  toast,
+  ProcessingTip,
+  HelperText,
+  ErrorTip,
+} from '@elytro/ui';
+import ShortedAddress from '@/components/ui/ShortedAddress';
+import { useWallet } from '@/contexts/wallet';
+import { useEffect, useState } from 'react';
+import ContactItem from '@/components/biz/ContactItem';
 import { safeClipboard } from '@/utils/clipboard';
 import { Copy as CopyIcon } from 'lucide-react';
 import Copy from '@/components/ui/Copy';
-import { toast } from '@/hooks/use-toast';
-import WalletImg from '@/assets/wallet.png';
+import { walletImage } from '@elytro/ui/assets';
 import { RecoveryStatusEn } from '@/constants/recovery';
 import { safeOpen } from '@/utils/safeOpen';
 import { useChain } from '@/contexts/chain-context';
@@ -135,7 +135,7 @@ function PageContent() {
     };
     return (
       <div className="h-full flex flex-col justify-center items-center gap-y-xl text-center">
-        <img src={WalletImg} alt="Wallet" className="size-36 mt-10" />
+        <img src={walletImage} alt="Wallet" className="size-36 mt-10" />
         <div className="flex flex-col gap-y-sm">
           <h1 className="elytro-text-title mb-sm">Recovery completed</h1>
           <Button onClick={handleNext}>Enter wallet</Button>
@@ -147,7 +147,7 @@ function PageContent() {
   if (recoveryRecord?.status === RecoveryStatusEn.SIGNATURE_COMPLETED) {
     return (
       <div className="h-full flex flex-col items-center gap-y-xl text-center">
-        <img src={WalletImg} alt="Wallet" className="size-36 mt-10" />
+        <img src={walletImage} alt="Wallet" className="size-36 mt-10" />
         <div className="flex flex-col gap-y-sm">
           <h1 className="elytro-text-title">Enough confirmations collected</h1>
           <p className="text-gray-600 elytro-text-smaller-body">Complete your recovery in recovery app</p>

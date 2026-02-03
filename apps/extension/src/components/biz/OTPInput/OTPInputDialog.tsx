@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@elytro/ui';
 import { OTPInputContent, type OTPInputProps } from './OTPInputContent';
 
 export interface OTPInputDialogProps extends OTPInputProps {

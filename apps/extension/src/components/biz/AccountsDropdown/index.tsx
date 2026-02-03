@@ -1,18 +1,24 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  toast,
+  cn,
+} from '@elytro/ui';
 import AccountOption from './AccountOption';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 import { getIconByChainId, getChainNameByChainId } from '@/constants/chains';
-import { formatAddressToShort, formatTokenAmount } from '@/utils/format';
-import FragmentedAddress from '@/components/biz/FragmentedAddress';
+import { formatTokenAmount } from '@/utils/format';
 import { useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
 import { navigateTo } from '@/utils/navigation';
-import { toast } from '@/hooks/use-toast';
-import { cn } from '@/utils/shadcn/utils';
 
 interface IAccountsDropdownProps {
   className?: string;
@@ -127,13 +133,16 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
             </Avatar>
           </DropdownMenuTrigger>
 
-          <span className="text-ellipsis overflow-hidden whitespace-nowrap">
-            {currentAccount?.address ? (
-              formatAddressToShort(currentAccount.address)
-            ) : (
-              <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
-            )}
-          </span>
+          {currentAccount?.address ? (
+            <ShortedAddress
+              address={currentAccount.address}
+              showChainIcon={false}
+              hideTooltip
+              className="!bg-transparent !p-0"
+            />
+          ) : (
+            <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
+          )}
 
           <ChevronIcon className="size-3" />
         </div>
@@ -152,24 +161,22 @@ export default function AccountsDropdown({ className, chainId }: IAccountsDropdo
               className="flex flex-col items-center gap-y-xs px-lg py-2xl cursor-pointer bg-blue-50 rounded-sm m-2"
               onClick={() => handleSwitchAccount(showAccounts.current!)}
             >
-              <FragmentedAddress
+              <img src={getIconByChainId(showAccounts.current.chainId)} alt="chain" className="size-16 rounded-full" />
+              <ShortedAddress
                 address={showAccounts.current.address}
-                chainId={showAccounts.current.chainId}
+                showChainIcon={false}
+                hideTooltip
                 size="lg"
-                iconSize="size-16"
-                className="flex-col items-center"
-                extra={
-                  <div className="flex flex-col items-center gap-y-0 mt-0">
-                    <span className="elytro-text-small-body text-gray-750">
-                      {getChainNameByChainId(showAccounts.current.chainId)}
-                    </span>
-                    <span className="elytro-text-small-body text-gray-750">
-                      {formatTokenAmount(showAccounts.current?.balance, 18, 'ETH')}
-                    </span>
-                  </div>
-                }
-                extraLayout="column"
+                className="!bg-transparent !p-0"
               />
+              <div className="flex flex-col items-center gap-y-0 mt-0">
+                <span className="elytro-text-small-body text-gray-750">
+                  {getChainNameByChainId(showAccounts.current.chainId)}
+                </span>
+                <span className="elytro-text-small-body text-gray-750">
+                  {formatTokenAmount(showAccounts.current?.balance, 18, 'ETH')}
+                </span>
+              </div>
             </div>
           )}
 

@@ -1,5 +1,5 @@
 import { useWallet } from '@/contexts/wallet';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@elytro/ui';
 import { navigateTo } from '@/utils/navigation';
 import { DecodeResult } from '@elytro/decoder';
 import type { Transaction } from '@elytro/sdk';

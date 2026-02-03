@@ -1,39 +1,46 @@
 import { getIconByChainId } from '@/constants/chains';
-import { formatAddressToShort } from '@/utils/format';
-import { cn } from '@/utils/shadcn/utils';
-import { Tooltip, TooltipContent } from './tooltip';
-import { TooltipTrigger } from '@radix-ui/react-tooltip';
+import { ShortedAddress as BaseShortedAddress, type ShortedAddressSize } from '@elytro/ui';
+import { ReactNode } from 'react';
 
 interface IProps {
   address: string;
   chainId?: number;
   className?: string;
+  size?: ShortedAddressSize;
   hideTooltip?: boolean;
+  showChainIcon?: boolean;
+  dotColor?: string;
+  rightExtra?: ReactNode;
+  bottomExtra?: ReactNode;
 }
 
-export default function ShortedAddress({ address, chainId, className, hideTooltip = false }: IProps) {
-  const prefix = address.slice(0, 7);
-  const suffix = address.slice(-5);
+/**
+ * Extension-specific wrapper that resolves chainId to icon URL
+ */
+export default function ShortedAddress({
+  address,
+  chainId,
+  className,
+  size = 'sm',
+  hideTooltip = false,
+  showChainIcon = true,
+  dotColor,
+  rightExtra,
+  bottomExtra,
+}: IProps) {
+  const chainIconUrl = chainId ? getIconByChainId(chainId) : undefined;
 
   return (
-    <span className={cn('w-fit flex flex-row items-center gap-x-sm p-xs rounded-2xs bg-gray-150', className)}>
-      {chainId && <img src={getIconByChainId(chainId)} className="size-4 rounded-full" />}
-      {!hideTooltip ? (
-        <Tooltip delayDuration={0} disableHoverableContent>
-          <TooltipTrigger>
-            <span className="elytro-text-tiny-body">{formatAddressToShort(address)}</span>
-          </TooltipTrigger>
-          <TooltipContent className="rounded-sm bg-blue-600 p-4">
-            <div className="text-blue-450">
-              <span className="text-blue-300 font-bold">{prefix}</span>
-              {address.slice(7, -5)}
-              <span className="text-blue-300 font-bold">{suffix}</span>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      ) : (
-        <span className="elytro-text-tiny-body">{formatAddressToShort(address)}</span>
-      )}
-    </span>
+    <BaseShortedAddress
+      address={address}
+      chainIconUrl={chainIconUrl}
+      className={className}
+      size={size}
+      hideTooltip={hideTooltip}
+      showChainIcon={showChainIcon}
+      dotColor={dotColor}
+      rightExtra={rightExtra}
+      bottomExtra={bottomExtra}
+    />
   );
 }

@@ -1,9 +1,8 @@
-import { Select, SelectTrigger, SelectContent } from '@/components/ui/select';
+import { Select, SelectTrigger, SelectContent, cn } from '@elytro/ui';
 import { ChevronDown } from 'lucide-react';
-import DefaultTokenIcon from '@/assets/icons/ether.svg';
+import { etherIcon } from '@elytro/ui/assets';
 import { useEffect, useState, useCallback, memo } from 'react';
 import TokenItem from '@/components/ui/TokenItem';
-import { cn } from '@/utils/shadcn/utils';
 import { formatTokenAmount } from '@/utils/format';
 
 const SelectedToken = memo(({ token }: { token?: TTokenInfo }) => {
@@ -17,7 +16,7 @@ const SelectedToken = memo(({ token }: { token?: TTokenInfo }) => {
 
   return (
     <div className="flex items-center w-full">
-      <img className="h-10 w-10" src={token.logoURI || DefaultTokenIcon} alt={token.name || 'Token'} />
+      <img className="h-10 w-10" src={token.logoURI || etherIcon} alt={token.name || 'Token'} />
       <div className="text-left ml-2">
         <div className="flex items-center">
           <div className="text-lg font-bold">{token.name || token.symbol}</div>

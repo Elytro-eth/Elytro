@@ -1,7 +1,8 @@
-import AddressWithChain from '@/components/AddressWithChain';
+import { ShortedAddress } from '@elytro/ui';
 import { useRecoveryRecord } from '@/contexts';
 import React from 'react';
 import { useAccount } from 'wagmi';
+import { CHAIN_LOGOS } from '@/constants/chains';
 
 export default function Status() {
   const { contacts, chainId } = useRecoveryRecord();
@@ -34,11 +35,11 @@ export default function Status() {
       {contacts
         ?.filter((contact) => !contact.confirmed)
         .map((contact) => (
-          <AddressWithChain
-            className="!p-lg rounded-[16px]"
+          <ShortedAddress
+            className="!p-lg rounded-[16px] w-full"
             key={contact.address}
             address={contact.address}
-            chainID={chainId!}
+            chainIconUrl={chainId ? CHAIN_LOGOS[chainId] : undefined}
             rightExtra={
               contact.confirmed ? (
                 <div className="flex items-center text-tiny rounded-xs bg-green-300 px-xs py-3xs">Confirmed</div>

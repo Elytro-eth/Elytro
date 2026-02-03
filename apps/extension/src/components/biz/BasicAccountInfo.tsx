@@ -4,13 +4,10 @@ import { navigateTo } from '@/utils/navigation';
 import ActionButton from './ActionButton';
 import { useAccount } from '@/contexts/account-context';
 import AccountsDropdown from './AccountsDropdown';
-import { RedDot } from '@/components/ui/RedDot';
 import { Copy as IconCopy, Check as IconCheck } from 'lucide-react';
 import { safeClipboard } from '@/utils/clipboard';
 import { useState, useCallback, useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, Button, Checkbox, RedDot } from '@elytro/ui';
 import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
 
 /**

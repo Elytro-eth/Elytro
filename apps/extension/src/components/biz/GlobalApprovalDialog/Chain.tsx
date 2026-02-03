@@ -1,6 +1,5 @@
 import { useApproval } from '@/contexts/approval-context';
-import Spin from '@/components/ui/Spin';
-import { Button } from '@/components/ui/button';
+import { Button, DialogFooter, DialogHeader, DialogTitle, Spin } from '@elytro/ui';
 import { ethErrors } from 'eth-rpc-errors';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';
@@ -8,7 +7,6 @@ import { SUPPORTED_CHAINS, ChainOperationEn, TChainItem } from '@/constants/chai
 import DappInteractionBar from '@/components/biz/DappInteractionBar';
 import { useEffect, useState } from 'react';
 import ChainAccountsDropdown from '@/components/biz/ChainAccountsDropdown.tsx';
-import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 function URLSection({ title, items }: { title: string; items: string[] }) {
   return (

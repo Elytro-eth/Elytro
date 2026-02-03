@@ -4,15 +4,13 @@ import { useEffect, useState } from 'react';
 import { fetchTokens } from '@/utils/tokens';
 import { SearchInput } from '@/components/biz/SearchInput';
 import { HighlightText } from '@/components/biz/HighlightText';
-import { Button } from '@/components/ui/button';
+import { Button, Tooltip, TooltipContent, TooltipTrigger, toast } from '@elytro/ui';
 import { isAddress } from 'viem';
 import { useWallet } from '@/contexts/wallet';
-import { toast } from '@/hooks/use-toast';
 import { navigateTo } from '@/utils/navigation';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { LabelInput } from '@/components/biz/LabelInput';
 import { formatAddressToShort } from '@/utils/format';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const TokenConfigItem = ({
   token,

@@ -1,7 +1,7 @@
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
 import InfoCard from '@/components/biz/InfoCard';
 import { formatEther, formatUnits } from 'viem';
-import FragmentedAddress from '@/components/biz/FragmentedAddress';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 import { formatBalance, formatDollarBalance, formatRawData } from '@/utils/format';
 import { useMemo, useState, useEffect } from 'react';
 import ActivateDetail from './ActivationDetail';
@@ -9,12 +9,9 @@ import InnerSendingDetail from './InnerSendingDetail';
 import ApprovalDetail from './ApprovalDetail';
 import { ChevronUp, RefreshCw, Copy as CopyIcon, Check } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import HelperText from '@/components/ui/HelperText';
+import { RadioGroup, RadioGroupItem, Button, cn, HelperText } from '@elytro/ui';
 import { RawData } from '@/components/ui/rawData';
-import { cn } from '@/utils/shadcn/utils';
 import { safeClipboard } from '@/utils/clipboard';
-import { Button } from '@/components/ui/button';
 
 const { InfoCardItem, InfoCardList } = InfoCard;
 
@@ -137,7 +134,10 @@ export function UserOpDetail() {
 
       {/* UserOp Pay Info */}
       <InfoCardList>
-        <InfoCardItem label="From wallet" content={<FragmentedAddress address={address} chainId={chainId} />} />
+        <InfoCardItem
+          label="From wallet"
+          content={<ShortedAddress address={address} chainId={chainId} className="!bg-transparent !p-0" />}
+        />
 
         {/* Network cost: unit ETH */}
         <InfoCardItem

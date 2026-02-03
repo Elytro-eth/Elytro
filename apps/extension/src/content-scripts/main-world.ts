@@ -1,4 +1,4 @@
-import { iconElytroDark, iconElytroLight } from '@/assets/icons';
+import { iconElytroDark, iconElytroLight } from '@elytro/ui/assets';
 import PageProvider from '@/background/provider/pageProvider';
 
 declare global {
@@ -57,10 +57,9 @@ const mainWorld = () => {
     },
   });
 
-  const announceEvent: EIP6963AnnounceProviderEvent = new CustomEvent(
-    'eip6963:announceProvider',
-    { detail: Object.freeze({ info, provider: injectedProvider }) }
-  );
+  const announceEvent: EIP6963AnnounceProviderEvent = new CustomEvent('eip6963:announceProvider', {
+    detail: Object.freeze({ info, provider: injectedProvider }),
+  });
 
   const announce = () => {
     window.dispatchEvent(announceEvent);

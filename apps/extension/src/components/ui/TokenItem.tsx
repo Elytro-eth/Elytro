@@ -1,4 +1,4 @@
-import DefaultTokenIcon from '@/assets/icons/ether.svg';
+import { etherIcon } from '@elytro/ui/assets';
 import TokenBalanceItem from '../biz/TokenBalanceItem';
 
 export interface TokenItemProps {
@@ -10,7 +10,7 @@ export default function TokenItem({ token, showSymbol = true }: TokenItemProps) 
   return (
     <div className="flex flex-row items-center justify-between h-16 px-4">
       <div className="flex flex-row items-center gap-x-2">
-        <img src={token?.logoURI || DefaultTokenIcon} alt={token?.name} className="size-8 rounded-full" />
+        <img src={token?.logoURI || etherIcon} alt={token?.name} className="size-8 rounded-full" />
         <p className="text-lg font-bold">{token?.symbol}</p>
       </div>
       <TokenBalanceItem

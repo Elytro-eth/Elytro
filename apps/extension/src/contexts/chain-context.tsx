@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useWallet } from '@/contexts/wallet';
 import { TChainItem } from '@/constants/chains';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@elytro/ui';
 import useEnhancedHashLocation from '@/hooks/use-enhanced-hash-location';
 
 type IChainContext = {

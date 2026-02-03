@@ -1,11 +1,8 @@
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
-import ProcessingTip from '@/components/ui/ProcessingTip';
-import { Button } from '@/components/ui/button';
+import { Button, DialogFooter, DialogHeader, DialogTitle, toast, ProcessingTip } from '@elytro/ui';
 import { UserOpDetail } from '@/components/biz/UserOpDetail';
 import { AlertCircle, Box, InfoIcon } from 'lucide-react';
-import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { OTPInputContent } from '@/components/biz/OTPInput';
-import { toast } from '@/hooks/use-toast';
 
 const UserOpTitleMap: Record<TxRequestTypeEn, string> = {
   [TxRequestTypeEn.DeployWallet]: 'Activate wallet',

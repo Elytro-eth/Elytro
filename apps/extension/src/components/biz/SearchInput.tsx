@@ -1,4 +1,4 @@
-import { cn } from '@/utils/shadcn/utils';
+import { cn } from '@elytro/ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { LabelInput } from './LabelInput';
 

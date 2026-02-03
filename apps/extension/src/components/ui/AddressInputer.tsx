@@ -1,8 +1,8 @@
 import { getIconByChainId } from '@/constants/chains';
-import { Input } from '@/components/ui/input';
+import { Input } from '@elytro/ui';
 import { useState, useRef, useEffect } from 'react';
 import { isAddress } from 'viem';
-import FragmentedAddress from '@/components/biz/FragmentedAddress';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 
 interface IAddressInputWithChainIconProps {
   chainId: number;
@@ -51,13 +51,13 @@ export default function AddressInputWithChainIcon({ chainId, address, onChange }
   };
 
   const isValidAddress = isAddress(address);
-  const showFragmentedAddress = !isFocused && isValidAddress && (displayAddress || address);
+  const showShortedAddress = !isFocused && isValidAddress && (displayAddress || address);
 
   const chainIcon = <img src={getIconByChainId(chainId)} className="rounded-full size-6 flex-shrink-0" />;
 
   return (
     <div className="w-full relative">
-      {showFragmentedAddress ? (
+      {showShortedAddress ? (
         <div
           className="w-full flex flex-row items-center bg-gray-150 rounded-md px-lg py-sm cursor-pointer"
           onClick={() => {
@@ -66,12 +66,12 @@ export default function AddressInputWithChainIcon({ chainId, address, onChange }
           }}
         >
           {chainIcon}
-          <FragmentedAddress
+          <ShortedAddress
             address={displayAddress || address}
             chainId={chainId}
             size="lg"
             showChainIcon={false}
-            className="h-10 ml-3"
+            className="h-10 ml-3 !bg-transparent !p-0"
           />
         </div>
       ) : (

@@ -1,15 +1,20 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  cn,
+  Spin,
+} from '@elytro/ui';
 import AccountOption from '../AccountsDropdown/AccountOption';
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 import { getIconByChainId } from '@/constants/chains';
-import { formatAddressToShort } from '@/utils/format';
 import { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { ChevronUp } from 'lucide-react';
 import { useAccount } from '@/contexts/account-context';
-import Spin from '@/components/ui/Spin';
-import { cn } from '@/utils/shadcn/utils';
 
 interface IAccountsDropdownProps {
   className?: string;
@@ -81,13 +86,17 @@ export default function ChainAccountsDropdown({
             </Avatar>
           </DropdownMenuTrigger>
 
-          <span className="text-ellipsis overflow-hidden whitespace-nowrap">
-            {showAccount?.address ? (
-              formatAddressToShort(showAccount.address)
-            ) : (
-              <Spin size="sm" color="text-gray-300" isLoading inline />
-            )}
-          </span>
+          {showAccount?.address ? (
+            <ShortedAddress
+              address={showAccount.address}
+              chainId={chainId}
+              showChainIcon={false}
+              hideTooltip
+              className="!bg-transparent !p-0"
+            />
+          ) : (
+            <Spin size="sm" color="text-gray-300" isLoading inline />
+          )}
 
           <ChevronIcon className="size-3" />
         </div>

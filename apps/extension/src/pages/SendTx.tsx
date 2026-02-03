@@ -4,8 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle } from 'lucide-react';
 import { Transaction } from '@elytro/sdk';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Button, Form, FormControl, FormField, FormItem, FormMessage, Dialog, DialogContent, toast } from '@elytro/ui';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import { useAccount } from '@/contexts/account-context';
 import TokenSelector from '@/components/biz/TokenSelector';
@@ -13,14 +12,12 @@ import AmountInput from '@/components/biz/AmountInput';
 import { useTx } from '@/contexts/tx-context';
 import { TxRequestTypeEn } from '@/contexts/tx-context';
 import { ABI_ERC20_TRANSFER } from '@/constants/abi';
-import { toast } from '@/hooks/use-toast';
 import { formatTokenAmount } from '@/utils/format';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import AddressInput from '@/components/biz/AddressInput';
 import { saveRecentAddress } from '@/utils/recentAddresses';
 import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
 import { useWallet } from '@/contexts/wallet';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 
 export default function SendTx() {

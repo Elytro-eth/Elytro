@@ -2,14 +2,10 @@ import { useAccount } from '@/contexts/account-context';
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import ReceiveAddressBadge from '@/components/biz/ReceiveAddressBadge';
 import { CircleAlert } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import Spin from '@/components/ui/Spin';
+import { Button, Dialog, DialogContent, Checkbox, toast, Spin } from '@elytro/ui';
 import { getChainNameByChainId, getIconByChainId } from '@/constants/chains';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useState, useCallback, useEffect } from 'react';
 import { safeClipboard } from '@/utils/clipboard';
-import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from '@/hooks/use-toast';
 
 /**
  * "Don't remind me again" feature:

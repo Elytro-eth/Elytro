@@ -1,5 +1,5 @@
-import LaunchImg from '@/assets/launch.png';
-import { Button } from '@/components/ui/button';
+import { Button } from '@elytro/ui';
+import { launchImage } from '@elytro/ui/assets';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
 import { navigateTo } from '@/utils/navigation';
 import { useEffect } from 'react';
@@ -16,7 +16,7 @@ export default function Launch() {
   return (
     <div className={`elytro-gradient-bg flex flex-1 flex-col items-center px-xl min-h-screen pt-10 page-fade-in`}>
       <div className="flex flex-col items-center gap-y-3xl flex-1">
-        <img src={LaunchImg} alt="Launch" className="size-[12rem] mt-20" />
+        <img src={launchImage} alt="Launch" className="size-[12rem] mt-20" />
         <h1 className="elytro-text-headline">Your next-gen Ethereum wallet</h1>
         <div className="flex flex-col w-full">
           <div className="flex flex-col gap-y-3">

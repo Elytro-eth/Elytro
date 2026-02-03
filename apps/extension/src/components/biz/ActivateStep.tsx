@@ -1,6 +1,4 @@
-import CardWrapper from '@/components/ui/CardWrapper';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/utils/shadcn/utils';
+import { Button, cn, CardWrapper } from '@elytro/ui';
 
 export enum ActivateStepStatus {
   NonReady,

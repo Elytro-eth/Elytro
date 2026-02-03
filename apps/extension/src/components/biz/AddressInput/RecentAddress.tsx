@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import FragmentedAddress from '../FragmentedAddress';
+import ShortedAddress from '@/components/ui/ShortedAddress';
 import ENSInfoComponent from '../ENSInfo';
 import { useMemo } from 'react';
 
@@ -25,7 +25,13 @@ const RecentAddressItem = ({ item, chainId, onClick }: IRecentAddressItemProps) 
       {item.name ? (
         <ENSInfoComponent ensInfo={item} extra={time} />
       ) : (
-        <FragmentedAddress size="md" address={item.address} chainId={chainId} extra={time} />
+        <ShortedAddress
+          size="lg"
+          address={item.address}
+          chainId={chainId}
+          bottomExtra={time}
+          className="!bg-transparent !p-0"
+        />
       )}
     </div>
   );

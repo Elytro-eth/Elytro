@@ -5,7 +5,7 @@ import * as React from 'react';
 import type { ToastActionElement, ToastProps } from '../components/toast';
 
 const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 2_000;
+const TOAST_REMOVE_DELAY = 3_000;
 
 type ToasterToast = ToastProps & {
   id: string;
@@ -53,14 +53,22 @@ interface State {
 }
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
+const toastTimeoutStartTimes = new Map<string, number>();
+const toastRemainingTimes = new Map<string, number>();
 
 const addToRemoveQueue = (toastId: string) => {
   if (toastTimeouts.has(toastId)) {
     return;
   }
 
+  const startTime = Date.now();
+  toastTimeoutStartTimes.set(toastId, startTime);
+  toastRemainingTimes.set(toastId, TOAST_REMOVE_DELAY);
+
   const timeout = setTimeout(() => {
     toastTimeouts.delete(toastId);
+    toastTimeoutStartTimes.delete(toastId);
+    toastRemainingTimes.delete(toastId);
     dispatch({
       type: 'REMOVE_TOAST',
       toastId: toastId,
@@ -68,6 +76,41 @@ const addToRemoveQueue = (toastId: string) => {
   }, TOAST_REMOVE_DELAY);
 
   toastTimeouts.set(toastId, timeout);
+};
+
+const pauseToastTimeout = (toastId: string) => {
+  const timeout = toastTimeouts.get(toastId);
+  const startTime = toastTimeoutStartTimes.get(toastId);
+
+  if (timeout && startTime) {
+    clearTimeout(timeout);
+    toastTimeouts.delete(toastId);
+
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, TOAST_REMOVE_DELAY - elapsed);
+    toastRemainingTimes.set(toastId, remaining);
+  }
+};
+
+const resumeToastTimeout = (toastId: string) => {
+  const remainingTime = toastRemainingTimes.get(toastId);
+
+  if (remainingTime && remainingTime > 0 && !toastTimeouts.has(toastId)) {
+    const startTime = Date.now();
+    toastTimeoutStartTimes.set(toastId, startTime);
+
+    const timeout = setTimeout(() => {
+      toastTimeouts.delete(toastId);
+      toastTimeoutStartTimes.delete(toastId);
+      toastRemainingTimes.delete(toastId);
+      dispatch({
+        type: 'REMOVE_TOAST',
+        toastId: toastId,
+      });
+    }, remainingTime);
+
+    toastTimeouts.set(toastId, timeout);
+  }
 };
 
 export const reducer = (state: State, action: Action): State => {
@@ -182,6 +225,8 @@ function useToast() {
     ...state,
     toast,
     dismiss: (toastId?: string) => dispatch({ type: 'DISMISS_TOAST', toastId }),
+    pauseToast: pauseToastTimeout,
+    resumeToast: resumeToastTimeout,
   };
 }
 

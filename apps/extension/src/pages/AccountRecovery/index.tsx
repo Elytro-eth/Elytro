@@ -1,18 +1,17 @@
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
 import AddressInputWithChainIcon from '@/components/ui/AddressInputer';
 import { useWallet } from '@/contexts/wallet';
-import { Button } from '@/components/ui/button';
+import { Button, toast } from '@elytro/ui';
 import { useChain } from '@/contexts/chain-context';
 import { navigateTo } from '@/utils/navigation';
 import { Box, Clock, Search, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Address, isAddress } from 'viem';
 import { SIDE_PANEL_ROUTE_PATHS } from '@/routes';
-import WalletImg from '@/assets/bg-images/guardian-bg-top.png';
+import { bgGuardianTop } from '@elytro/ui/assets';
 import TipItem from '@/components/biz/TipItem';
 import { TChainItem } from '@/constants/chains';
 import NetworkSelection from '@/components/biz/NetworkSelection';
-import { toast } from '@/hooks/use-toast';
 import RecoveryFileUploadDialog from './RecoveryFileUploadDialog';
 
 const tips = [
@@ -89,7 +88,7 @@ export default function AccountRecovery() {
       >
         <div className="flex flex-col h-full">
           <div className="w-full">
-            <img src={WalletImg} className="w-full h-full object-contain mb-3" />
+            <img src={bgGuardianTop} className="w-full h-full object-contain mb-3" />
           </div>
           <div className="flex-1 flex flex-col px-lg">
             <h3 className="text-xl font-bold text-gray-900 mb-4 leading-tight">How to recover</h3>
@@ -117,19 +116,16 @@ export default function AccountRecovery() {
     );
   }
 
-  const handleSelectChain = (chain: TChainItem) => {
+  const handleSelectChain = async (chain: TChainItem) => {
     setSelectedChain(chain);
-  };
 
-  const handleNext = async () => {
     try {
-      await wallet.switchChain(selectedChain!.id);
+      await wallet.switchChain(chain.id);
       setIsChainConfirmed(true);
     } catch (error) {
       console.error(error);
       toast({
         title: 'Failed to switch network',
-        // description: 'Please try again',
       });
     }
   };
@@ -141,17 +137,10 @@ export default function AccountRecovery() {
         onBack={() => {
           setAddress('');
           setSelectedChain(null);
+          setChecked(false);
         }}
       >
         <NetworkSelection selectedChain={selectedChain} handleSelectChain={handleSelectChain} />
-        <div className="w-full grid grid-cols-2 gap-x-sm mt-10">
-          <Button variant="secondary" onClick={() => setChecked(false)}>
-            Cancel
-          </Button>
-          <Button disabled={!selectedChain} onClick={handleNext}>
-            Next
-          </Button>
-        </div>
       </SecondaryPageWrapper>
     );
   }

@@ -1,5 +1,5 @@
 import SecondaryPageWrapper from '@/components/biz/SecondaryPageWrapper';
-import { Switch } from '@/components/ui/switch';
+import { Switch, toast, Spin } from '@elytro/ui';
 import { useAccount } from '@/contexts/account-context';
 import { useChain } from '@/contexts/chain-context';
 import { getApproveErc20Tx, queryErc20Approvals } from '@/utils/tokenApproval';
@@ -8,8 +8,6 @@ import { CircleDollarSignIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { Transaction } from '@elytro/sdk';
 import { TxRequestTypeEn, useTx } from '@/contexts/tx-context';
-import { toast } from '@/hooks/use-toast';
-import Spin from '@/components/ui/Spin';
 import { CoinLogoNameMap } from '@/constants/token';
 import { useWallet } from '@/contexts/wallet';
 

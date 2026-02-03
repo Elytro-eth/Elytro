@@ -1,4 +1,4 @@
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '@elytro/ui';
 import { ELYTRO_APP_DATA } from '@/constants/dapps';
 
 interface DappInteractionBarProps {

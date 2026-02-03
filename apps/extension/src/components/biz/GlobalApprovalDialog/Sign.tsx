@@ -1,14 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useApproval } from '@/contexts/approval-context';
-import Spin from '@/components/ui/Spin';
-import { toast } from '@/hooks/use-toast';
 import SignDetail from '@/components/biz/SignDetail';
 import { useAccount } from '@/contexts/account-context';
 import { useTx, TxRequestTypeEn } from '@/contexts/tx-context';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import LogoWithCircle from '@/assets/logo_full.svg';
-import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button, Avatar, AvatarFallback, AvatarImage, DialogHeader, DialogTitle, toast, Spin } from '@elytro/ui';
+import { logoWithCircleSvg } from '@elytro/ui/assets';
 
 export default function Sign() {
   const {
@@ -48,7 +44,7 @@ export default function Sign() {
         </DialogHeader>
         <div className="flex flex-col items-center gap-y-6 text-center">
           <Avatar className="size-5xl mt-10 z-10 rounded-full">
-            <AvatarImage src={LogoWithCircle} alt="Elytro" />
+            <AvatarImage src={logoWithCircleSvg} alt="Elytro" />
             <AvatarFallback>Elytro</AvatarFallback>
           </Avatar>
           <span className="elytro-text-bold-body">You’re almost ready</span>

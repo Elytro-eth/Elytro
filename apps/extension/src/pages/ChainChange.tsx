@@ -1,7 +1,5 @@
 import { useApproval } from '@/contexts/approval-context';
-import Spin from '@/components/ui/Spin';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, Button, Spin } from '@elytro/ui';
 import { ethErrors } from 'eth-rpc-errors';
 import { useWallet } from '@/contexts/wallet';
 import { useAccount } from '@/contexts/account-context';

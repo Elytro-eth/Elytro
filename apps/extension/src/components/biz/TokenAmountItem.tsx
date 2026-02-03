@@ -1,9 +1,9 @@
 import { useAccount } from '@/contexts/account-context';
 import { formatDollarBalance, formatTokenAmount } from '@/utils/format';
-import { cn } from '@/utils/shadcn/utils';
+import { cn } from '@elytro/ui';
 import { TokenInfo } from '@elytro/decoder';
 import { useMemo } from 'react';
-import DefaultTokenIcon from '@/assets/icons/ether.svg';
+import { etherIcon } from '@elytro/ui/assets';
 
 interface ITokenAmountItemProps extends Partial<Pick<TokenInfo, 'logoURI' | 'symbol' | 'decimals'>> {
   value?: string;
@@ -48,7 +48,7 @@ export default function TokenAmountItem({
     >
       <img
         className={cn('size-6 p-1 rounded-full ring-1 ring-gray-150 bg-white', size === 'sm' && 'p-1 size-5')}
-        src={logoURI || DefaultTokenIcon}
+        src={logoURI || etherIcon}
         alt={symbol}
       />
       <span className={cn(size === 'md' && 'elytro-text-bold-body')}>

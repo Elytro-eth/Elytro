@@ -1,5 +1,4 @@
-import { cn } from '@/utils/shadcn/utils';
-import { Input, InputProps } from '../ui/input';
+import { cn, Input, InputProps } from '@elytro/ui';
 
 interface LabelInputProps extends InputProps {
   label: string;

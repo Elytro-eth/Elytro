@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import HashRouter from '@/components/ui/HashRouter';
 import PageContainer from '@/components/ui/PageContainer';
 import { bootstrap } from '@/utils/bootstrap';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { TooltipProvider } from '@elytro/ui';
 import { ApprovalProvider } from '@/contexts/approval-context';
 import { AccountProvider } from '@/contexts/account-context';
 import { ApolloProvider } from '@apollo/client';

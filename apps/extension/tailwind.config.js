@@ -2,7 +2,7 @@
 module.exports = {
   mode: 'jit',
   darkMode: ['class'],
-  content: ['./src/**/*.{tsx,html}'],
+  content: ['./src/**/*.{tsx,html}', '../../packages/ui/src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       spacing: {

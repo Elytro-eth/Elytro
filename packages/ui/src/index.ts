@@ -1,5 +1,8 @@
 // Base utility
-export { cn } from './utils';
+export { cn, formatAddressToShort } from './utils';
+
+// Constants
+export { CHAIN_IDS, CHAIN_LOGOS, getChainLogo } from './constants/chain-logos';
 
 // Alert Dialog
 export {
@@ -26,14 +29,7 @@ export { Badge, badgeVariants } from './components/badge';
 export { Button, buttonVariants, type ButtonProps } from './components/button';
 
 // Card
-export {
-  Card,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from './components/card';
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './components/card';
 
 // Checkbox
 export { Checkbox } from './components/checkbox';
@@ -84,15 +80,10 @@ export {
 } from './components/form';
 
 // Input
-export { Input } from './components/input';
+export { Input, type InputProps } from './components/input';
 
 // Input OTP
-export {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-  InputOTPSeparator,
-} from './components/input-otp';
+export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from './components/input-otp';
 
 // Label
 export { Label } from './components/label';
@@ -162,9 +153,36 @@ export { Toggle, toggleVariants } from './components/toggle';
 export { ToggleGroup, ToggleGroupItem } from './components/toggle-group';
 
 // Tooltip
-export {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  TooltipProvider,
-} from './components/tooltip';
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './components/tooltip';
+
+// === Extended Components ===
+
+// Spin (loading spinner)
+export { default as Spin } from './components/spin';
+
+// HelperText
+export { default as HelperText } from './components/helper-text';
+
+// ErrorTip
+export { default as ErrorTip } from './components/error-tip';
+
+// CardWrapper
+export { default as CardWrapper } from './components/card-wrapper';
+
+// LoadingSkeleton
+export { LoadingSkeleton } from './components/loading-skeleton';
+
+// ProcessingTip
+export { default as ProcessingTip } from './components/processing-tip';
+
+// RedDot
+export { RedDot, type RedDotProps } from './components/red-dot';
+
+// Slogan
+export { default as Slogan } from './components/slogan';
+
+// EyeOnOff
+export { EyeOnOff } from './components/eye-on-off';
+
+// ShortedAddress
+export { ShortedAddress, type ShortedAddressSize } from './components/shorted-address';
