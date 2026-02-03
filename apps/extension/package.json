@@ -1,7 +1,7 @@
 {
   "name": "extension",
   "private": true,
-  "version": "0.0.17",
+  "version": "0.0.19",
   "type": "module",
   "scripts": {
     "dev": "cross-env APP_ENV=development vite",
