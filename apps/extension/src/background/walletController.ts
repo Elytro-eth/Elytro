@@ -945,7 +945,7 @@ class WalletController {
   }
 
   public async updateRecoveryStatus(): Promise<boolean> {
-    let recoveryRecord = (await accountManager.getRecoveryRecord()) as TRecoveryRecord | null;
+    const recoveryRecord = (await accountManager.getRecoveryRecord()) as TRecoveryRecord | null;
     if (!recoveryRecord) {
       return false;
     }
@@ -994,7 +994,7 @@ class WalletController {
         isRecoveryEnabled: true,
       });
       this._onAccountChanged();
-      recoveryRecord = null;
+      // Keep record with RECOVERY_COMPLETED so UI can show success page; clear when user clicks "Enter wallet"
     } else {
       const onChainStatus = await elytroSDK.checkOnchainRecoveryStatus(
         recoveryRecord.address,
@@ -1014,6 +1014,10 @@ class WalletController {
   public async getRecoveryRecord() {
     await this.updateRecoveryStatus();
     return (await accountManager.getRecoveryRecord()) as TRecoveryRecord;
+  }
+
+  public async clearRecoveryRecord() {
+    await accountManager.updateRecoveryRecord(null);
   }
 
   public async importRecoveryRecord(address: Address, chainId: number, contacts: [], threshold: number) {

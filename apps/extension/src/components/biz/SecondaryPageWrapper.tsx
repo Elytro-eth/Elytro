@@ -24,6 +24,11 @@ interface ISecondaryPageWrapperProps extends PropsWithChildren {
    * @default false
    */
   isGuide?: boolean;
+  /**
+   * No inner card: content sits directly on root green-50 background (no white container)
+   * @default false
+   */
+  noInnerCard?: boolean;
 }
 
 export default function SecondaryPageWrapper({
@@ -37,6 +42,7 @@ export default function SecondaryPageWrapper({
   className,
   fadeIn = true,
   isGuide = false,
+  noInnerCard = false,
 }: ISecondaryPageWrapperProps) {
   const handleClose = () => {
     onClose?.();
@@ -55,7 +61,8 @@ export default function SecondaryPageWrapper({
     <div className={cn('w-full min-h-full bg-green-50 p-sm', fadeIn && 'page-fade-in', className)}>
       <div
         className={cn(
-          'flex flex-col flex-grow w-full min-h-full bg-white rounded-sm pb-2xl relative overflow-hidden',
+          'flex flex-col flex-grow w-full min-h-full pb-2xl relative overflow-hidden',
+          noInnerCard ? 'bg-transparent' : 'bg-white rounded-sm',
           isGuide ? '' : 'p-lg'
         )}
       >

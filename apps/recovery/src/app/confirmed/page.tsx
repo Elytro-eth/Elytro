@@ -7,21 +7,26 @@ import { SidebarStepper } from '@/components/SidebarStepper';
 import { Button } from '@elytro/ui';
 import { useRecoveryRecord } from '@/contexts';
 import { bgContactsLg } from '@elytro/ui/assets';
+import { RecoveryStatusEn } from '@/constants/enums';
 
 export default function Confirmed() {
   let backToHome;
   let address: string | undefined;
   let chainId: number | undefined;
+  let status: RecoveryStatusEn | null = null;
 
   try {
     const context = useRecoveryRecord();
     backToHome = context?.backToHome;
     address = context?.address ?? undefined;
     chainId = context?.chainId ?? undefined;
+    status = context?.status ?? null;
   } catch (error) {
     console.error('Error getting context:', error);
     backToHome = null;
   }
+
+  const hasEnoughConfirmations = status === RecoveryStatusEn.SIGNATURE_COMPLETED;
 
   const handleBackToHome = () => {
     try {
@@ -50,7 +55,7 @@ export default function Confirmed() {
             <h1 className="text-title text-center">Confirmed successfully</h1>
             <p className="text-smaller text-gray-600">You can disconnect and close the window now</p>
             <Button onClick={handleBackToHome} variant="secondary" className="mt-4">
-              Back to Recovery
+              {hasEnoughConfirmations ? 'Continue to Start Recovery' : 'Back to Recovery'}
             </Button>
           </div>
         </ContentWrapper>
