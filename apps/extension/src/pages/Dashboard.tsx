@@ -12,9 +12,12 @@ import { useWallet } from '@/contexts/wallet';
 import { toast, cn } from '@elytro/ui';
 import dayjs from 'dayjs';
 import { writeFile } from '@/utils/file';
+import { navigate as navigateHash } from 'wouter/use-hash-location';
+import useSearchParams from '@/hooks/use-search-params';
 
 export default function Dashboard() {
   const { loading, reloadAccount, currentAccount } = useAccount();
+  const searchParams = useSearchParams();
   const [isPrivacyMode] = useLocalStorage('isPrivacyMode', false);
   const { wallet } = useWallet();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -110,6 +113,13 @@ export default function Dashboard() {
 
     checkRecoveryStatus();
   }, [currentAccount?.address, wallet]);
+
+  // After recovery, land on dashboard with fromRecovery=1; refresh account/tokens and strip param
+  useEffect(() => {
+    if (searchParams.fromRecovery !== '1') return;
+    reloadAccount(true);
+    navigateHash(SIDE_PANEL_ROUTE_PATHS.Dashboard);
+  }, [searchParams.fromRecovery, reloadAccount]);
 
   const handleReload = () => {
     reloadAccount(true);

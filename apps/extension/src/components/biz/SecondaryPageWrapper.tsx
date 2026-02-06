@@ -63,7 +63,7 @@ export default function SecondaryPageWrapper({
         className={cn(
           'flex flex-col flex-grow w-full min-h-full pb-2xl relative overflow-hidden',
           noInnerCard ? 'bg-transparent' : 'bg-white rounded-sm',
-          isGuide ? '' : 'p-lg'
+          isGuide ? '' : 'p-md'
         )}
       >
         {/* Header - absolutely positioned over content when isGuide */}

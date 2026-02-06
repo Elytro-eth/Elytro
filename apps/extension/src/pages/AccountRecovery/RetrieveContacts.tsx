@@ -17,7 +17,7 @@ import { useWallet } from '@/contexts/wallet';
 import { useEffect, useRef, useState } from 'react';
 import ContactItem from '@/components/biz/ContactItem';
 import { safeClipboard } from '@/utils/clipboard';
-import { Check, Copy as CopyIcon } from 'lucide-react';
+import { Check, Copy as CopyIcon, ExternalLink } from 'lucide-react';
 import ShortedAddress from '@/components/ui/ShortedAddress';
 import Copy from '@/components/ui/Copy';
 import { walletImage } from '@elytro/ui/assets';
@@ -200,7 +200,7 @@ function PageContent() {
         )}
 
         <div className="flex flex-row w-full mt-md gap-x-sm">
-          <Button variant="secondary" onClick={() => history.back()} className="flex-1">
+          <Button variant="secondary" onClick={() => history.back()} className="flex-1 bg-blue-300">
             Cancel
           </Button>
           {!loading && (
@@ -216,7 +216,7 @@ function PageContent() {
   if (recoveryRecord?.status === RecoveryStatusEn.RECOVERY_COMPLETED) {
     const handleNext = async () => {
       await wallet.clearRecoveryRecord();
-      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard);
+      navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Dashboard, { fromRecovery: '1' });
     };
     return (
       <div className="h-full flex flex-col justify-center items-center gap-y-xl text-center">
@@ -250,6 +250,10 @@ function PageContent() {
   const stepTitleClass = 'elytro-text-bold-body';
   const stepTitleInactiveClass = 'elytro-text-bold-body text-gray-600';
 
+  const confirmedCount = recoveryRecord?.contacts?.filter((c) => c.confirmed).length ?? 0;
+  const threshold = recoveryRecord?.threshold ?? 0;
+  const progressPercent = threshold > 0 ? (confirmedCount / threshold) * 100 : 0;
+
   return (
     <div className="flex flex-col gap-y-sm min-h-full">
       {/* Wallet in recovery */}
@@ -265,12 +269,63 @@ function PageContent() {
         </div>
       </div>
 
-      {/* Step 1: Confirm recovery (do later - placeholder) */}
-      <div className="rounded-md bg-white px-md py-4 flex flex-row items-center gap-x-md">
-        <StepIndicator state={step1State} stepNumber={1} />
-        <span className={step1State === 'active' ? `${stepTitleClass} text-gray-900` : stepTitleInactiveClass}>
-          Confirm recovery
-        </span>
+      {/* Step 1: Confirm recovery — expand with progress + contacts when active */}
+      <div
+        className={cn(
+          'rounded-md bg-white',
+          step1State === 'active'
+            ? 'px-md py-4 flex flex-col gap-y-md'
+            : 'px-md py-4 flex flex-row items-center gap-x-md'
+        )}
+      >
+        <div className="flex flex-row items-center gap-x-md">
+          <StepIndicator state={step1State} stepNumber={1} />
+          <span className={step1State === 'active' ? `${stepTitleClass} text-gray-900` : stepTitleInactiveClass}>
+            Confirm recovery
+          </span>
+        </div>
+        {step1State === 'active' && (
+          <>
+            <div className="flex flex-col gap-y-2">
+              <span className="elytro-text-small-body text-gray-600">
+                {confirmedCount}/{threshold} confirmations needed
+              </span>
+              <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gray-500 transition-all duration-300"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+            <h2 className="elytro-text-small text-gray-600">Recovery contacts</h2>
+            <div className="rounded-md overflow-hidden">
+              {recoveryRecord?.contacts.map((contact, index) => (
+                <ContactItem
+                  key={contact.address}
+                  contact={contact}
+                  isFirst={index === 0}
+                  isLast={index === (recoveryRecord?.contacts?.length ?? 1) - 1}
+                  rightContent={
+                    contact.confirmed ? (
+                      <span className="elytro-text-tiny-body bg-green-300 px-xs py-3xs rounded-xs">Confirmed</span>
+                    ) : (
+                      <Button
+                        variant="secondary"
+                        size="tiny"
+                        className="bg-blue-300 hover:bg-blue-450"
+                        onClick={handleShareContact}
+                      >
+                        <CopyIcon className="size-md mr-xs stroke-blue-600" />
+                        Get link
+                      </Button>
+                    )
+                  }
+                />
+              ))}
+            </div>
+            <HelperText description="Share above links with contacts to confirm." />
+          </>
+        )}
       </div>
 
       {/* Step 2: Start recovery - countdown + CTA */}
@@ -310,7 +365,8 @@ function PageContent() {
           </div>
         )}
         {showStep2CTA && status !== RecoveryStatusEn.RECOVERY_READY && (
-          <Button className="w-full" onClick={() => safeOpen(generateShareLink())}>
+          <Button variant="secondary" className="w-full" onClick={() => safeOpen(generateShareLink())}>
+            <ExternalLink className="size-4 mr-xs stroke-blue-600" />
             Start in recovery app
           </Button>
         )}
@@ -319,57 +375,32 @@ function PageContent() {
       {/* Step 3: Complete recovery + CTA when ready */}
       <div
         className={cn(
-          'rounded-md bg-white shadow-sm',
-          status === RecoveryStatusEn.RECOVERY_READY
+          'rounded-md bg-white',
+          step3State === 'active'
             ? 'px-md py-md flex flex-col gap-y-md'
             : 'px-md py-4 flex flex-row items-center gap-x-md'
         )}
       >
         <div className="flex flex-row items-center gap-x-md">
           <StepIndicator state={step3State} stepNumber={3} />
-          <span className={step3State === 'active' ? `${stepTitleClass} text-gray-900` : stepTitleInactiveClass}>
-            Complete recovery
-          </span>
+          <div className="flex flex-col">
+            <span className={step3State === 'active' ? `${stepTitleClass} text-gray-900` : stepTitleInactiveClass}>
+              Complete recovery
+            </span>
+            {step3State === 'active' && (
+              <span className="elytro-text-smaller-body text-gray-600 mt-1">
+                This is the last step to regain wallet access
+              </span>
+            )}
+          </div>
         </div>
         {status === RecoveryStatusEn.RECOVERY_READY && (
-          <Button className="w-full" onClick={() => safeOpen(generateShareLink('/start'))}>
+          <Button variant="secondary" className="w-full" onClick={() => safeOpen(generateShareLink('/start'))}>
+            <ExternalLink className="size-4 mr-xs stroke-blue-600" />
             Complete in recovery app
           </Button>
         )}
       </div>
-
-      {/* Contact list for WAITING_FOR_SIGNATURE */}
-      {status === RecoveryStatusEn.WAITING_FOR_SIGNATURE && (
-        <>
-          <h2 className="elytro-text-small text-gray-600 mt-2">Your recovery contacts</h2>
-          <div className="rounded-md overflow-hidden bg-white shadow-sm">
-            {recoveryRecord?.contacts.map((contact, index) => (
-              <ContactItem
-                key={contact.address}
-                contact={contact}
-                isFirst={index === 0}
-                isLast={index === recoveryRecord.contacts.length - 1}
-                rightContent={
-                  contact.confirmed ? (
-                    <span className="elytro-text-tiny-body bg-green-300 px-xs py-3xs rounded-xs">Confirmed</span>
-                  ) : (
-                    <Button
-                      variant="secondary"
-                      size="tiny"
-                      className="bg-blue-300 hover:bg-blue-450"
-                      onClick={handleShareContact}
-                    >
-                      <CopyIcon className="size-md mr-xs stroke-blue-600" />
-                      Get link
-                    </Button>
-                  )
-                }
-              />
-            ))}
-          </div>
-          <HelperText description="Share above links with contacts to confirm." />
-        </>
-      )}
 
       <Dialog open={!!sharedLink}>
         <DialogContent showCloseButton={false}>

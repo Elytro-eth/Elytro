@@ -29,7 +29,7 @@ const Create: React.FC = () => {
 
       console.log('params', params);
       if (params?.from === 'recover') {
-        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.YouAreIn, params);
+        navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.AccountRecovery, params);
       } else {
         navigateTo('side-panel', SIDE_PANEL_ROUTE_PATHS.Education);
       }

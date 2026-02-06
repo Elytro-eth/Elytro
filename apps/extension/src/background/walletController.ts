@@ -579,16 +579,15 @@ class WalletController {
           }, 5_000);
         });
 
+        const versionMapEntry = VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId];
         const [balance, versionInfo, recoveryInfo] = await Promise.all([
           walletClient.getBalance(basicInfo.address),
-          VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId]
-            ? elytroSDK.getContractVersion(basicInfo.address)
-            : Promise.resolve('0.0.0'),
+          versionMapEntry ? elytroSDK.getContractVersion(basicInfo.address) : Promise.resolve('0.0.0'),
           Promise.race([recoveryInfoPromise, timeoutPromise]),
         ]);
 
         updatedInfo.balance = Number(balance);
-        updatedInfo.needUpgrade = isOlderThan(versionInfo, VERSION_MODULE_ADDRESS_MAP[basicInfo.chainId].latestVersion);
+        updatedInfo.needUpgrade = versionMapEntry ? isOlderThan(versionInfo, versionMapEntry.latestVersion) : false;
         updatedInfo.isRecoveryEnabled =
           !!recoveryInfo?.contactsHash &&
           recoveryInfo.contactsHash !== '0x0000000000000000000000000000000000000000000000000000000000000000';

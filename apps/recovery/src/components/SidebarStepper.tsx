@@ -16,7 +16,7 @@ export const SidebarStepper = ({ currentStep, address, chainId }: SidebarStepper
       circle: `flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-sm font-bold ${
         isActive ? 'bg-brown-600 text-white' : isCompleted ? 'bg-green-300 text-blue-900' : 'bg-gray-450 text-white'
       }`,
-      text: `text-base font-medium ${isActive ? 'text-blue-900' : isCompleted ? 'text-blue-900' : 'text-gray-600'}`,
+      text: `text-base font-bold ${isActive ? 'text-blue-900' : isCompleted ? 'text-gray-600' : 'text-gray-600'}`,
       content: isCompleted ? <Check className="w-3.5 h-3.5" /> : step,
     };
   };
@@ -26,7 +26,7 @@ export const SidebarStepper = ({ currentStep, address, chainId }: SidebarStepper
       {address && chainId && (
         <>
           <div className="mb-lg">
-            <h2 className="text-small-bold text-blue-900 mb-sm">Account in recovery</h2>
+            <h2 className="text-small-bold text-blue-900 mb-sm">Wallet in recovery</h2>
             <ShortedAddress
               address={address}
               chainIconUrl={CHAIN_LOGOS[chainId]}
@@ -41,7 +41,7 @@ export const SidebarStepper = ({ currentStep, address, chainId }: SidebarStepper
         <div className="flex items-center space-x-md">
           <div className={getStepStyles(1).circle}>{getStepStyles(1).content}</div>
           <div className="flex-1 min-w-0">
-            <h3 className={getStepStyles(1).text}>Confirm</h3>
+            <h3 className={getStepStyles(1).text}>Confirm recovery</h3>
           </div>
         </div>
 
@@ -49,7 +49,7 @@ export const SidebarStepper = ({ currentStep, address, chainId }: SidebarStepper
         <div className="flex items-center space-x-md">
           <div className={getStepStyles(2).circle}>{getStepStyles(2).content}</div>
           <div className="flex-1 min-w-0">
-            <h3 className={getStepStyles(2).text}>Start</h3>
+            <h3 className={getStepStyles(2).text}>Start recovery</h3>
           </div>
         </div>
 
@@ -57,7 +57,7 @@ export const SidebarStepper = ({ currentStep, address, chainId }: SidebarStepper
         <div className="flex items-center space-x-md">
           <div className={getStepStyles(3).circle}>{getStepStyles(3).content}</div>
           <div className="flex-1 min-w-0">
-            <h3 className={getStepStyles(3).text}>Complete</h3>
+            <h3 className={getStepStyles(3).text}>Complete recovery</h3>
           </div>
         </div>
       </div>
