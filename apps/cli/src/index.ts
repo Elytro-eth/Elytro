@@ -3,7 +3,9 @@ import { createAppContext } from './context';
 import { registerInitCommand } from './commands/init';
 import { registerAccountCommand } from './commands/account';
 import { registerTxCommand } from './commands/tx';
+import { registerQueryCommand } from './commands/query';
 import * as display from './utils/display';
+import { sanitizeErrorMessage } from './utils/display';
 
 /**
  * Elytro CLI entry point.
@@ -27,14 +29,15 @@ async function main(): Promise<void> {
     registerInitCommand(program, ctx);
     registerAccountCommand(program, ctx);
     registerTxCommand(program, ctx);
+    registerQueryCommand(program, ctx);
 
-    // Phase 2: registerCallCommand(program, ctx);
+    // Phase 3: registerCallCommand(program, ctx);
     // Phase 3: registerRecoveryCommand(program, ctx);
     // Phase 3: registerHookCommand(program, ctx);
 
     await program.parseAsync(process.argv);
   } catch (err) {
-    display.error((err as Error).message);
+    display.error(sanitizeErrorMessage((err as Error).message));
     process.exitCode = 1;
   } finally {
     // Clear decrypted keys from memory

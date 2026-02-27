@@ -39,10 +39,10 @@ export async function createAppContext(): Promise<AppContext> {
   // Load persisted chain config
   await chain.init();
 
-  // Initialize chain-dependent services
-  const currentChain = chain.currentChain;
-  walletClient.initForChain(currentChain);
-  await sdk.initForChain(currentChain);
+  // Initialize chain-dependent services with config default first
+  const defaultChain = chain.currentChain;
+  walletClient.initForChain(defaultChain);
+  await sdk.initForChain(defaultChain);
 
   // Auto-load device key and unlock keyring
   const deviceKey = await loadDeviceKey(store.dataDir);
@@ -58,6 +58,20 @@ export async function createAppContext(): Promise<AppContext> {
     walletClient,
   });
   await account.init();
+
+  // Re-initialize chain-dependent services to match the current account's chain.
+  // The config default (e.g. OP Sepolia) may differ from the account's actual chain.
+  const currentAccount = account.currentAccount;
+  if (currentAccount) {
+    const acctInfo = account.resolveAccount(currentAccount.alias ?? currentAccount.address);
+    if (acctInfo) {
+      const acctChain = chain.chains.find((c) => c.id === acctInfo.chainId);
+      if (acctChain && acctChain.id !== defaultChain.id) {
+        walletClient.initForChain(acctChain);
+        await sdk.initForChain(acctChain);
+      }
+    }
+  }
 
   return { store, keyring, chain, sdk, walletClient, account, deviceKey };
 }

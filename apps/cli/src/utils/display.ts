@@ -76,3 +76,32 @@ export function address(addr: string): string {
   if (addr.length <= 14) return addr;
   return `${addr.slice(0, 8)}...${addr.slice(-6)}`;
 }
+
+/**
+ * Mask API keys in URLs before outputting.
+ *
+ * Handles two common patterns:
+ *   1. Path-based keys (Alchemy): `/v2/<key>` → `/v2/***`
+ *   2. Query-param keys (Pimlico): `?apikey=<key>` → `?apikey=***`
+ *
+ * Also catches generic patterns: `api_key`, `key`, `token`, `secret` in query params.
+ */
+export function maskApiKeys(url: string): string {
+  let masked = url;
+  // Alchemy-style: key is the LAST path segment after /v<n>/ (e.g. /v2/<key>)
+  // Only matches when the segment after /v<n>/ is the final path component (possibly followed by ? or #)
+  masked = masked.replace(/(\/v\d+\/)[^/?#]+(\?|#|$)/gi, '$1***$2');
+  // Query-param keys: apikey, api_key, key, token, secret
+  masked = masked.replace(/([?&](?:apikey|api_key|key|token|secret))=[^&#]+/gi, '$1=***');
+  return masked;
+}
+
+/**
+ * Sanitize an error message by masking any embedded URLs that may contain API keys.
+ *
+ * Useful for catching viem/SDK errors that include the RPC endpoint in their message.
+ */
+export function sanitizeErrorMessage(message: string): string {
+  // Match http(s) URLs and mask any API keys in them
+  return message.replace(/https?:\/\/[^\s"']+/gi, (match) => maskApiKeys(match));
+}

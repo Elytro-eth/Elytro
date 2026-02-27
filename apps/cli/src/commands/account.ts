@@ -5,6 +5,7 @@ import type { AppContext } from '../context';
 import { askSelect } from '../utils/prompt';
 import { registerAccount, requestSponsorship, applySponsorToUserOp } from '../utils/sponsor';
 import * as display from '../utils/display';
+import { sanitizeErrorMessage } from '../utils/display';
 
 /**
  * `elytro account` — Smart account management.
@@ -49,10 +50,15 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
 
       const spinner = ora('Creating smart account...').start();
       try {
-        const accountInfo = await ctx.account.createAccount(chainId, opts.alias);
-
+        // Initialize SDK for the target chain before address calculation
         const chainConfig = ctx.chain.chains.find((c) => c.id === chainId);
         const chainName = chainConfig?.name ?? String(chainId);
+        if (chainConfig) {
+          await ctx.sdk.initForChain(chainConfig);
+          ctx.walletClient.initForChain(chainConfig);
+        }
+
+        const accountInfo = await ctx.account.createAccount(chainId, opts.alias);
 
         // Register with Elytro backend (required for sponsorship)
         // Extension does this in sdk.ts calcWalletAddress (line 175)
@@ -81,7 +87,7 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
         }
       } catch (err) {
         spinner.fail('Failed to create account.');
-        display.error((err as Error).message);
+        display.error(sanitizeErrorMessage((err as Error).message));
         process.exitCode = 1;
       }
     });
@@ -226,7 +232,7 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
         }
       } catch (err) {
         spinner.fail('Activation failed.');
-        display.error((err as Error).message);
+        display.error(sanitizeErrorMessage((err as Error).message));
         process.exitCode = 1;
       }
     });
@@ -328,7 +334,7 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
         }
       } catch (err) {
         spinner.fail('Failed to fetch account info.');
-        display.error((err as Error).message);
+        display.error(sanitizeErrorMessage((err as Error).message));
         process.exitCode = 1;
       }
     });
@@ -363,9 +369,17 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
 
       try {
         const switched = await ctx.account.switchAccount(identifier);
-        display.success(`Switched to "${switched.alias}"`);
+
+        // Re-initialize chain-dependent services to match the new account's chain
+        const newChain = ctx.chain.chains.find((c) => c.id === switched.chainId);
+        if (newChain) {
+          ctx.walletClient.initForChain(newChain);
+          await ctx.sdk.initForChain(newChain);
+        }
+
+        display.success(`Switched to "${switched.alias}" on ${newChain?.name ?? `chain ${switched.chainId}`}`);
       } catch (err) {
-        display.error((err as Error).message);
+        display.error(sanitizeErrorMessage((err as Error).message));
         process.exitCode = 1;
       }
     });

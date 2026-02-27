@@ -7,6 +7,7 @@ import type { ElytroUserOperation, AccountInfo, ChainConfig } from '../types';
 import { requestSponsorship, applySponsorToUserOp } from '../utils/sponsor';
 import { askConfirm } from '../utils/prompt';
 import * as display from '../utils/display';
+import { sanitizeErrorMessage } from '../utils/display';
 
 // ─── Error Codes (JSON-RPC / MCP convention) ──────────────────────────
 //
@@ -50,11 +51,11 @@ class TxError extends Error {
  */
 function handleTxError(err: unknown): void {
   if (err instanceof TxError) {
-    display.txError({ code: err.code, message: err.message, data: err.data });
+    display.txError({ code: err.code, message: sanitizeErrorMessage(err.message), data: err.data });
   } else {
     display.txError({
       code: ERR_INTERNAL,
-      message: (err as Error).message ?? String(err),
+      message: sanitizeErrorMessage((err as Error).message ?? String(err)),
     });
   }
   process.exitCode = 1;
