@@ -1,33 +1,241 @@
 import { Command } from 'commander';
 import ora from 'ora';
-import { isAddress, isHex, formatEther, parseEther, toHex, formatUnits } from 'viem';
+import { isAddress, isHex, formatEther, parseEther, toHex } from 'viem';
 import type { Address, Hex } from 'viem';
 import type { AppContext } from '../context';
 import type { ElytroUserOperation, AccountInfo, ChainConfig } from '../types';
 import { requestSponsorship, applySponsorToUserOp } from '../utils/sponsor';
-import { getTokenInfo, getTokenBalance, encodeTransfer, parseTokenAmount } from '../utils/erc20';
 import { askConfirm } from '../utils/prompt';
 import * as display from '../utils/display';
 
+// ─── Error Codes (JSON-RPC / MCP convention) ──────────────────────────
+//
+//   -32602  Invalid params (bad --tx spec, missing required fields)
+//   -32001  Insufficient balance
+//   -32002  Account not ready (not initialized, not deployed, not found)
+//   -32003  Sponsorship failed
+//   -32004  Build / estimation failed
+//   -32005  Sign / send failed
+//   -32006  Execution reverted (UserOp included but reverted on-chain)
+//   -32000  Unknown / internal error
+
+const ERR_INVALID_PARAMS = -32602;
+const ERR_INSUFFICIENT_BALANCE = -32001;
+const ERR_ACCOUNT_NOT_READY = -32002;
+const ERR_SPONSOR_FAILED = -32003;
+const ERR_BUILD_FAILED = -32004;
+const ERR_SEND_FAILED = -32005;
+const ERR_EXECUTION_REVERTED = -32006;
+const ERR_INTERNAL = -32000;
+
 /**
- * Transaction type detected from user inputs.
- * Used to drive display logic in send confirmation and simulate output.
+ * Structured error for tx commands.
+ * Carries a JSON-RPC-style error code and optional data context.
  */
-type TxType = 'eth-transfer' | 'erc20-transfer' | 'contract-call';
+class TxError extends Error {
+  code: number;
+  data?: Record<string, unknown>;
+
+  constructor(code: number, message: string, data?: Record<string, unknown>) {
+    super(message);
+    this.name = 'TxError';
+    this.code = code;
+    this.data = data;
+  }
+}
+
+/**
+ * Unified error handler for all tx subcommands.
+ * Outputs structured JSON to stderr.
+ */
+function handleTxError(err: unknown): void {
+  if (err instanceof TxError) {
+    display.txError({ code: err.code, message: err.message, data: err.data });
+  } else {
+    display.txError({
+      code: ERR_INTERNAL,
+      message: (err as Error).message ?? String(err),
+    });
+  }
+  process.exitCode = 1;
+}
+
+// ─── Types ────────────────────────────────────────────────────────────
+
+/**
+ * A single transaction parsed from --tx flag.
+ * Mirrors eth_sendTransaction params (minus from/nonce/gas which are handled by the pipeline).
+ */
+interface TxSpec {
+  to: Address;
+  value?: string; // human-readable ETH amount (e.g. "0.1")
+  data?: Hex; // calldata hex
+}
+
+/**
+ * Transaction type detected from parsed tx specs.
+ * - Single tx with only value → 'eth-transfer'
+ * - Single tx with data → 'contract-call'
+ * - Multiple txs → 'batch'
+ */
+type TxType = 'eth-transfer' | 'contract-call' | 'batch';
+
+// ─── --tx Parser & Validator ──────────────────────────────────────────
+
+/**
+ * Parse a --tx spec string into a TxSpec object.
+ *
+ * Format: "to:0xAddr,value:0.1,data:0xAbcDef"
+ *   - `to` is required
+ *   - `value` and `data` are optional, but at least one must be present
+ *
+ * @param spec  Raw string from CLI --tx flag
+ * @param index 0-based position (for error messages)
+ * @returns     Validated TxSpec
+ */
+function parseTxSpec(spec: string, index: number): TxSpec {
+  const prefix = `--tx #${index + 1}`;
+  const fields: Record<string, string> = {};
+
+  for (const part of spec.split(',')) {
+    const colonIdx = part.indexOf(':');
+    if (colonIdx === -1) {
+      throw new TxError(ERR_INVALID_PARAMS, `${prefix}: invalid segment "${part}". Expected key:value format.`, {
+        spec,
+        index,
+      });
+    }
+    const key = part.slice(0, colonIdx).trim().toLowerCase();
+    const val = part.slice(colonIdx + 1).trim();
+    if (!key || !val) {
+      throw new TxError(ERR_INVALID_PARAMS, `${prefix}: empty key or value in "${part}".`, { spec, index });
+    }
+    if (fields[key]) {
+      throw new TxError(ERR_INVALID_PARAMS, `${prefix}: duplicate key "${key}".`, { spec, index, key });
+    }
+    fields[key] = val;
+  }
+
+  const knownKeys = new Set(['to', 'value', 'data']);
+  for (const key of Object.keys(fields)) {
+    if (!knownKeys.has(key)) {
+      throw new TxError(ERR_INVALID_PARAMS, `${prefix}: unknown key "${key}". Allowed: to, value, data.`, {
+        spec,
+        index,
+        key,
+      });
+    }
+  }
+
+  if (!fields.to) {
+    throw new TxError(ERR_INVALID_PARAMS, `${prefix}: "to" is required.`, { spec, index });
+  }
+  if (!isAddress(fields.to)) {
+    throw new TxError(ERR_INVALID_PARAMS, `${prefix}: invalid address "${fields.to}".`, { spec, index, to: fields.to });
+  }
+
+  if (!fields.value && !fields.data) {
+    throw new TxError(ERR_INVALID_PARAMS, `${prefix}: at least one of "value" or "data" is required.`, { spec, index });
+  }
+
+  if (fields.value) {
+    try {
+      const wei = parseEther(fields.value);
+      if (wei < 0n) throw new Error('negative');
+    } catch {
+      throw new TxError(
+        ERR_INVALID_PARAMS,
+        `${prefix}: invalid ETH amount "${fields.value}". Use human-readable format (e.g. "0.1").`,
+        { spec, index, value: fields.value }
+      );
+    }
+  }
+
+  if (fields.data) {
+    if (!isHex(fields.data)) {
+      throw new TxError(ERR_INVALID_PARAMS, `${prefix}: invalid hex in "data". Must start with 0x.`, {
+        spec,
+        index,
+        data: fields.data,
+      });
+    }
+    if (fields.data.length > 2 && fields.data.length % 2 !== 0) {
+      throw new TxError(ERR_INVALID_PARAMS, `${prefix}: "data" hex must have even length (complete bytes).`, {
+        spec,
+        index,
+        data: fields.data,
+      });
+    }
+  }
+
+  return {
+    to: fields.to as Address,
+    value: fields.value,
+    data: fields.data as Hex | undefined,
+  };
+}
+
+function detectTxType(specs: TxSpec[]): TxType {
+  if (specs.length > 1) return 'batch';
+  const tx = specs[0];
+  if (tx.data && tx.data !== '0x') return 'contract-call';
+  return 'eth-transfer';
+}
+
+function specsToTxs(specs: TxSpec[]): Array<{ to: string; value?: string; data?: string }> {
+  return specs.map((s) => ({
+    to: s.to,
+    value: s.value ? toHex(parseEther(s.value)) : '0x0',
+    data: s.data ?? '0x',
+  }));
+}
+
+function totalEthValue(specs: TxSpec[]): bigint {
+  let sum = 0n;
+  for (const s of specs) {
+    if (s.value) sum += parseEther(s.value);
+  }
+  return sum;
+}
+
+// ─── Display Helpers ──────────────────────────────────────────────────
+
+function txTypeLabel(txType: TxType): string {
+  switch (txType) {
+    case 'eth-transfer':
+      return 'ETH Transfer';
+    case 'contract-call':
+      return 'Contract Call';
+    case 'batch':
+      return 'Batch Transaction';
+  }
+}
+
+function truncateHex(hex: string, maxLen = 42): string {
+  if (hex.length <= maxLen) return hex;
+  return `${hex.slice(0, 20)}...${hex.slice(-8)} (${(hex.length - 2) / 2} bytes)`;
+}
+
+function displayTxSpec(spec: TxSpec, index: number): void {
+  const parts: string[] = [`#${index + 1}`];
+  parts.push(`→ ${spec.to}`);
+  if (spec.value) parts.push(`${spec.value} ETH`);
+  if (spec.data && spec.data !== '0x') {
+    const selector = spec.data.length >= 10 ? spec.data.slice(0, 10) : spec.data;
+    parts.push(`call ${selector}`);
+  }
+  display.info('Tx', parts.join('  '));
+}
+
+// ─── Command Registration ─────────────────────────────────────────────
 
 /**
  * `elytro tx` — Build, simulate, and send UserOperations.
  *
- * Subcommands:
- *   build    — Build a UserOp from eth_sendTransaction-style params
- *   send     — Build + sign + broadcast a UserOp (or send a pre-built one)
- *   simulate — Preview a UserOp (gas estimate, sponsor check, balance impact)
+ * All subcommands use --tx flag(s) to specify transactions.
+ * Multiple --tx flags are ordered and packed into a single UserOp (executeBatch).
  *
- * Design:
- * - Reuses the full UserOp pipeline from account activate (fee → estimate → sponsor → sign → send → receipt)
- * - Accepts eth_sendTransaction-style params (--to, --value, --data)
- * - Also supports ERC-20 shorthand via --token + --amount
- * - [account] is always optional, defaults to current
+ * Format: --tx "to:0xAddr,value:0.1,data:0xAbcDef"
  */
 export function registerTxCommand(program: Command, ctx: AppContext): void {
   const tx = program.command('tx').description('Build, simulate, and send transactions');
@@ -35,29 +243,30 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
   // ─── build ──────────────────────────────────────────────────────
 
   tx.command('build')
-    .description('Build a UserOp from transaction parameters')
+    .description('Build an unsigned UserOp from transaction parameters')
     .argument('[account]', 'Source account alias or address (default: current)')
-    .requiredOption('--to <address>', 'Recipient / contract address')
-    .option('--value <amount>', 'ETH value in human units (e.g. "0.1")')
-    .option('--data <hex>', 'Calldata hex (for contract calls)')
-    .option('--token <address>', 'ERC-20 token address (shorthand for transfer)')
-    .option('--amount <amount>', 'Token amount in human units (requires --token)')
+    .option('--tx <spec...>', 'Transaction spec: "to:0xAddr,value:0.1,data:0x..." (repeatable, ordered)')
     .option('--no-sponsor', 'Skip sponsorship check')
-    .action(async (target?: string, opts?: BuildOptions) => {
+    .action(async (target?: string, opts?: { tx?: string[]; sponsor?: boolean }) => {
       try {
-        const { userOp, accountInfo, chainConfig, sponsored, txType } = await buildUserOp(ctx, target, opts);
+        const specs = parseAllTxSpecs(opts?.tx);
+        const { userOp, accountInfo, chainConfig, sponsored, txType } = await buildUserOp(
+          ctx,
+          target,
+          specs,
+          opts?.sponsor
+        );
 
-        // Output the fully assembled (unsigned) UserOp as JSON
         display.heading('UserOperation (unsigned)');
         console.log(JSON.stringify(serializeUserOp(userOp), null, 2));
         console.log('');
         display.info('Account', accountInfo.alias);
         display.info('Chain', `${chainConfig.name} (${chainConfig.id})`);
         display.info('Type', txTypeLabel(txType));
+        if (txType === 'batch') display.info('Tx Count', specs.length.toString());
         display.info('Sponsored', sponsored ? 'Yes' : 'No');
       } catch (err) {
-        display.error((err as Error).message);
-        process.exitCode = 1;
+        handleTxError(err);
       }
     });
 
@@ -66,17 +275,12 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
   tx.command('send')
     .description('Send a transaction on-chain')
     .argument('[account]', 'Source account alias or address (default: current)')
-    .requiredOption('--to <address>', 'Recipient / contract address')
-    .option('--value <amount>', 'ETH value in human units (e.g. "0.1")')
-    .option('--data <hex>', 'Calldata hex (for contract calls)')
-    .option('--token <address>', 'ERC-20 token address (shorthand for transfer)')
-    .option('--amount <amount>', 'Token amount in human units (requires --token)')
+    .option('--tx <spec...>', 'Transaction spec: "to:0xAddr,value:0.1,data:0x..." (repeatable, ordered)')
     .option('--no-sponsor', 'Skip sponsorship check')
     .option('--userop <json>', 'Send a pre-built UserOp JSON (skips build step)')
-    .action(async (target?: string, opts?: SendOptions) => {
+    .action(async (target?: string, opts?: { tx?: string[]; sponsor?: boolean; userop?: string }) => {
       if (!ctx.deviceKey) {
-        display.error('Wallet not initialized. Run `elytro init` first.');
-        process.exitCode = 1;
+        handleTxError(new TxError(ERR_ACCOUNT_NOT_READY, 'Wallet not initialized. Run `elytro init` first.'));
         return;
       }
 
@@ -85,29 +289,27 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
         let accountInfo: AccountInfo;
         let chainConfig: ChainConfig;
         let sponsored: boolean;
-        let txType: TxType = 'contract-call'; // default for pre-built userop
+        let txType: TxType = 'contract-call';
+        let specs: TxSpec[] = [];
 
         if (opts?.userop) {
-          // ── Pre-built UserOp path ──
-          const parsed = deserializeUserOp(opts.userop);
-          userOp = parsed;
+          userOp = deserializeUserOp(opts.userop);
           sponsored = !!userOp.paymaster;
 
           const identifier = target ?? ctx.account.currentAccount?.alias ?? ctx.account.currentAccount?.address;
           if (!identifier) {
-            display.error('No account selected.');
-            process.exitCode = 1;
-            return;
+            throw new TxError(ERR_ACCOUNT_NOT_READY, 'No account selected.', {
+              hint: 'Specify an alias/address or create an account first.',
+            });
           }
           accountInfo = resolveAccountStrict(ctx, identifier);
           chainConfig = resolveChainStrict(ctx, accountInfo.chainId);
 
-          // Ensure SDK is initialized
           await ctx.sdk.initForChain(chainConfig);
           ctx.walletClient.initForChain(chainConfig);
         } else {
-          // ── Build from params path ──
-          const result = await buildUserOp(ctx, target, opts);
+          specs = parseAllTxSpecs(opts?.tx);
+          const result = await buildUserOp(ctx, target, specs, opts?.sponsor);
           userOp = result.userOp;
           accountInfo = result.accountInfo;
           chainConfig = result.chainConfig;
@@ -119,22 +321,27 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
         console.log('');
         display.heading('Transaction Summary');
         display.info('Type', txTypeLabel(txType));
-        display.info('From', `${accountInfo.alias} (${display.address(accountInfo.address)})`);
-        display.info('To', opts?.to ?? '—');
+        display.info('From', `${accountInfo.alias} (${accountInfo.address})`);
 
-        if (txType === 'erc20-transfer' && opts?.token && opts?.amount) {
-          display.info('Token', opts.token);
-          display.info('Amount', opts.amount);
+        if (txType === 'batch') {
+          display.info('Tx Count', specs.length.toString());
+          for (let i = 0; i < specs.length; i++) {
+            displayTxSpec(specs[i], i);
+          }
         } else if (txType === 'contract-call') {
-          display.info('Calldata', truncateHex(opts?.data ?? '0x'));
-          if (opts?.data && opts.data.length >= 10) {
-            display.info('Selector', opts.data.slice(0, 10));
+          const s = specs[0];
+          display.info('To', s.to);
+          display.info('Calldata', truncateHex(s.data ?? '0x'));
+          if (s.data && s.data.length >= 10) {
+            display.info('Selector', s.data.slice(0, 10));
           }
-          if (opts?.value && opts.value !== '0') {
-            display.info('Value', `${opts.value} ETH (payable)`);
+          if (s.value && s.value !== '0') {
+            display.info('Value', `${s.value} ETH (payable)`);
           }
-        } else if (opts?.value) {
-          display.info('Value', `${opts.value} ETH`);
+        } else {
+          const s = specs[0];
+          display.info('To', s.to);
+          display.info('Value', `${s.value ?? '0'} ETH`);
         }
 
         display.info('Sponsored', sponsored ? 'Yes (gasless)' : 'No (user pays gas)');
@@ -151,23 +358,40 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
         // ── Sign + Send + Wait ──
         const spinner = ora('Signing UserOperation...').start();
 
-        // Sign
-        const { packedHash, validationData } = await ctx.sdk.getUserOpHash(userOp);
-        const rawSignature = await ctx.keyring.signDigest(packedHash);
-        userOp.signature = await ctx.sdk.packUserOpSignature(rawSignature, validationData);
+        let opHash: string;
+        try {
+          const { packedHash, validationData } = await ctx.sdk.getUserOpHash(userOp);
+          const rawSignature = await ctx.keyring.signDigest(packedHash);
+          userOp.signature = await ctx.sdk.packUserOpSignature(rawSignature, validationData);
 
-        // Send
-        spinner.text = 'Sending to bundler...';
-        const opHash = await ctx.sdk.sendUserOp(userOp);
+          spinner.text = 'Sending to bundler...';
+          opHash = await ctx.sdk.sendUserOp(userOp);
+        } catch (err) {
+          spinner.fail('Send failed.');
+          throw new TxError(ERR_SEND_FAILED, (err as Error).message, {
+            sender: accountInfo.address,
+            chain: chainConfig.name,
+          });
+        }
 
-        // Wait
         spinner.text = 'Waiting for on-chain confirmation...';
         const receipt = await ctx.sdk.waitForReceipt(opHash, chainConfig);
 
         if (receipt.success) {
           spinner.succeed('Transaction confirmed!');
         } else {
-          spinner.warn('UserOp included but execution reverted.');
+          spinner.warn('Execution reverted.');
+          // Output structured error for the revert, then continue to show receipt
+          display.txError({
+            code: ERR_EXECUTION_REVERTED,
+            message: 'UserOp included but execution reverted on-chain.',
+            data: {
+              txHash: receipt.transactionHash,
+              block: receipt.blockNumber,
+              gasCost: `${formatEther(BigInt(receipt.actualGasCost))} ETH`,
+              sender: accountInfo.address,
+            },
+          });
         }
 
         console.log('');
@@ -180,9 +404,12 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
         if (chainConfig.blockExplorer) {
           display.info('Explorer', `${chainConfig.blockExplorer}/tx/${receipt.transactionHash}`);
         }
+
+        if (!receipt.success) {
+          process.exitCode = 1;
+        }
       } catch (err) {
-        display.error((err as Error).message);
-        process.exitCode = 1;
+        handleTxError(err);
       }
     });
 
@@ -191,83 +418,80 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
   tx.command('simulate')
     .description('Preview a transaction (gas estimate, sponsor check)')
     .argument('[account]', 'Source account alias or address (default: current)')
-    .requiredOption('--to <address>', 'Recipient / contract address')
-    .option('--value <amount>', 'ETH value in human units (e.g. "0.1")')
-    .option('--data <hex>', 'Calldata hex (for contract calls)')
-    .option('--token <address>', 'ERC-20 token address (shorthand for transfer)')
-    .option('--amount <amount>', 'Token amount in human units (requires --token)')
+    .option('--tx <spec...>', 'Transaction spec: "to:0xAddr,value:0.1,data:0x..." (repeatable, ordered)')
     .option('--no-sponsor', 'Skip sponsorship check')
-    .action(async (target?: string, opts?: BuildOptions) => {
+    .action(async (target?: string, opts?: { tx?: string[]; sponsor?: boolean }) => {
       if (!ctx.deviceKey) {
-        display.error('Wallet not initialized. Run `elytro init` first.');
-        process.exitCode = 1;
+        handleTxError(new TxError(ERR_ACCOUNT_NOT_READY, 'Wallet not initialized. Run `elytro init` first.'));
         return;
       }
 
       try {
-        const { userOp, accountInfo, chainConfig, sponsored, txType, tokenInfo } = await buildUserOp(ctx, target, opts);
+        const specs = parseAllTxSpecs(opts?.tx);
+        const { userOp, accountInfo, chainConfig, sponsored, txType } = await buildUserOp(
+          ctx,
+          target,
+          specs,
+          opts?.sponsor
+        );
 
-        // ── Fetch balances ──
         const { wei: ethBalance, ether: ethFormatted } = await ctx.walletClient.getBalance(accountInfo.address);
         const nativeCurrency = chainConfig.nativeCurrency.symbol;
 
         console.log('');
         display.heading('Transaction Simulation');
 
-        // ── Overview ──
         display.info('Type', txTypeLabel(txType));
-        display.info('From', `${accountInfo.alias} (${display.address(accountInfo.address)})`);
-        display.info('To', opts?.to ?? '—');
+        display.info('From', `${accountInfo.alias} (${accountInfo.address})`);
         display.info('Chain', `${chainConfig.name} (${chainConfig.id})`);
 
-        // ── Type-specific details ──
-        if (txType === 'erc20-transfer' && tokenInfo && opts?.amount) {
+        if (txType === 'batch') {
           console.log('');
-          display.info('Token', `${tokenInfo.symbol} (${opts.token})`);
-          display.info('Amount', `${opts.amount} ${tokenInfo.symbol}`);
-          const tokenBal = await getTokenBalance(ctx.walletClient, opts.token as Address, accountInfo.address);
-          display.info('Token Balance', `${formatUnits(tokenBal, tokenInfo.decimals)} ${tokenInfo.symbol}`);
-          const parsedAmt = parseTokenAmount(opts.amount, tokenInfo.decimals);
-          if (tokenBal < parsedAmt) {
-            display.warn(
-              `Insufficient token balance: need ${opts.amount}, have ${formatUnits(tokenBal, tokenInfo.decimals)}`
-            );
+          display.info('Tx Count', specs.length.toString());
+          for (let i = 0; i < specs.length; i++) {
+            displayTxSpec(specs[i], i);
           }
-        } else if (txType === 'contract-call') {
-          console.log('');
-          display.info('Calldata', truncateHex(opts?.data ?? '0x'));
-          display.info('Calldata Size', `${Math.max(0, ((opts?.data?.length ?? 2) - 2) / 2)} bytes`);
-          if (opts?.data && opts.data.length >= 10) {
-            display.info('Selector', opts.data.slice(0, 10));
-          }
-          if (opts?.value && opts.value !== '0') {
-            display.info('Value', `${opts.value} ${nativeCurrency} (payable)`);
-            const sendValue = parseEther(opts.value);
-            if (ethBalance < sendValue) {
-              display.warn(
-                `Insufficient balance for value: need ${opts.value}, have ${ethFormatted} ${nativeCurrency}`
-              );
+          const total = totalEthValue(specs);
+          if (total > 0n) {
+            display.info('Total ETH', formatEther(total));
+            if (ethBalance < total) {
+              display.warn(`Insufficient balance: need ${formatEther(total)}, have ${ethFormatted} ${nativeCurrency}`);
             }
           }
-          // Check target is a contract
-          const isContract = await ctx.walletClient.isContractDeployed(opts?.to as Address);
+        } else if (txType === 'contract-call') {
+          const s = specs[0];
+          console.log('');
+          display.info('To', s.to);
+          display.info('Calldata', truncateHex(s.data ?? '0x'));
+          display.info('Calldata Size', `${Math.max(0, ((s.data?.length ?? 2) - 2) / 2)} bytes`);
+          if (s.data && s.data.length >= 10) {
+            display.info('Selector', s.data.slice(0, 10));
+          }
+          if (s.value && s.value !== '0') {
+            display.info('Value', `${s.value} ${nativeCurrency} (payable)`);
+            const sendValue = parseEther(s.value);
+            if (ethBalance < sendValue) {
+              display.warn(`Insufficient balance for value: need ${s.value}, have ${ethFormatted} ${nativeCurrency}`);
+            }
+          }
+          const isContract = await ctx.walletClient.isContractDeployed(s.to);
           display.info('Target', isContract ? 'Contract' : 'EOA (warning: calling non-contract)');
           if (!isContract) {
             display.warn('Target address has no deployed code. The call may be a no-op or revert.');
           }
         } else {
-          // eth-transfer
+          const s = specs[0];
           console.log('');
-          display.info('Value', `${opts?.value ?? '0'} ${nativeCurrency}`);
-          if (opts?.value) {
-            const sendValue = parseEther(opts.value);
+          display.info('To', s.to);
+          display.info('Value', `${s.value ?? '0'} ${nativeCurrency}`);
+          if (s.value) {
+            const sendValue = parseEther(s.value);
             if (ethBalance < sendValue) {
-              display.warn(`Insufficient balance: need ${opts.value}, have ${ethFormatted} ${nativeCurrency}`);
+              display.warn(`Insufficient balance: need ${s.value}, have ${ethFormatted} ${nativeCurrency}`);
             }
           }
         }
 
-        // ── Gas details ──
         console.log('');
         display.info('callGasLimit', userOp.callGasLimit.toString());
         display.info('verificationGasLimit', userOp.verificationGasLimit.toString());
@@ -279,14 +503,12 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
         const maxCostWei = totalGas * userOp.maxFeePerGas;
         display.info('Max Gas Cost', `${formatEther(maxCostWei)} ${nativeCurrency}`);
 
-        // ── Sponsor ──
         console.log('');
         display.info('Sponsored', sponsored ? 'Yes (gasless)' : 'No (user pays gas)');
         if (sponsored && userOp.paymaster) {
           display.info('Paymaster', userOp.paymaster);
         }
 
-        // ── Balance summary ──
         display.info(`${nativeCurrency} Balance`, `${ethFormatted} ${nativeCurrency}`);
         if (!sponsored && ethBalance < maxCostWei) {
           display.warn(
@@ -294,26 +516,12 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
           );
         }
       } catch (err) {
-        display.error((err as Error).message);
-        process.exitCode = 1;
+        handleTxError(err);
       }
     });
 }
 
 // ─── Shared Build Logic ──────────────────────────────────────────────
-
-interface BuildOptions {
-  to?: string;
-  value?: string;
-  data?: string;
-  token?: string;
-  amount?: string;
-  sponsor?: boolean;
-}
-
-interface SendOptions extends BuildOptions {
-  userop?: string;
-}
 
 interface BuildResult {
   userOp: ElytroUserOperation;
@@ -321,156 +529,103 @@ interface BuildResult {
   chainConfig: ChainConfig;
   sponsored: boolean;
   txType: TxType;
-  tokenInfo?: { symbol: string; decimals: number };
+}
+
+function parseAllTxSpecs(rawSpecs: string[] | undefined): TxSpec[] {
+  if (!rawSpecs || rawSpecs.length === 0) {
+    throw new TxError(ERR_INVALID_PARAMS, 'At least one --tx is required. Format: --tx "to:0xAddr,value:0.1"');
+  }
+  return rawSpecs.map((spec, i) => parseTxSpec(spec, i));
 }
 
 /**
  * Shared UserOp build pipeline used by build, send, and simulate.
- *
- * Steps:
- *   1. Resolve account & chain
- *   2. Validate inputs
- *   3. Build transaction list (ETH transfer / ERC-20 transfer / raw calldata)
- *   4. Create unsigned UserOp via SDK fromTransaction
- *   5. Fetch gas prices
- *   6. Estimate gas
- *   7. Try sponsorship (unless --no-sponsor)
  */
 async function buildUserOp(
   ctx: AppContext,
   target: string | undefined,
-  opts: BuildOptions | undefined
+  specs: TxSpec[],
+  sponsor?: boolean
 ): Promise<BuildResult> {
   // 1. Resolve account
   const identifier = target ?? ctx.account.currentAccount?.alias ?? ctx.account.currentAccount?.address;
   if (!identifier) {
-    throw new Error('No account selected. Specify an alias/address or create an account first.');
+    throw new TxError(ERR_ACCOUNT_NOT_READY, 'No account selected.', {
+      hint: 'Specify an alias/address or create an account first.',
+    });
   }
 
   const accountInfo = resolveAccountStrict(ctx, identifier);
   const chainConfig = resolveChainStrict(ctx, accountInfo.chainId);
 
-  // Must be deployed
   if (!accountInfo.isDeployed) {
-    throw new Error(`Account "${accountInfo.alias}" is not deployed. Run \`elytro account activate\` first.`);
+    throw new TxError(ERR_ACCOUNT_NOT_READY, `Account "${accountInfo.alias}" is not deployed.`, {
+      account: accountInfo.alias,
+      address: accountInfo.address,
+      hint: 'Run `elytro account activate` first.',
+    });
   }
 
-  // 2. Validate inputs
-  if (!opts?.to || !isAddress(opts.to)) {
-    throw new Error('--to must be a valid address.');
-  }
-
-  if (opts.token && !isAddress(opts.token)) {
-    throw new Error('--token must be a valid address.');
-  }
-
-  if (opts.token && !opts.amount) {
-    throw new Error('--amount is required when using --token.');
-  }
-
-  if (!opts.value && !opts.data && !opts.token) {
-    throw new Error('At least one of --value, --data, or --token is required.');
-  }
-
-  // Validate --data hex format
-  if (opts.data) {
-    if (!isHex(opts.data)) {
-      throw new Error('--data must be a valid hex string (starting with 0x).');
-    }
-    if (opts.data.length > 2 && opts.data.length % 2 !== 0) {
-      throw new Error('--data hex string must have even length (complete bytes).');
-    }
-  }
-
-  // Ensure SDK + WalletClient are initialized for the account's chain
   await ctx.sdk.initForChain(chainConfig);
   ctx.walletClient.initForChain(chainConfig);
 
-  // 3. Build transaction(s) and determine type
-  const txs: Array<{ to: string; value?: string; data?: string }> = [];
-  let tokenInfo: { symbol: string; decimals: number } | undefined;
-  let txType: TxType;
-
-  if (opts.token && opts.amount) {
-    // ERC-20 transfer shorthand
-    txType = 'erc20-transfer';
-    tokenInfo = await getTokenInfo(ctx.walletClient, opts.token as Address);
-    const parsedAmount = parseTokenAmount(opts.amount, tokenInfo.decimals);
-    const transferData = encodeTransfer(opts.to as Address, parsedAmount);
-
-    txs.push({
-      to: opts.token,
-      value: '0x0',
-      data: transferData,
-    });
-  } else if (opts.data && opts.data !== '0x') {
-    // Has calldata → contract interaction (may also carry ETH value for payable)
-    txType = 'contract-call';
-    txs.push({
-      to: opts.to,
-      value: opts.value ? toHex(parseEther(opts.value)) : '0x0',
-      data: opts.data,
-    });
-  } else {
-    // Plain ETH transfer
-    txType = 'eth-transfer';
-    txs.push({
-      to: opts.to,
-      value: opts.value ? toHex(parseEther(opts.value)) : '0x0',
-      data: '0x',
-    });
-  }
-
-  // 3.5 Balance pre-check — reject early if sender can't cover transfer value
-  // (Sponsor covers gas only, NOT the value being transferred)
-  const { wei: ethBalance } = await ctx.walletClient.getBalance(accountInfo.address);
-
-  if (txType === 'eth-transfer' || txType === 'contract-call') {
-    const sendValue = opts.value ? parseEther(opts.value) : 0n;
-    if (sendValue > 0n && ethBalance < sendValue) {
-      const formatted = formatEther(ethBalance);
-      throw new Error(
-        `Insufficient ETH balance: need ${opts.value} ETH, have ${formatted} ETH. ` +
-          `Fund ${accountInfo.address} on ${chainConfig.name} before sending.`
-      );
+  // 2. Balance pre-check
+  const ethValueTotal = totalEthValue(specs);
+  if (ethValueTotal > 0n) {
+    const { wei: ethBalance } = await ctx.walletClient.getBalance(accountInfo.address);
+    if (ethBalance < ethValueTotal) {
+      const have = formatEther(ethBalance);
+      const need = formatEther(ethValueTotal);
+      throw new TxError(ERR_INSUFFICIENT_BALANCE, 'Insufficient ETH balance for transfer value.', {
+        need: `${need} ETH`,
+        have: `${have} ETH`,
+        account: accountInfo.address,
+        chain: chainConfig.name,
+      });
     }
   }
 
-  if (txType === 'erc20-transfer' && tokenInfo && opts.amount) {
-    const parsedAmount = parseTokenAmount(opts.amount, tokenInfo.decimals);
-    const tokenBal = await getTokenBalance(ctx.walletClient, opts.token as Address, accountInfo.address);
-    if (tokenBal < parsedAmount) {
-      const formatted = formatUnits(tokenBal, tokenInfo.decimals);
-      throw new Error(
-        `Insufficient ${tokenInfo.symbol} balance: need ${opts.amount}, have ${formatted}. ` +
-          `Fund ${accountInfo.address} with ${tokenInfo.symbol} before sending.`
-      );
-    }
-  }
+  // 3. Create unsigned UserOp (txs order preserved)
+  const txType = detectTxType(specs);
+  const txs = specsToTxs(specs);
 
-  // 4. Create unsigned UserOp
   const spinner = ora('Building UserOp...').start();
 
-  const userOp = await ctx.sdk.createSendUserOp(accountInfo.address, txs);
+  let userOp: ElytroUserOperation;
+  try {
+    userOp = await ctx.sdk.createSendUserOp(accountInfo.address, txs);
+  } catch (err) {
+    spinner.fail('Build failed.');
+    throw new TxError(ERR_BUILD_FAILED, `Failed to build UserOp: ${(err as Error).message}`, {
+      account: accountInfo.address,
+      chain: chainConfig.name,
+    });
+  }
 
-  // 5. Gas prices
+  // 4. Gas prices
   spinner.text = 'Fetching gas prices...';
   const feeData = await ctx.sdk.getFeeData(chainConfig);
   userOp.maxFeePerGas = feeData.maxFeePerGas;
   userOp.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
 
-  // 6. Estimate gas
-  // Extension always injects fakeBalance during estimation (before sponsor),
-  // because the bundler simulates as if user pays — AA21 if insufficient ETH.
+  // 5. Estimate gas
   spinner.text = 'Estimating gas...';
-  const gasEstimate = await ctx.sdk.estimateUserOp(userOp, { fakeBalance: true });
-  userOp.callGasLimit = gasEstimate.callGasLimit;
-  userOp.verificationGasLimit = gasEstimate.verificationGasLimit;
-  userOp.preVerificationGas = gasEstimate.preVerificationGas;
+  try {
+    const gasEstimate = await ctx.sdk.estimateUserOp(userOp, { fakeBalance: true });
+    userOp.callGasLimit = gasEstimate.callGasLimit;
+    userOp.verificationGasLimit = gasEstimate.verificationGasLimit;
+    userOp.preVerificationGas = gasEstimate.preVerificationGas;
+  } catch (err) {
+    spinner.fail('Gas estimation failed.');
+    throw new TxError(ERR_BUILD_FAILED, `Gas estimation failed: ${(err as Error).message}`, {
+      account: accountInfo.address,
+      chain: chainConfig.name,
+    });
+  }
 
-  // 7. Sponsorship
+  // 6. Sponsorship
   let sponsored = false;
-  if (opts?.sponsor !== false) {
+  if (sponsor !== false) {
     spinner.text = 'Checking sponsorship...';
     const { sponsor: sponsorResult, error: sponsorError } = await requestSponsorship(
       ctx.chain.graphqlEndpoint,
@@ -483,49 +638,30 @@ async function buildUserOp(
       applySponsorToUserOp(userOp, sponsorResult);
       sponsored = true;
     } else {
-      // Sponsor failed — check if account has funds to self-pay
       spinner.text = 'Sponsorship unavailable, checking balance...';
-      const { ether: balance } = await ctx.walletClient.getBalance(accountInfo.address);
-      if (parseFloat(balance) === 0) {
+      const { wei: balance } = await ctx.walletClient.getBalance(accountInfo.address);
+      if (balance === 0n) {
         spinner.fail('Build failed.');
-        throw new Error(
-          `Sponsorship failed: ${sponsorError ?? 'unknown'}. ` +
-            `Account has no ETH to pay gas. Fund ${accountInfo.address} on ${chainConfig.name}.`
-        );
+        throw new TxError(ERR_SPONSOR_FAILED, 'Sponsorship failed and account has no ETH to pay gas.', {
+          reason: sponsorError ?? 'unknown',
+          account: accountInfo.address,
+          chain: chainConfig.name,
+          hint: `Fund ${accountInfo.address} on ${chainConfig.name}.`,
+        });
       }
-      // Has funds — proceed without sponsor
     }
   }
 
   spinner.succeed('UserOp built.');
-  return { userOp, accountInfo, chainConfig, sponsored, txType, tokenInfo };
+  return { userOp, accountInfo, chainConfig, sponsored, txType };
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────
 
-function txTypeLabel(txType: TxType): string {
-  switch (txType) {
-    case 'eth-transfer':
-      return 'ETH Transfer';
-    case 'erc20-transfer':
-      return 'ERC-20 Transfer';
-    case 'contract-call':
-      return 'Contract Call';
-  }
-}
-
-/**
- * Truncate a long hex string for display (e.g. "0xabcdef...1234" if >20 chars).
- */
-function truncateHex(hex: string, maxLen = 42): string {
-  if (hex.length <= maxLen) return hex;
-  return `${hex.slice(0, 20)}...${hex.slice(-8)} (${(hex.length - 2) / 2} bytes)`;
-}
-
 function resolveAccountStrict(ctx: AppContext, identifier: string): AccountInfo {
   const account = ctx.account.resolveAccount(identifier);
   if (!account) {
-    throw new Error(`Account "${identifier}" not found.`);
+    throw new TxError(ERR_ACCOUNT_NOT_READY, `Account "${identifier}" not found.`, { identifier });
   }
   return account;
 }
@@ -533,14 +669,11 @@ function resolveAccountStrict(ctx: AppContext, identifier: string): AccountInfo 
 function resolveChainStrict(ctx: AppContext, chainId: number): ChainConfig {
   const chain = ctx.chain.chains.find((c) => c.id === chainId);
   if (!chain) {
-    throw new Error(`Chain ${chainId} not configured.`);
+    throw new TxError(ERR_ACCOUNT_NOT_READY, `Chain ${chainId} not configured.`, { chainId });
   }
   return chain;
 }
 
-/**
- * Serialize ElytroUserOperation to a plain JSON-safe object (bigint → hex string).
- */
 function serializeUserOp(op: ElytroUserOperation): Record<string, string | null> {
   return {
     sender: op.sender,
@@ -561,19 +694,16 @@ function serializeUserOp(op: ElytroUserOperation): Record<string, string | null>
   };
 }
 
-/**
- * Deserialize a JSON string into ElytroUserOperation (hex string → bigint).
- */
 function deserializeUserOp(json: string): ElytroUserOperation {
   let raw: Record<string, string | null>;
   try {
     raw = JSON.parse(json);
   } catch {
-    throw new Error('Invalid UserOp JSON. Pass a JSON-encoded UserOp object.');
+    throw new TxError(ERR_INVALID_PARAMS, 'Invalid UserOp JSON. Pass a JSON-encoded UserOp object.', { json });
   }
 
   if (!raw.sender || !raw.callData) {
-    throw new Error('Invalid UserOp: missing required fields (sender, callData).');
+    throw new TxError(ERR_INVALID_PARAMS, 'Invalid UserOp: missing required fields (sender, callData).');
   }
 
   return {

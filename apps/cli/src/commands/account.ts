@@ -299,8 +299,20 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
 
       const spinner = ora('Fetching on-chain data...').start();
       try {
+        // Resolve account first to get its chainId, then init walletClient for that chain
+        const accountInfo = ctx.account.resolveAccount(identifier);
+        if (!accountInfo) {
+          spinner.fail('Account not found.');
+          display.error(`Account "${identifier}" not found.`);
+          process.exitCode = 1;
+          return;
+        }
+        const chainConfig = ctx.chain.chains.find((c) => c.id === accountInfo.chainId);
+        if (chainConfig) {
+          ctx.walletClient.initForChain(chainConfig);
+        }
+
         const detail = await ctx.account.getAccountDetail(identifier);
-        const chainConfig = ctx.chain.chains.find((c) => c.id === detail.chainId);
         spinner.stop();
 
         display.heading('Account Details');

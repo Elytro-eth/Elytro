@@ -25,6 +25,40 @@ export function error(text: string): void {
   console.error(chalk.red(`✖ ${text}`));
 }
 
+/**
+ * Structured error output aligned with JSON-RPC / MCP conventions.
+ *
+ * Format:
+ *   { "success": false, "error": { "code": <number>, "message": <string>, "data": { ... } } }
+ *
+ * Error codes follow JSON-RPC reserved range convention:
+ *   -32602  Invalid params (bad --tx spec, missing required fields)
+ *   -32001  Insufficient balance
+ *   -32002  Account not ready (not initialized, not deployed)
+ *   -32003  Sponsorship failed
+ *   -32004  Build / estimation failed
+ *   -32005  Sign / send failed
+ *   -32006  Execution reverted (UserOp included but reverted on-chain)
+ *   -32000  Unknown / internal error
+ */
+export interface TxErrorPayload {
+  code: number;
+  message: string;
+  data?: Record<string, unknown>;
+}
+
+export function txError(payload: TxErrorPayload): void {
+  const output = {
+    success: false,
+    error: {
+      code: payload.code,
+      message: payload.message,
+      ...(payload.data && Object.keys(payload.data).length > 0 ? { data: payload.data } : {}),
+    },
+  };
+  console.error(chalk.red(JSON.stringify(output, null, 2)));
+}
+
 export function table(rows: Record<string, string>[], columns: { key: string; label: string; width?: number }[]): void {
   // Header
   const header = columns.map((c) => c.label.padEnd(c.width ?? 20)).join('  ');
