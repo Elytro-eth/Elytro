@@ -7,9 +7,9 @@
     "elytro": "./dist/index.js"
   },
   "scripts": {
-    "dev": "node --import tsx/esm src/index.ts",
+    "dev": "node --env-file=.env.development --import tsx/esm src/index.ts",
     "build": "tsup",
-    "test": "node --import tsx/esm test/smoke.ts",
+    "test": "node --env-file=.env.test --import tsx/esm test/smoke.ts",
     "lint": "eslint ."
   },
   "dependencies": {

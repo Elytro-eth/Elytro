@@ -96,6 +96,7 @@ export class AccountService {
       alias: finalAlias,
       owner,
       index,
+      isDeployed: false,
       isRecoveryEnabled: false,
     };
 
@@ -144,11 +145,27 @@ export class AccountService {
     return account;
   }
 
+  // ─── Activation ───────────────────────────────────────────────────
+
+  /**
+   * Mark an account as deployed on-chain.
+   * Called after successful UserOp receipt confirms deployment.
+   */
+  async markDeployed(address: Address, chainId: number): Promise<void> {
+    const account = this.state.accounts.find(
+      (a) => a.address.toLowerCase() === address.toLowerCase() && a.chainId === chainId
+    );
+    if (!account) {
+      throw new Error(`Account ${address} on chain ${chainId} not found.`);
+    }
+    account.isDeployed = true;
+    await this.persist();
+  }
+
   // ─── On-chain info ──────────────────────────────────────────────
 
   async getAccountDetail(aliasOrAddress: string): Promise<
     AccountInfo & {
-      isDeployed: boolean;
       balance: string;
     }
   > {
@@ -161,6 +178,12 @@ export class AccountService {
       this.walletClient.isContractDeployed(account.address),
       this.walletClient.getBalance(account.address),
     ]);
+
+    // Sync local state if on-chain status changed
+    if (isDeployed && !account.isDeployed) {
+      account.isDeployed = true;
+      await this.persist();
+    }
 
     return {
       ...account,

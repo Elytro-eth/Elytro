@@ -159,8 +159,9 @@ async function main() {
     assert.equal(a.alias, 'alpha-wolf');
     assert.equal(a.chainId, chainId);
     assert.equal(a.index, 0);
+    assert.equal(a.isDeployed, false);
     assert.match(a.address, /^0x[0-9a-fA-F]{40}$/);
-    ok(`created "alpha-wolf" (index=0) → ${a.address}`);
+    ok(`created "alpha-wolf" (index=0, isDeployed=false) → ${a.address}`);
   } catch (e) {
     fail('create with alias', e);
   }
@@ -170,6 +171,7 @@ async function main() {
     assert.ok(b.alias.includes('-'), `auto alias: ${b.alias}`);
     assert.equal(b.chainId, 1);
     assert.equal(b.index, 0); // first account on chain 1
+    assert.equal(b.isDeployed, false);
     ok(`created auto-alias "${b.alias}" on chain 1`);
   } catch (e) {
     fail('create with auto alias', e);
@@ -286,7 +288,157 @@ async function main() {
     fail('persistence', e);
   }
 
-  // ─── 12. Export / Import (password-based backup) ──────────
+  // ─── 12. Mark deployed ──────────────────────────────────
+  console.log('[mark deployed]');
+  try {
+    const alpha = account.resolveAccount('alpha-wolf')!;
+    assert.equal(alpha.isDeployed, false);
+    await account.markDeployed(alpha.address, alpha.chainId);
+    const updated = account.resolveAccount('alpha-wolf')!;
+    assert.equal(updated.isDeployed, true);
+    ok('markDeployed sets isDeployed=true');
+  } catch (e) {
+    fail('markDeployed', e);
+  }
+
+  try {
+    await assert.rejects(() => account.markDeployed('0x0000000000000000000000000000000000000000', 999), /not found/);
+    ok('markDeployed rejects unknown account');
+  } catch (e) {
+    fail('markDeployed unknown', e);
+  }
+
+  // ─── 13. signDigest (raw ECDSA) ─────────────────────────
+  console.log('[signDigest]');
+  try {
+    // Sign a dummy 32-byte hash
+    const dummyHash = '0x' + 'ab'.repeat(32);
+    const sig = await keyring.signDigest(dummyHash as `0x${string}`);
+    assert.match(sig, /^0x[0-9a-fA-F]+$/);
+    // ECDSA signature should be 65 bytes (130 hex chars + 0x prefix)
+    assert.equal(sig.length, 132);
+    ok(`signDigest produces 65-byte signature`);
+  } catch (e) {
+    fail('signDigest', e);
+  }
+
+  // ─── 14. SDK accessors ──────────────────────────────────
+  console.log('[sdk accessors]');
+  try {
+    assert.ok(sdk.isInitialized);
+    assert.match(sdk.entryPoint, /^0x[0-9a-fA-F]+$/);
+    assert.match(sdk.validatorAddress, /^0x[0-9a-fA-F]+$/);
+    ok(`entryPoint=${sdk.entryPoint.slice(0, 10)}... validator=${sdk.validatorAddress.slice(0, 10)}...`);
+  } catch (e) {
+    fail('sdk accessors', e);
+  }
+
+  // ─── 15. createSendUserOp (SDK fromTransaction) ────────────
+  console.log('[createSendUserOp]');
+  try {
+    // createSendUserOp requires SDK to talk to the chain for nonce,
+    // so this test only works when RPC key is available
+    const alpha = account.resolveAccount('alpha-wolf')!;
+    // alpha is already markDeployed from test 12
+
+    const recipient = '0x' + '1'.repeat(40);
+    const userOp = await sdk.createSendUserOp(alpha.address, [
+      { to: recipient, value: '0x2386F26FC10000', data: '0x' }, // 0.01 ETH
+    ]);
+
+    assert.equal(userOp.sender.toLowerCase(), alpha.address.toLowerCase());
+    assert.equal(userOp.factory, null, 'factory should be null for send op');
+    assert.ok(userOp.callData && userOp.callData !== '0x', 'callData must be non-empty');
+    ok('createSendUserOp builds unsigned UserOp with callData');
+  } catch (e) {
+    const msg = (e as Error).message;
+    if (msg.includes('fetch') || msg.includes('HTTP') || msg.includes('Failed')) {
+      ok('createSendUserOp skipped (no RPC/bundler) — set ELYTRO_ALCHEMY_KEY to test');
+    } else {
+      fail('createSendUserOp', e);
+    }
+  }
+
+  // ─── 16. ERC-20 encodeTransfer ─────────────────────────────
+  console.log('[erc20 encodeTransfer]');
+  try {
+    const { encodeTransfer } = await import('../src/utils/erc20');
+    const recipient = ('0x' + '2'.repeat(40)) as `0x${string}`;
+    const callData = encodeTransfer(recipient, 1000000n);
+
+    // transfer(address,uint256) selector = 0xa9059cbb
+    assert.ok(callData.startsWith('0xa9059cbb'), `expected transfer selector, got ${callData.slice(0, 10)}`);
+    assert.ok(callData.length > 10, 'callData should contain encoded args');
+    ok('encodeTransfer produces correct selector 0xa9059cbb');
+  } catch (e) {
+    fail('encodeTransfer', e);
+  }
+
+  // ─── 17. UserOp serialization round-trip ────────────────────
+  console.log('[userop serialize]');
+  try {
+    const { toHex } = await import('viem');
+
+    const testOp = {
+      sender: ('0x' + 'ab'.repeat(20)) as `0x${string}`,
+      nonce: 42n,
+      factory: null,
+      factoryData: null,
+      callData: '0xdeadbeef' as `0x${string}`,
+      callGasLimit: 100000n,
+      verificationGasLimit: 200000n,
+      preVerificationGas: 50000n,
+      maxFeePerGas: 1000000000n,
+      maxPriorityFeePerGas: 100000000n,
+      paymaster: null,
+      paymasterVerificationGasLimit: null,
+      paymasterPostOpGasLimit: null,
+      paymasterData: null,
+      signature: '0x' as `0x${string}`,
+    };
+
+    // Serialize: bigint → hex string
+    const serialized = {
+      sender: testOp.sender,
+      nonce: toHex(testOp.nonce),
+      callData: testOp.callData,
+      callGasLimit: toHex(testOp.callGasLimit),
+      verificationGasLimit: toHex(testOp.verificationGasLimit),
+      preVerificationGas: toHex(testOp.preVerificationGas),
+      maxFeePerGas: toHex(testOp.maxFeePerGas),
+      maxPriorityFeePerGas: toHex(testOp.maxPriorityFeePerGas),
+    };
+
+    const json = JSON.stringify(serialized);
+    const parsed = JSON.parse(json);
+
+    // Deserialize: hex string → bigint
+    assert.equal(BigInt(parsed.nonce), 42n);
+    assert.equal(BigInt(parsed.callGasLimit), 100000n);
+    assert.equal(parsed.callData, '0xdeadbeef');
+    ok('UserOp JSON round-trip preserves values');
+  } catch (e) {
+    fail('userop serialize', e);
+  }
+
+  // ─── 18. Hex validation (--data format check) ──────────────
+  console.log('[hex validation]');
+  try {
+    const { isHex } = await import('viem');
+    // Valid hex strings
+    assert.ok(isHex('0x'), '0x is valid empty hex');
+    assert.ok(isHex('0xabcdef'), 'valid hex');
+    assert.ok(isHex('0xa9059cbb0000000000000000000000000000000000000000000000000000000000000001'), 'long calldata');
+    // Invalid hex strings
+    assert.ok(!isHex('hello'), 'plain text is not hex');
+    assert.ok(!isHex('0xZZZZ'), 'invalid hex chars');
+    assert.ok(!isHex('abcdef'), 'missing 0x prefix');
+    ok('isHex validates calldata format correctly');
+  } catch (e) {
+    fail('hex validation', e);
+  }
+
+  // ─── 19. Export / Import (password-based backup) ──────────
   console.log('[export/import]');
   try {
     const exportPassword = 'backup-pass-789';

@@ -13,6 +13,8 @@ export interface AccountInfo {
   owner: Address;
   /** CREATE2 index — allows multiple accounts per owner per chain */
   index: number;
+  /** Whether the smart contract has been deployed on-chain */
+  isDeployed: boolean;
   /** Whether social recovery guardians have been set */
   isRecoveryEnabled: boolean;
 }
@@ -102,6 +104,38 @@ export interface ElytroUserOperation {
   paymasterPostOpGasLimit: bigint | null;
   paymasterData: Hex | null;
   signature: Hex;
+}
+
+// ─── Sponsor ────────────────────────────────────────────────────────
+
+export interface SponsorResult {
+  paymaster: Address;
+  paymasterData: Hex;
+  callGasLimit: string;
+  verificationGasLimit: string;
+  preVerificationGas: string;
+  paymasterVerificationGasLimit?: string;
+  paymasterPostOpGasLimit?: string;
+}
+
+// ─── UserOp Receipt ─────────────────────────────────────────────────
+
+export interface UserOpReceipt {
+  userOpHash: Hex;
+  entryPoint: Address;
+  sender: Address;
+  nonce: string;
+  paymaster?: Address;
+  actualGasCost: string;
+  actualGasUsed: string;
+  success: boolean;
+  reason?: string;
+  receipt?: {
+    transactionHash: Hex;
+    blockNumber: string;
+    blockHash: Hex;
+    gasUsed: string;
+  };
 }
 
 // ─── Nullable helper ────────────────────────────────────────────────

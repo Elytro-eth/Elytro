@@ -97,6 +97,19 @@ export class KeyringService {
   }
 
   /**
+   * Raw ECDSA sign over a 32-byte digest (no EIP-191 prefix).
+   *
+   * Equivalent to extension's `ethers.SigningKey.signDigest()`.
+   * Used for ERC-4337 UserOperation signing where the hash is
+   * already computed by the SDK (userOpHash → packRawHash).
+   */
+  async signDigest(digest: Hex): Promise<Hex> {
+    const key = this.getCurrentKey();
+    const account = privateKeyToAccount(key);
+    return account.sign({ hash: digest });
+  }
+
+  /**
    * Get a viem LocalAccount for the current owner.
    * Useful for SDK operations that need a signer.
    */

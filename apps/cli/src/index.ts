@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { createAppContext } from './context';
 import { registerInitCommand } from './commands/init';
 import { registerAccountCommand } from './commands/account';
+import { registerTxCommand } from './commands/tx';
 import * as display from './utils/display';
 
 /**
@@ -25,8 +26,8 @@ async function main(): Promise<void> {
 
     registerInitCommand(program, ctx);
     registerAccountCommand(program, ctx);
+    registerTxCommand(program, ctx);
 
-    // Phase 2: registerSendCommand(program, ctx);
     // Phase 2: registerCallCommand(program, ctx);
     // Phase 3: registerRecoveryCommand(program, ctx);
     // Phase 3: registerHookCommand(program, ctx);

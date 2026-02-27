@@ -75,7 +75,7 @@ export function getDefaultConfig(): CliConfig {
   return {
     currentChainId: 11155420, // Default to OP Sepolia for safety
     chains: DEFAULT_CHAINS,
-    graphqlEndpoint: GRAPHQL_ENDPOINTS[env] ?? GRAPHQL_ENDPOINTS['production'],
+    graphqlEndpoint: GRAPHQL_ENDPOINTS[env] ?? GRAPHQL_ENDPOINTS['development'],
     pimlicoKey: PIMLICO_KEY || undefined,
     alchemyKey: ALCHEMY_KEY || undefined,
   };
