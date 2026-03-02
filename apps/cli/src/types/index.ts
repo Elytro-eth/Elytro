@@ -138,6 +138,43 @@ export interface UserOpReceipt {
   };
 }
 
+// ─── Security Hook ─────────────────────────────────────────────────
+
+export interface HookStatus {
+  installed: boolean;
+  hookAddress: Address;
+  capabilities: {
+    preUserOpValidation: boolean;
+    preIsValidSignature: boolean;
+  };
+  forceUninstall: {
+    initiated: boolean;
+    canExecute: boolean;
+    /** ISO timestamp or null */
+    availableAfter: string | null;
+  };
+}
+
+export interface SecurityProfile {
+  email?: string;
+  emailVerified?: boolean;
+  maskedEmail?: string;
+  dailyLimitUsdCents?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface HookError {
+  code?: string;
+  challengeId?: string;
+  currentSpendUsdCents?: number;
+  dailyLimitUsdCents?: number;
+  maskedEmail?: string;
+  otpExpiresAt?: string;
+  projectedSpendUsdCents?: number;
+  message?: string;
+}
+
 // ─── Nullable helper ────────────────────────────────────────────────
 
 export type Nullable<T> = T | null | undefined;

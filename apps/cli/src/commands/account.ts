@@ -377,7 +377,27 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
           await ctx.sdk.initForChain(newChain);
         }
 
-        display.success(`Switched to "${switched.alias}" on ${newChain?.name ?? `chain ${switched.chainId}`}`);
+        display.success(`Switched to "${switched.alias}"`);
+
+        // Show account info after switch
+        const spinner = ora('Fetching on-chain data...').start();
+        try {
+          const detail = await ctx.account.getAccountDetail(switched.alias);
+          spinner.stop();
+
+          console.log('');
+          display.info('Address', detail.address);
+          display.info('Chain', newChain?.name ?? String(detail.chainId));
+          display.info('Deployed', detail.isDeployed ? 'Yes' : 'No');
+          display.info('Balance', `${detail.balance} ${newChain?.nativeCurrency.symbol ?? 'ETH'}`);
+          if (newChain?.blockExplorer) {
+            display.info('Explorer', `${newChain.blockExplorer}/address/${detail.address}`);
+          }
+        } catch {
+          spinner.stop();
+          // Non-fatal: switch succeeded, just couldn't fetch on-chain data
+          display.warn('Could not fetch on-chain data. Run `elytro account info` to retry.');
+        }
       } catch (err) {
         display.error(sanitizeErrorMessage((err as Error).message));
         process.exitCode = 1;

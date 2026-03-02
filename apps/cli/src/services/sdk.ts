@@ -317,6 +317,66 @@ export class SDKService {
   }
 
   /**
+   * Pack a raw ECDSA signature with hook input data.
+   *
+   * Used when SecurityHook is installed: the hook signature from the backend
+   * must be included alongside the EOA signature.
+   *
+   * Extension reference: sdk.ts#signUserOperationWithHook (line 239-318)
+   *
+   * @param rawSignature  Raw ECDSA signature from device key
+   * @param validationData  Validation data from packRawHash
+   * @param hookAddress  SecurityHook contract address
+   * @param hookSignature  Hook signature from authorizeUserOperation backend
+   */
+  async packUserOpSignatureWithHook(
+    rawSignature: Hex,
+    validationData: Hex,
+    hookAddress: Address,
+    hookSignature: Hex
+  ): Promise<Hex> {
+    const sdk = this.ensureSDK();
+
+    const hookInputData = [
+      {
+        hookAddress,
+        inputData: hookSignature,
+      },
+    ];
+
+    const result = await sdk.packUserOpEOASignature(
+      this.contractConfig.validator,
+      rawSignature,
+      validationData,
+      hookInputData
+    );
+
+    if (result.isErr()) {
+      throw new Error(`Failed to pack signature with hook: ${result.ERR}`);
+    }
+
+    return result.OK as Hex;
+  }
+
+  /**
+   * Pack a raw hash with validation time bounds.
+   *
+   * Used for EIP-1271 auth signing flow — takes an arbitrary message hash
+   * (not a userOp hash) and returns packedHash + validationData.
+   */
+  async packRawHash(hash: Hex): Promise<{ packedHash: Hex; validationData: Hex }> {
+    const sdk = this.ensureSDK();
+    const result = await sdk.packRawHash(hash);
+    if (result.isErr()) {
+      throw new Error(`Failed to pack raw hash: ${result.ERR}`);
+    }
+    return {
+      packedHash: result.OK.packedHash as Hex,
+      validationData: result.OK.validationData as Hex,
+    };
+  }
+
+  /**
    * Send a signed UserOperation to the bundler.
    */
   async sendUserOp(userOp: ElytroUserOperation): Promise<Hex> {

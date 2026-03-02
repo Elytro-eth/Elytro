@@ -4,6 +4,7 @@ import { registerInitCommand } from './commands/init';
 import { registerAccountCommand } from './commands/account';
 import { registerTxCommand } from './commands/tx';
 import { registerQueryCommand } from './commands/query';
+import { registerSecurityCommand } from './commands/security';
 import * as display from './utils/display';
 import { sanitizeErrorMessage } from './utils/display';
 
@@ -30,10 +31,10 @@ async function main(): Promise<void> {
     registerAccountCommand(program, ctx);
     registerTxCommand(program, ctx);
     registerQueryCommand(program, ctx);
+    registerSecurityCommand(program, ctx);
 
-    // Phase 3: registerCallCommand(program, ctx);
-    // Phase 3: registerRecoveryCommand(program, ctx);
-    // Phase 3: registerHookCommand(program, ctx);
+    // Phase 4: registerCallCommand(program, ctx);
+    // Phase 4: registerRecoveryCommand(program, ctx);
 
     await program.parseAsync(process.argv);
   } catch (err) {

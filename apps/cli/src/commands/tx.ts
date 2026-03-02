@@ -5,9 +5,11 @@ import type { Address, Hex } from 'viem';
 import type { AppContext } from '../context';
 import type { ElytroUserOperation, AccountInfo, ChainConfig } from '../types';
 import { requestSponsorship, applySponsorToUserOp } from '../utils/sponsor';
-import { askConfirm } from '../utils/prompt';
+import { askConfirm, askInput } from '../utils/prompt';
 import * as display from '../utils/display';
 import { sanitizeErrorMessage } from '../utils/display';
+import { SecurityHookService, createSignMessageForAuth } from '../services/securityHook';
+import { SECURITY_HOOK_ADDRESS_MAP } from '../constants/securityHook';
 
 // ─── Error Codes (JSON-RPC / MCP convention) ──────────────────────────
 //
@@ -278,8 +280,9 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
     .argument('[account]', 'Source account alias or address (default: current)')
     .option('--tx <spec...>', 'Transaction spec: "to:0xAddr,value:0.1,data:0x..." (repeatable, ordered)')
     .option('--no-sponsor', 'Skip sponsorship check')
+    .option('--no-hook', 'Skip SecurityHook signing (bypass 2FA)')
     .option('--userop <json>', 'Send a pre-built UserOp JSON (skips build step)')
-    .action(async (target?: string, opts?: { tx?: string[]; sponsor?: boolean; userop?: string }) => {
+    .action(async (target?: string, opts?: { tx?: string[]; sponsor?: boolean; hook?: boolean; userop?: string }) => {
       if (!ctx.deviceKey) {
         handleTxError(new TxError(ERR_ACCOUNT_NOT_READY, 'Wallet not initialized. Run `elytro init` first.'));
         return;
@@ -363,7 +366,113 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
         try {
           const { packedHash, validationData } = await ctx.sdk.getUserOpHash(userOp);
           const rawSignature = await ctx.keyring.signDigest(packedHash);
-          userOp.signature = await ctx.sdk.packUserOpSignature(rawSignature, validationData);
+
+          // Check if SecurityHook is installed and signing is needed
+          const useHook = opts?.hook !== false; // --no-hook disables
+          let hookSigned = false;
+
+          if (useHook) {
+            const hookAddress = SECURITY_HOOK_ADDRESS_MAP[accountInfo.chainId];
+            if (hookAddress) {
+              // Create a temporary hook service to check status
+              const hookService = new SecurityHookService({
+                store: ctx.store,
+                graphqlEndpoint: ctx.chain.graphqlEndpoint,
+                signMessageForAuth: createSignMessageForAuth({
+                  signDigest: (digest) => ctx.keyring.signDigest(digest),
+                  packRawHash: (hash) => ctx.sdk.packRawHash(hash),
+                  packSignature: (rawSig, valData) => ctx.sdk.packUserOpSignature(rawSig, valData),
+                }),
+                readContract: async (params) =>
+                  ctx.walletClient.readContract(params as Parameters<typeof ctx.walletClient.readContract>[0]),
+                getBlockTimestamp: async () => {
+                  const blockNum = await ctx.walletClient.raw.getBlockNumber();
+                  const block = await ctx.walletClient.raw.getBlock({ blockNumber: blockNum });
+                  return block.timestamp;
+                },
+              });
+
+              spinner.text = 'Checking SecurityHook status...';
+              const hookStatus = await hookService.getHookStatus(accountInfo.address, accountInfo.chainId);
+
+              if (hookStatus.installed && hookStatus.capabilities.preUserOpValidation) {
+                // Pre-sign: pack signature without hook first for authorization request
+                userOp.signature = await ctx.sdk.packUserOpSignature(rawSignature, validationData);
+
+                spinner.text = 'Requesting hook authorization...';
+                let hookResult = await hookService.getHookSignature(
+                  accountInfo.address,
+                  accountInfo.chainId,
+                  ctx.sdk.entryPoint,
+                  userOp
+                );
+
+                // Handle OTP challenge
+                if (hookResult.error) {
+                  spinner.stop();
+                  const errCode = hookResult.error.code;
+
+                  if (errCode === 'OTP_REQUIRED' || errCode === 'SPENDING_LIMIT_EXCEEDED') {
+                    display.warn(hookResult.error.message ?? `Verification required (${errCode}).`);
+                    if (hookResult.error.maskedEmail) {
+                      display.info('OTP sent to', hookResult.error.maskedEmail);
+                    }
+                    if (
+                      errCode === 'SPENDING_LIMIT_EXCEEDED' &&
+                      hookResult.error.projectedSpendUsdCents !== undefined
+                    ) {
+                      display.info('Projected spend', `$${(hookResult.error.projectedSpendUsdCents / 100).toFixed(2)}`);
+                      display.info('Daily limit', `$${((hookResult.error.dailyLimitUsdCents ?? 0) / 100).toFixed(2)}`);
+                    }
+
+                    const otpCode = await askInput('Enter the 6-digit OTP code:');
+
+                    spinner.start('Verifying OTP...');
+                    await hookService.verifySecurityOtp(
+                      accountInfo.address,
+                      accountInfo.chainId,
+                      hookResult.error.challengeId!,
+                      otpCode.trim()
+                    );
+
+                    spinner.text = 'OTP verified. Retrying authorization...';
+                    hookResult = await hookService.getHookSignature(
+                      accountInfo.address,
+                      accountInfo.chainId,
+                      ctx.sdk.entryPoint,
+                      userOp
+                    );
+
+                    if (hookResult.error) {
+                      throw new TxError(
+                        ERR_SEND_FAILED,
+                        `Hook authorization failed after OTP: ${hookResult.error.message}`
+                      );
+                    }
+                  } else {
+                    throw new TxError(
+                      ERR_SEND_FAILED,
+                      `Hook authorization failed: ${hookResult.error.message ?? errCode}`
+                    );
+                  }
+                }
+
+                // Pack signature with hook data
+                userOp.signature = await ctx.sdk.packUserOpSignatureWithHook(
+                  rawSignature,
+                  validationData,
+                  hookAddress,
+                  hookResult.signature! as Hex
+                );
+                hookSigned = true;
+              }
+            }
+          }
+
+          // Standard signing (no hook or hook not installed)
+          if (!hookSigned) {
+            userOp.signature = await ctx.sdk.packUserOpSignature(rawSignature, validationData);
+          }
 
           spinner.text = 'Sending to bundler...';
           opHash = await ctx.sdk.sendUserOp(userOp);
