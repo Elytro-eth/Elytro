@@ -1,16 +1,40 @@
 {
   "name": "@elytro/cli",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Elytro ERC-4337 Smart Account Wallet CLI",
   "type": "module",
   "bin": {
     "elytro": "./dist/index.js"
   },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "dev": "node --env-file=.env.development --import tsx/esm src/index.ts",
     "build": "tsup",
+    "prepublishOnly": "bun run build",
     "test": "node --env-file=.env.test --import tsx/esm test/smoke.ts",
     "lint": "eslint ."
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "elytro",
+    "erc-4337",
+    "smart-account",
+    "wallet",
+    "cli",
+    "useroperation",
+    "account-abstraction"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aspect-build/Elytro",
+    "directory": "apps/cli"
   },
   "dependencies": {
     "@apollo/client": "^3.11.8",

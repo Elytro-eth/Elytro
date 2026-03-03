@@ -5,6 +5,7 @@ import { registerAccountCommand } from './commands/account';
 import { registerTxCommand } from './commands/tx';
 import { registerQueryCommand } from './commands/query';
 import { registerSecurityCommand } from './commands/security';
+import { registerConfigCommand } from './commands/config';
 import * as display from './utils/display';
 import { sanitizeErrorMessage } from './utils/display';
 
@@ -32,6 +33,7 @@ async function main(): Promise<void> {
     registerTxCommand(program, ctx);
     registerQueryCommand(program, ctx);
     registerSecurityCommand(program, ctx);
+    registerConfigCommand(program, ctx);
 
     // Phase 4: registerCallCommand(program, ctx);
     // Phase 4: registerRecoveryCommand(program, ctx);

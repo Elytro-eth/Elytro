@@ -71,10 +71,14 @@ export interface CliConfig {
   chains: ChainConfig[];
   /** GraphQL API endpoint */
   graphqlEndpoint: string;
-  /** Pimlico API key */
-  pimlicoKey?: string;
-  /** Alchemy API key */
+}
+
+/** User-configured API keys persisted in ~/.elytro/user-keys.json */
+export interface UserKeys {
+  /** Alchemy API key — unlocks higher RPC rate limits */
   alchemyKey?: string;
+  /** Pimlico API key — unlocks higher bundler rate limits */
+  pimlicoKey?: string;
 }
 
 // ─── Storage ────────────────────────────────────────────────────────

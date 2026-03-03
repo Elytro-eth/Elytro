@@ -208,7 +208,7 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
 
         // 9. Wait for receipt
         spinner.text = 'Waiting for on-chain confirmation...';
-        const receipt = await ctx.sdk.waitForReceipt(opHash, chainConfig);
+        const receipt = await ctx.sdk.waitForReceipt(opHash);
 
         // 10. Update local state
         await ctx.account.markDeployed(accountInfo.address, accountInfo.chainId);

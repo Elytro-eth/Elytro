@@ -362,7 +362,7 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
         // ── Sign + Send + Wait ──
         const spinner = ora('Signing UserOperation...').start();
 
-        let opHash: string;
+        let opHash: Hex;
         try {
           const { packedHash, validationData } = await ctx.sdk.getUserOpHash(userOp);
           const rawSignature = await ctx.keyring.signDigest(packedHash);
@@ -485,7 +485,7 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
         }
 
         spinner.text = 'Waiting for on-chain confirmation...';
-        const receipt = await ctx.sdk.waitForReceipt(opHash, chainConfig);
+        const receipt = await ctx.sdk.waitForReceipt(opHash);
 
         if (receipt.success) {
           spinner.succeed('Transaction confirmed!');

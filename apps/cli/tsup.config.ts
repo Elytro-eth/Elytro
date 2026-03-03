@@ -6,7 +6,7 @@ export default defineConfig({
   target: 'node24',
   outDir: 'dist',
   clean: true,
-  sourcemap: true,
+  sourcemap: false,
   dts: false,
   splitting: false,
   banner: {

@@ -1,0 +1,40 @@
+# ── Source code ──
+src/
+test/
+docs/
+
+# ── Env & secrets ──
+.env
+.env.*
+.env.development
+.env.production
+.env.test
+
+# ── Build config ──
+tsconfig.json
+tsup.config.ts
+tsup.config.bundled_*.mjs
+
+# ── Lint / format ──
+.eslintrc*
+eslint.config.*
+.prettierrc*
+.editorconfig
+biome.json
+
+# ── AI / dev notes ──
+CLAUDE.md
+.claude/
+.cursor/
+.vscode/
+
+# ── Sourcemaps ──
+*.map
+
+# ── Dev artifacts ──
+*.tsbuildinfo
+node_modules/
+coverage/
+.turbo/
+*.log
+npm-debug.log*

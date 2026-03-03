@@ -1,7 +1,8 @@
-import type { StorageAdapter, ChainConfig, CliConfig } from '../types';
-import { getDefaultConfig } from '../utils/config';
+import type { StorageAdapter, ChainConfig, CliConfig, UserKeys } from '../types';
+import { getDefaultConfig, buildChains } from '../utils/config';
 
 const STORAGE_KEY = 'config';
+const USER_KEYS_KEY = 'user-keys';
 
 /**
  * ChainService — multi-chain configuration management.
@@ -15,22 +16,54 @@ const STORAGE_KEY = 'config';
  * - No reactive store / eventBus — single-process, imperative
  * - Config persisted as a single JSON file
  * - No version-migration logic (fresh start for CLI)
+ *
+ * API keys:
+ * - Stored separately in user-keys.json (never in config.json)
+ * - Resolved at init: userKeys > env vars > public fallback
  */
 export class ChainService {
   private store: StorageAdapter;
   private config: CliConfig;
+  private userKeys: UserKeys = {};
 
   constructor(store: StorageAdapter) {
     this.store = store;
     this.config = getDefaultConfig();
   }
 
-  /** Load persisted config or use defaults. */
+  /** Load persisted config and user keys, rebuild chain endpoints. */
   async init(): Promise<void> {
+    // Load user keys first — they affect chain endpoint resolution
+    this.userKeys = (await this.store.load<UserKeys>(USER_KEYS_KEY)) ?? {};
+
     const saved = await this.store.load<CliConfig>(STORAGE_KEY);
     if (saved) {
       this.config = { ...getDefaultConfig(), ...saved };
     }
+
+    // Always rebuild chain endpoints with current key resolution
+    this.config.chains = buildChains(this.userKeys.alchemyKey, this.userKeys.pimlicoKey);
+  }
+
+  // ─── User Keys ──────────────────────────────────────────────────
+
+  /** Get current user keys (for display — values are masked). */
+  getUserKeys(): UserKeys {
+    return { ...this.userKeys };
+  }
+
+  /** Set a user API key and rebuild chain endpoints. */
+  async setUserKey(key: keyof UserKeys, value: string): Promise<void> {
+    this.userKeys[key] = value;
+    await this.store.save(USER_KEYS_KEY, this.userKeys);
+    this.config.chains = buildChains(this.userKeys.alchemyKey, this.userKeys.pimlicoKey);
+  }
+
+  /** Remove a user API key and fall back to env / public endpoints. */
+  async removeUserKey(key: keyof UserKeys): Promise<void> {
+    delete this.userKeys[key];
+    await this.store.save(USER_KEYS_KEY, this.userKeys);
+    this.config.chains = buildChains(this.userKeys.alchemyKey, this.userKeys.pimlicoKey);
   }
 
   // ─── Getters ────────────────────────────────────────────────────
