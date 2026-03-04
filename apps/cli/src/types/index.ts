@@ -37,7 +37,7 @@ export interface EncryptedData {
   data: string;
   iv: string;
   salt: string;
-  /** 1 = PBKDF2 password-based, 2 = raw device key. Absent treated as 1. */
+  /** 1 = PBKDF2 password-based, 2 = raw vault key (via SecretProvider). Absent treated as 1. */
   version?: 1 | 2;
 }
 

@@ -8,20 +8,22 @@ const STORAGE_KEY = 'keyring';
 /**
  * KeyringService — EOA private key management.
  *
- * All routine operations use a device key (256-bit raw key from file).
+ * All routine operations use a vault key (256-bit raw key from SecretProvider).
  * Password-based encryption is only used for export/import (backup).
  *
  * Lifecycle:
- *   init  → createNewOwner(deviceKey) → vault encrypted with device key
- *   boot  → unlock(deviceKey) automatically by context
+ *   init  → createNewOwner(vaultKey) → vault encrypted with vault key
+ *   boot  → unlock(vaultKey) automatically by context via SecretProvider
  *   use   → signMessage / getAccount (vault already in memory)
- *   exit  → lock() clears vault from memory
+ *   exit  → lock() clears vault AND vault key from memory
  *   export → exportVault(password) re-encrypts with user password
- *   import → importVault(encrypted, password, deviceKey) decrypts then re-encrypts
+ *   import → importVault(encrypted, password, vaultKey) decrypts then re-encrypts
  */
 export class KeyringService {
   private store: StorageAdapter;
   private vault: VaultData | null = null;
+  /** Vault key kept in memory for re-encryption operations (addOwner, switchOwner). */
+  private vaultKey: Uint8Array | null = null;
 
   constructor(store: StorageAdapter) {
     this.store = store;
@@ -36,9 +38,9 @@ export class KeyringService {
 
   /**
    * Create a brand-new vault with one owner.
-   * Called during `elytro init`. Encrypts with device key.
+   * Called during `elytro init`. Encrypts with vault key.
    */
-  async createNewOwner(deviceKey: Uint8Array): Promise<Address> {
+  async createNewOwner(vaultKey: Uint8Array): Promise<Address> {
     const privateKey = generatePrivateKey();
     const account = privateKeyToAccount(privateKey);
 
@@ -48,30 +50,36 @@ export class KeyringService {
       currentOwnerId: account.address,
     };
 
-    const encrypted = await encryptWithKey(deviceKey, vault);
+    const encrypted = await encryptWithKey(vaultKey, vault);
     await this.store.save(STORAGE_KEY, encrypted);
 
     this.vault = vault;
+    this.vaultKey = new Uint8Array(vaultKey);
     return account.address;
   }
 
   // ─── Unlock / Access ────────────────────────────────────────────
 
   /**
-   * Decrypt the vault with the device key.
-   * Called automatically by context at CLI startup.
+   * Decrypt the vault with the vault key.
+   * Called automatically by context at CLI startup via SecretProvider.
    */
-  async unlock(deviceKey: Uint8Array): Promise<void> {
+  async unlock(vaultKey: Uint8Array): Promise<void> {
     const encrypted = await this.store.load<EncryptedData>(STORAGE_KEY);
     if (!encrypted) {
       throw new Error('Keyring not initialized. Run `elytro init` first.');
     }
-    this.vault = await decryptWithKey<VaultData>(deviceKey, encrypted);
+    this.vault = await decryptWithKey<VaultData>(vaultKey, encrypted);
+    this.vaultKey = new Uint8Array(vaultKey);
   }
 
-  /** Lock the vault, clearing decrypted keys from memory. */
+  /** Lock the vault, clearing decrypted keys and vault key from memory. */
   lock(): void {
     this.vault = null;
+    if (this.vaultKey) {
+      this.vaultKey.fill(0);
+      this.vaultKey = null;
+    }
   }
 
   get isUnlocked(): boolean {
@@ -120,18 +128,18 @@ export class KeyringService {
 
   // ─── Multi-owner management ─────────────────────────────────────
 
-  async addOwner(deviceKey: Uint8Array): Promise<Address> {
+  async addOwner(): Promise<Address> {
     this.ensureUnlocked();
 
     const privateKey = generatePrivateKey();
     const account = privateKeyToAccount(privateKey);
 
     this.vault!.owners.push({ id: account.address, key: privateKey });
-    await this.persistVault(deviceKey);
+    await this.persistVault();
     return account.address;
   }
 
-  async switchOwner(ownerId: Address, deviceKey: Uint8Array): Promise<void> {
+  async switchOwner(ownerId: Address): Promise<void> {
     this.ensureUnlocked();
 
     const exists = this.vault!.owners.some((o) => o.id === ownerId);
@@ -140,7 +148,7 @@ export class KeyringService {
     }
 
     this.vault!.currentOwnerId = ownerId;
-    await this.persistVault(deviceKey);
+    await this.persistVault();
   }
 
   // ─── Export / Import (password-based for portability) ───────────
@@ -156,20 +164,22 @@ export class KeyringService {
 
   /**
    * Import vault from a password-encrypted backup.
-   * Decrypts with the backup password, then re-encrypts with device key.
+   * Decrypts with the backup password, then re-encrypts with vault key.
    */
-  async importVault(encrypted: EncryptedData, password: string, deviceKey: Uint8Array): Promise<void> {
+  async importVault(encrypted: EncryptedData, password: string, vaultKey: Uint8Array): Promise<void> {
     const vault = await decrypt<VaultData>(password, encrypted);
     this.vault = vault;
-    const reEncrypted = await encryptWithKey(deviceKey, vault);
+    this.vaultKey = new Uint8Array(vaultKey);
+    const reEncrypted = await encryptWithKey(vaultKey, vault);
     await this.store.save(STORAGE_KEY, reEncrypted);
   }
 
-  // ─── Rekey (device key rotation) ───────────────────────────────
+  // ─── Rekey (vault key rotation) ───────────────────────────────
 
-  async rekey(newDeviceKey: Uint8Array): Promise<void> {
+  async rekey(newVaultKey: Uint8Array): Promise<void> {
     this.ensureUnlocked();
-    await this.persistVault(newDeviceKey);
+    this.vaultKey = new Uint8Array(newVaultKey);
+    await this.persistVault();
   }
 
   // ─── Internal ───────────────────────────────────────────────────
@@ -191,9 +201,10 @@ export class KeyringService {
     }
   }
 
-  private async persistVault(deviceKey: Uint8Array): Promise<void> {
+  private async persistVault(): Promise<void> {
     if (!this.vault) throw new Error('No vault to persist.');
-    const encrypted = await encryptWithKey(deviceKey, this.vault!);
+    if (!this.vaultKey) throw new Error('No vault key available for re-encryption.');
+    const encrypted = await encryptWithKey(this.vaultKey, this.vault);
     await this.store.save(STORAGE_KEY, encrypted);
   }
 }

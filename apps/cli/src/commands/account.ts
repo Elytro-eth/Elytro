@@ -21,7 +21,7 @@ import { sanitizeErrorMessage } from '../utils/display';
  * - Owner (EOA) is never shown to users
  * - Accounts are identified by alias (e.g. "swift-panda") or address
  * - Chain is required at creation time
- * - No password needed — keyring is auto-unlocked via device key at boot
+ * - No password needed — keyring is auto-unlocked via SecretProvider at boot
  */
 export function registerAccountCommand(program: Command, ctx: AppContext): void {
   const account = program.command('account').description('Manage smart accounts');
@@ -34,7 +34,7 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
     .requiredOption('-c, --chain <chainId>', 'Target chain ID')
     .option('-a, --alias <alias>', 'Human-readable alias (default: random)')
     .action(async (opts) => {
-      if (!ctx.deviceKey) {
+      if (!ctx.keyring.isUnlocked) {
         display.error('Wallet not initialized. Run `elytro init` first.');
         process.exitCode = 1;
         return;
@@ -100,7 +100,7 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
     .argument('[account]', 'Alias or address (default: current)')
     .option('--no-sponsor', 'Skip sponsorship check (user pays gas)')
     .action(async (target?: string, opts?: { sponsor?: boolean }) => {
-      if (!ctx.deviceKey) {
+      if (!ctx.keyring.isUnlocked) {
         display.error('Wallet not initialized. Run `elytro init` first.');
         process.exitCode = 1;
         return;

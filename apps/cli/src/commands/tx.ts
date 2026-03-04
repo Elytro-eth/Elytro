@@ -283,7 +283,7 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
     .option('--no-hook', 'Skip SecurityHook signing (bypass 2FA)')
     .option('--userop <json>', 'Send a pre-built UserOp JSON (skips build step)')
     .action(async (target?: string, opts?: { tx?: string[]; sponsor?: boolean; hook?: boolean; userop?: string }) => {
-      if (!ctx.deviceKey) {
+      if (!ctx.keyring.isUnlocked) {
         handleTxError(new TxError(ERR_ACCOUNT_NOT_READY, 'Wallet not initialized. Run `elytro init` first.'));
         return;
       }
@@ -531,7 +531,7 @@ export function registerTxCommand(program: Command, ctx: AppContext): void {
     .option('--tx <spec...>', 'Transaction spec: "to:0xAddr,value:0.1,data:0x..." (repeatable, ordered)')
     .option('--no-sponsor', 'Skip sponsorship check')
     .action(async (target?: string, opts?: { tx?: string[]; sponsor?: boolean }) => {
-      if (!ctx.deviceKey) {
+      if (!ctx.keyring.isUnlocked) {
         handleTxError(new TxError(ERR_ACCOUNT_NOT_READY, 'Wallet not initialized. Run `elytro init` first.'));
         return;
       }

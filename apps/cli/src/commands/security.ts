@@ -68,7 +68,7 @@ interface SecurityContext {
  * Every security subcommand starts with this.
  */
 function initSecurityContext(ctx: AppContext): SecurityContext {
-  if (!ctx.deviceKey) {
+  if (!ctx.keyring.isUnlocked) {
     throw new SecurityError(ERR_ACCOUNT_NOT_READY, 'Wallet not initialized. Run `elytro init` first.');
   }
 

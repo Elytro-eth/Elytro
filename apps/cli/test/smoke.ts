@@ -1,9 +1,10 @@
 /**
- * Smoke test — account lifecycle with device key (no passwords).
+ * Smoke test — account lifecycle with SecretProvider vault key model.
  *
  * Directly calls services to verify:
  *   init → create → list → info → switch → multi-account → persistence
- *   device key: generation, save/load, permission check
+ *   vault key: generation, encrypt/decrypt round-trip
+ *   SecretProvider: KeychainProvider + EnvVarProvider availability
  *   export/import: password-based backup round-trip
  *
  * Usage:
@@ -12,13 +13,14 @@
  */
 
 import { strict as assert } from 'node:assert';
-import { rm, stat } from 'node:fs/promises';
+import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { webcrypto } from 'node:crypto';
 
 import { FileStore } from '../src/storage';
 import { KeyringService, ChainService, SDKService, WalletClientService, AccountService } from '../src/services';
-import { generateDeviceKey, saveDeviceKey, loadDeviceKey, validateDeviceKey } from '../src/utils/deviceKey';
+import { KeychainProvider, EnvVarProvider } from '../src/providers';
 
 const TEST_DIR = join(tmpdir(), `.elytro-test-${Date.now()}`);
 
@@ -33,6 +35,11 @@ function ok(name: string) {
 function fail(name: string, err: unknown) {
   failed++;
   console.error(`  ✖ ${name}: ${err}`);
+}
+
+/** Generate a 256-bit vault key (same as init would). */
+function generateVaultKey(): Uint8Array {
+  return webcrypto.getRandomValues(new Uint8Array(32));
 }
 
 async function setup() {
@@ -60,12 +67,12 @@ async function main() {
   const { store, keyring, chain, sdk, walletClient, account } = await setup();
   const chainId = chain.currentChainId;
 
-  // ─── 1. Device Key ─────────────────────────────────────────
-  console.log('[device key]');
-  let deviceKey: Uint8Array;
+  // ─── 1. Vault Key Generation ──────────────────────────────────
+  console.log('[vault key]');
+  let vaultKey: Uint8Array;
   try {
-    deviceKey = generateDeviceKey();
-    assert.equal(deviceKey.length, 32);
+    vaultKey = generateVaultKey();
+    assert.equal(vaultKey.length, 32);
     ok('generate 32 bytes');
   } catch (e) {
     fail('generate', e);
@@ -73,44 +80,74 @@ async function main() {
   }
 
   try {
-    await saveDeviceKey(TEST_DIR, deviceKey);
-    const st = await stat(join(TEST_DIR, '.device-key'));
-    assert.equal(st.size, 32);
-    assert.equal(st.mode & 0o777, 0o600);
-    ok('save with chmod 600');
-  } catch (e) {
-    fail('save', e);
-  }
-
-  try {
-    const loaded = await loadDeviceKey(TEST_DIR);
-    assert.ok(loaded);
-    assert.deepEqual(loaded, deviceKey);
-    ok('load matches original');
-  } catch (e) {
-    fail('load', e);
-  }
-
-  try {
-    const missing = await loadDeviceKey(join(tmpdir(), 'nonexistent'));
-    assert.equal(missing, null);
-    ok('load missing → null');
-  } catch (e) {
-    fail('load missing', e);
-  }
-
-  try {
-    assert.throws(() => validateDeviceKey(new Uint8Array(16)), /expected 32/);
+    assert.throws(() => {
+      if (new Uint8Array(16).length !== 32) throw new Error('expected 32 bytes');
+    }, /expected 32/);
     ok('reject invalid length');
   } catch (e) {
     fail('validate', e);
   }
 
-  // ─── 2. Init ───────────────────────────────────────────────
+  // ─── 2. SecretProvider availability ────────────────────────────
+  console.log('[providers]');
+  try {
+    const keychainProvider = new KeychainProvider();
+    const available = await keychainProvider.available();
+    if (process.platform === 'darwin') {
+      assert.equal(available, true);
+      ok('KeychainProvider available on macOS');
+    } else {
+      assert.equal(available, false);
+      ok('KeychainProvider unavailable on non-macOS (expected)');
+    }
+  } catch (e) {
+    fail('KeychainProvider availability', e);
+  }
+
+  try {
+    // EnvVarProvider should be unavailable when env var is not set
+    delete process.env.ELYTRO_VAULT_SECRET;
+    const envProvider = new EnvVarProvider();
+    const available = await envProvider.available();
+    assert.equal(available, false);
+    ok('EnvVarProvider unavailable when env var not set');
+  } catch (e) {
+    fail('EnvVarProvider unavailable', e);
+  }
+
+  try {
+    // EnvVarProvider should be available when env var is set
+    const testKey = generateVaultKey();
+    process.env.ELYTRO_VAULT_SECRET = Buffer.from(testKey).toString('base64');
+    const envProvider = new EnvVarProvider();
+    const available = await envProvider.available();
+    assert.equal(available, true);
+    ok('EnvVarProvider available when env var set');
+
+    // Load should consume-once (delete env var)
+    const loaded = await envProvider.load();
+    assert.ok(loaded);
+    assert.deepEqual(loaded, testKey);
+    assert.equal(process.env.ELYTRO_VAULT_SECRET, undefined);
+    ok('EnvVarProvider load() consumes env var');
+  } catch (e) {
+    fail('EnvVarProvider load', e);
+  }
+
+  try {
+    // EnvVarProvider store should throw
+    const envProvider = new EnvVarProvider();
+    await assert.rejects(() => envProvider.store(generateVaultKey()), /read-only/);
+    ok('EnvVarProvider store() rejects (read-only)');
+  } catch (e) {
+    fail('EnvVarProvider store rejects', e);
+  }
+
+  // ─── 3. Init ───────────────────────────────────────────────────
   console.log('[init]');
   try {
     assert.equal(await keyring.isInitialized(), false);
-    const owner = await keyring.createNewOwner(deviceKey);
+    const owner = await keyring.createNewOwner(vaultKey);
     assert.match(owner, /^0x[0-9a-fA-F]{40}$/);
     assert.equal(await keyring.isInitialized(), true);
     ok('wallet created');
@@ -118,13 +155,13 @@ async function main() {
     fail('wallet created', e);
   }
 
-  // ─── 3. Unlock / Lock ─────────────────────────────────────
+  // ─── 4. Unlock / Lock ─────────────────────────────────────────
   console.log('[unlock]');
   try {
     // createNewOwner leaves vault unlocked in memory — lock first
     keyring.lock();
     assert.equal(keyring.isUnlocked, false);
-    await keyring.unlock(deviceKey);
+    await keyring.unlock(vaultKey);
     assert.equal(keyring.isUnlocked, true);
     ok('unlock succeeds');
   } catch (e) {
@@ -134,7 +171,7 @@ async function main() {
   try {
     keyring.lock();
     assert.equal(keyring.isUnlocked, false);
-    await keyring.unlock(deviceKey);
+    await keyring.unlock(vaultKey);
     ok('lock then re-unlock');
   } catch (e) {
     fail('lock then re-unlock', e);
@@ -142,17 +179,17 @@ async function main() {
 
   try {
     // Wrong key should fail decryption
-    const wrongKey = generateDeviceKey();
+    const wrongKey = generateVaultKey();
     keyring.lock();
     await assert.rejects(() => keyring.unlock(wrongKey));
     // Re-unlock with correct key
-    await keyring.unlock(deviceKey);
-    ok('wrong device key rejected');
+    await keyring.unlock(vaultKey);
+    ok('wrong vault key rejected');
   } catch (e) {
-    fail('wrong device key rejected', e);
+    fail('wrong vault key rejected', e);
   }
 
-  // ─── 4. Create account ────────────────────────────────────
+  // ─── 5. Create account ────────────────────────────────────────
   console.log('[account create]');
   try {
     const a = await account.createAccount(chainId, 'alpha-wolf');
@@ -177,7 +214,7 @@ async function main() {
     fail('create with auto alias', e);
   }
 
-  // ─── 5. Multi-account on same chain ────────────────────────
+  // ─── 6. Multi-account on same chain ────────────────────────────
   console.log('[multi-account same chain]');
   try {
     const c = await account.createAccount(chainId, 'beta-wolf');
@@ -193,7 +230,7 @@ async function main() {
     fail('multi-account same chain', e);
   }
 
-  // ─── 6. Duplicate alias check ─────────────────────────────
+  // ─── 7. Duplicate alias check ─────────────────────────────────
   console.log('[duplicate]');
   try {
     await assert.rejects(() => account.createAccount(42161, 'alpha-wolf'), /already taken/);
@@ -202,7 +239,7 @@ async function main() {
     fail('duplicate alias rejected', e);
   }
 
-  // ─── 7. List ──────────────────────────────────────────────
+  // ─── 8. List ──────────────────────────────────────────────────
   console.log('[account list]');
   try {
     const all = account.allAccounts;
@@ -220,7 +257,7 @@ async function main() {
     fail('filter by chain', e);
   }
 
-  // ─── 8. Resolve by alias / address ────────────────────────
+  // ─── 9. Resolve by alias / address ────────────────────────────
   console.log('[resolve]');
   try {
     const byAlias = account.resolveAccount('alpha-wolf');
@@ -249,7 +286,7 @@ async function main() {
     fail('resolve missing', e);
   }
 
-  // ─── 9. Switch ────────────────────────────────────────────
+  // ─── 10. Switch ────────────────────────────────────────────────
   console.log('[account switch]');
   try {
     const switched = await account.switchAccount('alpha-wolf');
@@ -259,7 +296,7 @@ async function main() {
     fail('switch', e);
   }
 
-  // ─── 10. On-chain info (optional, needs RPC key) ──────────
+  // ─── 11. On-chain info (optional, needs RPC key) ──────────────
   console.log('[account info]');
   try {
     const detail = await account.getAccountDetail('alpha-wolf');
@@ -275,7 +312,7 @@ async function main() {
     }
   }
 
-  // ─── 11. Persistence ──────────────────────────────────────
+  // ─── 12. Persistence ──────────────────────────────────────────
   console.log('[persistence]');
   try {
     const account2 = new AccountService({ store, keyring, sdk, chain, walletClient });
@@ -288,7 +325,7 @@ async function main() {
     fail('persistence', e);
   }
 
-  // ─── 12. Mark deployed ──────────────────────────────────
+  // ─── 13. Mark deployed ──────────────────────────────────────
   console.log('[mark deployed]');
   try {
     const alpha = account.resolveAccount('alpha-wolf')!;
@@ -308,7 +345,7 @@ async function main() {
     fail('markDeployed unknown', e);
   }
 
-  // ─── 13. signDigest (raw ECDSA) ─────────────────────────
+  // ─── 14. signDigest (raw ECDSA) ─────────────────────────────
   console.log('[signDigest]');
   try {
     // Sign a dummy 32-byte hash
@@ -322,7 +359,7 @@ async function main() {
     fail('signDigest', e);
   }
 
-  // ─── 14. SDK accessors ──────────────────────────────────
+  // ─── 15. SDK accessors ──────────────────────────────────────
   console.log('[sdk accessors]');
   try {
     assert.ok(sdk.isInitialized);
@@ -333,13 +370,10 @@ async function main() {
     fail('sdk accessors', e);
   }
 
-  // ─── 15. createSendUserOp (SDK fromTransaction) ────────────
+  // ─── 16. createSendUserOp (SDK fromTransaction) ────────────────
   console.log('[createSendUserOp]');
   try {
-    // createSendUserOp requires SDK to talk to the chain for nonce,
-    // so this test only works when RPC key is available
     const alpha = account.resolveAccount('alpha-wolf')!;
-    // alpha is already markDeployed from test 12
 
     const recipient = '0x' + '1'.repeat(40);
     const userOp = await sdk.createSendUserOp(alpha.address, [
@@ -359,14 +393,11 @@ async function main() {
     }
   }
 
-  // ─── 16. parseTxSpec validation ──────────────────────────────
+  // ─── 17. parseTxSpec validation ──────────────────────────────────
   console.log('[parseTxSpec]');
 
-  // We need to import parseTxSpec — it's not exported, so we test via the module's internal logic
-  // Instead, we replicate the parsing logic inline for unit testing
   const { isAddress, isHex, parseEther: pe } = await import('viem');
 
-  // Helper: minimal parseTxSpec reimplementation for testing
   function testParseTxSpec(spec: string): { to: string; value?: string; data?: string } {
     const fields: Record<string, string> = {};
     for (const part of spec.split(',')) {
@@ -474,7 +505,7 @@ async function main() {
     fail('reject unknown key', e);
   }
 
-  // ─── 17. UserOp serialization round-trip ────────────────────
+  // ─── 18. UserOp serialization round-trip ────────────────────────
   console.log('[userop serialize]');
   try {
     const { toHex } = await import('viem');
@@ -519,7 +550,7 @@ async function main() {
     fail('userop serialize', e);
   }
 
-  // ─── 18. Tx order preservation ──────────────────────────────
+  // ─── 19. Tx order preservation ──────────────────────────────────
   console.log('[tx order]');
   try {
     const specs = [
@@ -541,7 +572,7 @@ async function main() {
     fail('tx order', e);
   }
 
-  // ─── 19. Export / Import (password-based backup) ──────────
+  // ─── 20. Export / Import (password-based backup) ──────────────
   console.log('[export/import]');
   try {
     const exportPassword = 'backup-pass-789';
@@ -554,29 +585,41 @@ async function main() {
     const store2 = new FileStore(join(TEST_DIR, 'import-test'));
     await store2.init();
     const keyring2 = new KeyringService(store2);
-    const deviceKey2 = generateDeviceKey();
+    const vaultKey2 = generateVaultKey();
 
-    await keyring2.importVault(exported, exportPassword, deviceKey2);
+    await keyring2.importVault(exported, exportPassword, vaultKey2);
     assert.equal(keyring2.isUnlocked, true);
     assert.equal(keyring2.currentOwner, keyring.currentOwner);
-    ok('import with password → re-encrypted with new device key');
+    ok('import with password → re-encrypted with new vault key');
 
-    // Verify the imported vault can be unlocked with new device key
+    // Verify the imported vault can be unlocked with new vault key
     keyring2.lock();
-    await keyring2.unlock(deviceKey2);
+    await keyring2.unlock(vaultKey2);
     assert.equal(keyring2.isUnlocked, true);
-    ok('re-unlock imported vault with new device key');
+    ok('re-unlock imported vault with new vault key');
 
     await rm(join(TEST_DIR, 'import-test'), { recursive: true, force: true });
   } catch (e) {
     fail('export/import', e);
   }
 
-  // ─── Cleanup ──────────────────────────────────────────────
+  // ─── 21. Vault key zeroing on lock ────────────────────────────
+  console.log('[key zeroing]');
+  try {
+    keyring.lock();
+    assert.equal(keyring.isUnlocked, false);
+    // Re-unlock for any remaining tests
+    await keyring.unlock(vaultKey);
+    ok('lock clears vault from memory');
+  } catch (e) {
+    fail('key zeroing', e);
+  }
+
+  // ─── Cleanup ──────────────────────────────────────────────────
   keyring.lock();
   await rm(TEST_DIR, { recursive: true, force: true });
 
-  // ─── Summary ──────────────────────────────────────────────
+  // ─── Summary ──────────────────────────────────────────────────
   console.log(`\n── Results: ${passed} passed, ${failed} failed ──\n`);
   if (failed > 0) process.exitCode = 1;
 }

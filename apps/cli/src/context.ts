@@ -1,6 +1,7 @@
 import { FileStore } from './storage';
 import { KeyringService, ChainService, SDKService, WalletClientService, AccountService } from './services';
-import { loadDeviceKey } from './utils/deviceKey';
+import { resolveProvider } from './providers';
+import type { SecretProvider } from './providers';
 
 /**
  * Application context — the service container.
@@ -16,16 +17,20 @@ export interface AppContext {
   sdk: SDKService;
   walletClient: WalletClientService;
   account: AccountService;
-  /** Device key loaded from disk. null if not yet initialized. */
-  deviceKey: Uint8Array | null;
+  /**
+   * The resolved provider for storing/loading the vault key.
+   * null if no provider was available at boot (init not yet run, or unsupported platform).
+   */
+  secretProvider: SecretProvider | null;
 }
 
 /**
  * Bootstrap all services and return the app context.
  * Called once at CLI startup.
  *
- * If a device key exists, the keyring is automatically unlocked.
- * Commands can assume keyring is ready when deviceKey is non-null.
+ * If a vault key can be loaded (from Keychain or env var),
+ * the keyring is automatically unlocked.
+ * Commands can check keyring.isUnlocked to verify readiness.
  */
 export async function createAppContext(): Promise<AppContext> {
   const store = new FileStore();
@@ -44,10 +49,17 @@ export async function createAppContext(): Promise<AppContext> {
   walletClient.initForChain(defaultChain);
   await sdk.initForChain(defaultChain);
 
-  // Auto-load device key and unlock keyring
-  const deviceKey = await loadDeviceKey(store.dataDir);
-  if (deviceKey && (await keyring.isInitialized())) {
-    await keyring.unlock(deviceKey);
+  // Resolve secret provider (macOS Keychain > env var > null)
+  const { loadProvider } = await resolveProvider();
+
+  // Auto-load vault key and unlock keyring
+  if (loadProvider && (await keyring.isInitialized())) {
+    const vaultKey = await loadProvider.load();
+    if (vaultKey) {
+      await keyring.unlock(vaultKey);
+      // Zero-fill the key buffer after use
+      vaultKey.fill(0);
+    }
   }
 
   const account = new AccountService({
@@ -73,5 +85,5 @@ export async function createAppContext(): Promise<AppContext> {
     }
   }
 
-  return { store, keyring, chain, sdk, walletClient, account, deviceKey };
+  return { store, keyring, chain, sdk, walletClient, account, secretProvider: loadProvider };
 }
