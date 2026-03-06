@@ -211,6 +211,20 @@ export class AccountService {
     return imported;
   }
 
+  // ─── Recovery State ─────────────────────────────────────────────
+
+  /**
+   * Update the recovery-enabled flag for an account.
+   * Called by RecoveryService after recovery setup or completion.
+   */
+  async updateAccountRecoveryState(address: Address, isRecoveryEnabled: boolean): Promise<void> {
+    const account = this.state.accounts.find((a) => a.address.toLowerCase() === address.toLowerCase());
+    if (account) {
+      account.isRecoveryEnabled = isRecoveryEnabled;
+      await this.persist();
+    }
+  }
+
   // ─── Internal ───────────────────────────────────────────────────
 
   /**

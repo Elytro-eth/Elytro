@@ -1,7 +1,24 @@
 import type { Address, Hex } from 'viem';
-import { padHex, createPublicClient, http, toHex, parseEther } from 'viem';
-import type { ChainConfig, ElytroUserOperation } from '../types';
-import { ElytroWallet, Bundler, type UserOperation } from '@elytro/sdk';
+import {
+  padHex,
+  createPublicClient,
+  http,
+  toHex,
+  parseEther,
+  stringToHex,
+  keccak256,
+  hashTypedData,
+  encodeFunctionData,
+  encodeAbiParameters,
+  decodeAbiParameters,
+  parseAbiParameters,
+  parseAbiItem,
+  zeroHash,
+} from 'viem';
+import type { ChainConfig, ElytroUserOperation, RecoveryInfo, TRecoveryContactsInfo } from '../types';
+import { RecoveryStatusEn } from '../types';
+import { ElytroWallet, Bundler, SocialRecovery, type UserOperation, type GuardianSignature } from '@elytro/sdk';
+import { ABI_SocialRecoveryModule, ABI_ElytroInfoRecorder, ABI_Elytro } from '@elytro/abi';
 
 /**
  * SDKService — @elytro/sdk wrapper for ERC-4337 operations.
@@ -28,14 +45,16 @@ const ENTRYPOINT_CONFIGS: Record<string, SDKContractConfig> = {
     recovery: '0x36693563E41BcBdC8d295bD3C2608eb7c32b1cCb',
     validator: '0x162485941bA1FAF21013656DAB1E60e9D7226DC0',
     elytroWalletLogic: '0x186b91aE45dd22dEF329BF6b4233cf910E157C84',
+    infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
   },
   'v0.8': {
-    entryPoint: '0x4337084d9e255ff0702461cf8895ce9e3b5ff108',
+    entryPoint: '0x4337084D9E255Ff0702461CF8895CE9E3b5Ff108',
     factory: '0x82a8B1a5986f565a1546672e8939daA1b20F441E',
     fallback: '0xB73Ec2FD0189202F6C22067Eeb19EAad25CAB551',
-    recovery: '0xAFEF5D8Fb7b4650B1724a23e40633f720813c731',
+    recovery: '0xAFEF5D8Fb7B4650B1724a23e40633f720813c731',
     validator: '0xea50a2874df3eEC9E0365425ba948989cd63FED6',
     elytroWalletLogic: '0x2CC8A41e26dAC15F1D11F333f74D0451be6caE36',
+    infoRecorder: '0xB21689a23048D39c72EFE96c320F46151f18b22F',
   },
 };
 
@@ -55,6 +74,7 @@ interface SDKContractConfig {
   recovery: string;
   validator: string;
   elytroWalletLogic: string;
+  infoRecorder: string;
 }
 
 export class SDKService {
@@ -475,6 +495,311 @@ export class SDKService {
   /** Expose the raw SDK instance for advanced operations. */
   get raw(): ElytroWallet {
     return this.ensureSDK();
+  }
+
+  // ─── Phase 3: Social Recovery ────────────────────────────────────
+
+  /** Guardian info recording category key. */
+  private get guardianInfoKey(): Hex {
+    return keccak256(stringToHex('GUARDIAN_INFO')) as Hex;
+  }
+
+  /** Expose recovery module address. */
+  get recoveryModuleAddress(): Address {
+    return this.contractConfig.recovery as Address;
+  }
+
+  /** Expose info recorder address. */
+  get infoRecorderAddress(): Address {
+    return this.contractConfig.infoRecorder as Address;
+  }
+
+  /**
+   * Calculate guardian hash from contacts + threshold.
+   * Uses the SDK's SocialRecovery.calcGuardianHash with zero salt.
+   */
+  calculateRecoveryContactsHash(contacts: string[], threshold: number): string {
+    return SocialRecovery.calcGuardianHash(contacts, threshold, zeroHash);
+  }
+
+  /**
+   * Query recovery info from on-chain SocialRecoveryModule.
+   * Returns the guardian hash, nonce, and delay period.
+   */
+  async getRecoveryInfo(address: Address): Promise<RecoveryInfo | null> {
+    const client = this.getPublicClient();
+
+    try {
+      const result = (await client.readContract({
+        address: this.contractConfig.recovery as Address,
+        abi: ABI_SocialRecoveryModule,
+        functionName: 'getSocialRecoveryInfo',
+        args: [address],
+      })) as [string, bigint, bigint];
+
+      return {
+        contactsHash: result[0],
+        nonce: result[1],
+        delayPeriod: result[2],
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Get the current recovery nonce for a wallet.
+   */
+  async getRecoveryNonce(address: Address): Promise<number> {
+    const client = this.getPublicClient();
+
+    const result = (await client.readContract({
+      address: this.contractConfig.recovery as Address,
+      abi: ABI_SocialRecoveryModule,
+      functionName: 'walletNonce',
+      args: [address],
+    })) as bigint;
+
+    return Number(result);
+  }
+
+  /**
+   * Query recovery contacts from on-chain ElytroInfoRecorder (public mode only).
+   * Returns null if no guardian info is recorded.
+   */
+  async queryRecoveryContacts(address: Address): Promise<TRecoveryContactsInfo | null> {
+    const client = this.getPublicClient();
+    const infoRecorder = this.contractConfig.infoRecorder as Address;
+    const guardianKey = keccak256(stringToHex('GUARDIAN_INFO'));
+
+    try {
+      // Get latest record block
+      const latestBlock = (await client.readContract({
+        address: infoRecorder,
+        abi: ABI_ElytroInfoRecorder,
+        functionName: 'latestRecordAt',
+        args: [address, guardianKey],
+      })) as bigint;
+
+      if (latestBlock === 0n) {
+        return null;
+      }
+
+      // Query DataRecorded events in a narrow window around the latest block
+      const fromBlock = latestBlock > 10n ? latestBlock - 10n : 0n;
+
+      const logs = await client.getLogs({
+        address: infoRecorder,
+        event: parseAbiItem('event DataRecorded(address indexed wallet, bytes32 indexed category, bytes data)'),
+        args: {
+          wallet: address,
+          category: guardianKey,
+        },
+        fromBlock,
+        toBlock: latestBlock + 10n,
+      });
+
+      if (logs.length === 0) {
+        return null;
+      }
+
+      // Decode the latest log entry: (address[] contacts, uint256 threshold, bytes32 salt)
+      const latestLog = logs[logs.length - 1];
+      const [contacts, threshold, salt] = decodeAbiParameters(
+        parseAbiParameters(['address[]', 'uint256', 'bytes32']),
+        latestLog.data as Hex
+      );
+
+      return {
+        contacts: contacts as string[],
+        threshold: Number(threshold),
+        salt: salt as string,
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Generate the EIP-712 approval hash for recovery.
+   * Guardians sign this hash to authorize the recovery.
+   */
+  async generateRecoveryApproveHash(walletAddress: Address, nonce: number, newOwners: string[]): Promise<string> {
+    const chainConfig = this.ensureChainConfig();
+    const typedData = SocialRecovery.getSocialRecoveryTypedData(
+      chainConfig.id,
+      this.contractConfig.recovery,
+      walletAddress,
+      nonce,
+      newOwners
+    );
+
+    const domain = {
+      chainId: Number(typedData.domain.chainId),
+      ...(typedData.domain.name && { name: typedData.domain.name }),
+      verifyingContract: typedData.domain.verifyingContract as Address,
+      ...(typedData.domain.version && { version: typedData.domain.version }),
+    };
+
+    const hash = hashTypedData({
+      domain,
+      types: typedData.types as Record<string, Array<{ name: string; type: string }>>,
+      primaryType: typedData.primaryType,
+      message: typedData.message,
+    });
+
+    return hash.toLowerCase();
+  }
+
+  /**
+   * Compute the on-chain recovery ID (deterministic keccak256).
+   * Used to query operation state.
+   */
+  async getRecoveryOnchainID(walletAddress: Address, nonce: number, newOwners: string[]): Promise<string> {
+    const chainConfig = this.ensureChainConfig();
+
+    // Encode new owners as bytes32 array
+    const ownersData = encodeAbiParameters(parseAbiParameters(['bytes32[]']), [
+      newOwners.map((owner) => padHex(owner as Hex, { size: 32 })),
+    ]);
+
+    // Hash the packed recovery parameters
+    const id = keccak256(
+      encodeAbiParameters(parseAbiParameters(['address', 'uint256', 'bytes', 'address', 'uint256']), [
+        walletAddress,
+        BigInt(nonce),
+        ownersData,
+        this.contractConfig.recovery as Address,
+        BigInt(chainConfig.id),
+      ])
+    );
+
+    return id;
+  }
+
+  /**
+   * Check if a guardian has signed the approval hash on-chain.
+   * Scans ApproveHash events from the recovery module.
+   */
+  async checkIsGuardianSigned(guardianAddress: Address, fromBlock: bigint, approvalHash?: string): Promise<boolean> {
+    const client = this.getPublicClient();
+
+    try {
+      const logs = await client.getLogs({
+        address: this.contractConfig.recovery as Address,
+        event: parseAbiItem('event ApproveHash(address indexed guardian, bytes32 indexed hash)'),
+        args: { guardian: guardianAddress },
+        fromBlock,
+      });
+
+      if (approvalHash) {
+        return logs.some((log) => (log.args as Record<string, unknown>)?.hash === approvalHash);
+      }
+
+      return logs.length > 0;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Check on-chain recovery operation state.
+   */
+  async checkOnchainRecoveryStatus(walletAddress: Address, recoveryID: string): Promise<RecoveryStatusEn> {
+    const client = this.getPublicClient();
+
+    const status = (await client.readContract({
+      address: this.contractConfig.recovery as Address,
+      abi: ABI_SocialRecoveryModule,
+      functionName: 'getOperationState',
+      args: [walletAddress, recoveryID],
+    })) as number;
+
+    return Number(status) as RecoveryStatusEn;
+  }
+
+  /**
+   * Generate transaction to record guardian info on-chain (public mode).
+   * Records contacts, threshold, and salt in ElytroInfoRecorder.
+   */
+  generateRecoveryInfoRecordTx(contacts: string[], threshold: number): { to: string; data: string; value: string } {
+    const guardianKey = keccak256(stringToHex('GUARDIAN_INFO'));
+
+    // Encode guardian data: (address[] contacts, uint256 threshold, bytes32 salt)
+    const guardianData = encodeAbiParameters(parseAbiParameters(['address[]', 'uint256', 'bytes32']), [
+      contacts as Address[],
+      BigInt(threshold),
+      zeroHash,
+    ]);
+
+    const callData = encodeFunctionData({
+      abi: ABI_ElytroInfoRecorder,
+      functionName: 'recordData',
+      args: [guardianKey, guardianData],
+    });
+
+    return {
+      to: this.contractConfig.infoRecorder,
+      data: callData,
+      value: '0',
+    };
+  }
+
+  /**
+   * Generate transaction to set guardian hash on SocialRecoveryModule.
+   */
+  generateRecoveryContactsSettingTx(newHash: string): { to: string; data: string; value: string } {
+    const callData = encodeFunctionData({
+      abi: ABI_SocialRecoveryModule,
+      functionName: 'setGuardian',
+      args: [newHash],
+    });
+
+    return {
+      to: this.contractConfig.recovery,
+      data: callData,
+      value: '0',
+    };
+  }
+
+  /**
+   * Pack guardian signatures for submitting recovery on-chain.
+   */
+  packGuardianSignatures(signatures: GuardianSignature[]): string {
+    return SocialRecovery.packGuardianSignature(signatures);
+  }
+
+  /**
+   * Check if an EOA is the owner of a smart account on-chain.
+   * Calls `isOwner(bytes32)` on the wallet contract.
+   */
+  async isOwnerOf(walletAddress: Address, eoaAddress: Address): Promise<boolean> {
+    const client = this.getPublicClient();
+    const ownerKey = padHex(eoaAddress, { size: 32 });
+    const result = await client.readContract({
+      address: walletAddress,
+      abi: ABI_Elytro,
+      functionName: 'isOwner',
+      args: [ownerKey],
+    });
+    return result as boolean;
+  }
+
+  /**
+   * Get a viem PublicClient for on-chain reads.
+   */
+  private getPublicClient() {
+    const chainConfig = this.ensureChainConfig();
+    return createPublicClient({
+      transport: http(chainConfig.endpoint),
+    });
+  }
+
+  private ensureChainConfig(): ChainConfig {
+    if (!this.chainConfig) {
+      throw new Error('Chain config not set. Call initForChain() first.');
+    }
+    return this.chainConfig;
   }
 
   // ─── Internal ──────────────────────────────────────────────────

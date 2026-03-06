@@ -5,7 +5,7 @@ import type { AppContext } from '../context';
 import { askSelect } from '../utils/prompt';
 import { registerAccount, requestSponsorship, applySponsorToUserOp } from '../utils/sponsor';
 import * as display from '../utils/display';
-import { sanitizeErrorMessage } from '../utils/display';
+import { outputSuccess, outputError, ErrorCode, handleError, isJsonMode } from '../utils/output';
 
 /**
  * `elytro account` — Smart account management.
@@ -35,20 +35,18 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
     .option('-a, --alias <alias>', 'Human-readable alias (default: random)')
     .action(async (opts) => {
       if (!ctx.keyring.isUnlocked) {
-        display.error('Wallet not initialized. Run `elytro init` first.');
-        process.exitCode = 1;
+        outputError(ErrorCode.ACCOUNT_NOT_READY, 'Wallet not initialized. Run `elytro init` first.');
         return;
       }
 
       const chainId = Number(opts.chain);
 
       if (Number.isNaN(chainId)) {
-        display.error('Invalid chain ID.');
-        process.exitCode = 1;
+        outputError(ErrorCode.INVALID_PARAMS, 'Invalid chain ID.', { chain: opts.chain });
         return;
       }
 
-      const spinner = ora('Creating smart account...').start();
+      const spinner = isJsonMode() ? null : ora('Creating smart account...').start();
       try {
         // Initialize SDK for the target chain before address calculation
         const chainConfig = ctx.chain.chains.find((c) => c.id === chainId);
@@ -61,8 +59,7 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
         const accountInfo = await ctx.account.createAccount(chainId, opts.alias);
 
         // Register with Elytro backend (required for sponsorship)
-        // Extension does this in sdk.ts calcWalletAddress (line 175)
-        spinner.text = 'Registering with backend...';
+        if (spinner) spinner.text = 'Registering with backend...';
         const { guardianHash, guardianSafePeriod } = ctx.sdk.initDefaults;
         const paddedKey = padHex(accountInfo.owner, { size: 32 });
         const { error: regError } = await registerAccount(
@@ -75,20 +72,31 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
           guardianSafePeriod
         );
 
-        spinner.succeed(`Account "${accountInfo.alias}" created.`);
-        console.log('');
-        display.info('Alias', accountInfo.alias);
-        display.info('Address', accountInfo.address);
-        display.info('Chain', `${chainName} (${chainId})`);
-        display.info('Status', 'Not deployed (run `elytro account activate` to deploy)');
+        if (spinner) spinner.succeed(`Account "${accountInfo.alias}" created.`);
+
+        const result: Record<string, unknown> = {
+          alias: accountInfo.alias,
+          address: accountInfo.address,
+          chainId,
+          chainName,
+          deployed: false,
+        };
+
         if (regError) {
-          display.warn(`Backend registration failed: ${regError}`);
-          display.warn('Sponsorship may not work. You can still activate with ETH.');
+          result.backendRegistration = 'failed';
+          result.backendError = regError;
+          if (!isJsonMode()) {
+            display.warn(`Backend registration failed: ${regError}`);
+            display.warn('Sponsorship may not work. You can still activate with ETH.');
+          }
+        } else {
+          result.backendRegistration = 'ok';
         }
+
+        outputSuccess(result);
       } catch (err) {
-        spinner.fail('Failed to create account.');
-        display.error(sanitizeErrorMessage((err as Error).message));
-        process.exitCode = 1;
+        if (spinner) spinner.fail('Failed to create account.');
+        handleError(err);
       }
     });
 
@@ -101,28 +109,33 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
     .option('--no-sponsor', 'Skip sponsorship check (user pays gas)')
     .action(async (target?: string, opts?: { sponsor?: boolean }) => {
       if (!ctx.keyring.isUnlocked) {
-        display.error('Wallet not initialized. Run `elytro init` first.');
-        process.exitCode = 1;
+        outputError(ErrorCode.ACCOUNT_NOT_READY, 'Wallet not initialized. Run `elytro init` first.');
         return;
       }
 
       // 1. Resolve account
       const identifier = target ?? ctx.account.currentAccount?.alias ?? ctx.account.currentAccount?.address;
       if (!identifier) {
-        display.warn('No account selected. Specify an alias/address or create an account first.');
+        outputError(ErrorCode.ACCOUNT_NOT_READY, 'No account selected.', {
+          hint: 'Specify an alias/address or create an account first.',
+        });
         return;
       }
 
       const accountInfo = ctx.account.resolveAccount(identifier);
       if (!accountInfo) {
-        display.error(`Account "${identifier}" not found.`);
-        process.exitCode = 1;
+        outputError(ErrorCode.ACCOUNT_NOT_READY, `Account "${identifier}" not found.`, { identifier });
         return;
       }
 
       // 2. Check if already deployed
       if (accountInfo.isDeployed) {
-        display.warn(`Account "${accountInfo.alias}" is already deployed.`);
+        outputSuccess({
+          status: 'already_deployed',
+          alias: accountInfo.alias,
+          address: accountInfo.address,
+          chainId: accountInfo.chainId,
+        });
         return;
       }
 
@@ -130,8 +143,9 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
       const chainName = chainConfig?.name ?? String(accountInfo.chainId);
 
       if (!chainConfig) {
-        display.error(`Chain ${accountInfo.chainId} not configured.`);
-        process.exitCode = 1;
+        outputError(ErrorCode.ACCOUNT_NOT_READY, `Chain ${accountInfo.chainId} not configured.`, {
+          chainId: accountInfo.chainId,
+        });
         return;
       }
 
@@ -139,31 +153,30 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
       await ctx.sdk.initForChain(chainConfig);
       ctx.walletClient.initForChain(chainConfig);
 
-      const spinner = ora(`Activating "${accountInfo.alias}" on ${chainName}...`).start();
+      const spinner = isJsonMode() ? null : ora(`Activating "${accountInfo.alias}" on ${chainName}...`).start();
 
       try {
         // 3. Create unsigned deploy UserOp
-        spinner.text = 'Building deployment UserOp...';
+        if (spinner) spinner.text = 'Building deployment UserOp...';
         const userOp = await ctx.sdk.createDeployUserOp(accountInfo.owner, accountInfo.index);
 
         // 4. Get fee data from Pimlico bundler
-        spinner.text = 'Fetching gas prices...';
+        if (spinner) spinner.text = 'Fetching gas prices...';
         const feeData = await ctx.sdk.getFeeData(chainConfig);
         userOp.maxFeePerGas = feeData.maxFeePerGas;
         userOp.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
 
         // 5. Estimate gas (with fakeBalance to prevent AA21 on undeployed accounts)
-        spinner.text = 'Estimating gas...';
+        if (spinner) spinner.text = 'Estimating gas...';
         const gasEstimate = await ctx.sdk.estimateUserOp(userOp, { fakeBalance: true });
         userOp.callGasLimit = gasEstimate.callGasLimit;
         userOp.verificationGasLimit = gasEstimate.verificationGasLimit;
         userOp.preVerificationGas = gasEstimate.preVerificationGas;
 
         // 6. Try sponsorship (unless --no-sponsor)
-        // Extension flow: estimate (with fake balance) → sponsor → sign
         let sponsored = false;
         if (opts?.sponsor !== false) {
-          spinner.text = 'Checking sponsorship...';
+          if (spinner) spinner.text = 'Checking sponsorship...';
           const { sponsor: sponsorResult, error: sponsorError } = await requestSponsorship(
             ctx.chain.graphqlEndpoint,
             accountInfo.chainId,
@@ -176,24 +189,25 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
             sponsored = true;
           } else {
             // Sponsor failed — check if account has funds to self-pay
-            spinner.text = 'Sponsorship unavailable, checking balance...';
+            if (spinner) spinner.text = 'Sponsorship unavailable, checking balance...';
             const { ether: balance } = await ctx.walletClient.getBalance(accountInfo.address);
             if (parseFloat(balance) === 0) {
-              spinner.fail('Activation failed.');
-              display.error(`Sponsorship failed: ${sponsorError ?? 'unknown reason'}`);
-              display.error(
-                `Account has no ETH to pay gas. Fund ${accountInfo.address} on ${chainName}, or fix sponsorship.`
-              );
-              process.exitCode = 1;
+              if (spinner) spinner.fail('Activation failed.');
+              outputError(ErrorCode.SPONSOR_FAILED, 'Sponsorship failed and account has no ETH to pay gas.', {
+                reason: sponsorError ?? 'unknown',
+                account: accountInfo.address,
+                chain: chainName,
+                hint: `Fund ${accountInfo.address} on ${chainName}, or fix sponsorship.`,
+              });
               return;
             }
             // Account has funds — proceed without sponsor
-            spinner.text = 'Proceeding without sponsor (user pays gas)...';
+            if (spinner) spinner.text = 'Proceeding without sponsor (user pays gas)...';
           }
         }
 
         // 7. Compute hash and sign
-        spinner.text = 'Signing UserOperation...';
+        if (spinner) spinner.text = 'Signing UserOperation...';
         const { packedHash, validationData } = await ctx.sdk.getUserOpHash(userOp);
 
         // Raw ECDSA sign (no EIP-191 prefix)
@@ -203,37 +217,42 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
         userOp.signature = await ctx.sdk.packUserOpSignature(rawSignature, validationData);
 
         // 8. Send to bundler
-        spinner.text = 'Sending to bundler...';
+        if (spinner) spinner.text = 'Sending to bundler...';
         const opHash = await ctx.sdk.sendUserOp(userOp);
 
         // 9. Wait for receipt
-        spinner.text = 'Waiting for on-chain confirmation...';
+        if (spinner) spinner.text = 'Waiting for on-chain confirmation...';
         const receipt = await ctx.sdk.waitForReceipt(opHash);
 
         // 10. Update local state
         await ctx.account.markDeployed(accountInfo.address, accountInfo.chainId);
 
         if (receipt.success) {
-          spinner.succeed(`Account "${accountInfo.alias}" activated!`);
+          if (spinner) spinner.succeed(`Account "${accountInfo.alias}" activated!`);
         } else {
-          spinner.warn(`UserOp included but execution reverted.`);
+          if (spinner) spinner.warn(`UserOp included but execution reverted.`);
         }
 
-        console.log('');
-        display.info('Account', accountInfo.alias);
-        display.info('Address', accountInfo.address);
-        display.info('Chain', `${chainName} (${accountInfo.chainId})`);
-        display.info('Tx Hash', receipt.transactionHash);
-        display.info('Gas Cost', `${formatEther(BigInt(receipt.actualGasCost))} ETH`);
-        display.info('Sponsored', sponsored ? 'Yes (gasless)' : 'No (user paid)');
+        outputSuccess({
+          status: receipt.success ? 'activated' : 'reverted',
+          alias: accountInfo.alias,
+          address: accountInfo.address,
+          chainId: accountInfo.chainId,
+          chainName,
+          txHash: receipt.transactionHash,
+          gasCost: `${formatEther(BigInt(receipt.actualGasCost))} ETH`,
+          sponsored,
+          ...(chainConfig.blockExplorer
+            ? { explorerUrl: `${chainConfig.blockExplorer}/tx/${receipt.transactionHash}` }
+            : {}),
+        });
 
-        if (chainConfig.blockExplorer) {
-          display.info('Explorer', `${chainConfig.blockExplorer}/tx/${receipt.transactionHash}`);
+        if (!receipt.success) {
+          process.exitCode = 1;
         }
       } catch (err) {
-        spinner.fail('Activation failed.');
-        display.error(sanitizeErrorMessage((err as Error).message));
-        process.exitCode = 1;
+        if (spinner) spinner.fail('Activation failed.');
+        handleError(err);
       }
     });
 
@@ -251,42 +270,59 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
       if (target) {
         const matched = ctx.account.resolveAccount(target);
         if (!matched) {
-          display.error(`Account "${target}" not found.`);
-          process.exitCode = 1;
+          outputError(ErrorCode.ACCOUNT_NOT_READY, `Account "${target}" not found.`, { identifier: target });
           return;
         }
         accounts = [matched];
       }
 
       if (accounts.length === 0) {
-        display.warn('No accounts found. Run `elytro account create --chain <chainId>` first.');
+        outputSuccess({
+          accounts: [],
+          hint: 'Run `elytro account create --chain <chainId>` first.',
+        });
         return;
       }
 
       const current = ctx.account.currentAccount;
 
-      display.heading('Accounts');
-      display.table(
-        accounts.map((a) => {
-          const chainConfig = ctx.chain.chains.find((c) => c.id === a.chainId);
-          return {
-            active: a.address === current?.address ? '→' : ' ',
+      const accountList = accounts.map((a) => {
+        const chainConfig = ctx.chain.chains.find((c) => c.id === a.chainId);
+        return {
+          active: a.address === current?.address,
+          alias: a.alias,
+          address: a.address,
+          chainId: a.chainId,
+          chainName: chainConfig?.name ?? String(a.chainId),
+          deployed: a.isDeployed,
+          recoveryEnabled: a.isRecoveryEnabled,
+        };
+      });
+
+      // Human-readable table in non-JSON mode
+      if (!isJsonMode()) {
+        display.heading('Accounts');
+        display.table(
+          accountList.map((a) => ({
+            active: a.active ? '→' : ' ',
             alias: a.alias,
             address: a.address,
-            chain: chainConfig?.name ?? String(a.chainId),
-            deployed: a.isDeployed ? 'Yes' : 'No',
-            recovery: a.isRecoveryEnabled ? 'Yes' : 'No',
-          };
-        }),
-        [
-          { key: 'active', label: '', width: 3 },
-          { key: 'alias', label: 'Alias', width: 16 },
-          { key: 'address', label: 'Address', width: 44 },
-          { key: 'chain', label: 'Chain', width: 18 },
-          { key: 'deployed', label: 'Deployed', width: 10 },
-          { key: 'recovery', label: 'Recovery', width: 10 },
-        ]
-      );
+            chain: a.chainName,
+            deployed: a.deployed ? 'Yes' : 'No',
+            recovery: a.recoveryEnabled ? 'Yes' : 'No',
+          })),
+          [
+            { key: 'active', label: '', width: 3 },
+            { key: 'alias', label: 'Alias', width: 16 },
+            { key: 'address', label: 'Address', width: 44 },
+            { key: 'chain', label: 'Chain', width: 18 },
+            { key: 'deployed', label: 'Deployed', width: 10 },
+            { key: 'recovery', label: 'Recovery', width: 10 },
+          ]
+        );
+      }
+
+      outputSuccess({ accounts: accountList });
     });
 
   // ─── info ─────────────────────────────────────────────────────
@@ -299,18 +335,19 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
       const identifier = target ?? ctx.account.currentAccount?.alias ?? ctx.account.currentAccount?.address;
 
       if (!identifier) {
-        display.warn('No account selected. Run `elytro account create --chain <chainId>` first.');
+        outputError(ErrorCode.ACCOUNT_NOT_READY, 'No account selected.', {
+          hint: 'Run `elytro account create --chain <chainId>` first.',
+        });
         return;
       }
 
-      const spinner = ora('Fetching on-chain data...').start();
+      const spinner = isJsonMode() ? null : ora('Fetching on-chain data...').start();
       try {
         // Resolve account first to get its chainId, then init walletClient for that chain
         const accountInfo = ctx.account.resolveAccount(identifier);
         if (!accountInfo) {
-          spinner.fail('Account not found.');
-          display.error(`Account "${identifier}" not found.`);
-          process.exitCode = 1;
+          if (spinner) spinner.fail('Account not found.');
+          outputError(ErrorCode.ACCOUNT_NOT_READY, `Account "${identifier}" not found.`, { identifier });
           return;
         }
         const chainConfig = ctx.chain.chains.find((c) => c.id === accountInfo.chainId);
@@ -319,23 +356,24 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
         }
 
         const detail = await ctx.account.getAccountDetail(identifier);
-        spinner.stop();
+        if (spinner) spinner.stop();
 
-        display.heading('Account Details');
-        display.info('Alias', detail.alias);
-        display.info('Address', detail.address);
-        display.info('Chain', chainConfig?.name ?? String(detail.chainId));
-        display.info('Deployed', detail.isDeployed ? 'Yes' : 'No');
-        display.info('Balance', `${detail.balance} ${chainConfig?.nativeCurrency.symbol ?? 'ETH'}`);
-        display.info('Recovery', detail.isRecoveryEnabled ? 'Enabled' : 'Not set');
-
-        if (chainConfig?.blockExplorer) {
-          display.info('Explorer', `${chainConfig.blockExplorer}/address/${detail.address}`);
-        }
+        outputSuccess({
+          alias: detail.alias,
+          address: detail.address,
+          chainId: detail.chainId,
+          chainName: chainConfig?.name ?? String(detail.chainId),
+          deployed: detail.isDeployed,
+          balance: detail.balance,
+          balanceSymbol: chainConfig?.nativeCurrency.symbol ?? 'ETH',
+          recoveryEnabled: detail.isRecoveryEnabled,
+          ...(chainConfig?.blockExplorer
+            ? { explorerUrl: `${chainConfig.blockExplorer}/address/${detail.address}` }
+            : {}),
+        });
       } catch (err) {
-        spinner.fail('Failed to fetch account info.');
-        display.error(sanitizeErrorMessage((err as Error).message));
-        process.exitCode = 1;
+        if (spinner) spinner.fail('Failed to fetch account info.');
+        handleError(err);
       }
     });
 
@@ -348,14 +386,21 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
     .action(async (target?: string) => {
       const accounts = ctx.account.allAccounts;
       if (accounts.length === 0) {
-        display.warn('No accounts found.');
+        outputError(ErrorCode.ACCOUNT_NOT_READY, 'No accounts found.', {
+          hint: 'Run `elytro account create --chain <chainId>` first.',
+        });
         return;
       }
 
       let identifier = target;
 
-      // Interactive selection if no target given
+      // Interactive selection if no target given (only in human mode)
       if (!identifier) {
+        if (isJsonMode()) {
+          outputError(ErrorCode.INVALID_PARAMS, 'Account alias or address is required in JSON mode.');
+          return;
+        }
+
         const chainConfig = (chainId: number) => ctx.chain.chains.find((c) => c.id === chainId);
 
         identifier = await askSelect(
@@ -377,30 +422,29 @@ export function registerAccountCommand(program: Command, ctx: AppContext): void 
           await ctx.sdk.initForChain(newChain);
         }
 
-        display.success(`Switched to "${switched.alias}"`);
-
-        // Show account info after switch
-        const spinner = ora('Fetching on-chain data...').start();
+        // Try to get balance info
+        let balance: string | undefined;
+        let balanceSymbol: string | undefined;
         try {
           const detail = await ctx.account.getAccountDetail(switched.alias);
-          spinner.stop();
-
-          console.log('');
-          display.info('Address', detail.address);
-          display.info('Chain', newChain?.name ?? String(detail.chainId));
-          display.info('Deployed', detail.isDeployed ? 'Yes' : 'No');
-          display.info('Balance', `${detail.balance} ${newChain?.nativeCurrency.symbol ?? 'ETH'}`);
-          if (newChain?.blockExplorer) {
-            display.info('Explorer', `${newChain.blockExplorer}/address/${detail.address}`);
-          }
+          balance = detail.balance;
+          balanceSymbol = newChain?.nativeCurrency.symbol ?? 'ETH';
         } catch {
-          spinner.stop();
           // Non-fatal: switch succeeded, just couldn't fetch on-chain data
-          display.warn('Could not fetch on-chain data. Run `elytro account info` to retry.');
         }
+
+        outputSuccess({
+          status: 'switched',
+          alias: switched.alias,
+          address: switched.address,
+          chainId: switched.chainId,
+          chainName: newChain?.name ?? String(switched.chainId),
+          deployed: switched.isDeployed,
+          ...(balance !== undefined ? { balance, balanceSymbol } : {}),
+          ...(newChain?.blockExplorer ? { explorerUrl: `${newChain.blockExplorer}/address/${switched.address}` } : {}),
+        });
       } catch (err) {
-        display.error(sanitizeErrorMessage((err as Error).message));
-        process.exitCode = 1;
+        handleError(err);
       }
     });
 }

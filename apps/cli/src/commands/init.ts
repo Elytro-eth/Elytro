@@ -4,7 +4,7 @@ import ora from 'ora';
 import type { AppContext } from '../context';
 import { resolveProvider } from '../providers';
 import * as display from '../utils/display';
-import { sanitizeErrorMessage } from '../utils/display';
+import { outputSuccess, outputError, ErrorCode, isJsonMode } from '../utils/output';
 
 /**
  * `elytro init` — Initialize a new wallet.
@@ -23,15 +23,17 @@ export function registerInitCommand(program: Command, ctx: AppContext): void {
     .description('Initialize a new Elytro wallet')
     .action(async () => {
       if (await ctx.keyring.isInitialized()) {
-        display.warn('Wallet already initialized.');
-        display.info('Data', ctx.store.dataDir);
-        display.info('Hint', 'Use `elytro account create` to create a smart account.');
+        outputSuccess({
+          status: 'already_initialized',
+          dataDir: ctx.store.dataDir,
+          hint: 'Use `elytro account create` to create a smart account.',
+        });
         return;
       }
 
-      display.heading('Initialize Elytro Wallet');
+      if (!isJsonMode()) display.heading('Initialize Elytro Wallet');
 
-      const spinner = ora('Setting up wallet...').start();
+      const spinner = isJsonMode() ? null : ora('Setting up wallet...').start();
       try {
         // 1. Generate a cryptographically secure 256-bit vault key
         const vaultKey = webcrypto.getRandomValues(new Uint8Array(32));
@@ -39,22 +41,31 @@ export function registerInitCommand(program: Command, ctx: AppContext): void {
         // 2. Resolve the init provider (persistent storage)
         const { initProvider } = await resolveProvider();
 
+        let secretProviderName: string;
+        let manualSecret: string | null = null;
+
         if (initProvider) {
           // Persistent provider available (e.g. macOS Keychain)
           await initProvider.store(vaultKey);
-          spinner.text = `Vault key stored in ${initProvider.name}.`;
+          if (spinner) spinner.text = `Vault key stored in ${initProvider.name}.`;
+          secretProviderName = initProvider.name;
         } else {
           // No persistent provider — display secret for manual storage
-          spinner.stop();
+          if (spinner) spinner.stop();
           const b64 = Buffer.from(vaultKey).toString('base64');
-          console.log('');
-          display.warn('No persistent secret provider available (not on macOS).');
-          display.warn('Save the following vault secret — it will NOT be shown again:');
-          console.log('');
-          console.log(`  ELYTRO_VAULT_SECRET="${b64}"`);
-          console.log('');
-          display.info('Hint', 'Set this environment variable before running any elytro command.');
-          spinner.start('Creating wallet...');
+          manualSecret = b64;
+          secretProviderName = 'manual';
+
+          if (!isJsonMode()) {
+            console.log('');
+            display.warn('No persistent secret provider available (not on macOS).');
+            display.warn('Save the following vault secret — it will NOT be shown again:');
+            console.log('');
+            console.log(`  ELYTRO_VAULT_SECRET="${b64}"`);
+            console.log('');
+            display.info('Hint', 'Set this environment variable before running any elytro command.');
+          }
+          if (spinner) spinner.start('Creating wallet...');
         }
 
         // 3. Create the encrypted vault with the new key
@@ -63,19 +74,18 @@ export function registerInitCommand(program: Command, ctx: AppContext): void {
         // Zero-fill the key buffer after use
         vaultKey.fill(0);
 
-        spinner.succeed('Wallet initialized.');
+        if (spinner) spinner.succeed('Wallet initialized.');
 
-        console.log('');
-        display.info('Data', ctx.store.dataDir);
-        if (initProvider) {
-          display.info('Secret Provider', initProvider.name);
-        }
-        console.log('');
-        display.success('Run `elytro account create --chain <chainId>` to create your first smart account.');
+        outputSuccess({
+          status: 'initialized',
+          dataDir: ctx.store.dataDir,
+          secretProvider: secretProviderName,
+          ...(manualSecret ? { vaultSecret: manualSecret } : {}),
+          hint: 'Run `elytro account create --chain <chainId>` to create your first smart account.',
+        });
       } catch (err) {
-        spinner.fail('Failed to initialize wallet.');
-        display.error(sanitizeErrorMessage((err as Error).message));
-        process.exitCode = 1;
+        if (spinner) spinner.fail('Failed to initialize wallet.');
+        outputError(ErrorCode.INTERNAL, display.sanitizeErrorMessage((err as Error).message));
       }
     });
 }

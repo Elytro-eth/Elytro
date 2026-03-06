@@ -1,6 +1,6 @@
 {
   "name": "@elytro/cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Elytro ERC-4337 Smart Account Wallet CLI",
   "type": "module",
   "bin": {

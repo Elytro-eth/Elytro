@@ -179,6 +179,69 @@ export interface HookError {
   message?: string;
 }
 
+// ─── Social Recovery ──────────────────────────────────────────────────
+
+export type TRecoveryContact = {
+  /** Optional human-readable label for the guardian */
+  label?: string;
+  /** Guardian EOA address */
+  address: string;
+  /** Whether this guardian has signed the approval hash */
+  confirmed?: boolean;
+};
+
+export type TRecoveryContactsInfo = {
+  /** Salt used when computing the guardian hash (bytes32) */
+  salt: string;
+  /** Minimum number of guardian signatures required */
+  threshold: number;
+  /** Array of guardian addresses */
+  contacts: string[];
+};
+
+export type TRecoveryRecord = Omit<TRecoveryContactsInfo, 'contacts'> & {
+  /** Smart account address being recovered */
+  address: string;
+  /** Chain ID of the smart account */
+  chainId: number;
+  /** EIP-712 typed data hash that guardians must sign */
+  approveHash: string;
+  /** On-chain recovery operation ID (keccak256 of packed params) */
+  recoveryID: string;
+  /** List of guardian addresses that have already signed */
+  signedGuardians: string[];
+  /** Current recovery status (RecoveryStatusEn) */
+  status: number;
+  /** Block number from which to start scanning for ApproveHash events */
+  fromBlock: string;
+  /** Contacts with confirmation state */
+  contacts: TRecoveryContact[];
+  /** New owner address for recovery */
+  owner: string;
+};
+
+export type RecoveryInfo = {
+  /** On-chain guardian hash (bytes32) */
+  contactsHash: string;
+  /** Recovery nonce — increments after each recovery */
+  nonce: bigint;
+  /** Time delay (seconds) before recovery can be finalized */
+  delayPeriod: bigint;
+};
+
+export enum RecoveryStatusEn {
+  /** UX-only: waiting for guardians to sign approveHash off-chain */
+  WAITING_FOR_SIGNATURE = 9,
+  /** On-chain: Unset — enough signatures collected, ready to submit */
+  SIGNATURE_COMPLETED = 0,
+  /** On-chain: Waiting — recovery submitted, delay period active */
+  RECOVERY_STARTED = 1,
+  /** On-chain: Ready — delay period elapsed, can finalize */
+  RECOVERY_READY = 2,
+  /** On-chain: Done — recovery finalized, new owner active */
+  RECOVERY_COMPLETED = 3,
+}
+
 // ─── Nullable helper ────────────────────────────────────────────────
 
 export type Nullable<T> = T | null | undefined;

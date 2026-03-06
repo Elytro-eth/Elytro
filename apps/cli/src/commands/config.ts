@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import type { AppContext } from '../context';
 import type { UserKeys } from '../types';
 import * as display from '../utils/display';
+import { outputSuccess, outputError, ErrorCode } from '../utils/output';
 
 /**
  * `elytro config` — Manage CLI configuration.
@@ -32,34 +33,21 @@ export function registerConfigCommand(program: Command, ctx: AppContext): void {
     .command('show')
     .description('Show current endpoint configuration')
     .action(() => {
-      display.heading('Configuration');
-
       const keys = ctx.chain.getUserKeys();
-      const hasAlchemy = !!keys.alchemyKey;
-      const hasPimlico = !!keys.pimlicoKey;
-
-      display.info('RPC provider', hasAlchemy ? 'Alchemy (user-configured)' : 'Public (publicnode.com)');
-      display.info('Bundler provider', hasPimlico ? 'Pimlico (user-configured)' : 'Public (pimlico.io/public)');
-
-      if (keys.alchemyKey) {
-        display.info('Alchemy key', maskKey(keys.alchemyKey));
-      }
-      if (keys.pimlicoKey) {
-        display.info('Pimlico key', maskKey(keys.pimlicoKey));
-      }
-
-      console.log('');
       const chain = ctx.chain.currentChain;
-      display.info('Current chain', `${chain.name} (${chain.id})`);
-      display.info('RPC endpoint', display.maskApiKeys(chain.endpoint));
-      display.info('Bundler', display.maskApiKeys(chain.bundler));
 
-      if (!hasAlchemy || !hasPimlico) {
-        console.log('');
-        display.warn('Public endpoints have rate limits. Set your own keys for production use:');
-        if (!hasAlchemy) console.log('  elytro config set alchemy-key <YOUR_KEY>');
-        if (!hasPimlico) console.log('  elytro config set pimlico-key <YOUR_KEY>');
-      }
+      outputSuccess({
+        rpcProvider: keys.alchemyKey ? 'alchemy' : 'public',
+        bundlerProvider: keys.pimlicoKey ? 'pimlico' : 'public',
+        alchemyKey: keys.alchemyKey ? maskKey(keys.alchemyKey) : null,
+        pimlicoKey: keys.pimlicoKey ? maskKey(keys.pimlicoKey) : null,
+        currentChain: {
+          id: chain.id,
+          name: chain.name,
+          rpcEndpoint: display.maskApiKeys(chain.endpoint),
+          bundler: display.maskApiKeys(chain.bundler),
+        },
+      });
     });
 
   // ── set ────────────────────────────────────────────────────────
@@ -69,18 +57,22 @@ export function registerConfigCommand(program: Command, ctx: AppContext): void {
     .action(async (key: string, value: string) => {
       const mapped = KEY_MAP[key];
       if (!mapped) {
-        display.error(`Unknown key "${key}". Valid keys: ${VALID_KEYS.join(', ')}`);
-        process.exitCode = 1;
+        outputError(ErrorCode.INVALID_PARAMS, `Unknown key "${key}". Valid keys: ${VALID_KEYS.join(', ')}`, {
+          key,
+          validKeys: VALID_KEYS,
+        });
         return;
       }
 
       await ctx.chain.setUserKey(mapped, value);
-      display.success(`${key} saved. Endpoints updated.`);
 
-      // Show the new endpoint for current chain
       const chain = ctx.chain.currentChain;
-      display.info('RPC endpoint', display.maskApiKeys(chain.endpoint));
-      display.info('Bundler', display.maskApiKeys(chain.bundler));
+      outputSuccess({
+        status: 'saved',
+        key,
+        rpcEndpoint: display.maskApiKeys(chain.endpoint),
+        bundler: display.maskApiKeys(chain.bundler),
+      });
     });
 
   // ── remove ─────────────────────────────────────────────────────
@@ -90,12 +82,19 @@ export function registerConfigCommand(program: Command, ctx: AppContext): void {
     .action(async (key: string) => {
       const mapped = KEY_MAP[key];
       if (!mapped) {
-        display.error(`Unknown key "${key}". Valid keys: ${VALID_KEYS.join(', ')}`);
-        process.exitCode = 1;
+        outputError(ErrorCode.INVALID_PARAMS, `Unknown key "${key}". Valid keys: ${VALID_KEYS.join(', ')}`, {
+          key,
+          validKeys: VALID_KEYS,
+        });
         return;
       }
 
       await ctx.chain.removeUserKey(mapped);
-      display.success(`${key} removed. Reverted to public endpoint.`);
+
+      outputSuccess({
+        status: 'removed',
+        key,
+        hint: 'Reverted to public endpoint.',
+      });
     });
 }
