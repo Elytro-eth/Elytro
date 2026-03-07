@@ -21,7 +21,11 @@ import { sanitizeErrorMessage } from './utils/display';
 
 const program = new Command();
 
-program.name('elytro').description('Elytro — ERC-4337 Smart Account Wallet CLI').version('0.0.1');
+program
+  .name('elytro')
+  .description('Elytro — ERC-4337 Smart Account Wallet CLI')
+  .version('0.0.1')
+  .addHelpText('after', '\nLearn how to use Elytro skills: https://github.com/Elytro-eth/skills\n');
 
 async function main(): Promise<void> {
   let ctx: Awaited<ReturnType<typeof createAppContext>> | null = null;
