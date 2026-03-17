@@ -1,1 +1,0 @@
-type SafeAny = any;
